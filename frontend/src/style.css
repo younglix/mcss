@@ -607,7 +607,66 @@ textarea {
   }
 
   .mcss-route-navigator {
-    display: none;
+    display: block;
+    left: 12px;
+    right: auto;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    z-index: 10000;
+  }
+
+  .mcss-route-navigator summary {
+    width: 46px;
+    min-width: 46px;
+    height: 46px;
+    min-height: 46px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 999px;
+    font-size: 0;
+  }
+
+  .mcss-route-navigator summary .material-symbols-outlined {
+    font-size: 22px;
+  }
+
+  .mcss-route-panel {
+    left: 0;
+    right: auto;
+    bottom: 56px;
+    width: min(330px, calc(100vw - 24px));
+    max-height: min(520px, calc(100vh - 120px));
+    border-radius: 16px;
+  }
+
+  .stitch-screen[data-screen-title="Public Landing"] > div > div:first-child {
+    min-height: 28px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    align-items: center !important;
+  }
+
+  .stitch-screen[data-screen-title="Public Landing"] > div > div:first-child p,
+  .stitch-screen[data-screen-title="Public Landing"] > div > div:first-child a {
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+
+  .stitch-screen[data-screen-title="Public Landing"] > div > div:first-child .material-symbols-outlined {
+    font-size: 15px !important;
+  }
+
+  .stitch-screen[data-screen-title="Public Landing"] header.fixed {
+    top: 28px !important;
+  }
+
+  .stitch-screen[data-screen-title="Public Landing"] header.fixed > div {
+    height: 58px !important;
+  }
+
+  .stitch-screen[data-screen-title="Public Landing"] section[class*="pt-[105px]"] {
+    padding-top: 86px !important;
   }
 }
 
@@ -644,5 +703,23 @@ textarea {
 
   .stitch-screen.needs-mobile-polish :is(th, td) {
     padding: 10px 12px !important;
+  }
+
+  .stitch-screen[data-screen-title="Public Landing"] > div > div:first-child {
+    min-height: 24px !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+  }
+
+  .stitch-screen[data-screen-title="Public Landing"] header.fixed {
+    top: 24px !important;
+  }
+
+  .stitch-screen[data-screen-title="Public Landing"] header.fixed > div {
+    height: 54px !important;
+  }
+
+  .stitch-screen[data-screen-title="Public Landing"] section[class*="pt-[105px]"] {
+    padding-top: 78px !important;
   }
 }
