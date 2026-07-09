@@ -34,6 +34,43 @@ export default function StitchScreen({ title, bodyClassName, html }) {
     const root = screenRef.current;
     if (!root) return;
 
+    const shell = root.firstElementChild;
+    const landingHeader = title === 'Public Landing' ? root.querySelector('header') : null;
+    const landingBanner =
+      title === 'Public Landing' && shell?.firstElementChild?.textContent?.includes('Admissions')
+        ? shell.firstElementChild
+        : null;
+    let closeLandingBanner;
+
+    if (landingHeader && landingBanner) {
+      root.classList.add('landing-banner-layout');
+      landingHeader.classList.add('mcss-landing-header');
+      landingBanner.classList.add('mcss-landing-banner');
+      landingHeader.after(landingBanner);
+
+      if (!landingBanner.querySelector('.mcss-banner-close')) {
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'mcss-banner-close';
+        closeButton.setAttribute('aria-label', 'Hide admissions banner');
+        closeButton.textContent = '×';
+        landingBanner.append(closeButton);
+      }
+
+      if (sessionStorage.getItem('mcssLandingBannerHidden') === 'true') {
+        landingBanner.hidden = true;
+        root.classList.add('landing-banner-hidden');
+      }
+
+      closeLandingBanner = () => {
+        landingBanner.hidden = true;
+        root.classList.add('landing-banner-hidden');
+        sessionStorage.setItem('mcssLandingBannerHidden', 'true');
+      };
+
+      landingBanner.querySelector('.mcss-banner-close')?.addEventListener('click', closeLandingBanner);
+    }
+
     root.querySelectorAll('img').forEach((image) => {
       const descriptor = `${image.alt || ''} ${image.dataset.alt || ''} ${image.className || ''}`.toLowerCase();
       if (descriptor.includes('crest') || descriptor.includes('logo') || descriptor.includes('school seal')) {
@@ -160,6 +197,9 @@ export default function StitchScreen({ title, bodyClassName, html }) {
 
     return () => {
       observer?.disconnect();
+      if (closeLandingBanner) {
+        landingBanner?.querySelector('.mcss-banner-close')?.removeEventListener('click', closeLandingBanner);
+      }
       menuToggle?.removeEventListener('click', openMenu);
       menuClose?.removeEventListener('click', closeMenu);
       window.removeEventListener('scroll', handleScroll);
