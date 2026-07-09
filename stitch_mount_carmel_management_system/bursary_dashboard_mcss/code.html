@@ -1,0 +1,461 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Bursary Dashboard | Mount Carmel Secondary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&amp;family=Archivo+Narrow:wght@400;600&amp;family=Domine:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&amp;family=Arimo:wght@100..900&amp;family=Domine:wght@100..900&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#3c0022",
+                    "inverse-surface": "#2f3131",
+                    "on-tertiary-fixed-variant": "#8c0055",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f0f1f1",
+                    "primary-fixed-dim": "#e4b5ff",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed": "#3e0022",
+                    "background": "#f9f9f9",
+                    "tertiary-fixed-dim": "#ffb0ce",
+                    "on-primary-container": "#ba80df",
+                    "outline": "#7e7481",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#ff57aa",
+                    "surface-container": "#eeeeee",
+                    "tertiary-container": "#62003a",
+                    "surface-variant": "#e2e2e2",
+                    "secondary-fixed": "#dee0ff",
+                    "on-secondary-fixed": "#031159",
+                    "surface-container-highest": "#e2e2e2",
+                    "surface-container-high": "#e8e8e8",
+                    "surface": "#f9f9f9",
+                    "on-background": "#1a1c1c",
+                    "tertiary-fixed": "#ffd9e5",
+                    "secondary-fixed-dim": "#bbc3ff",
+                    "surface-bright": "#f9f9f9",
+                    "primary-container": "#4a0f6e",
+                    "on-surface": "#1a1c1c",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#364186",
+                    "outline-variant": "#cfc2d1",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#7d46a1",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#a6b1fe",
+                    "on-surface-variant": "#4c4450",
+                    "on-primary-fixed-variant": "#632c87",
+                    "on-secondary-fixed-variant": "#354185",
+                    "inverse-primary": "#e4b5ff",
+                    "error": "#ba1a1a",
+                    "primary": "#2e004a",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#2f004c",
+                    "surface-dim": "#dadada",
+                    "surface-container-low": "#f3f3f3",
+                    "secondary": "#4e599f",
+                    "primary-fixed": "#f4d9ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "xs": "4px",
+                    "xl": "40px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "md": "16px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "headline-xl": ["Arimo"],
+                    "headline-lg": ["Arimo"],
+                    "label-sm": ["Domine"],
+                    "headline-lg-mobile": ["Arimo"],
+                    "body-lg": ["Archivo Narrow"],
+                    "headline-md": ["Arimo"],
+                    "body-md": ["Archivo Narrow"],
+                    "label-md": ["Domine"]
+            },
+            "fontSize": {
+                    "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ribbon-tag {
+            position: relative;
+            padding-right: 20px;
+        }
+        .ribbon-tag::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 12px 10px 12px 0;
+            border-color: transparent white transparent transparent;
+        }
+        .donut-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+        svg.progress-ring {
+            transform: rotate(-90deg);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md">
+<!-- Sidebar Navigation -->
+<aside class="hidden lg:flex flex-col h-full fixed left-0 top-0 z-40 w-64 bg-primary dark:bg-tertiary shadow-sm">
+<div class="p-lg flex flex-col items-center border-b border-primary-container/20">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-primary text-headline-md">school</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-primary">MCSS Portal</h1>
+<p class="font-label-md text-label-md text-on-primary/70">Academic Excellence</p>
+</div>
+<nav class="flex-1 mt-lg px-sm">
+<a class="flex items-center gap-sm px-md py-sm mb-xs text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm mb-xs text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 transition-all" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md text-label-md">Academics</span>
+</a>
+<a class="flex items-center gap-sm border-l-4 border-on-tertiary-container bg-primary-container text-on-primary-container font-bold px-md py-sm mb-xs translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Finance</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm mb-xs text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 transition-all" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-label-md">Schedule</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm mb-xs text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 transition-all" href="#">
+<span class="material-symbols-outlined">menu</span>
+<span class="font-label-md text-label-md">More</span>
+</a>
+</nav>
+<div class="p-lg border-t border-primary-container/20">
+<div class="flex items-center gap-sm">
+<img class="w-10 h-10 rounded-full border-2 border-on-primary/30" data-alt="A professional portrait of a senior finance officer in business attire, set against a blurred institutional background of a mahogany-paneled office. The lighting is warm and directional, highlighting textures of quality fabric and polished wood. The aesthetic is authoritative yet accessible, mirroring a high-trust academic environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYVwnhvpkPzoI8EJ84LRmCO3OSAURsM4fkmyWqqkcMzrKiKY3yQ0SfWot_Om4mQPnvXQq5iLVLhlJpuIUqa2naR2Eb1Cf7R2qa1qjClSGMbtJZkG0HIoHYJ4UEgW-eghMfSeGdtBAiQt-BDdqtcjPieoowJwYvPoUlBFtcXElzoF74aoI8ZIf2EZTsZzpwqu2CS0BHEnuBBUsE6vJx7FjZb10HxTGbxYb8uXGPrOx3-h6f529QX5eY4AO6m73XofTrlaHriI8h8GVA">
+<div>
+<p class="font-label-md text-label-md text-on-primary">Admin User</p>
+<p class="text-[10px] text-on-primary/50 uppercase tracking-widest">Bursar Office</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-64 min-h-screen">
+<!-- Top Nav Bar -->
+<header class="flex justify-between items-center w-full px-lg py-sm bg-surface border-b border-outline-variant sticky top-0 z-30">
+<div class="flex items-center gap-md">
+<h2 class="font-headline-md text-headline-md font-bold text-primary">Bursary Dashboard</h2>
+<div class="bg-surface-container-low px-md py-xs rounded-full flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full animate-pulse bg-on-tertiary-container"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Live Financial Data</span>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="hidden md:flex items-center bg-surface-container px-md py-xs rounded-full border border-outline-variant w-64">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-full ml-xs" placeholder="Search accounts..." type="text">
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors">settings</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors">help</button>
+</div>
+</div>
+</header>
+<div class="p-lg max-w-container-max mx-auto">
+<!-- Hero Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg mb-xl">
+<!-- Total Fees Progress (Major Card) -->
+<div class="md:col-span-8 bg-white border border-outline-variant rounded-lg p-lg flex flex-col md:flex-row items-center gap-xl relative overflow-hidden shadow-sm justify-center">
+<div class="flex-1 space-y-md z-10">
+<span class="font-label-md text-label-md text-primary bg-primary-fixed px-md py-xs rounded-full">Term Collection Target</span>
+<h3 class="font-headline-lg text-headline-lg text-primary">Total Fees Collected</h3>
+<div class="flex items-baseline gap-xs">
+<span class="text-headline-xl font-headline-xl">₦142.8M</span>
+<span class="text-on-surface-variant font-label-md">/ ₦180M Target</span>
+</div>
+<p class="text-body-md text-on-surface-variant leading-relaxed">
+                            Currently at <span class="font-bold text-on-tertiary-fixed-variant">79.3%</span> of the collection goal for the Trinity Term. We are ahead of the projected timeline by 4.2 days.
+                        </p>
+<div class="flex gap-md pt-md">
+<button class="bg-primary text-white font-bold px-lg py-sm rounded-lg hover:opacity-90 transition-opacity flex items-center gap-sm">
+<span class="material-symbols-outlined">receipt_long</span>
+                                Generate Report
+                            </button>
+<button class="border border-secondary text-secondary font-bold px-lg py-sm rounded-lg hover:bg-secondary-container/10 transition-colors">
+                                View Details
+                            </button>
+</div>
+</div>
+<div class="donut-container z-10 mx-auto">
+<svg class="progress-ring" height="200" width="200">
+<circle class="text-surface-container" cx="100" cy="100" fill="transparent" r="80" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary" cx="100" cy="100" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502.65" stroke-dashoffset="103.5" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-headline-md font-headline-md">79%</span>
+<span class="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant">Achieved</span>
+</div>
+</div>
+<!-- Background Decoration -->
+<div class="absolute -right-16 -bottom-16 w-64 h-64 bg-primary-fixed/20 rounded-full blur-3xl -z-0"></div>
+</div>
+<!-- Outstanding Balances (Minor Card) -->
+<div class="md:col-span-4 bg-tertiary text-on-tertiary rounded-lg p-lg flex flex-col justify-between shadow-sm relative w-full">
+<div>
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-tertiary-fixed text-headline-lg">account_balance_wallet</span>
+<span class="bg-on-tertiary-container/30 text-on-tertiary-fixed px-md py-xs rounded-full font-label-sm">High Priority</span>
+</div>
+<h4 class="font-headline-md text-headline-md">Outstanding Balances</h4>
+<p class="text-headline-lg font-headline-xl mt-sm">₦37.2M</p>
+</div>
+<div class="space-y-sm mt-lg">
+<div class="flex justify-between text-body-md border-b border-on-tertiary/20 pb-xs">
+<span class="text-on-tertiary/70">JSS Classes</span>
+<span class="font-bold">₦12.4M</span>
+</div>
+<div class="flex justify-between text-body-md border-b border-on-tertiary/20 pb-xs">
+<span class="text-on-tertiary/70">SSS Classes</span>
+<span class="font-bold">₦24.8M</span>
+</div>
+<p class="text-[12px] italic text-on-tertiary/50 mt-sm">Total 142 students remaining</p>
+</div>
+</div>
+</div>
+<!-- Dashboard Sections Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg md:grid-cols-1">
+<!-- Quick Stats by Class (Asymmetric Sidebar in main content) -->
+<div class="lg:col-span-4 space-y-lg">
+<section class="bg-white border border-outline-variant rounded-lg overflow-hidden">
+<div class="bg-surface-container-high px-lg py-md border-b border-outline-variant">
+<h3 class="font-label-md text-label-md uppercase tracking-wider text-primary">Efficiency by Arm</h3>
+</div>
+<div class="p-lg space-y-md">
+<!-- Class Progress Bar -->
+<div class="space-y-xs">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="">JSS 1 (A-D)</span>
+<span class="text-primary font-bold">92%</span>
+</div>
+<div class="w-full bg-surface-container-low h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 92%"></div>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="">JSS 2 (A-D)</span>
+<span class="text-primary font-bold">85%</span>
+</div>
+<div class="w-full bg-surface-container-low h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="">JSS 3 (A-D)</span>
+<span class="text-primary font-bold">78%</span>
+</div>
+<div class="w-full bg-surface-container-low h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="">SSS 1-3</span>
+<span class="text-primary font-bold">64%</span>
+</div>
+<div class="w-full bg-surface-container-low h-2 rounded-full overflow-hidden">
+<div class="bg-on-tertiary-fixed-variant h-full rounded-full" style="width: 64%"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Summary Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg flex items-start gap-md">
+<span class="material-symbols-outlined text-primary-container text-headline-lg">info</span>
+<div>
+<h4 class="font-label-md text-label-md text-primary mb-xs">Action Required</h4>
+<p class="text-body-md text-on-surface-variant">The "Mid-Term Balance Clearance" notices are scheduled to be dispatched via email and SMS tomorrow at 08:00 AM.</p>
+<a class="inline-block mt-sm font-bold text-secondary text-label-sm border-b-2 border-secondary" href="#">Manage Notifications</a>
+</div>
+</div>
+</div>
+<!-- Recent Transactions (Main Content Table) -->
+<div class="lg:col-span-8 bg-white border border-outline-variant rounded-lg overflow-hidden">
+<div class="bg-surface-container-high px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-primary">Recent Transactions</h3>
+<button class="text-label-md font-label-md text-secondary hover:text-primary transition-colors flex items-center gap-xs">
+                            View All History <span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse min-w-[600px]">
+<thead>
+<tr class="bg-primary text-white font-label-md text-label-md uppercase tracking-wider text-left">
+<th class="px-lg py-md font-medium">Reference ID</th>
+<th class="px-lg py-md font-medium">Student / Class</th>
+<th class="px-lg py-md font-medium">Amount</th>
+<th class="px-lg py-md font-medium">Status</th>
+<th class="px-lg py-md font-medium">Date</th>
+</tr>
+</thead>
+<tbody class="text-body-md font-body-md divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-md text-on-surface-variant font-mono">#TRX-99201</td>
+<td class="px-lg py-md">
+<div class="font-bold text-primary">Chukwudi Nwachukwu</div>
+<div class="text-[12px] text-on-surface-variant">SSS 2 Science</div>
+</td>
+<td class="px-lg py-md font-bold">₦125,000</td>
+<td class="px-lg py-md">
+<div class="bg-green-100 text-green-800 text-[10px] font-bold px-md py-xs rounded-full inline-block uppercase ribbon-tag">Cleared</div>
+</td>
+<td class="px-lg py-md text-on-surface-variant">Today, 10:42 AM</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-md text-on-surface-variant font-mono">#TRX-99198</td>
+<td class="px-lg py-md">
+<div class="font-bold text-primary">Aditiya O. Sharma</div>
+<div class="text-[12px] text-on-surface-variant">JSS 1 Blue</div>
+</td>
+<td class="px-lg py-md font-bold">₦85,000</td>
+<td class="px-lg py-md">
+<div class="bg-green-100 text-green-800 text-[10px] font-bold px-md py-xs rounded-full inline-block uppercase ribbon-tag">Cleared</div>
+</td>
+<td class="px-lg py-md text-on-surface-variant">Today, 09:15 AM</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-md text-on-surface-variant font-mono">#TRX-99195</td>
+<td class="px-lg py-md">
+<div class="font-bold text-primary">Blessing Effiong</div>
+<div class="text-[12px] text-on-surface-variant">SSS 3 Arts</div>
+</td>
+<td class="px-lg py-md font-bold">₦210,000</td>
+<td class="px-lg py-md">
+<div class="bg-amber-100 text-amber-800 text-[10px] font-bold px-md py-xs rounded-full inline-block uppercase">Pending</div>
+</td>
+<td class="px-lg py-md text-on-surface-variant">Today, 08:30 AM</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-md text-on-surface-variant font-mono">#TRX-99192</td>
+<td class="px-lg py-md">
+<div class="font-bold text-primary">Ibrahim Abubakar</div>
+<div class="text-[12px] text-on-surface-variant">JSS 3 Gold</div>
+</td>
+<td class="px-lg py-md font-bold">₦15,000</td>
+<td class="px-lg py-md">
+<div class="bg-green-100 text-green-800 text-[10px] font-bold px-md py-xs rounded-full inline-block uppercase ribbon-tag">Cleared</div>
+</td>
+<td class="px-lg py-md text-on-surface-variant">Yesterday</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-md text-on-surface-variant font-mono">#TRX-99189</td>
+<td class="px-lg py-md">
+<div class="font-bold text-primary">Fatima Zahra</div>
+<div class="text-[12px] text-on-surface-variant">SSS 1 Science</div>
+</td>
+<td class="px-lg py-md font-bold">₦145,000</td>
+<td class="px-lg py-md">
+<div class="bg-green-100 text-green-800 text-[10px] font-bold px-md py-xs rounded-full inline-block uppercase ribbon-tag">Cleared</div>
+</td>
+<td class="px-lg py-md text-on-surface-variant">Yesterday</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-md text-on-surface-variant font-mono">#TRX-99185</td>
+<td class="px-lg py-md">
+<div class="font-bold text-primary">Tunde Adebayo</div>
+<div class="text-[12px] text-on-surface-variant">JSS 2 Green</div>
+</td>
+<td class="px-lg py-md font-bold">₦40,000</td>
+<td class="px-lg py-md">
+<div class="bg-error-container text-on-error-container text-[10px] font-bold px-md py-xs rounded-full inline-block uppercase">Failed</div>
+</td>
+<td class="px-lg py-md text-on-surface-variant">Yesterday</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom Mobile Navigation -->
+<nav class="fixed bottom-md left-0 right-0 w-[calc(100%-48px)] mx-auto z-50 flex justify-around items-center py-sm px-md lg:hidden bg-inverse-surface dark:bg-tertiary rounded-full shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">grade</span>
+<span class="font-label-sm text-[10px]">Grades</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-tertiary-container bg-tertiary-container/20 rounded-full p-2 scale-95 duration-100" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-sm text-[10px]">Fees</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">event_note</span>
+<span class="font-label-sm text-[10px]">Time</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">more_vert</span>
+<span class="font-label-sm text-[10px]">More</span>
+</a>
+</nav>
+</main>
+<script>
+        // Simple interactive micro-interactions
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', () => {
+                const ref = row.querySelector('.font-mono').innerText;
+                console.log('Viewing details for ' + ref);
+                // Future expansion: Open modal with detailed transaction history
+            });
+        });
+
+        // Simulating live data update every 30 seconds
+        setInterval(() => {
+            const statusDot = document.querySelector('.animate-pulse');
+            statusDot.classList.remove('bg-on-tertiary-container');
+            statusDot.classList.add('bg-on-secondary-container');
+            setTimeout(() => {
+                statusDot.classList.add('bg-on-tertiary-container');
+                statusDot.classList.remove('bg-on-secondary-container');
+            }, 1000);
+        }, 30000);
+    </script>
+
+
+</body></html>

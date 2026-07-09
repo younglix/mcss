@@ -1,0 +1,429 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Mount Carmel Secondary - Mess &amp; Dining Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&amp;family=Archivo+Narrow:wght@400;500;600;700&amp;family=Domine:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&amp;family=Arimo:wght@100..900&amp;family=Domine:wght@100..900&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ribbon-tag {
+            position: relative;
+            clip-path: polygon(100% 0%, 95% 50%, 100% 100%, 0 100%, 0% 50%, 0 0);
+            padding-right: 1.5rem;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(229, 231, 235, 1);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4e599f;
+            border-radius: 10px;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#62003a",
+                    "on-tertiary-fixed": "#3e0022",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-primary-container": "#ba80df",
+                    "surface-container-high": "#e8e8e8",
+                    "on-error": "#ffffff",
+                    "primary-container": "#4a0f6e",
+                    "on-secondary-fixed": "#031159",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#ffd9e5",
+                    "on-tertiary-container": "#ff57aa",
+                    "surface-variant": "#e2e2e2",
+                    "inverse-primary": "#e4b5ff",
+                    "secondary-fixed": "#dee0ff",
+                    "outline-variant": "#cfc2d1",
+                    "primary-fixed-dim": "#e4b5ff",
+                    "primary": "#2e004a",
+                    "on-primary-fixed-variant": "#632c87",
+                    "inverse-surface": "#2f3131",
+                    "on-primary-fixed": "#2f004c",
+                    "inverse-on-surface": "#f0f1f1",
+                    "background": "#f9f9f9",
+                    "on-secondary-container": "#364186",
+                    "surface-container-low": "#f3f3f3",
+                    "tertiary-fixed-dim": "#ffb0ce",
+                    "on-background": "#1a1c1c",
+                    "on-surface": "#1a1c1c",
+                    "secondary-container": "#a6b1fe",
+                    "secondary-fixed-dim": "#bbc3ff",
+                    "surface-tint": "#7d46a1",
+                    "tertiary": "#3c0022",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#dadada",
+                    "surface-bright": "#f9f9f9",
+                    "on-secondary-fixed-variant": "#354185",
+                    "primary-fixed": "#f4d9ff",
+                    "surface-container": "#eeeeee",
+                    "surface": "#f9f9f9",
+                    "secondary": "#4e599f",
+                    "outline": "#7e7481",
+                    "on-surface-variant": "#4c4450",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed-variant": "#8c0055",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "xl": "40px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "md": "16px",
+                    "gutter": "24px",
+                    "sm": "8px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Arimo"],
+                    "body-lg": ["Archivo Narrow"],
+                    "label-sm": ["Domine"],
+                    "label-md": ["Domine"],
+                    "body-md": ["Archivo Narrow"],
+                    "headline-md": ["Arimo"],
+                    "headline-xl": ["Arimo"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+<!-- SideNavBar Anchor -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-primary flex flex-col py-md z-40 shadow-sm hidden lg:flex">
+<div class="px-gutter mb-xl">
+<h1 class="font-headline-md text-headline-md text-on-primary font-bold">Mount Carmel</h1>
+<p class="font-label-md text-label-md text-on-primary/70">Admin Portal</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md min-h-[48px]" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md min-h-[48px]" href="#">
+<span class="material-symbols-outlined mr-3">school</span> Students
+            </a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md min-h-[48px]" href="#">
+<span class="material-symbols-outlined mr-3">auto_stories</span> Academics
+            </a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md min-h-[48px]" href="#">
+<span class="material-symbols-outlined mr-3">payments</span> Finance
+            </a>
+<!-- Active State: Mess/Dining (mapped to Dashboard/Operations flow) -->
+<a class="flex items-center border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary py-3 px-4 transition-all duration-200 ease-in-out font-label-md min-h-[48px]" href="#">
+<span class="material-symbols-outlined mr-3">restaurant</span> Mess/Dining
+            </a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md min-h-[48px]" href="#">
+<span class="material-symbols-outlined mr-3">description</span> Reports
+            </a>
+</nav>
+<div class="mt-auto border-t border-on-primary/10 pt-md">
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md" href="#">
+<span class="material-symbols-outlined mr-3">settings</span> Settings
+            </a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md" href="#">
+<span class="material-symbols-outlined mr-3">logout</span> Logout
+            </a>
+</div>
+</aside>
+<!-- TopNavBar Anchor -->
+<header class="fixed top-0 left-64 right-0 bg-surface h-16 border-b border-outline-variant z-30 left-0 lg:left-64">
+<div class="flex justify-between items-center w-full px-gutter h-full">
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:outline-none focus:border-primary w-64 transition-all" placeholder="Search menu items..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex gap-md text-on-surface-variant">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">apps</span></button>
+</div>
+<div class="h-8 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface leading-none">Admin Office</p>
+<p class="text-[10px] text-on-surface-variant font-label-sm uppercase tracking-wider">Staff Login</p>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a school administrator in a navy blue blazer, set against a blurred institutional background of high-end library bookshelves. The lighting is soft and directional, creating a sense of academic authority and technical precision. The color palette is dominated by deep blues and warm wood tones, reflecting a prestigious secondary school environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHfuvWkZLCu_LsvBwYhA58Awc20oWjmsizhmvFPp7DwO4tOoWTSbrGdyfbNeTl_6v26dSMubXCGVmgYDla9E6xVwbdEevFAI9-3W0On29tszGKTThsPzbgMr5OilyKGYTwK6IGhtxOFrFj_HF8Y1o-CLXRfv3F7UY92eDwL5biArhhGwO0YTvvRagNPwyXoHhVL5R_7AiJrEN_qI6zPjEAN-JBGylBaOWJm3CFjWkgSZ5M1Z5FMjW6SFOm_AElFVBkGZsTJ4konprK">
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-16 min-h-screen bg-background ml-0 lg:ml-64">
+<div class="p-xl max-w-container-max mx-auto">
+<!-- Header Section -->
+<div class="mb-xl flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Mess &amp; Dining Management</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Administer nutritional plans, schedules, and inventory for academic excellence.</p>
+</div>
+<div class="flex gap-md">
+<button class="px-md py-2 border border-secondary text-secondary rounded-full font-label-md hover:bg-secondary-fixed-dim transition-all flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px]">print</span> Export Menu
+                    </button>
+<button class="px-md py-2 bg-primary text-on-primary rounded-full font-label-md hover:opacity-90 transition-all flex items-center gap-xs shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add</span> Update Plan
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="bento-grid">
+<!-- Weekly Meal Plan (Large Centerpiece) -->
+<section class="col-span-8 bg-surface border border-outline-variant rounded-lg overflow-hidden shadow-sm flex flex-col col-span-12 lg:col-span-8">
+<div class="bg-surface-container-low p-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">calendar_month</span> Weekly Meal Plan: Oct 21 - Oct 27
+                        </h3>
+<div class="flex items-center gap-sm bg-white rounded-full p-1 border border-outline-variant">
+<button class="p-1 hover:bg-surface-container rounded-full transition-colors"><span class="material-symbols-outlined">chevron_left</span></button>
+<span class="font-label-sm text-on-surface px-2">Next Week</span>
+<button class="p-1 hover:bg-surface-container rounded-full transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+<div class="p-0 overflow-x-auto">
+<table class="w-full border-collapse font-body-md">
+<thead class="bg-primary text-on-primary">
+<tr>
+<th class="py-4 px-4 text-left font-label-md border-r border-on-primary/10">Session</th>
+<th class="py-4 px-4 text-left font-label-md">Monday</th>
+<th class="py-4 px-4 text-left font-label-md">Tuesday</th>
+<th class="py-4 px-4 text-left font-label-md">Wednesday</th>
+<th class="py-4 px-4 text-left font-label-md">Thursday</th>
+<th class="py-4 px-4 text-left font-label-md">Friday</th>
+</tr>
+</thead>
+<tbody class="text-on-surface-variant divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="bg-surface-container-low py-4 px-4 font-bold border-r border-outline-variant text-primary">Breakfast</td>
+<td class="p-4"><p class="font-semibold text-on-surface">Oatmeal &amp; Fruits</p><span class="text-xs">Milk, Nuts, Tea</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Whole Grain Toast</p><span class="text-xs">Eggs, Juice</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Cornflakes</p><span class="text-xs">Fruit Platter, Milk</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Pancakes</p><span class="text-xs">Syrup, Yogurt</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Scrambled Eggs</p><span class="text-xs">Avocado, Bread</span></td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="bg-surface-container-low py-4 px-4 font-bold border-r border-outline-variant text-primary">Lunch</td>
+<td class="p-4 bg-primary-container/5"><p class="font-semibold text-on-surface">Grilled Chicken</p><span class="text-xs">Quinoa Salad, Peas</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Beef Stew</p><span class="text-xs">Mashed Potatoes</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Vegetable Pasta</p><span class="text-xs">Garlic Bread, Corn</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Fish Fillet</p><span class="text-xs">Rice, Steamed Veg</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Roast Turkey</p><span class="text-xs">Sweet Potato, Broccoli</span></td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="bg-surface-container-low py-4 px-4 font-bold border-r border-outline-variant text-primary">Dinner</td>
+<td class="p-4"><p class="font-semibold text-on-surface">Lentil Soup</p><span class="text-xs">Dinner Roll, Salad</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Stir-fry Veggies</p><span class="text-xs">Tofu, Brown Rice</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Chicken Curry</p><span class="text-xs">Naan, Cucumber Raita</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Shepherd's Pie</p><span class="text-xs">Mixed Greens</span></td>
+<td class="p-4"><p class="font-semibold text-on-surface">Taco Bar</p><span class="text-xs">Beans, Salsa, Cheese</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Hostel-wise Dining Schedule (Vertical Column) -->
+<aside class="col-span-4 space-y-lg col-span-12 lg:col-span-4">
+<div class="bg-surface border border-outline-variant rounded-lg p-lg shadow-sm">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest">Dining Rotation</h3>
+<span class="material-symbols-outlined text-primary">schedule</span>
+</div>
+<div class="space-y-md">
+<div class="flex items-center justify-between p-md bg-surface-container-low rounded-md border-l-4 border-tertiary">
+<div>
+<p class="font-label-md text-primary">St. Jude’s House</p>
+<p class="text-xs text-on-surface-variant">07:00 AM - 07:45 AM</p>
+</div>
+<div class="bg-tertiary-fixed text-on-tertiary-fixed text-[10px] px-2 py-1 rounded font-bold uppercase">Current</div>
+</div>
+<div class="flex items-center justify-between p-md bg-white border border-outline-variant rounded-md">
+<div>
+<p class="font-label-md text-on-surface">St. Mary’s House</p>
+<p class="text-xs text-on-surface-variant">07:45 AM - 08:30 AM</p>
+</div>
+<div class="text-[10px] text-on-surface-variant font-bold uppercase">Next</div>
+</div>
+<div class="flex items-center justify-between p-md bg-white border border-outline-variant rounded-md">
+<div>
+<p class="font-label-md text-on-surface">St. Francis House</p>
+<p class="text-xs text-on-surface-variant">08:30 AM - 09:15 AM</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-md bg-white border border-outline-variant rounded-md">
+<div>
+<p class="font-label-md text-on-surface">St. Peter’s House</p>
+<p class="text-xs text-on-surface-variant">09:15 AM - 10:00 AM</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-lg py-2 text-primary font-label-md hover:underline decoration-2 underline-offset-4">Adjust Timings</button>
+</div>
+<div class="bg-secondary p-lg rounded-lg text-on-secondary shadow-sm relative overflow-hidden h-48">
+<div class="relative z-10">
+<h3 class="font-headline-md text-[20px] mb-xs">Inventory Status</h3>
+<p class="font-body-md opacity-80 mb-md text-sm">Critical stock levels for upcoming festive banquet.</p>
+<div class="space-y-sm">
+<div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+<div class="bg-on-primary-container h-full w-[85%]"></div>
+</div>
+<div class="flex justify-between text-xs font-label-md">
+<span class="">Grains &amp; Pulses</span>
+<span class="">85% Sufficient</span>
+</div>
+</div>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]">inventory_2</span>
+</div>
+</div>
+</aside>
+<!-- Menu Management (Wide Horizontal) -->
+<section class="col-span-12 glass-card rounded-lg p-lg border border-outline-variant">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest">Active Menu Items &amp; Allergens</h3>
+<div class="flex gap-sm">
+<button class="px-3 py-1 text-xs font-bold border border-outline rounded-full text-on-surface-variant hover:bg-surface-container transition-all">All Categories</button>
+<button class="px-3 py-1 text-xs font-bold bg-primary text-on-primary rounded-full">Vegetarian</button>
+<button class="px-3 py-1 text-xs font-bold border border-outline rounded-full text-on-surface-variant">Gluten-Free</button>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-lg grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+<!-- Menu Item Card 1 -->
+<div class="group border border-outline-variant rounded-lg p-md hover:border-primary transition-all bg-white">
+<div class="aspect-video w-full rounded-md mb-md overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform" data-alt="A high-definition culinary photograph of a vibrant Mediterranean quinoa salad with roasted chickpeas and lemon zest, presented in a minimalist ceramic bowl. The lighting is crisp and natural, emphasizing textures and colors. The style is modern institutional, clean and high-trust, suitable for an elite academic dining menu." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsNR1TuHQdAMvfN7x_m-XcFfa8Mvp7BY1PntlP89HGc9NjnGMU5609Jh2aueRJj7JACSIthkZfp2dOyqDywrbvl9Pn6JjavZ0r-_DwLN38Bznoj-R4b-qtIltZPP7XpbFiB3TuylkrCF5uGZi9IndPW9waA-FgLIODchB6kGgC9wcV8MwDzEhrrgR9qCo_MeRYNFpO4SyQ3uJqn7T58OmuvrjZiU1Oi6Jfle2gdqeWM7dFNLPsxAa_1D2S0RCTL95X0Jx3h6wYGlqK">
+</div>
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-on-surface">Zesty Quinoa Salad</h4>
+<span class="material-symbols-outlined text-primary text-sm">edit</span>
+</div>
+<div class="mt-sm flex flex-wrap gap-xs">
+<span class="ribbon-tag bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5">High Fiber</span>
+<span class="bg-surface-container-highest text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded-full">Vegan</span>
+</div>
+</div>
+<!-- Menu Item Card 2 -->
+<div class="group border border-outline-variant rounded-lg p-md hover:border-primary transition-all bg-white">
+<div class="aspect-video w-full rounded-md mb-md overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform" data-alt="A gourmet close-up shot of a herb-crusted grilled chicken breast served with roasted root vegetables. The plate is elegantly arranged on a dark stone surface, lit with dramatic, focused lighting that highlights the golden-brown crust. Professional food photography style, representing the high standard of nutrition and meal quality at a prestigious secondary school." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDDS_e15MOVCc8V5sXRh1QpbKawSEKMOC6z0mHbw3oWF99FjLCppuaesnOzTUx9j8uS71JvzB5JXoCjPhG9DUdwQDH4QElIatB12IbtxRom0cwIqmuvo0OL8uVyHL9JvpDSPrcSqhqLCdC0rA8cV88zHykH7PcpimebIgzdY1TXpiet9VRFo1Ft5j_SxKzrg9KD6iYTiuOPkjVKKHhDdEqnExt6PwCfDR4qWmjiw2RdowukaetBCfxg2QfMuKPR1bEMDQNAgWOuC9t">
+</div>
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-on-surface">Herb-Crusted Chicken</h4>
+<span class="material-symbols-outlined text-primary text-sm">edit</span>
+</div>
+<div class="mt-sm flex flex-wrap gap-xs">
+<span class="ribbon-tag bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5">Protein Rich</span>
+<span class="bg-surface-container-highest text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded-full">Nut-Free</span>
+</div>
+</div>
+<!-- Menu Item Card 3 -->
+<div class="group border border-outline-variant rounded-lg p-md hover:border-primary transition-all bg-white">
+<div class="aspect-video w-full rounded-md mb-md overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform" data-alt="A warm, steaming bowl of artisanal lentil soup garnished with fresh parsley and a drizzle of olive oil, served alongside a toasted whole-grain baguette. The composition uses soft, warm lighting to create an inviting and wholesome mood. High-contrast colors and clean lines align with a modern institutional aesthetic for a premium school dining module." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtrX40Tu7YVQnRK3g280_BAImiWcjMV8aKXvzMcT6Phs_-Vqzw4zGfQhUu1Tp5OUTO_EC1t-drS9Hj_H6wWmvjpALNsx9r830Oz-y-wNYR1FqcQo2FYtO76NaEHb65cv5HpnBTx-uqgyo-Nets688-O3TtGX0xX7aA_6g6-P52kmvDuqSlFVYP1mUsSxVAk8iHW_VLbVN88DSBNr-83u2yuQPNVECyHq_OsvXF427YPZC2-hhy8NV4KZAMuvCRKn1_-8jokkHRha5d">
+</div>
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-on-surface">Artisan Lentil Stew</h4>
+<span class="material-symbols-outlined text-primary text-sm">edit</span>
+</div>
+<div class="mt-sm flex flex-wrap gap-xs">
+<span class="ribbon-tag bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5">Gluten-Free</span>
+<span class="bg-surface-container-highest text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded-full">Vegetarian</span>
+</div>
+</div>
+<!-- Add New Item Slot -->
+<button class="border-2 border-dashed border-outline-variant rounded-lg flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[40px] mb-xs">add_circle</span>
+<span class="font-label-md">Add Menu Item</span>
+</button>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer Anchor -->
+<footer class="ml-64 w-[calc(100%-16rem)] py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary text-on-secondary ml-0 w-full lg:ml-64 lg:w-[calc(100%-16rem)]">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-secondary font-bold mb-xs">Mount Carmel Secondary</h2>
+<p class="font-label-sm text-label-sm opacity-80">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>
+</div>
+<div class="flex flex-wrap gap-lg justify-end">
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Campus Safety</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity underline font-bold" href="#">Contact Us</a>
+</div>
+</footer>
+<script>
+        // Micro-interaction for sidebar links
+        document.querySelectorAll('aside nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!this.classList.contains('border-l-4')) {
+                    document.querySelectorAll('aside nav a').forEach(l => {
+                        l.classList.remove('border-l-4', 'border-tertiary-container', 'bg-primary-container/20', 'text-on-primary');
+                        l.classList.add('text-on-primary/70');
+                    });
+                    this.classList.add('border-l-4', 'border-tertiary-container', 'bg-primary-container/20', 'text-on-primary');
+                    this.classList.remove('text-on-primary/70');
+                }
+            });
+        });
+
+        // Search bar interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-105');
+            searchInput.classList.add('shadow-md');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-105');
+            searchInput.classList.remove('shadow-md');
+        });
+    </script>
+
+
+</body></html>

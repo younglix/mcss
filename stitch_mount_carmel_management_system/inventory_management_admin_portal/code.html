@@ -1,0 +1,496 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Mount Carmel Secondary - Inventory Admin Portal</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&amp;family=Arimo:ital,wght@0,400..700;1,400..700&amp;family=Domine:wght@400..700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Design System Theme Integration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "tertiary-container": "#62003a",
+                "on-tertiary-fixed": "#3e0022",
+                "surface-container-lowest": "#ffffff",
+                "on-secondary": "#ffffff",
+                "surface-container-highest": "#e2e2e2",
+                "on-primary-container": "#ba80df",
+                "surface-container-high": "#e8e8e8",
+                "on-error": "#ffffff",
+                "primary-container": "#4a0f6e",
+                "on-secondary-fixed": "#031159",
+                "on-error-container": "#93000a",
+                "tertiary-fixed": "#ffd9e5",
+                "on-tertiary-container": "#ff57aa",
+                "surface-variant": "#e2e2e2",
+                "inverse-primary": "#e4b5ff",
+                "secondary-fixed": "#dee0ff",
+                "outline-variant": "#cfc2d1",
+                "primary-fixed-dim": "#e4b5ff",
+                "primary": "#2e004a",
+                "on-primary-fixed-variant": "#632c87",
+                "inverse-surface": "#2f3131",
+                "on-primary-fixed": "#2f004c",
+                "inverse-on-surface": "#f0f1f1",
+                "background": "#f9f9f9",
+                "on-secondary-container": "#364186",
+                "surface-container-low": "#f3f3f3",
+                "tertiary-fixed-dim": "#ffb0ce",
+                "on-background": "#1a1c1c",
+                "on-surface": "#1a1c1c",
+                "secondary-container": "#a6b1fe",
+                "secondary-fixed-dim": "#bbc3ff",
+                "surface-tint": "#7d46a1",
+                "tertiary": "#3c0022",
+                "on-tertiary": "#ffffff",
+                "surface-dim": "#dadada",
+                "surface-bright": "#f9f9f9",
+                "on-secondary-fixed-variant": "#354185",
+                "primary-fixed": "#f4d9ff",
+                "surface-container": "#eeeeee",
+                "surface": "#f9f9f9",
+                "secondary": "#4e599f",
+                "outline": "#7e7481",
+                "on-surface-variant": "#4c4450",
+                "error-container": "#ffdad6",
+                "on-tertiary-fixed-variant": "#8c0055",
+                "error": "#ba1a1a",
+                "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                "DEFAULT": "1rem",
+                "lg": "2rem",
+                "xl": "3rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "xs": "4px",
+                "xl": "40px",
+                "lg": "24px",
+                "base": "4px",
+                "md": "16px",
+                "gutter": "24px",
+                "sm": "8px",
+                "container-max": "1280px"
+            },
+            "fontFamily": {
+                "headline-lg": ["Arimo"],
+                "body-lg": ["Archivo Narrow"],
+                "label-sm": ["Domine"],
+                "label-md": ["Domine"],
+                "body-md": ["Archivo Narrow"],
+                "headline-lg-mobile": ["Arimo"],
+                "headline-md": ["Arimo"],
+                "headline-xl": ["Arimo"]
+            },
+            "fontSize": {
+                "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ribbon-status {
+            position: relative;
+            clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cfc2d1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-white">
+<!-- Sidebar Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-primary dark:bg-surface-container-lowest flex flex-col py-md z-40 shadow-sm transition-all duration-200 ease-in-out hidden md:flex">
+<div class="px-6 mb-10 flex items-center space-x-3">
+<div class="w-10 h-10 bg-on-primary rounded-lg flex items-center justify-center text-primary font-bold overflow-hidden shadow-inner">
+<img class="w-full h-full object-cover" data-alt="A professional crest for Mount Carmel Secondary School, featuring a minimalist shield design with academic symbols like an open book and a torch. The aesthetic is traditional yet clean, utilizing a royal purple and ivory white color palette. Soft studio lighting highlights the textures of the crest." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiYEqhHMg9DVjprWyiWTzUOGEBGb_cTQLnWsNSbwRXTEgPMtXOPdRNoNZBmIp4_NwKL6Eo6wE1zs1BHGlcIHrKSTQntHIa1LiK2jwDKp37kQOMjXyQ8kOjnYOGrxaBdJdmmIi1eru6QAfQnWip3cwFMGu8IyEnhnW2xUFbLP98AoB5MeNCMHsl6FoI1mOmpK-Aa0pCyGAzIWu8nW0E3OJDQXzFHcRccGSDRGl5_toiPkf6Zd13RClH_rInm-gNOBm1nk1Vaurm11d9">
+</div>
+<div>
+<h2 class="font-headline-md text-headline-sm text-on-primary dark:text-primary leading-tight">Mount Carmel</h2>
+<p class="font-label-sm text-label-sm text-on-primary/60">Admin Portal</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Navigation Items Mapping -->
+<a class="flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined mr-3">school</span>
+<span class="font-label-md text-label-md">Students</span>
+</a>
+<a class="flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined mr-3">auto_stories</span>
+<span class="font-label-md text-label-md">Academics</span>
+</a>
+<!-- Inventory Active State (Semantic interpretation of Finance/Resources) -->
+<a class="flex items-center border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary dark:text-primary-fixed-dim py-3 px-4" href="#">
+<span class="material-symbols-outlined mr-3">inventory_2</span>
+<span class="font-label-md text-label-md">Inventory</span>
+</a>
+<a class="flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined mr-3">event_available</span>
+<span class="font-label-md text-label-md">Attendance</span>
+</a>
+<a class="flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined mr-3">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+</nav>
+<div class="mt-auto px-4 space-y-1">
+<a class="flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined mr-3 text-red-400">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Top AppBar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-surface dark:bg-surface-container-high border-b border-outline-variant dark:border-outline z-30 left-0 md:left-64">
+<div class="flex justify-between items-center h-full px-gutter max-w-container-max mx-auto">
+<div class="flex items-center gap-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Inventory Module</h1>
+<div class="relative">
+<span class="absolute inset-y-0 left-3 flex items-center text-outline">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:ring-primary focus:border-primary w-64 transition-all" placeholder="Search school assets..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<div class="flex items-center gap-sm ml-4 pl-4 border-l border-outline-variant">
+<div class="text-right hidden xl:block">
+<p class="font-label-md text-label-md text-primary">Admin User</p>
+<p class="text-[10px] text-outline uppercase tracking-wider font-bold">School Registrar</p>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A clean, professional headshot of a middle-aged female administrator wearing a navy blazer and white blouse. The background is a soft-focus library or office setting with warm wood tones. The lighting is flattering and professional, reflecting an institutional and authoritative atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB2idzsPJSrQLR2Czw9tFcwO8Zt6yhNtFwbpfM9aN3ua9ILZ4EROLf3LRBkM-ZEqHmazJPzI_yobyDeA_Ye42D6lNRh6JaGqK2157-QYqUJ-EOE_UVam2WE7q-ie91tNf0mxKdjZwkcPpbnh7jRVc5gZC1TwPtyb2E2jr6gGHgAunaJHP-KpP36Rk0xMBy-7_EdEsecjh1fEXuTzAwOgapQoOuYGiE3dfc4HKUlTFXtONlAVg_Q0vVQCxRhH5VgF6CVyRMg7LfKZKt">
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 px-gutter pb-xl min-h-screen ml-0 md:ml-64 pt-20 md:pt-24">
+<div class="max-w-container-max mx-auto space-y-lg">
+<!-- Dashboard Stats Summary (Asymmetric Layout) -->
+<div class="grid grid-cols-12 gap-gutter">
+<div class="col-span-8 bg-white p-lg rounded-lg border border-outline-variant shadow-sm flex items-center justify-between overflow-hidden relative col-span-12 md:col-span-8">
+<div class="relative z-10">
+<h3 class="font-label-md text-label-md text-outline uppercase tracking-widest mb-2">Total Assets Tracked</h3>
+<p class="font-headline-xl text-headline-xl text-primary">1,428</p>
+<div class="mt-4 flex gap-md">
+<span class="flex items-center text-green-600 font-bold text-sm">
+<span class="material-symbols-outlined mr-1">trending_up</span> +12%
+                            </span>
+<span class="text-on-surface-variant/60 text-sm">Since last quarter</span>
+</div>
+</div>
+<div class="w-1/3 h-full relative opacity-20">
+<!-- Decorative element simulating data flow -->
+<div class="absolute inset-0 bg-gradient-to-l from-primary-container to-transparent"></div>
+</div>
+<button class="absolute top-lg right-lg bg-primary text-white px-md py-sm rounded-md font-label-md text-label-md hover:bg-primary-container transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+                        Add Stock
+                    </button>
+</div>
+<div class="col-span-4 bg-tertiary-container p-lg rounded-lg border border-tertiary text-white shadow-sm flex flex-col justify-between col-span-12 md:col-span-8 md:col-span-4">
+<div>
+<h3 class="font-label-md text-label-md text-tertiary-fixed opacity-80 uppercase tracking-widest mb-2">Low Stock Alerts</h3>
+<p class="font-headline-xl text-headline-xl">24 <span class="text-headline-md font-normal">items</span></p>
+</div>
+<button class="w-full py-sm bg-tertiary text-white border border-tertiary-fixed/30 rounded-md font-label-md text-label-md hover:bg-tertiary/80 transition-all">
+                        View Alerts
+                    </button>
+</div>
+</div>
+<!-- Filters & Controls -->
+<div class="flex items-center justify-between bg-surface-container-low p-md rounded-lg border border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="font-label-md text-label-md text-primary">Filter By:</span>
+<button class="px-4 py-2 bg-primary text-white rounded-full font-label-md text-label-md">All Items</button>
+<button class="px-4 py-2 bg-white text-on-surface-variant border border-outline-variant rounded-full font-label-md text-label-md hover:border-primary transition-colors">Science Lab</button>
+<button class="px-4 py-2 bg-white text-on-surface-variant border border-outline-variant rounded-full font-label-md text-label-md hover:border-primary transition-colors">Stationery</button>
+<button class="px-4 py-2 bg-white text-on-surface-variant border border-outline-variant rounded-full font-label-md text-label-md hover:border-primary transition-colors">Electronics</button>
+<button class="px-4 py-2 bg-white text-on-surface-variant border border-outline-variant rounded-full font-label-md text-label-md hover:border-primary transition-colors">Sports</button>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-2 border border-outline-variant rounded bg-white text-on-surface-variant">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 border border-outline-variant rounded bg-white text-on-surface-variant">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<!-- Data Table Card -->
+<div class="bg-white rounded-lg border border-outline-variant overflow-hidden shadow-sm">
+<div class="bg-primary px-lg py-md flex items-center">
+<h2 class="font-label-md text-label-md text-white font-headline-sm">Master Stock Registry</h2>
+<span class="ml-4 px-2 py-0.5 bg-primary-container text-white text-[10px] font-bold rounded uppercase tracking-tighter">Updated 2m ago</span>
+</div>
+<div class="overflow-x-auto custom-scrollbar"><div class="md:hidden divide-y divide-outline-variant">
+  <div class="p-4 space-y-2">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="text-xs text-outline">#INV-8821</p>
+        <h4 class="font-bold text-primary">Microscope Slides (Pack of 50)</h4>
+      </div>
+      <div class="ribbon-status bg-tertiary-container text-white text-[10px] font-bold px-3 py-1 uppercase">Low Stock</div>
+    </div>
+    <div class="flex justify-between text-sm">
+      <span class="text-on-surface-variant">Science Lab</span>
+      <span class="font-bold text-on-tertiary-container">Qty: 12</span>
+    </div>
+    <div class="flex justify-end pt-2">
+      <button class="p-2 bg-primary-container/10 text-primary rounded-full"><span class="material-symbols-outlined">edit</span></button>
+    </div>
+  </div>
+  <div class="p-4 space-y-2">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="text-xs text-outline">#INV-9023</p>
+        <h4 class="font-bold text-primary">Whiteboard Markers (Blue)</h4>
+      </div>
+      <div class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full uppercase">In Stock</div>
+    </div>
+    <div class="flex justify-between text-sm">
+      <span class="text-on-surface-variant">Stationery</span>
+      <span class="font-bold">Qty: 420</span>
+    </div>
+    <div class="flex justify-end pt-2">
+      <button class="p-2 bg-primary-container/10 text-primary rounded-full"><span class="material-symbols-outlined">edit</span></button>
+    </div>
+  </div>
+</div>
+<table class="w-full text-left border-collapse font-body-md hidden md:table">
+<thead>
+<tr class="bg-surface-container-high border-b border-outline-variant">
+<th class="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Item ID</th>
+<th class="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Item Name</th>
+<th class="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Category</th>
+<th class="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Quantity</th>
+<th class="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Storage Location</th>
+<th class="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Status</th>
+<th class="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider text-center">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Low Stock Item -->
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-lg py-4 text-outline font-body-md">#INV-8821</td>
+<td class="px-lg py-4 font-bold text-primary">Microscope Slides (Pack of 50)</td>
+<td class="px-lg py-4">Science Lab</td>
+<td class="px-lg py-4 font-bold text-on-tertiary-container">12</td>
+<td class="px-lg py-4">Lab Storage B-4</td>
+<td class="px-lg py-4">
+<div class="ribbon-status bg-tertiary-container text-white text-[10px] font-bold px-3 py-1 inline-block uppercase tracking-widest">
+                                        Low Stock
+                                    </div>
+</td>
+<td class="px-lg py-4 text-center">
+<button class="text-primary hover:text-tertiary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+<!-- Regular Item -->
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-lg py-4 text-outline font-body-md">#INV-9023</td>
+<td class="px-lg py-4 font-bold text-primary">Whiteboard Markers (Blue)</td>
+<td class="px-lg py-4">Stationery</td>
+<td class="px-lg py-4">420</td>
+<td class="px-lg py-4">Main Admin Store</td>
+<td class="px-lg py-4">
+<div class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full inline-block uppercase tracking-widest">
+                                        In Stock
+                                    </div>
+</td>
+<td class="px-lg py-4 text-center">
+<button class="text-primary hover:text-tertiary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+<!-- Low Stock Item -->
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-lg py-4 text-outline font-body-md">#INV-8845</td>
+<td class="px-lg py-4 font-bold text-primary">Graphing Calculators TI-84</td>
+<td class="px-lg py-4">Electronics</td>
+<td class="px-lg py-4 font-bold text-on-tertiary-container">5</td>
+<td class="px-lg py-4">Math Dept Office</td>
+<td class="px-lg py-4">
+<div class="ribbon-status bg-tertiary-container text-white text-[10px] font-bold px-3 py-1 inline-block uppercase tracking-widest">
+                                        Critical
+                                    </div>
+</td>
+<td class="px-lg py-4 text-center">
+<button class="text-primary hover:text-tertiary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+<!-- Regular Item -->
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-lg py-4 text-outline font-body-md">#INV-1029</td>
+<td class="px-lg py-4 font-bold text-primary">A4 Printing Paper (Reams)</td>
+<td class="px-lg py-4">Stationery</td>
+<td class="px-lg py-4">85</td>
+<td class="px-lg py-4">Main Admin Store</td>
+<td class="px-lg py-4">
+<div class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full inline-block uppercase tracking-widest">
+                                        In Stock
+                                    </div>
+</td>
+<td class="px-lg py-4 text-center">
+<button class="text-primary hover:text-tertiary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+<!-- Regular Item -->
+<tr class="hover:bg-primary-container/5 transition-colors">
+<td class="px-lg py-4 text-outline font-body-md">#INV-4412</td>
+<td class="px-lg py-4 font-bold text-primary">Basketballs (Wilson)</td>
+<td class="px-lg py-4">Sports</td>
+<td class="px-lg py-4">24</td>
+<td class="px-lg py-4">Gymnasium Lockers</td>
+<td class="px-lg py-4">
+<div class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full inline-block uppercase tracking-widest">
+                                        In Stock
+                                    </div>
+</td>
+<td class="px-lg py-4 text-center">
+<button class="text-primary hover:text-tertiary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-surface-container px-lg py-4 flex items-center justify-between border-t border-outline-variant">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Showing 1 to 5 of 1,428 entries</p>
+<div class="flex items-center gap-xs">
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white text-outline disabled:opacity-50" disabled=""><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+<button class="w-8 h-8 flex items-center justify-center border border-primary rounded bg-primary text-white text-xs font-bold">1</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white text-on-surface-variant text-xs hover:border-primary">2</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white text-on-surface-variant text-xs hover:border-primary">3</button>
+<span class="px-2 text-outline">...</span>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white text-on-surface-variant text-xs hover:border-primary">286</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white text-on-surface-variant"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+</div>
+<!-- Bento-Style Bottom Sections -->
+<div class="grid grid-cols-3 gap-gutter grid-cols-1 md:grid-cols-3">
+<!-- Recent Activity -->
+<div class="bg-white p-lg rounded-lg border border-outline-variant shadow-sm h-full flex flex-col">
+<h3 class="font-label-md text-label-md text-primary mb-lg flex items-center gap-sm">
+<span class="material-symbols-outlined">history</span>
+                        Recent Logins &amp; Inventory Changes
+                    </h3>
+<div class="space-y-md flex-1">
+<div class="flex items-start gap-md pb-md border-b border-outline-variant/30">
+<div class="w-8 h-8 bg-primary-container/10 text-primary rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-sm">add_box</span>
+</div>
+<div>
+<p class="font-label-md text-label-md">Added 500 units of A4 Paper</p>
+<p class="text-[10px] text-outline">Today, 10:45 AM • Admin Smith</p>
+</div>
+</div>
+<div class="flex items-start gap-md pb-md border-b border-outline-variant/30">
+<div class="w-8 h-8 bg-tertiary-container/10 text-tertiary rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-sm">remove_done</span>
+</div>
+<div>
+<p class="font-label-md text-label-md">Withdrawn 15 Microscope Slides</p>
+<p class="text-[10px] text-outline">Yesterday, 03:20 PM • Biology Dept</p>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<div class="w-8 h-8 bg-secondary-container/10 text-secondary rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-sm">inventory</span>
+</div>
+<div>
+<p class="font-label-md text-label-md">Stock Audit Completed: Sports</p>
+<p class="text-[10px] text-outline">Oct 24, 09:00 AM • System Task</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Actions / Request Inventory -->
+<div class="bg-surface-container-high p-lg rounded-lg border border-outline shadow-sm flex flex-col justify-between">
+<div>
+<h3 class="font-label-md text-label-md text-primary mb-md">Departmental Requests</h3>
+<p class="text-body-md text-on-surface-variant mb-lg">There are 8 pending item requests awaiting approval from the Bursar's office.</p>
+</div>
+<div class="space-y-sm">
+<button class="w-full py-2 bg-secondary text-white rounded-md font-label-md text-label-md hover:opacity-90 transition-opacity">Review Requests</button>
+<button class="w-full py-2 bg-white text-secondary border border-secondary rounded-md font-label-md text-label-md hover:bg-secondary-container/10 transition-colors">Generate Requisition</button>
+</div>
+</div>
+<!-- Warehouse Map / Quick Link -->
+<div class="relative rounded-lg border border-outline-variant overflow-hidden shadow-sm group">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A detailed digital architectural map of a school campus warehouse and storage facility. The style is clean and technical, using shades of grey and royal purple for zoning. High-legibility labels denote different storage areas like Stationery, Science equipment, and Sports. The aesthetic is modern institutional, resembling a professional facility management dashboard." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAt4L_AjbOdB2Yyh9Ff_Vn02ppaXxMrquQz3oLq9CnkDNwjy0q-a4hg2b6jyVPeXSJYc2J9EgmQzYlLN9Iq5j3RCxuXR6_KHGqDNoMpkrIKd51u2aYCm9yQLTFpASbKVi_t8quTczWNGoYTyqu-49UG-VA6ShYzp4u7eG3vX79ha3sGLN1iUmUtSPfTNkCzkHFrHmObSSb4sf8M-HkGmDyK0hK6xcoUryP5YHV-Yy70fyTowksEqhdukcuaVKiTxPgRPNET7f9vVE-m')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent"></div>
+<div class="absolute bottom-lg left-lg right-lg text-white">
+<h3 class="font-label-md text-label-md uppercase tracking-wider mb-1">Storage Management</h3>
+<p class="font-headline-md text-headline-sm">Locate Assets</p>
+<button class="mt-4 flex items-center gap-xs font-label-md text-label-sm hover:underline">
+                            Open Interactive Map <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="ml-64 w-[calc(100%-16rem)] py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary dark:bg-secondary-fixed-dim border-t border-white/10 ml-0 md:ml-64 w-full md:w-[calc(100%-16rem)] pb-24 md:pb-xl">
+<div class="text-on-secondary dark:text-on-secondary-fixed">
+<h4 class="font-headline-md text-headline-md mb-2">Mount Carmel Secondary</h4>
+<p class="font-label-sm text-label-sm opacity-80">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>
+</div>
+<div class="flex justify-end gap-lg">
+<a class="font-label-sm text-label-sm text-on-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-secondary opacity-80 hover:opacity-100 transition-opacity underline font-bold" href="#">Contact Us</a>
+</div>
+</footer>
+<!-- Interactive Layer: Hover Effects and Micro-interactions -->
+<script>
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.style.transform = 'scale(0.98)';
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+
+
+</body></html>

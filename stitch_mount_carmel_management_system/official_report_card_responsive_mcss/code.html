@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Report Sheet - Mount Carmel Secondary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;700&amp;family=Archivo+Narrow:wght@400;500;700&amp;family=Domine:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Playfair+Display:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"on-tertiary": "#ffffff", "error-container": "#ffdad6", "on-secondary-fixed": "#031159", "on-primary-fixed-variant": "#632c87", "tertiary-fixed-dim": "#ffb0ce", "inverse-surface": "#2f3131", tertiary: "#3c0022", "primary-container": "#4a0f6e", "on-primary-container": "#ba80df", "surface-tint": "#7d46a1", "on-primary": "#ffffff", "on-surface": "#1a1c1c", surface: "#f9f9f9", "surface-variant": "#e2e2e2", "primary-fixed": "#f4d9ff", "on-secondary-container": "#364186", "surface-dim": "#dadada", background: "#f9f9f9", "surface-container-high": "#e8e8e8", "on-secondary-fixed-variant": "#354185", "secondary-fixed-dim": "#bbc3ff", "on-tertiary-fixed-variant": "#8c0055", "secondary-fixed": "#dee0ff", "on-secondary": "#ffffff", "outline-variant": "#cfc2d1", "surface-container-highest": "#e2e2e2", "surface-container": "#eeeeee", "on-error": "#ffffff", "surface-bright": "#f9f9f9", outline: "#7e7481", "on-error-container": "#93000a", primary: "#2e004a", "on-background": "#1a1c1c", "on-surface-variant": "#4c4450", "on-tertiary-fixed": "#3e0022", "inverse-on-surface": "#f0f1f1", "on-tertiary-container": "#ff57aa", "tertiary-fixed": "#ffd9e5", "surface-container-low": "#f3f3f3", "on-primary-fixed": "#2f004c", "inverse-primary": "#e4b5ff", error: "#ba1a1a", "primary-fixed-dim": "#e4b5ff", secondary: "#4e599f", "secondary-container": "#a6b1fe", "tertiary-container": "#62003a", "surface-container-lowest": "#ffffff"}, borderRadius: {DEFAULT: "1rem", lg: "2rem", xl: "3rem", full: "9999px"}, spacing: {lg: "24px", sm: "8px", xl: "40px", gutter: "24px", "container-max": "1280px", base: "4px", xs: "4px", md: "16px"}, fontFamily: {"headline-lg": ["Playfair Display"], "headline-md": ["Playfair Display"], "body-lg": ["Geist"], "label-sm": ["Geist"], "headline-xl": ["Playfair Display"], "label-md": ["Geist"], "body-md": ["Geist"], headline: ["Arimo"], display: ["Arimo"], body: ["Archivo Narrow"], label: ["Domine"]}, fontSize: {"headline-lg": ["32px", {lineHeight: "1.3", fontWeight: "700"}], "headline-md": ["24px", {lineHeight: "1.4", fontWeight: "600"}], "body-lg": ["18px", {lineHeight: "1.6", fontWeight: "400"}], "label-sm": ["12px", {lineHeight: "1.2", fontWeight: "500"}], "headline-xl": ["48px", {lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "700"}], "label-md": ["14px", {lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "600"}], "body-md": ["16px", {lineHeight: "1.5", fontWeight: "400"}]}}}};</script>
+<style>
+      @media print {
+        .no-print { display: none !important; }
+        body { background: white !important; }
+        .report-canvas { border: none !important; box-shadow: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+      }
+      .watermark-container { position: relative; }
+      .watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        opacity: 0.035;
+        font-size: 8rem;
+        pointer-events: none;
+        z-index: 0;
+        white-space: nowrap;
+      }
+      .ribbon-tag {
+        position: relative;
+        clip-path: polygon(100% 0%, 95% 50%, 100% 100%, 0% 100%, 0% 0%);
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+</head>
+<body class="bg-surface-container-low font-body-md text-on-surface flex min-h-screen">
+<!-- Sidebar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary dark:bg-surface-container-lowest docked left-0 h-full w-64 shadow-sm no-print hidden md:flex">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-primary text-3xl" data-icon="school">school</span>
+<div>
+<h1 class="font-headline-md text-headline-md text-on-primary dark:text-primary">Mount Carmel</h1>
+<p class="font-label-sm text-label-sm text-on-primary/70">Admin Portal</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col">
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary dark:text-primary-fixed-dim py-3 px-4 transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="font-label-md">Students</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span class="font-label-md">Academics</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label-md">Finance</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span class="font-label-md">Attendance</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md">Reports</span>
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-on-primary/10">
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md">Settings</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen ml-0 md:ml-64 pb-20 md:pb-0">
+<!-- Top Nav Bar (Shared Component Implementation) -->
+<header class="bg-surface dark:bg-surface-container-high docked full-width top-0 sticky border-b border-outline-variant dark:border-outline z-30 no-print">
+<div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
+<div class="flex items-center gap-lg">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Student Report View</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="flex items-center gap-xs bg-primary text-on-primary px-md py-sm rounded-lg hover:opacity-90 transition-all font-label-md" onclick="window.print()">
+<span class="material-symbols-outlined" data-icon="print">print</span>
+                        Print Official Copy
+                    </button>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="notifications">notifications</span>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a school administrator in formal attire, set against a blurred institutional background, conveying authority and technical precision for a high-end academic portal interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmuF6ReGx6aNTegxV3kwTStBQva2h_yWt7xOEzC3_d_l19iC6HG09D7wvpCUnEupmumOWJDpSNhjKmpI_2yJiRp13WQAHMnSdvWVZbe_mUXdTNQgpV8w3S9gAyTeaMgHVb4cVhyjI3HhwKRAYoiidZk3g0RCL2pbYSRiElQgyE4WnXE15kHgxCJyqyMu6ifqT0Ril4426LGj2qjTLy8kyRnvFDLUQrkyzjzjan7posZRg6ERlehl7B4Vzd5EnbAdiBBxSCzFbCjhwA"/>
+</div>
+</div>
+</div>
+</header>
+<!-- The Formal Report Sheet -->
+<div class="flex-1 p-lg flex justify-center items-start overflow-y-auto">
+<div class="report-canvas w-full max-w-[1000px] bg-white border border-outline-variant shadow-lg p-xl watermark-container relative mb-xl">
+<!-- Background Watermark -->
+<div class="watermark font-headline-xl">MOUNT CARMEL</div>
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start gap-lg border-b-2 border-primary pb-lg mb-lg items-center md:items-start text-center md:text-left">
+<div class="flex items-center gap-lg flex-col md:flex-row md:items-start">
+<div class="w-32 h-32 flex-shrink-0">
+<img class="w-full h-full object-contain" data-alt="A detailed, classical school crest for Mount Carmel Secondary School, featuring a shield with an open book, a mountain silhouette, and a burning torch, rendered in royal purple and deep navy blue with gold accents for a traditional academic authority aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEHMxbNa5ZwHpxZ-WAM1cTNalmd67Glfe5CzN0Y4HxfIUA2lbHyr-v_jVx9x_a9G3WN5EGDxt9B-HR8unExeg41-muqSWn60Be9tec0_UDS2b5m-jDco6AAyCDejedDEwaGz53N0tj2z7KVaz4ePobANgoi7e_yIbXVkWHsqXZjOe0FoAstZxn6V8mVgmM1ax---zS7GxgQbyEMzXuTOFGcJhbu0S0YhxsXfXlF7f0oWxYF1RKZea_OuxMuBguvHyUKyc_bExk4JoV"/>
+</div>
+<div>
+<h1 class="font-headline-lg text-primary uppercase tracking-wider mb-xs">Mount Carmel Secondary School</h1>
+<p class="font-label-md text-on-surface-variant uppercase">Emanating Excellence &amp; Integrity</p>
+<p class="font-body-md text-on-surface mt-2 italic">Official Academic Terminal Progress Report</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-sm text-right items-center md:items-end text-center md:text-right">
+<div class="w-32 h-40 border border-outline bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A formal student passport photograph of a teenage boy in a crisp white school uniform with the Mount Carmel crest on his pocket, professional lighting, neutral background, looking directly at the camera with a calm and serious expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB24z7XzE9IsCr9bvSMx5L40GXq9RWFmZbQqC9yPoEiSnYg4vXWfLAw9t3WCsSTg9CKpZNqVIYSQRzB0s2syXYzG6Cyi4NBi5kgKXrcSTajv3SWVCjX4jrfZJha2y-r_-9tLrc1qntxPbr-8VWUYPhL-b-o5dffE6e9VV7eVFwnhwMV0KuhHopRiNUd16m94YzjtMZHTgAYUVsXcBv09QNXb1VKDhgFkypgmenqLW0zDBCX_sp0TayY1YRGOfUlDRyrjpWOMtIgvTSd"/>
+</div>
+<span class="font-label-sm text-on-surface-variant">STUDENT NO: MCSS/2024/0412</span>
+</div>
+</div>
+<!-- Bio-Data Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-lg mb-xl bg-surface-container-low p-md border border-outline-variant rounded">
+<div class="space-y-1">
+<p class="font-label-sm text-outline uppercase tracking-tight">Student Name</p>
+<p class="font-body-md font-bold text-primary">ADEBAYO, OLUWASEUN SAMUEL</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-outline uppercase tracking-tight">Academic Session</p>
+<p class="font-body-md font-bold text-primary">2023 / 2024</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-outline uppercase tracking-tight">Current Class</p>
+<p class="font-body-md font-bold text-primary">Senior Secondary 2 (SS2A)</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-outline uppercase tracking-tight">Term / Phase</p>
+<p class="font-body-md font-bold text-primary">Second Term (Lent)</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-outline uppercase tracking-tight">Class Position</p>
+<div class="flex items-center gap-xs">
+<p class="font-body-md font-bold text-primary">4th</p>
+<span class="text-on-surface-variant font-label-sm">of 38 Students</span>
+</div>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-outline uppercase tracking-tight">Attendance</p>
+<p class="font-body-md font-bold text-primary">82 / 85 Days</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-outline uppercase tracking-tight">Grade Average</p>
+<p class="font-body-md font-bold text-primary">78.4%</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-outline uppercase tracking-tight">Result Status</p>
+<span class="ribbon-tag bg-secondary text-white font-label-sm px-3 py-1">PROMOTED</span>
+</div>
+</div>
+<!-- Subjects Table -->
+<div class="mb-xl overflow-hidden border border-primary hidden md:block">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-primary text-on-primary">
+<th class="p-sm font-label-md border-r border-primary-container">Subject Title</th>
+<th class="p-sm font-label-md text-center border-r border-primary-container">CA (40)</th>
+<th class="p-sm font-label-md text-center border-r border-primary-container">Exam (60)</th>
+<th class="p-sm font-label-md text-center border-r border-primary-container">Total (100)</th>
+<th class="p-sm font-label-md text-center border-r border-primary-container">Grade</th>
+<th class="p-sm font-label-md text-center border-r border-primary-container">Avg</th>
+<th class="p-sm font-label-md">Subject Teacher's Remark</th>
+</tr>
+</thead>
+<tbody class="font-body-md">
+<tr class="border-b border-outline-variant bg-surface-container-lowest">
+<td class="p-sm font-bold border-r border-outline-variant">Mathematics</td>
+<td class="p-sm text-center border-r border-outline-variant">34</td>
+<td class="p-sm text-center border-r border-outline-variant">52</td>
+<td class="p-sm text-center border-r border-outline-variant font-bold">86</td>
+<td class="p-sm text-center border-r border-outline-variant text-secondary font-bold">A1</td>
+<td class="p-sm text-center border-r border-outline-variant">64.5</td>
+<td class="p-sm text-on-surface-variant text-sm">Excellent grasp of calculus and logic.</td>
+</tr>
+<tr class="border-b border-outline-variant bg-surface-container-low">
+<td class="p-sm font-bold border-r border-outline-variant">English Language</td>
+<td class="p-sm text-center border-r border-outline-variant">28</td>
+<td class="p-sm text-center border-r border-outline-variant">45</td>
+<td class="p-sm text-center border-r border-outline-variant font-bold">73</td>
+<td class="p-sm text-center border-r border-outline-variant text-secondary font-bold">B2</td>
+<td class="p-sm text-center border-r border-outline-variant">61.2</td>
+<td class="p-sm text-on-surface-variant text-sm">Strong essay structure, improve vocabulary.</td>
+</tr>
+<tr class="border-b border-outline-variant bg-surface-container-lowest">
+<td class="p-sm font-bold border-r border-outline-variant">Physics</td>
+<td class="p-sm text-center border-r border-outline-variant">31</td>
+<td class="p-sm text-center border-r border-outline-variant">48</td>
+<td class="p-sm text-center border-r border-outline-variant font-bold">79</td>
+<td class="p-sm text-center border-r border-outline-variant text-secondary font-bold">A1</td>
+<td class="p-sm text-center border-r border-outline-variant">58.0</td>
+<td class="p-sm text-on-surface-variant text-sm">Consistent high performance in practicals.</td>
+</tr>
+<tr class="border-b border-outline-variant bg-surface-container-low">
+<td class="p-sm font-bold border-r border-outline-variant">Chemistry</td>
+<td class="p-sm text-center border-r border-outline-variant">36</td>
+<td class="p-sm text-center border-r border-outline-variant">54</td>
+<td class="p-sm text-center border-r border-outline-variant font-bold">90</td>
+<td class="p-sm text-center border-r border-outline-variant text-secondary font-bold">A1</td>
+<td class="p-sm text-center border-r border-outline-variant">55.8</td>
+<td class="p-sm text-on-surface-variant text-sm">Exceptional performance. Chemistry medalist.</td>
+</tr>
+<tr class="border-b border-outline-variant bg-surface-container-lowest">
+<td class="p-sm font-bold border-r border-outline-variant">Biology</td>
+<td class="p-sm text-center border-r border-outline-variant">25</td>
+<td class="p-sm text-center border-r border-outline-variant">40</td>
+<td class="p-sm text-center border-r border-outline-variant font-bold">65</td>
+<td class="p-sm text-center border-r border-outline-variant text-secondary font-bold">B3</td>
+<td class="p-sm text-center border-r border-outline-variant">59.3</td>
+<td class="p-sm text-on-surface-variant text-sm">Good, but needs more focus on physiology.</td>
+</tr>
+<tr class="border-b border-outline-variant bg-surface-container-low">
+<td class="p-sm font-bold border-r border-outline-variant">Further Maths</td>
+<td class="p-sm text-center border-r border-outline-variant">29</td>
+<td class="p-sm text-center border-r border-outline-variant">42</td>
+<td class="p-sm text-center border-r border-outline-variant font-bold">71</td>
+<td class="p-sm text-center border-r border-outline-variant text-secondary font-bold">B2</td>
+<td class="p-sm text-center border-r border-outline-variant">52.1</td>
+<td class="p-sm text-on-surface-variant text-sm">Analytical skills are improving steadily.</td>
+</tr>
+<tr class="border-b border-outline-variant bg-surface-container-lowest">
+<td class="p-sm font-bold border-r border-outline-variant">Computer Science</td>
+<td class="p-sm text-center border-r border-outline-variant">38</td>
+<td class="p-sm text-center border-r border-outline-variant">58</td>
+<td class="p-sm text-center border-r border-outline-variant font-bold">96</td>
+<td class="p-sm text-center border-r border-outline-variant text-secondary font-bold">A1</td>
+<td class="p-sm text-center border-r border-outline-variant">68.4</td>
+<td class="p-sm text-on-surface-variant text-sm">Top of class. Advanced coding proficiency.</td>
+</tr>
+</tbody>
+</table>
+</div><div class="md:hidden space-y-md mb-xl">
+<div class="bg-primary text-on-primary p-sm rounded-t font-label-md text-center">Subject Performance</div>
+<div class="space-y-sm">
+<div class="bg-surface-container-low p-md border border-outline-variant rounded-lg">
+<div class="flex justify-between items-start mb-2">
+<span class="font-bold text-primary">Mathematics</span>
+<span class="bg-secondary text-white px-2 py-1 rounded text-sm font-bold">A1</span>
+</div>
+<div class="grid grid-cols-3 gap-2 text-center text-xs">
+<div class="bg-white p-1 rounded border border-outline-variant"><p class="text-outline uppercase">Total</p><p class="font-bold">86</p></div>
+<div class="bg-white p-1 rounded border border-outline-variant"><p class="text-outline uppercase">CA</p><p>34</p></div>
+<div class="bg-white p-1 rounded border border-outline-variant"><p class="text-outline uppercase">Exam</p><p>52</p></div>
+</div>
+<p class="mt-2 text-sm italic text-on-surface-variant">"Excellent grasp of calculus and logic."</p>
+</div>
+<div class="bg-surface-container-lowest p-md border border-outline-variant rounded-lg">
+<div class="flex justify-between items-start mb-2">
+<span class="font-bold text-primary">English Language</span>
+<span class="bg-secondary text-white px-2 py-1 rounded text-sm font-bold">B2</span>
+</div>
+<div class="grid grid-cols-3 gap-2 text-center text-xs">
+<div class="bg-white p-1 rounded border border-outline-variant"><p class="text-outline uppercase">Total</p><p class="font-bold">73</p></div>
+<div class="bg-white p-1 rounded border border-outline-variant"><p class="text-outline uppercase">CA</p><p>28</p></div>
+<div class="bg-white p-1 rounded border border-outline-variant"><p class="text-outline uppercase">Exam</p><p>45</p></div>
+</div>
+<p class="mt-2 text-sm italic text-on-surface-variant">"Strong essay structure, improve vocabulary."</p>
+</div>
+</div>
+<p class="text-center text-label-sm text-outline italic">... and 5 other subjects</p>
+</div>
+<!-- Footer Summary Sections (Bento-style layout) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Psychomotor & Affective Skills -->
+<div class="border border-outline-variant p-md rounded bg-surface-container-lowest">
+<h3 class="font-label-md text-primary uppercase border-b border-outline-variant pb-xs mb-md">Psychomotor &amp; Affective Skills</h3>
+<div class="space-y-sm">
+<div class="flex justify-between items-center text-sm">
+<span>Punctuality</span>
+<div class="flex gap-1">
+<span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 border border-outline rounded-xs"></span>
+</div>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span>Neatness</span>
+<div class="flex gap-1">
+<span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span>
+</div>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span>Leadership</span>
+<div class="flex gap-1">
+<span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 border border-outline rounded-xs"></span><span class="w-4 h-4 border border-outline rounded-xs"></span>
+</div>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span>Honesty</span>
+<div class="flex gap-1">
+<span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span><span class="w-4 h-4 bg-primary rounded-xs"></span>
+</div>
+</div>
+</div>
+<p class="font-label-sm text-outline mt-4 italic">Scale: 5-Excellent, 4-V.Good, 3-Good, 2-Fair, 1-Poor</p>
+</div>
+<!-- Grading Scale & Key -->
+<div class="border border-outline-variant p-md rounded bg-surface-container-lowest">
+<h3 class="font-label-md text-primary uppercase border-b border-outline-variant pb-xs mb-md">Grading Interpretation</h3>
+<div class="grid grid-cols-2 gap-2 text-sm">
+<div class="flex justify-between border-b border-surface-variant py-1"><span>75 - 100</span> <span class="font-bold">A1 (Excellent)</span></div>
+<div class="flex justify-between border-b border-surface-variant py-1"><span>70 - 74</span> <span class="font-bold">B2 (V. Good)</span></div>
+<div class="flex justify-between border-b border-surface-variant py-1"><span>65 - 69</span> <span class="font-bold">B3 (Good)</span></div>
+<div class="flex justify-between border-b border-surface-variant py-1"><span>60 - 64</span> <span class="font-bold">C4 (Credit)</span></div>
+<div class="flex justify-between border-b border-surface-variant py-1"><span>55 - 59</span> <span class="font-bold">C5 (Credit)</span></div>
+<div class="flex justify-between border-b border-surface-variant py-1"><span>50 - 54</span> <span class="font-bold">C6 (Credit)</span></div>
+</div>
+</div>
+</div>
+<!-- Final Remarks & Signatures -->
+<div class="mt-xl space-y-lg">
+<div class="border-l-4 border-primary pl-lg py-sm">
+<p class="font-label-sm text-outline uppercase">Class Teacher's Remark</p>
+<p class="font-body-md text-on-surface mt-1 italic">"Oluwaseun is a focused and brilliant student who consistently demonstrates leadership qualities. He is encouraged to maintain this momentum."</p>
+</div>
+<div class="border-l-4 border-tertiary pl-lg py-sm">
+<p class="font-label-sm text-outline uppercase">Principal's Final Comment</p>
+<p class="font-body-md text-on-surface mt-1 italic">"An outstanding academic term. Keep up the technical precision in your STEM subjects. Congratulations on your promotion."</p>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-end gap-xl pt-xl items-center md:items-end">
+<div class="flex flex-col items-center">
+<div class="w-48 border-b-2 border-on-surface-variant mb-2">
+<img class="h-12 mx-auto object-contain" data-alt="A realistic high-resolution scan of a stylized blue-ink handwritten signature on a plain white paper background, for an official institutional document feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7uc-vfv48yehPOiO-myEZ0I-3YQx-eXtnLeAx6x7gV9c1aYo1crzLxD2rgHV8bVhHON0bQ-Lp4kyp8zoecRcrXkKCeRAW-fyKuMyCPicNBfC3gFDFd6_hxYiLWKISunp3VJOF05nT_gpZlKlbDsQYfLzlRYo88xrtbSUVqNPJ41qCPeae6FZCz9cNit9B68ZH71CYQgrnubARCm5PhkGar17_A9bi9WAlB4pmF6jZWR5bBaLHepsPgDo8Nbxcl4BJyGX6Y69GijcE"/>
+</div>
+<p class="font-label-md uppercase">Class Teacher</p>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-24 h-24 mb-2 opacity-80">
+<img class="w-full h-full object-contain" data-alt="A round official school seal or stamp in purple ink, showing 'MOUNT CARMEL SECONDARY SCHOOL' in a circle around the school crest, with a date and 'APPROVED' text inside." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJRR6GXGXeRf1PjxeU1Di_DbUqqB6f3yxzgdkwdeskTYjplEBeKiHR4epQ3s6t-Puj6eBADQmr69F7BlEal90qK-qWHr8OIvu69JhPHnorAyiGGM8wMdP66MNIffj3ui1Jh7oCvozyvn_nLe37xzbVo-dzQ3RlPB-8HwAtJWDmxAsYWMDcdrojzrYwoi9mp8z_TqhR-oZAhp_szWNgypXBMWTOBP9MaPnCr9cjVXDb7Ge3jbABBNfQlaMQa0hKGm6t0AKGt1tZc4Lg"/>
+</div>
+<p class="font-label-sm text-outline">School Stamp</p>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-48 border-b-2 border-on-surface-variant mb-2">
+<img class="h-12 mx-auto object-contain" data-alt="A crisp, professional signature in dark blue ink of a principal, appearing authoritative and established, suitable for a formal academic transcript." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPu2vtDR3m8Tl1SKLhE5dz7dAjL4Vx3SODYVd-vKpzFAbT69Mu8A2_fQe4at2YLuRnps2yNnbfCevnw1-Ud059Pe-zZsvpvrPwd5u62lzybIlVOVzsQf5niwSPLpz2pWsJFxxSjdIqTsSooqf3dLlVwX68crWEjfDwmDbBjXRQxqwgj9WoafuroG4SlXn9AtGqE7MlHs8eGlQLN_t9F22VrDgKq8_gJDx-C1Fq7GGs6wJnM7tiIc7ERCwvuiNcaR6dpATr8iMWrk4P"/>
+</div>
+<p class="font-label-md uppercase">Principal</p>
+</div>
+</div>
+</div>
+<!-- Footer (Shared Component Adaptation) -->
+<footer class="mt-xl border-t border-outline-variant pt-lg flex flex-col md:flex-row justify-between items-center text-outline text-label-sm">
+<span>© 2024 Mount Carmel Secondary School. All Rights Reserved.</span>
+<div class="flex gap-md mt-sm md:mt-0">
+<span>Campus Safety</span>
+<span>Contact Us</span>
+</div>
+</footer>
+</div>
+</div>
+<!-- Floating Action Button (Suppressed per logic as this is a focused Detail/Report view) -->
+</main>
+<script>
+        // Micro-interaction for hover effects on rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.classList.add('transition-all', 'bg-primary/5');
+            });
+            row.addEventListener('mouseleave', () => {
+                row.classList.remove('bg-primary/5');
+            });
+        });
+
+        // Determine active navigation
+        const currentPath = "Reports"; // Mock logic
+        document.querySelectorAll('nav a').forEach(link => {
+            if (link.textContent.trim() === currentPath) {
+                link.className = "border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary dark:text-primary-fixed-dim py-3 px-4 transition-all flex items-center gap-3";
+            } else {
+                link.className = "text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all flex items-center gap-3";
+            }
+        });
+    </script>
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-primary text-on-primary flex justify-around items-center py-3 z-50 no-print shadow-lg">
+<a class="flex flex-col items-center gap-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] uppercase">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-secondary-container" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[10px] uppercase">Report</span>
+</a>
+<a class="flex flex-col items-center gap-1" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] uppercase">Profile</span>
+</a>
+<a class="flex flex-col items-center gap-1" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] uppercase">Settings</span>
+</a>
+</div></body></html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admissions | Mount Carmel Secondary School</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&amp;family=Arimo:wght@400;500;600;700&amp;family=Archivo+Narrow:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#f9f9f9",
+                    "surface-container": "#eeeeee",
+                    "tertiary-fixed": "#ffd9e5",
+                    "on-tertiary-fixed": "#3e0022",
+                    "error-container": "#ffdad6",
+                    "surface-tint": "#7d46a1",
+                    "surface": "#f9f9f9",
+                    "primary-fixed": "#f4d9ff",
+                    "on-secondary-fixed-variant": "#354185",
+                    "surface-dim": "#dadada",
+                    "secondary-fixed": "#dee0ff",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-surface": "#1a1c1c",
+                    "on-background": "#1a1c1c",
+                    "on-tertiary-container": "#ff57aa",
+                    "on-primary-fixed": "#2f004c",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb0ce",
+                    "on-surface-variant": "#4c4450",
+                    "surface-container-high": "#e8e8e8",
+                    "on-error-container": "#93000a",
+                    "primary": "#2e004a",
+                    "outline-variant": "#cfc2d1",
+                    "on-primary-container": "#ba80df",
+                    "on-secondary-container": "#364186",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#632c87",
+                    "outline": "#7e7481",
+                    "inverse-primary": "#e4b5ff",
+                    "secondary-fixed-dim": "#bbc3ff",
+                    "background": "#f9f9f9",
+                    "tertiary-container": "#62003a",
+                    "primary-container": "#4a0f6e",
+                    "tertiary": "#3c0022",
+                    "inverse-surface": "#2f3131",
+                    "primary-fixed-dim": "#e4b5ff",
+                    "surface-container-low": "#f3f3f3",
+                    "secondary-container": "#a6b1fe",
+                    "secondary": "#4e599f",
+                    "on-secondary-fixed": "#031159",
+                    "inverse-on-surface": "#f0f1f1",
+                    "surface-variant": "#e2e2e2",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed-variant": "#8c0055",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "lg": "24px",
+                    "xl": "40px",
+                    "container-max": "1280px",
+                    "base": "4px",
+                    "md": "16px",
+                    "gutter": "24px",
+                    "sm": "8px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Domine"],
+                    "headline-md": ["Arimo"],
+                    "headline-lg-mobile": ["Arimo"],
+                    "body-lg": ["Archivo Narrow"],
+                    "label-md": ["Domine"],
+                    "headline-xl": ["Arimo"],
+                    "headline-lg": ["Arimo"],
+                    "body-md": ["Archivo Narrow"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .ribbon {
+            position: relative;
+            background: var(--tw-color-secondary);
+        }
+        .ribbon:after {
+            content: "";
+            position: absolute;
+            right: -10px;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 10px solid currentColor;
+        }
+        .tonal-layer {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0px 4px 12px rgba(30, 42, 110, 0.04);
+        }
+        .academic-gradient {
+            background: linear-gradient(135deg, #2e004a 0%, #4e599f 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="bg-surface sticky top-0 z-50 border-b border-outline-variant">
+<nav class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">Mount Carmel Secondary</span>
+</div>
+<div class="hidden md:flex items-center space-x-lg">
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1 transition-all" href="#">Admissions</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Academics</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Portal</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+</div>
+<div class="flex items-center gap-sm">
+<button class="px-md py-sm bg-primary text-on-primary rounded-lg font-label-md hover:opacity-90 transition-all">Staff Login</button>
+<span class="material-symbols-outlined text-on-surface-variant p-sm cursor-pointer">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant p-sm cursor-pointer">apps</span>
+</div>
+</nav>
+</header>
+<main class="flex-grow">
+<!-- Hero Section with Background Illustration -->
+<section class="relative w-full h-[400px] flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-primary/80 mix-blend-multiply z-10"></div>
+<div class="w-full h-full" data-alt="A grand, architectural view of a historic stone secondary school building with Gothic arches and ivy-covered walls. The scene is set during a golden hour sunset, casting warm amber light across the prestigious campus. The photography style is sharp, clean, and highlights the institutional heritage and elite academic atmosphere of the institution." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhqAw9U6WjniFSSp3tjq7wxdGnNk9d6wOUi6uq-oCQMaxMtkOgZqdnvHN9Zt2nVpPbf_p5Vh7Mnh3JFc7Sh_auKbClHMHMB1SeG0298vXMqBohMVex3V98UOFvdR0Cp3ZeyomZ4z0it_99Ahad-2ETcnUfzUQaGNpeHuH_6X6y9IrlwpwNsuetjpP16vLjfAppvTVtupqnQkvQsQyDVJlauMX5zZucmCaHhSzPqyLuOlKMy_XXq_18uMbMjKDwvawxKVFP_H-fUBxu')"></div>
+</div>
+<div class="relative z-20 text-center max-w-3xl px-gutter">
+<h1 class="font-headline-xl text-headline-xl text-white mb-md">Forge Your Future at Mount Carmel</h1>
+<p class="font-body-lg text-body-lg text-white/90">Join a legacy of excellence, integrity, and academic mastery. Your journey to leadership begins with a single application.</p>
+</div>
+</section>
+<!-- Main Application Container -->
+<section class="max-w-container-max mx-auto px-gutter -mt-24 relative z-30 pb-xl">
+<div class="tonal-layer rounded-lg p-xl md:p-[64px] flex flex-col items-center">
+<!-- Progress Indicator -->
+<div class="w-full max-w-2xl mb-xl">
+<div class="flex justify-between items-center relative">
+<div class="absolute top-1/2 left-0 w-full h-0.5 bg-surface-container -z-10 -translate-y-1/2"></div>
+<div class="absolute top-1/2 left-0 w-1/4 h-0.5 bg-secondary -z-10 -translate-y-1/2"></div>
+<div class="flex flex-col items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold shadow-md">1</div>
+<span class="font-label-sm text-label-sm text-secondary">Introduction</span>
+</div>
+<div class="flex flex-col items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-surface-container text-outline flex items-center justify-center font-bold">2</div>
+<span class="font-label-sm text-label-sm text-outline">Personal Info</span>
+</div>
+<div class="flex flex-col items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-surface-container text-outline flex items-center justify-center font-bold">3</div>
+<span class="font-label-sm text-label-sm text-outline">Academic Record</span>
+</div>
+<div class="flex flex-col items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-surface-container text-outline flex items-center justify-center font-bold">4</div>
+<span class="font-label-sm text-label-sm text-outline">Submission</span>
+</div>
+</div>
+</div>
+<div class="max-w-4xl w-full">
+<header class="text-center mb-xl">
+<h2 class="font-label-md text-label-md text-secondary tracking-widest uppercase mb-xs">Step 01: Getting Started</h2>
+<h3 class="font-headline-lg text-headline-lg text-primary">Admission Application Process</h3>
+<p class="mt-md font-body-md text-on-surface-variant max-w-2xl mx-auto">
+                            Welcome to the Mount Carmel Secondary School online application portal. Please read the following instructions carefully before commencing your application for the upcoming academic session.
+                        </p>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+<!-- Step Details -->
+<div class="p-lg bg-surface-container-low rounded-lg border border-outline-variant/30 text-center">
+<span class="material-symbols-outlined text-primary text-3xl mb-sm" style="font-variation-settings: 'FILL' 1;">description</span>
+<h4 class="font-label-md text-label-md text-primary mb-xs">1. Complete Form</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Provide accurate personal and academic information.</p>
+</div>
+<div class="p-lg bg-surface-container-low rounded-lg border border-outline-variant/30 text-center">
+<span class="material-symbols-outlined text-primary text-3xl mb-sm" style="font-variation-settings: 'FILL' 1;">upload_file</span>
+<h4 class="font-label-md text-label-md text-primary mb-xs">2. Upload Documents</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Attach birth certificate and previous school reports.</p>
+</div>
+<div class="p-lg bg-surface-container-low rounded-lg border border-outline-variant/30 text-center">
+<span class="material-symbols-outlined text-primary text-3xl mb-sm" style="font-variation-settings: 'FILL' 1;">payments</span>
+<h4 class="font-label-md text-label-md text-primary mb-xs">3. Pay Fee</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Securely process the non-refundable application fee.</p>
+</div>
+</div>
+<!-- Input Block -->
+<div class="bg-surface-bright p-xl rounded-lg border border-outline-variant max-w-2xl mx-auto">
+<div class="space-y-lg">
+<div>
+<label class="font-label-md text-label-md text-primary block mb-sm">Select Intended Academic Session</label>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<button class="relative p-md border-2 border-primary bg-primary-fixed/20 rounded-lg text-left transition-all ring-offset-2 ring-primary">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-md text-label-md text-primary">2024/2025 Session</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Regular Admission</p>
+</div>
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+</button>
+<button class="p-md border border-outline-variant hover:border-primary rounded-lg text-left transition-all">
+<div>
+<p class="font-label-md text-label-md text-on-surface">2025/2026 Session</p>
+<p class="font-label-sm text-label-sm text-outline">Advance Registration</p>
+</div>
+</button>
+</div>
+</div>
+<div class="pt-md">
+<label class="flex items-start gap-md cursor-pointer group">
+<input class="mt-1 w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">
+                                        I certify that I am the legal guardian or applicant and I have read the <a class="text-secondary font-bold hover:underline" href="#">Admission Guidelines</a> and <a class="text-secondary font-bold hover:underline" href="#">Privacy Policy</a> of Mount Carmel Secondary School.
+                                    </span>
+</label>
+</div>
+</div>
+</div>
+<div class="mt-xl flex flex-col items-center gap-md">
+<button class="px-xl py-lg bg-primary text-on-primary rounded-lg font-headline-md text-headline-md hover:opacity-90 shadow-lg transform hover:-translate-y-1 transition-all flex items-center gap-sm">
+                            Start Application
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<p class="font-label-sm text-label-sm text-outline">Average completion time: 15-20 minutes</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Institutional Trust Section -->
+<section class="max-w-container-max mx-auto px-gutter pb-xl">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl items-center">
+<div class="tonal-layer p-xl rounded-lg h-full">
+<h4 class="font-headline-md text-headline-md text-primary mb-md">Required Documentation</h4>
+<ul class="space-y-md">
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-secondary">verified</span>
+<span class="font-body-md text-body-md">Certified copy of Birth Certificate or Passport.</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-secondary">verified</span>
+<span class="font-body-md text-body-md">Previous two years of academic transcripts or report cards.</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-secondary">verified</span>
+<span class="font-body-md text-body-md">Two recent passport-sized photographs (Digital).</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-secondary">verified</span>
+<span class="font-body-md text-body-md">Letter of recommendation from the previous School Principal.</span>
+</li>
+</ul>
+</div>
+<div class="relative rounded-lg overflow-hidden h-[340px] group">
+<div class="absolute inset-0 bg-primary/20 group-hover:bg-primary/10 transition-colors z-10"></div>
+<div class="w-full h-full transform group-hover:scale-105 transition-transform duration-700" data-alt="A focused, modern student sitting in a bright, clean library environment, using a digital tablet to review academic material. The aesthetic is clean, professional, and reflects technical precision within an academic setting. Soft natural light filters through large library windows in the background." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCypn8xUHFTduHE78GtjvnYe4IVFrybVQ9BdF0fQycK-lQPZOdcicYpHrw1wL5IjE6SA6EUCoUawhzu9iVR5nrWUKQMCEcGO4Xvsidn86ZjfsNQfCxF8xF2tEXGsHiXkhGRCE-tJptQ8rm1QGFAlgt8deoVHd8F3MvNDxzrf-Rryki88VF274G5stkApWJLvmB52NHGyVLn55IfY1pG9tis6JgR8BWxaf4QlZ9AxLyPnmEVDzfSZZt3EqFb7QsgXXZ_2eD0f0kffpc8')"></div>
+<div class="absolute bottom-md left-md z-20">
+<div class="bg-secondary text-on-secondary px-md py-xs rounded-sm font-label-md flex items-center gap-xs shadow-md">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">info</span>
+                            Technical Assistance Available 24/7
+                        </div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-secondary text-on-secondary w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center">
+<div>
+<span class="font-headline-md text-headline-md font-bold mb-md block">Mount Carmel Secondary</span>
+<p class="font-label-sm text-label-sm opacity-80">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>
+</div>
+<div class="flex flex-wrap gap-lg md:justify-end mt-xl md:mt-0">
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Campus Safety</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Contact Us</a>
+</div>
+</footer>
+<script>
+        // Micro-interactions for button hover effects and form focus
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.style.transform = 'scale(0.98)';
+            });
+            button.addEventListener('mouseup', () => {
+                button.style.transform = 'scale(1)';
+            });
+        });
+
+        // Simple tab selector logic for the session selector
+        const sessionButtons = document.querySelectorAll('.grid-cols-1.md\\:grid-cols-2 button');
+        sessionButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                sessionButtons.forEach(b => {
+                    b.classList.remove('border-primary', 'bg-primary-fixed/20', 'ring-offset-2', 'ring-primary');
+                    b.classList.add('border-outline-variant');
+                    const icon = b.querySelector('.material-symbols-outlined');
+                    if(icon) icon.remove();
+                });
+                btn.classList.add('border-primary', 'bg-primary-fixed/20', 'ring-offset-2', 'ring-primary');
+                btn.classList.remove('border-outline-variant');
+                
+                const checkIcon = document.createElement('span');
+                checkIcon.className = 'material-symbols-outlined text-primary';
+                checkIcon.innerText = 'check_circle';
+                btn.querySelector('.flex').appendChild(checkIcon);
+            });
+        });
+    </script>
+</body></html>

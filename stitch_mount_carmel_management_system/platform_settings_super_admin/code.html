@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Platform Settings | Mount Carmel Secondary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&family=Domine:wght@400;500;600;700&family=Archivo+Narrow:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&family=Arimo:wght@100..900&family=Domine:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f9f9f9",
+                        "surface-container": "#eeeeee",
+                        "tertiary-fixed": "#ffd9e5",
+                        "on-tertiary-fixed": "#3e0022",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#7d46a1",
+                        "surface": "#f9f9f9",
+                        "primary-fixed": "#f4d9ff",
+                        "on-secondary-fixed-variant": "#354185",
+                        "surface-dim": "#dadada",
+                        "secondary-fixed": "#dee0ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-surface": "#1a1c1c",
+                        "on-background": "#1a1c1c",
+                        "on-tertiary-container": "#ff57aa",
+                        "on-primary-fixed": "#2f004c",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb0ce",
+                        "on-surface-variant": "#4c4450",
+                        "surface-container-high": "#e8e8e8",
+                        "on-error-container": "#93000a",
+                        "primary": "#2e004a",
+                        "outline-variant": "#cfc2d1",
+                        "on-primary-container": "#ba80df",
+                        "on-secondary-container": "#364186",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#632c87",
+                        "outline": "#7e7481",
+                        "inverse-primary": "#e4b5ff",
+                        "secondary-fixed-dim": "#bbc3ff",
+                        "background": "#f9f9f9",
+                        "tertiary-container": "#62003a",
+                        "primary-container": "#4a0f6e",
+                        "tertiary": "#3c0022",
+                        "inverse-surface": "#2f3131",
+                        "primary-fixed-dim": "#e4b5ff",
+                        "surface-container-low": "#f3f3f3",
+                        "secondary-container": "#a6b1fe",
+                        "secondary": "#4e599f",
+                        "on-secondary-fixed": "#031159",
+                        "inverse-on-surface": "#f0f1f1",
+                        "surface-variant": "#e2e2e2",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#8c0055",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "md": "16px",
+                        "gutter": "24px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Domine"],
+                        "headline-md": ["Arimo"],
+                        "headline-lg-mobile": ["Arimo"],
+                        "body-lg": ["Archivo Narrow"],
+                        "label-md": ["Domine"],
+                        "headline-xl": ["Arimo"],
+                        "headline-lg": ["Arimo"],
+                        "body-md": ["Archivo Narrow"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ribbon-tag {
+            position: relative;
+            clip-path: polygon(100% 0, 95% 50%, 100% 100%, 0% 100%, 0% 0%);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #7e7481;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary dark:bg-surface-container-lowest text-on-primary dark:text-primary docked left-0 w-64 shadow-sm transition-all duration-200 ease-in-out">
+<div class="px-md mb-xl">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="The crest of Mount Carmel Secondary School, a sophisticated heraldic shield featuring traditional academic symbols like an open book and a torch, rendered in a modern flat design style with royal purple and gold accents against a clean white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZP2ESanccNtB4gsF0Mmz85O6Cqhbqhd3x1JB7qhy330iBPiDSspibcICc94eSIJknzfPs9FpQd99g6NQlx14cIqONprLIleUzS0r9mN7WmOqTveR_5GT440SbLRMlvZQpN8yJOU_dze5EXlTcQQHJihxzc7-UEtcKhk6vL_QGELfMDIT2Ld9PTk8W3gEIQejG1YDRCmS77cM2xHJVTGn_3vMeLwl4FUVj1XjHaFF_TkWVxV8HzWGiJgqaNyJKvMf33OorxF44JXsn"/>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-on-primary dark:text-primary leading-none">Mount Carmel</h1>
+<span class="font-label-sm text-label-sm opacity-80">Admin Portal</span>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs overflow-y-auto px-xs">
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md text-label-md">Students</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-label-md text-label-md">Academics</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Finance</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-md text-label-md">Attendance</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+</nav>
+<div class="mt-auto px-xs flex flex-col gap-xs pt-md border-t border-on-primary/10">
+<a class="border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary dark:text-primary-fixed-dim py-3 px-4 flex items-center gap-md transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface-container-high border-b border-outline-variant dark:border-outline sticky top-0 z-30 h-16">
+<div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-full">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Platform Settings</span>
+<div class="hidden md:flex gap-lg">
+<a class="text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed pb-1 font-label-md text-label-md transition-all" href="#matrix">Role Matrix</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed font-label-md text-label-md transition-colors" href="#branding">Global Branding</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed font-label-md text-label-md transition-colors" href="#audit">Audit Log</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md py-2 rounded-full hover:opacity-90 transition-all">
+                        Save Changes
+                    </button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant ml-2">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female school administrator in her late 40s, wearing a charcoal grey suit and a subtle purple silk blouse. She has a confident and friendly expression, set against a softly blurred background of an institutional library with rich wooden bookshelves and warm lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCuTVnk3p7ULshiLERWQ6z3NJzd1KqB5RXWWaSLQUWdKkb8ke0CB99JPxw1Ulz8yAbHqEUrsVYEoR0lfx8kDzaIPYTR_Ztn1UaLYHXlJfpVv0QvNQPqPM0XZTEO7z4KzQL31LsQvrySZu1DyBwVqUkW0PcvhbyZC2VYSPZhm3E0vIdJz6YQBkB7ail9fRTIcVFIBv7QeBkOmoDejeR9JezZUVQXACwIE5FyxTTKL7m8kKQn70RFqLN6R5ufuMrYfjXy0QzAc7DMOum"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="p-xl max-w-container-max mx-auto space-y-xl">
+<!-- Section: Header Info -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-lg shadow-sm">
+<div class="flex items-center gap-md mb-md">
+<div class="w-12 h-12 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Access Control</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">4 Active Global Roles</p>
+</div>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-primary w-3/4 h-full"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-lg shadow-sm">
+<div class="flex items-center gap-md mb-md">
+<div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">palette</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-secondary">Brand Identity</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Last updated 2 days ago</p>
+</div>
+</div>
+<div class="flex gap-xs">
+<div class="w-6 h-6 rounded-full bg-primary"></div>
+<div class="w-6 h-6 rounded-full bg-secondary"></div>
+<div class="w-6 h-6 rounded-full bg-tertiary-container"></div>
+<div class="w-6 h-6 rounded-full border border-outline"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-lg shadow-sm">
+<div class="flex items-center gap-md mb-md">
+<div class="w-12 h-12 bg-error-container text-on-error-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-error">System Integrity</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">12.4k Logs this month</p>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Health Status: <span class="text-emerald-600 font-bold">OPTIMAL</span></p>
+</div>
+</section>
+<!-- Section: Role/Permission Matrix -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm" id="matrix">
+<div class="bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">Role/Permission Matrix</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Configure cross-module access for primary system roles.</p>
+</div>
+<button class="flex items-center gap-sm text-primary font-label-md text-label-md hover:underline">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+                        Create New Role
+                    </button>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-primary text-on-primary">
+<th class="p-lg font-label-md text-label-md border-r border-on-primary/20 sticky left-0 bg-primary z-10">Module Name</th>
+<th class="p-lg font-label-md text-label-md text-center">Super Admin</th>
+<th class="p-lg font-label-md text-label-md text-center">Principal</th>
+<th class="p-lg font-label-md text-label-md text-center">Finance Lead</th>
+<th class="p-lg font-label-md text-label-md text-center">Department Head</th>
+<th class="p-lg font-label-md text-label-md text-center">Staff/Teacher</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md">
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+<td class="p-lg font-bold text-on-surface sticky left-0 bg-surface-container-lowest border-r border-outline-variant">User Management</td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-emerald-600">check_circle</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-emerald-600">check_circle</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-outline">radio_button_unchecked</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-outline">radio_button_unchecked</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-outline">radio_button_unchecked</span></td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+<td class="p-lg font-bold text-on-surface sticky left-0 bg-surface-container-lowest border-r border-outline-variant">Financial Ledger</td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-emerald-600">check_circle</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-on-tertiary-container">visibility</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-emerald-600">check_circle</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-outline">radio_button_unchecked</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-outline">radio_button_unchecked</span></td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+<td class="p-lg font-bold text-on-surface sticky left-0 bg-surface-container-lowest border-r border-outline-variant">Academic Curriculum</td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-emerald-600">check_circle</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-emerald-600">check_circle</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-outline">radio_button_unchecked</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-emerald-600">check_circle</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-on-tertiary-container">visibility</span></td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+<td class="p-lg font-bold text-on-surface sticky left-0 bg-surface-container-lowest border-r border-outline-variant">Audit Logs</td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-emerald-600">check_circle</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-on-tertiary-container">visibility</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-outline">radio_button_unchecked</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-outline">radio_button_unchecked</span></td>
+<td class="p-lg text-center"><span class="material-symbols-outlined text-outline">radio_button_unchecked</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Section: Branding & Logs (Asymmetric Layout) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-xl">
+<!-- Branding Settings -->
+<section class="lg:col-span-5 space-y-lg" id="branding">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg shadow-sm">
+<h2 class="font-headline-md text-headline-md text-primary mb-md">Global Branding</h2>
+<div class="space-y-md">
+<div>
+<label class="font-label-md text-label-md text-on-surface mb-xs block">Institution Name</label>
+<input class="w-full px-md py-2 border border-outline rounded text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="text" value="Mount Carmel Secondary"/>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div>
+<label class="font-label-md text-label-md text-on-surface mb-xs block">Primary Color</label>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded border border-outline-variant bg-primary"></div>
+<input class="w-full px-md py-2 border border-outline rounded text-label-md" type="text" value="#2e004a"/>
+</div>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface mb-xs block">Secondary Color</label>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded border border-outline-variant bg-secondary"></div>
+<input class="w-full px-md py-2 border border-outline rounded text-label-md" type="text" value="#4e599f"/>
+</div>
+</div>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface mb-xs block">Logo Asset</label>
+<div class="border-2 border-dashed border-outline-variant rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-primary text-[48px] mb-sm group-hover:scale-110 transition-transform">cloud_upload</span>
+<p class="font-label-md text-label-md text-on-surface-variant">Click to upload SVG or PNG</p>
+<p class="text-[10px] text-outline mt-xs uppercase">Max size: 2MB</p>
+</div>
+</div>
+<div class="pt-md border-t border-outline-variant flex justify-end gap-md">
+<button class="px-md py-2 font-label-md text-label-md text-on-surface-variant border border-outline rounded hover:bg-surface-container transition-all">Reset Defaults</button>
+<button class="px-md py-2 font-label-md text-label-md bg-secondary text-on-secondary rounded hover:opacity-90 transition-all">Update Identity</button>
+</div>
+</div>
+</div>
+<div class="bg-primary dark:bg-surface-container-lowest text-on-primary dark:text-primary rounded-lg p-lg flex items-center justify-between shadow-lg overflow-hidden relative group">
+<div class="relative z-10">
+<h4 class="font-headline-md text-headline-md mb-xs">Maintenance Mode</h4>
+<p class="font-body-md text-body-md opacity-80 max-w-[240px]">Restrict platform access for all non-admin users during updates.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer z-10">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-14 h-7 bg-on-primary/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-tertiary-container"></div>
+</label>
+<!-- Subtle Background Pattern -->
+<div class="absolute -right-8 -bottom-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
+<span class="material-symbols-outlined text-[160px]">construction</span>
+</div>
+</div>
+</section>
+<!-- Audit Log -->
+<section class="lg:col-span-7" id="audit">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm h-full flex flex-col">
+<div class="p-lg border-b border-outline-variant flex items-center justify-between bg-surface-container-low rounded-t-lg">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">System Audit Log</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Live feed of all administrative actions across the platform.</p>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded border border-outline-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-lg space-y-md" style="max-height: 600px;">
+<!-- Log Entry 1 -->
+<div class="flex gap-md border-l-4 border-emerald-500 pl-md py-xs bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-r">
+<div class="pt-1">
+<span class="material-symbols-outlined text-emerald-600" style="font-variation-settings: 'FILL' 1;">person_add</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-xs">
+<p class="font-body-md text-body-md"><strong>Administrator</strong> added a new role <strong>'Sub-Warden'</strong></p>
+<span class="font-label-sm text-label-sm text-outline">12:45 PM</span>
+</div>
+<div class="ribbon-tag bg-emerald-100 text-emerald-800 px-md py-xs inline-block font-label-sm text-label-sm">SECURITY_EVENT</div>
+</div>
+</div>
+<!-- Log Entry 2 -->
+<div class="flex gap-md border-l-4 border-primary pl-md py-xs bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-r">
+<div class="pt-1">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">settings_brightness</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-xs">
+<p class="font-body-md text-body-md"><strong>System</strong> auto-archived logs from March 2024</p>
+<span class="font-label-sm text-label-sm text-outline">11:20 AM</span>
+</div>
+<div class="ribbon-tag bg-primary-container/20 text-primary-container px-md py-xs inline-block font-label-sm text-label-sm">SYSTEM_MAINTENANCE</div>
+</div>
+</div>
+<!-- Log Entry 3 -->
+<div class="flex gap-md border-l-4 border-error pl-md py-xs bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-r">
+<div class="pt-1">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-xs">
+<p class="font-body-md text-body-md">Multiple failed login attempts detected for user <strong>'finance_user_02'</strong></p>
+<span class="font-label-sm text-label-sm text-outline">09:15 AM</span>
+</div>
+<div class="ribbon-tag bg-error-container text-on-error-container px-md py-xs inline-block font-label-sm text-label-sm">THREAT_ALERT</div>
+</div>
+</div>
+<!-- Log Entry 4 -->
+<div class="flex gap-md border-l-4 border-secondary pl-md py-xs bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-r">
+<div class="pt-1">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">edit_square</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-xs">
+<p class="font-body-md text-body-md"><strong>Principal</strong> updated school fee structure for Term 2</p>
+<span class="font-label-sm text-label-sm text-outline">Yesterday</span>
+</div>
+<div class="ribbon-tag bg-secondary-container text-on-secondary-container px-md py-xs inline-block font-label-sm text-label-sm">FINANCE_CHANGE</div>
+</div>
+</div>
+<!-- Log Entry 5 -->
+<div class="flex gap-md border-l-4 border-tertiary-container pl-md py-xs bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-r">
+<div class="pt-1">
+<span class="material-symbols-outlined text-tertiary-container" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-xs">
+<p class="font-body-md text-body-md"><strong>Curriculum Lead</strong> added <strong>'Advanced Physics'</strong> to Academic Calendar</p>
+<span class="font-label-sm text-label-sm text-outline">Yesterday</span>
+</div>
+<div class="ribbon-tag bg-tertiary-fixed text-on-tertiary-fixed px-md py-xs inline-block font-label-sm text-label-sm">ACADEMIC_LOG</div>
+</div>
+</div>
+</div>
+<div class="p-md bg-surface-container-low border-t border-outline-variant text-center">
+<button class="font-label-md text-label-md text-primary hover:underline">View Full Historical Audit</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary dark:bg-secondary-fixed-dim text-on-secondary dark:text-on-secondary-fixed mt-xl">
+<div>
+<p class="font-body-md text-body-md opacity-80">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>
+</div>
+<div class="flex flex-wrap gap-lg md:justify-end mt-md md:mt-0">
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Campus Safety</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Contact Us</a>
+</div>
+</footer>
+</main>
+<!-- Micro-interactions Script -->
+<script>
+        // Simple theme toggle logic for demonstration (if user had one)
+        // const toggleDarkMode = () => document.documentElement.classList.toggle('dark');
+
+        // Notification dots or subtle animations
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.style.transform = 'scale(0.98)';
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+
+        // Hover effect for audit log entries
+        const auditEntries = document.querySelectorAll('#audit .flex-1');
+        auditEntries.forEach(entry => {
+            entry.addEventListener('mouseenter', () => {
+                entry.closest('.flex').classList.add('translate-x-1');
+            });
+            entry.addEventListener('mouseleave', () => {
+                entry.closest('.flex').classList.remove('translate-x-1');
+            });
+        });
+    </script>
+</body></html>

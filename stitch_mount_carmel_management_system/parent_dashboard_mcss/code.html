@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mount Carmel Secondary - Parent Portal</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&amp;family=Archivo+Narrow:wght@400;500;600;700&amp;family=Domine:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary": "#3c0022",
+                      "inverse-surface": "#2f3131",
+                      "on-tertiary-fixed-variant": "#8c0055",
+                      "on-error-container": "#93000a",
+                      "inverse-on-surface": "#f0f1f1",
+                      "primary-fixed-dim": "#e4b5ff",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed": "#3e0022",
+                      "background": "#f9f9f9",
+                      "tertiary-fixed-dim": "#ffb0ce",
+                      "on-primary-container": "#ba80df",
+                      "outline": "#7e7481",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-container": "#ff57aa",
+                      "surface-container": "#eeeeee",
+                      "tertiary-container": "#62003a",
+                      "surface-variant": "#e2e2e2",
+                      "secondary-fixed": "#dee0ff",
+                      "on-secondary-fixed": "#031159",
+                      "surface-container-highest": "#e2e2e2",
+                      "surface-container-high": "#e8e8e8",
+                      "surface": "#f9f9f9",
+                      "on-background": "#1a1c1c",
+                      "tertiary-fixed": "#ffd9e5",
+                      "secondary-fixed-dim": "#bbc3ff",
+                      "surface-bright": "#f9f9f9",
+                      "primary-container": "#4a0f6e",
+                      "on-surface": "#1a1c1c",
+                      "on-error": "#ffffff",
+                      "on-secondary-container": "#364186",
+                      "outline-variant": "#cfc2d1",
+                      "on-primary": "#ffffff",
+                      "surface-tint": "#7d46a1",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#a6b1fe",
+                      "on-surface-variant": "#4c4450",
+                      "on-primary-fixed-variant": "#632c87",
+                      "on-secondary-fixed-variant": "#354185",
+                      "inverse-primary": "#e4b5ff",
+                      "error": "#ba1a1a",
+                      "primary": "#2e004a",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#2f004c",
+                      "surface-dim": "#dadada",
+                      "surface-container-low": "#f3f3f3",
+                      "secondary": "#4e599f",
+                      "primary-fixed": "#f4d9ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "xs": "4px",
+                      "xl": "40px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-xl": ["Arimo"],
+                      "headline-lg": ["Arimo"],
+                      "label-sm": ["Domine"],
+                      "headline-lg-mobile": ["Arimo"],
+                      "body-lg": ["Archivo Narrow"],
+                      "headline-md": ["Arimo"],
+                      "body-md": ["Archivo Narrow"],
+                      "label-md": ["Domine"]
+              },
+              "fontSize": {
+                      "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                      "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ribbon-tag {
+            position: relative;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 8% 50%);
+            padding-left: 1.5rem;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+        }
+        .sidebar-active-indicator {
+            position: absolute;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #ff57aa; /* Magenta accent */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface fixed top-0 w-full z-50 border-b border-outline-variant">
+<div class="flex justify-between items-center w-full px-lg py-sm max-w-container-max mx-auto h-16">
+<div class="flex items-center gap-md">
+<button class="lg:hidden p-sm hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-headline-md text-headline-md font-bold text-primary">Mount Carmel Secondary</span>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex items-center bg-surface-container-low px-md py-xs rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-body-md">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-48" placeholder="Search records..." type="text"/>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-sm text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-sm text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full border border-outline-variant bg-center bg-cover ml-sm" data-alt="A professional portrait of a middle-aged parent, dressed in smart-casual institutional attire, looking kindly toward the camera. The lighting is bright and clear, reflecting a high-trust, academic management environment with soft neutral tones in the background." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDkcrGRouAjsfbQV4IkMmpjQsUdapXoJTYJ-yRg2OzsbnpPK1J6Xly2uC0CbBSZt2cQMFEmTo71H68o3dKfCSFQC6h2-ikf_ylPGSL3t9mt1hx48-yxRjKG58It9uqO1ZlQyKpM9z_fawPL4MLAzz2AFqsMddBDLET-rxf1Lg4AqL5OXNwTegov-fzEn0FtStXcT1azUzx5XK-T6FUeSXT0-RhxbVc16LQ70xDTYsD2r9-rr6GYGT7fQREAEjRmHKRVGDVHWo2ZfZcE')"></div>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Shared Component) -->
+<aside class="hidden lg:flex flex-col h-full fixed left-0 top-0 z-40 w-64 bg-primary text-on-primary shadow-sm pt-20">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm mb-sm">
+<div class="w-12 h-12 bg-white rounded-full flex items-center justify-center p-2">
+<img class="w-full" data-alt="A stylized school crest for Mount Carmel Secondary, featuring a traditional shield with an open book, a cross, and a mountain peak, rendered in clean royal purple and gold lines for a professional academic institutional identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChfCyMz41715v0fTogi1h0mY_nG7kNhqq01acf6auzqZULK8oH_7KJNyPlK4kqHBQFcazy-Tj85wL3g8fLOpuTMR2fM3BF47n7AxKw1hF46yIC36_eEegOGCT1i6DtJsE93PyjSCMp2pbZpZj83H193lPwo8XzgCO3dkJOzdNd8uYvOnXEXB1Q0OKlY3pdsXtdN425COgMglkCkgAQU0WIPtYbkHj0jpUMeaLWYpepqytajvR1gZA5-GCSRaIN4nKlILb-c1E8sQMm"/>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-white">MCSS Portal</h2>
+<p class="text-[10px] uppercase tracking-widest opacity-70">Academic Excellence</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs">
+<a class="relative border-l-4 border-on-tertiary-container bg-primary-container text-on-primary-container font-bold px-md py-sm flex items-center gap-sm transition-all translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm flex items-center gap-sm transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="font-label-md text-label-md">Academics</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm flex items-center gap-sm transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label-md text-label-md">Finance</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm flex items-center gap-sm transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md">Schedule</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm flex items-center gap-sm transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+<span class="font-label-md text-label-md">More</span>
+</a>
+</nav>
+<div class="mt-auto p-lg border-t border-white/10">
+<button class="flex items-center gap-sm text-on-primary/60 hover:text-white transition-colors">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Sign Out</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 pt-24 pb-32 px-md md:px-lg max-w-container-max mx-auto min-h-screen">
+<!-- Child Switcher Section -->
+<section class="mb-xl flex flex-col md:flex-row md:items-end justify-between gap-lg">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary mb-xs">Welcome back, Mrs. Adebayo</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Manage your children's academic progress and records.</p>
+</div>
+<div class="flex items-center gap-md bg-surface-container-high p-sm rounded-lg border border-outline-variant self-start md:self-auto">
+<p class="font-label-md text-label-md text-primary px-sm">Active Profile:</p>
+<div class="flex gap-xs">
+<button class="flex items-center gap-sm bg-primary text-white px-md py-xs rounded-full shadow-sm">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest bg-center bg-cover" data-alt="A circular headshot of a smiling young high school boy in a neat purple school blazer and white shirt. The photo is a professional student portrait with a clean, light grey studio background." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDwFbVjWCvMRl9jfs5krCNzrZJmPeSxOcCbR_80RUDPi8mhogzGhaZCaB2FIe9nJxTbE3Yi79O4iT3ibHVNWFQwxEr5m6G6-6-nFMDD1KPY4-HeNOMteObzhEWONjvY6nB11TnVGDlGEooqC7HaUGPs2hTrr8y1r-S5cMvXd9uV8w7oX6U2Wl389Y3M1YWhUx43WaZdUs1vqbK2uZxbm8wzmkFL-xYLzHc4u50kW-OeXOHTo6vEq1N5MSBh_dTUEtdxux0UcJaEgq33')"></div>
+<span class="font-label-md text-label-md">Samuel</span>
+</button>
+<button class="flex items-center gap-sm bg-white text-on-surface-variant px-md py-xs rounded-full border border-outline-variant hover:bg-surface-container-low transition-colors">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest bg-center bg-cover" data-alt="A circular headshot of a teenage girl with braids, wearing a dark school uniform with a subtle purple tie. She has a bright, confident expression in a professional academic portrait setting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB03oM1QQNxiUWRrf6RcMZK54Yerum2cFavKmfHDGNkAKIjVO5unHf1PbGQjltCIgi2vYVtJtOjDF3UsIIAATmTGZsuSsMDiO9yf9wIRkO7Yem1rc4rx8xakZjcppNJUgiW9eoIuOqIXi0VpdUFuGXOC0PvmhFnwPwUe5hL-yb1wfNXlIpU_APfJJDPuAANxFd4w2erZCeHQBg7zCBTT_5wATjAcX-_SlFvlbgDiSAOZR6ENzGq95d1wFQSMvwmA9uzLfVRteYvR-5t')"></div>
+<span class="font-label-md text-label-md">Grace</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-outline-variant text-primary hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-body-md">add</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Summary Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Attendance Card -->
+<div class="md:col-span-4 bg-white rounded-lg border border-outline-variant shadow-sm flex flex-col overflow-hidden group hover:border-primary transition-all">
+<div class="p-lg flex-1">
+<div class="flex justify-between items-start mb-md">
+<div class="p-sm bg-primary/5 rounded-lg">
+<span class="material-symbols-outlined text-primary">calendar_month</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant opacity-60">This Term</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Attendance</h3>
+<div class="flex items-baseline gap-xs">
+<span class="text-4xl font-bold text-primary">94.2%</span>
+<span class="text-on-error font-semibold text-label-sm bg-error px-xs py-0.5 rounded">-1.5%</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-sm">2 days absent this term.</p>
+</div>
+<div class="h-1.5 bg-surface-container-high w-full">
+<div class="h-full bg-primary" style="width: 94.2%"></div>
+</div>
+</div>
+<!-- Latest Result Card -->
+<div class="md:col-span-8 bg-white rounded-lg border border-outline-variant shadow-sm overflow-hidden flex flex-col md:flex-row group hover:border-primary transition-all">
+<div class="p-lg md:w-2/5 flex flex-col justify-center border-b md:border-b-0 md:border-r border-outline-variant bg-surface-container-low/30">
+<div class="flex items-center gap-sm mb-sm">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant">trending_up</span>
+<span class="font-label-md text-label-md text-on-tertiary-fixed-variant">Latest Assessment</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Term 2 Average</h3>
+<div class="text-5xl font-bold text-primary tracking-tight">78.5<span class="text-2xl font-medium opacity-50">%</span></div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-md">Standing: 4th in Class</p>
+</div>
+<div class="p-lg md:w-3/5 flex flex-col justify-between">
+<div class="space-y-md">
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md">Mathematics (Mid-term)</span>
+<span class="font-bold text-primary">82/100</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md">English Lit. (Essay)</span>
+<span class="font-bold text-primary">74/100</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md">Physics (Practical)</span>
+<span class="font-bold text-primary">80/100</span>
+</div>
+</div>
+<button class="mt-lg text-primary font-bold font-label-md flex items-center gap-xs hover:gap-md transition-all">
+                        View Detailed Transcript <span class="material-symbols-outlined text-body-md">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Fee Status Ribbon Card -->
+<div class="md:col-span-12 lg:col-span-6 bg-white rounded-lg border border-outline-variant shadow-sm overflow-hidden flex items-center p-lg relative">
+<div class="absolute right-0 top-0 h-full w-24 bg-surface-container-high/20 pointer-events-none"></div>
+<div class="p-md bg-tertiary-container text-on-tertiary-container rounded-lg mr-lg">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-md mb-xs">
+<h3 class="font-headline-md text-headline-md text-on-surface">Fee Status</h3>
+<div class="bg-tertiary text-white font-label-sm text-label-sm ribbon-tag pr-md py-1">
+                            PARTIAL PAYMENT
+                        </div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Outstanding Balance: <span class="font-bold text-primary">₦45,000.00</span></p>
+</div>
+<button class="bg-primary text-white px-lg py-sm rounded-full font-bold hover:bg-primary-container transition-colors shadow-md">
+                    Pay Now
+                </button>
+</div>
+<!-- Schedule / Calendar Mini -->
+<div class="md:col-span-12 lg:col-span-6 bg-white rounded-lg border border-outline-variant shadow-sm p-lg">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-sm text-headline-sm text-primary">Upcoming Events</h3>
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">more_horiz</span></button>
+</div>
+<div class="space-y-md">
+<div class="flex gap-md items-start">
+<div class="flex flex-col items-center bg-surface-container px-sm py-xs rounded min-w-[50px]">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Nov</span>
+<span class="font-headline-sm text-headline-sm text-primary leading-none">12</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Parent-Teacher Conference</h4>
+<p class="text-xs text-on-surface-variant">14:00 - Main Hall</p>
+</div>
+</div>
+<div class="flex gap-md items-start">
+<div class="flex flex-col items-center bg-surface-container px-sm py-xs rounded min-w-[50px]">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Nov</span>
+<span class="font-headline-sm text-headline-sm text-primary leading-none">15</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Mid-Term Inter-House Sports</h4>
+<p class="text-xs text-on-surface-variant">08:00 - Sports Complex</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Message Notification Strip -->
+<div class="md:col-span-12 bg-surface-container-lowest border border-outline-variant rounded-lg p-md flex flex-col md:flex-row items-center justify-between gap-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="A portrait of a senior school administrator, a middle-aged woman with a professional bob hairstyle and glasses, wearing a pearl necklace and a purple blazer. The background is a soft-focus library with leather-bound books, conveying academic authority and trust." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6LcrM_FOod-KcnC6Rx54UItGk9zd3MrzJFU7lqjlfBnEvah6_KqJ3-8y6hq0w3zOv9aULug6aB0eUc5AaqZlCJnEqXJ5YG5fsUZ7xlQvqvu6806gkSzR0LMtsPqOEB460x14jwcy7pYcQVaWNUk6Icae0Kl5jLjs23fFPvMZbsx30rY9637ARlVwYhXIBZSmohmLMG0DO92Jx_g-IJHvGrofo_J0g1QZ6u-WZYYhcgBkVOEVgOYRG9FO0kxPz97SDgcalSeSWmM8o"/>
+</div>
+<div>
+<p class="font-label-md text-label-md text-primary">New Message from Principal</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Regarding the upcoming semester curriculum adjustments...</p>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="px-md py-sm border border-outline text-on-surface font-bold rounded-full hover:bg-surface-container transition-colors">Dismiss</button>
+<button class="px-md py-sm bg-secondary text-white font-bold rounded-full hover:bg-secondary-fixed-dim transition-colors">Read Message</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Shared Component for Mobile) -->
+<nav class="fixed bottom-md left-0 right-0 w-[calc(100%-48px)] mx-auto z-50 flex justify-around items-center py-sm px-md lg:hidden bg-inverse-surface rounded-full shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-tertiary-container bg-tertiary-container/20 rounded-full p-2 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm-mobile">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="grade">grade</span>
+<span class="font-label-sm text-label-sm-mobile">Grades</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-label-sm text-label-sm-mobile">Fees</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+<span class="font-label-sm text-label-sm-mobile">Time</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+<span class="font-label-sm text-label-sm-mobile">More</span>
+</a>
+</nav>
+<!-- Micro-interaction Script -->
+<script>
+        // Simple ripple-like effect on summary cards or interactivity handling
+        document.querySelectorAll('.group').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('translate-y-[-4px]');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('translate-y-[-4px]');
+            });
+        });
+
+        // Theme toggle (demo-only)
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+    </script>
+</body></html>

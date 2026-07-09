@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mount Carmel Secondary - Student Dashboard</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&family=Domine:wght@500;700&family=Archivo+Narrow:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&family=Arimo:wght@100..900&family=Domine:wght@100..900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ribbon-tag {
+            position: relative;
+            clip-path: polygon(0% 0%, 100% 0%, 95% 50%, 100% 100%, 0% 100%);
+        }
+        /* Custom scrollbar for institutional feel */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #4e599f; border-radius: 10px; }
+    </style>
+<!-- Tailwind Config Verbatim -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary": "#3c0022",
+                      "inverse-surface": "#2f3131",
+                      "on-tertiary-fixed-variant": "#8c0055",
+                      "on-error-container": "#93000a",
+                      "inverse-on-surface": "#f0f1f1",
+                      "primary-fixed-dim": "#e4b5ff",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed": "#3e0022",
+                      "background": "#f9f9f9",
+                      "tertiary-fixed-dim": "#ffb0ce",
+                      "on-primary-container": "#ba80df",
+                      "outline": "#7e7481",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-container": "#ff57aa",
+                      "surface-container": "#eeeeee",
+                      "tertiary-container": "#62003a",
+                      "surface-variant": "#e2e2e2",
+                      "secondary-fixed": "#dee0ff",
+                      "on-secondary-fixed": "#031159",
+                      "surface-container-highest": "#e2e2e2",
+                      "surface-container-high": "#e8e8e8",
+                      "surface": "#f9f9f9",
+                      "on-background": "#1a1c1c",
+                      "tertiary-fixed": "#ffd9e5",
+                      "secondary-fixed-dim": "#bbc3ff",
+                      "surface-bright": "#f9f9f9",
+                      "primary-container": "#4a0f6e",
+                      "on-surface": "#1a1c1c",
+                      "on-error": "#ffffff",
+                      "on-secondary-container": "#364186",
+                      "outline-variant": "#cfc2d1",
+                      "on-primary": "#ffffff",
+                      "surface-tint": "#7d46a1",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#a6b1fe",
+                      "on-surface-variant": "#4c4450",
+                      "on-primary-fixed-variant": "#632c87",
+                      "on-secondary-fixed-variant": "#354185",
+                      "inverse-primary": "#e4b5ff",
+                      "error": "#ba1a1a",
+                      "primary": "#2e004a",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#2f004c",
+                      "surface-dim": "#dadada",
+                      "surface-container-low": "#f3f3f3",
+                      "secondary": "#4e599f",
+                      "primary-fixed": "#f4d9ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "xs": "4px",
+                      "xl": "40px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-xl": ["Arimo"],
+                      "headline-lg": ["Arimo"],
+                      "label-sm": ["Domine"],
+                      "headline-lg-mobile": ["Arimo"],
+                      "body-lg": ["Archivo Narrow"],
+                      "headline-md": ["Arimo"],
+                      "body-md": ["Archivo Narrow"],
+                      "label-md": ["Domine"]
+              },
+              "fontSize": {
+                      "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                      "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface sticky top-0 z-50 border-b border-outline-variant w-full">
+<div class="flex justify-between items-center w-full px-lg py-sm max-w-container-max mx-auto">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">Mount Carmel Secondary</span>
+</div>
+<div class="flex items-center gap-lg">
+<div class="hidden md:flex items-center bg-surface-container-low px-md py-xs rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant mr-xs">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-64" placeholder="Search Portal..." type="text"/>
+</div>
+<div class="flex items-center gap-md">
+<button class="hover:bg-surface-container-low transition-colors p-xs rounded-full relative">
+<span class="material-symbols-outlined text-primary">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="hover:bg-surface-container-low transition-colors p-xs rounded-full">
+<span class="material-symbols-outlined text-primary">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full border-2 border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Professional studio portrait of a young West African male student in a crisp white school uniform shirt against a neutral academic background. The lighting is bright and even, reflecting a light-mode high-trust institutional aesthetic. The student has a focused and proud expression, representing the heritage of Mount Carmel Secondary school." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDc6K3McMw7zCNQ05ktuSCEuktZQBdGjlH7QD5RItRsQDctp5U-eXpl4nuwhnfpsLFe_OlyyAOWAc6DRXotKpHKFLYTYS34Icz5fyBEDTMUlOK3heW9w3--7yHYxLFhQcssVGEhMe2_TPLTvlPoG-UTc5lISIcRoLX2VjJkf5PvB6boA6v0kgCZ0aREdobmNvXRllM8UXm56CIV3_dyWo2Nm8nUh0RNTQkyCdDvO0Tr-2PeTQ8aAY0OYJIighXGfB9mbsKXPQL8_28A"/>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Shared Component) -->
+<aside class="hidden lg:flex flex-col h-full fixed left-0 top-0 z-40 bg-primary w-64 pt-20">
+<div class="px-lg py-md mb-lg">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-10 h-10 bg-on-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-primary">MCSS Portal</h2>
+<p class="font-label-sm text-label-sm text-on-primary/70">Academic Excellence</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-sm">
+<a class="border-l-4 border-on-tertiary-container bg-primary-container text-on-primary-container font-bold px-md py-sm mb-xs flex items-center gap-sm transition-all translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm mb-xs flex items-center gap-sm transition-all rounded-r-lg" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md text-label-md">Academics</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm mb-xs flex items-center gap-sm transition-all rounded-r-lg" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Finance</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm mb-xs flex items-center gap-sm transition-all rounded-r-lg" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-label-md">Schedule</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm mb-xs flex items-center gap-sm transition-all rounded-r-lg" href="#">
+<span class="material-symbols-outlined">menu</span>
+<span class="font-label-md text-label-md">More</span>
+</a>
+</nav>
+<div class="p-md mt-auto mb-lg">
+<div class="bg-primary-container/10 p-md rounded-xl border border-on-primary/10">
+<p class="text-on-primary/80 text-sm italic">"Scientia et Virtus"</p>
+<p class="text-on-primary text-xs mt-xs opacity-50">Est. 1954</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 p-gutter max-w-container-max mx-auto">
+<!-- Welcome Section -->
+<section class="mb-xl animate-fade-in">
+<div class="relative bg-white border border-outline-variant p-lg rounded-lg overflow-hidden flex flex-col md:flex-row items-center gap-lg shadow-sm">
+<!-- Ribbon Tag -->
+<div class="absolute top-0 right-0 ribbon-tag bg-secondary text-on-secondary px-lg py-xs font-label-md shadow-sm">
+                    Active Student
+                </div>
+<div class="w-32 h-32 rounded-lg border-4 border-primary/10 overflow-hidden shadow-inner">
+<img class="w-full h-full object-cover" data-alt="A close-up high-resolution photo of Adebayo Oluwaseun Samuel, a handsome student in his senior secondary school years. He is wearing the traditional purple and white school tie and blazer of Mount Carmel Secondary. The lighting is warm and directional, creating a sophisticated academic mood that emphasizes character and scholarly achievement." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQF-eA7_lpBJ1x-jYsCVKumoj85m6cuSF_GmBQZs5B1xx31aKpA98icEnrNolEPKSN7IqNz5YlaNtjwdLKDu1dXnKvI_aM76bbS0yT2SfD8rtSGIE-k254hWbglqY0VhA57gQZ0SlnWNiPdAPKWWGhMaWYOEPF3Ma96k9kcL9LaMlkbtGtHSHBJPJgTwv_SlOnLAI0j9moEUjwkJDLQA9rv7jPXB2-JhslOC7banufwzhW5ODGICsx0PZp6oDylrA5TwiyawR__dsY"/>
+</div>
+<div class="flex-1 text-center md:text-left">
+<h1 class="font-headline-xl text-headline-xl text-primary mb-xs">Welcome back, Adebayo</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Adebayo Oluwaseun Samuel • <span class="font-bold text-secondary">SS2A (Science)</span></p>
+<div class="flex flex-wrap gap-sm mt-md justify-center md:justify-start">
+<span class="bg-surface-container px-md py-xs rounded-full font-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">id_card</span> 2024/MCSS/772
+                        </span>
+<span class="bg-surface-container px-md py-xs rounded-full font-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">location_on</span> St. Augustine Block
+                        </span>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+<!-- Term Average -->
+<div class="bg-white border border-outline-variant p-lg rounded-lg shadow-sm hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start mb-md">
+<div class="p-sm bg-secondary-container rounded-lg text-on-secondary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</div>
+<span class="text-xs font-bold text-on-surface-variant">TERM 2</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Term Average</h3>
+<div class="flex items-baseline gap-sm">
+<span class="font-headline-lg text-headline-lg text-primary">78.4%</span>
+<span class="text-success text-sm font-bold flex items-center text-[#2e7d32]">
+<span class="material-symbols-outlined text-sm">arrow_upward</span> 2.1%
+                    </span>
+</div>
+<div class="mt-md w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[78.4%] group-hover:scale-x-105 transition-transform origin-left"></div>
+</div>
+</div>
+<!-- Attendance -->
+<div class="bg-white border border-outline-variant p-lg rounded-lg shadow-sm hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start mb-md">
+<div class="p-sm bg-tertiary-fixed rounded-lg text-on-tertiary-fixed">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+</div>
+<span class="text-xs font-bold text-on-surface-variant">LATEST MONTH</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Attendance</h3>
+<div class="flex items-baseline gap-sm">
+<span class="font-headline-lg text-headline-lg text-tertiary">96%</span>
+<span class="text-on-surface-variant text-sm font-medium">Excellent</span>
+</div>
+<div class="mt-md flex gap-1">
+<div class="h-2 flex-1 bg-tertiary rounded-full"></div>
+<div class="h-2 flex-1 bg-tertiary rounded-full"></div>
+<div class="h-2 flex-1 bg-tertiary rounded-full"></div>
+<div class="h-2 flex-1 bg-tertiary rounded-full"></div>
+<div class="h-2 flex-1 bg-outline-variant rounded-full opacity-30"></div>
+</div>
+</div>
+<!-- Outstanding Fees -->
+<div class="bg-white border border-outline-variant p-lg rounded-lg shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-md">
+<div class="p-sm bg-primary-fixed rounded-lg text-on-primary-fixed">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Outstanding Fees</h3>
+<div class="flex items-baseline gap-sm">
+<span class="font-headline-lg text-headline-lg text-on-background">₦0</span>
+<div class="px-sm py-1 bg-[#e8f5e9] text-[#2e7d32] rounded text-xs font-bold uppercase">Paid</div>
+</div>
+<p class="mt-md text-body-md text-on-surface-variant">Receipt No: MCSS/2024/042-B</p>
+</div>
+</section>
+<!-- Lower Dashboard Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-xl">
+<!-- Upcoming Exams Widget (2/3 width) -->
+<div class="lg:col-span-2">
+<div class="bg-white border border-outline-variant rounded-lg shadow-sm overflow-hidden h-full">
+<div class="bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">event_note</span>
+<h2 class="font-headline-md text-headline-md text-primary">Upcoming Exams</h2>
+</div>
+<button class="text-secondary font-label-md hover:underline">Full Schedule</button>
+</div>
+<div class="p-lg overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-primary text-white font-label-md">
+<th class="p-md font-label-md">Subject</th>
+<th class="p-md font-label-md">Date</th>
+<th class="p-md font-label-md">Time</th>
+<th class="p-md font-label-md">Venue</th>
+<th class="p-md font-label-md">Status</th>
+</tr>
+</thead>
+<tbody class="font-body-md divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-bold text-on-surface">Further Mathematics</td>
+<td class="p-md">May 14, 2024</td>
+<td class="p-md">09:00 AM</td>
+<td class="p-md">Assembly Hall</td>
+<td class="p-md"><span class="px-sm py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-xs font-bold">UPCOMING</span></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-bold text-on-surface">Physics (Theory)</td>
+<td class="p-md">May 15, 2024</td>
+<td class="p-md">01:30 PM</td>
+<td class="p-md">Lab A</td>
+<td class="p-md"><span class="px-sm py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-xs font-bold">UPCOMING</span></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-bold text-on-surface">English Literature</td>
+<td class="p-md">May 17, 2024</td>
+<td class="p-md">11:00 AM</td>
+<td class="p-md">St. Paul B</td>
+<td class="p-md"><span class="px-sm py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-xs font-bold">UPCOMING</span></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-md font-bold text-on-surface">Chemistry Practical</td>
+<td class="p-md">May 18, 2024</td>
+<td class="p-md">08:00 AM</td>
+<td class="p-md">Main Lab</td>
+<td class="p-md"><span class="px-sm py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-xs font-bold">UPCOMING</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Recent Announcements Feed (1/3 width) -->
+<div class="lg:col-span-1">
+<div class="bg-white border border-outline-variant rounded-lg shadow-sm h-full flex flex-col">
+<div class="bg-surface-container-low px-lg py-md border-b border-outline-variant flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary">campaign</span>
+<h2 class="font-headline-md text-headline-md text-tertiary">Announcements</h2>
+</div>
+<div class="p-lg flex-1 overflow-y-auto space-y-md">
+<!-- Announcement Item -->
+<div class="relative pl-md border-l-2 border-tertiary-fixed-dim py-1">
+<div class="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-tertiary"></div>
+<p class="text-xs font-bold text-tertiary-fixed-dim uppercase mb-1">Today, 08:30 AM</p>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface mb-xs">Inter-House Sports Final</h4>
+<p class="text-body-md text-sm text-on-surface-variant line-clamp-2">The final list of track events for Friday has been posted on the main notice board.</p>
+</div>
+<!-- Announcement Item -->
+<div class="relative pl-md border-l-2 border-outline-variant py-1 opacity-70">
+<p class="text-xs font-bold text-on-surface-variant uppercase mb-1">Yesterday</p>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface mb-xs">Maths Olympiad Trials</h4>
+<p class="text-body-md text-sm text-on-surface-variant line-clamp-2">Students interested in the Olympiad should register with Mr. Okafor by 2 PM.</p>
+</div>
+<!-- Announcement Item -->
+<div class="relative pl-md border-l-2 border-outline-variant py-1 opacity-70">
+<p class="text-xs font-bold text-on-surface-variant uppercase mb-1">May 02, 2024</p>
+<h4 class="font-headline-sm text-sm font-bold text-on-surface mb-xs">Term Break Notification</h4>
+<p class="text-body-md text-sm text-on-surface-variant line-clamp-2">The draft schedule for the mid-term break has been approved by the Principal.</p>
+</div>
+</div>
+<div class="p-md border-t border-outline-variant">
+<button class="w-full py-sm bg-surface-container hover:bg-surface-container-high text-primary font-bold rounded-lg transition-colors flex items-center justify-center gap-sm">
+                            View All Feed <span class="material-symbols-outlined text-sm">open_in_new</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Actions (Institutional Authority Style) -->
+<section class="mt-xl grid grid-cols-2 md:grid-cols-4 gap-md">
+<button class="flex flex-col items-center justify-center p-lg bg-white border border-outline-variant rounded-lg hover:border-primary transition-all group">
+<div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-md group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-white transition-colors">download_for_offline</span>
+</div>
+<span class="font-label-md text-on-surface">Report Card</span>
+</button>
+<button class="flex flex-col items-center justify-center p-lg bg-white border border-outline-variant rounded-lg hover:border-primary transition-all group">
+<div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-md group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-white transition-colors">library_books</span>
+</div>
+<span class="font-label-md text-on-surface">E-Library</span>
+</button>
+<button class="flex flex-col items-center justify-center p-lg bg-white border border-outline-variant rounded-lg hover:border-primary transition-all group">
+<div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-md group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-white transition-colors">chat_bubble</span>
+</div>
+<span class="font-label-md text-on-surface">Ask Tutor</span>
+</button>
+<button class="flex flex-col items-center justify-center p-lg bg-white border border-outline-variant rounded-lg hover:border-primary transition-all group">
+<div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-md group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-white transition-colors">person_search</span>
+</div>
+<span class="font-label-md text-on-surface">Attendance Log</span>
+</button>
+</section>
+</main>
+<!-- BottomNavBar (Shared Component - Mobile Only) -->
+<nav class="fixed bottom-md left-0 right-0 w-[calc(100%-48px)] mx-auto z-50 flex justify-around items-center py-sm px-md lg:hidden bg-inverse-surface rounded-full shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-tertiary-container bg-tertiary-container/20 rounded-full p-2 scale-95 duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-[10px] text-white">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">grade</span>
+<span class="font-label-sm text-[10px]">Grades</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-sm text-[10px]">Fees</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">event_note</span>
+<span class="font-label-sm text-[10px]">Time</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform" href="#">
+<span class="material-symbols-outlined">more_vert</span>
+<span class="font-label-sm text-[10px]">More</span>
+</a>
+</nav>
+<script>
+        // Simple animation logic for dashboard widgets
+        document.addEventListener('DOMContentLoaded', () => {
+            const widgets = document.querySelectorAll('.animate-fade-in');
+            widgets.forEach((widget, index) => {
+                widget.style.opacity = '0';
+                widget.style.transform = 'translateY(20px)';
+                widget.style.transition = `all 0.5s ease-out ${index * 0.1}s`;
+                setTimeout(() => {
+                    widget.style.opacity = '1';
+                    widget.style.transform = 'translateY(0)';
+                }, 100);
+            });
+        });
+    </script>
+</body></html>

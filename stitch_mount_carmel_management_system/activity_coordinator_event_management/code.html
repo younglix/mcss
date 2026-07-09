@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mount Carmel Secondary - Activity Coordinator Dashboard</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&amp;family=Archivo+Narrow:wght@400;500;600&amp;family=Domine:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#a6b1fe",
+                        "outline": "#7e7481",
+                        "on-primary-container": "#ba80df",
+                        "on-secondary-fixed": "#031159",
+                        "primary": "#2e004a",
+                        "surface-dim": "#dadada",
+                        "on-background": "#1a1c1c",
+                        "tertiary-fixed": "#ffd9e5",
+                        "outline-variant": "#cfc2d1",
+                        "surface-container-high": "#e8e8e8",
+                        "secondary": "#4e599f",
+                        "surface-container": "#eeeeee",
+                        "inverse-primary": "#e4b5ff",
+                        "on-primary-fixed-variant": "#632c87",
+                        "on-surface-variant": "#4c4450",
+                        "surface-tint": "#7d46a1",
+                        "surface-container-low": "#f3f3f3",
+                        "secondary-fixed": "#dee0ff",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#bbc3ff",
+                        "on-tertiary-fixed-variant": "#8c0055",
+                        "tertiary-fixed-dim": "#ffb0ce",
+                        "on-primary-fixed": "#2f004c",
+                        "background": "#f9f9f9",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-bright": "#f9f9f9",
+                        "on-secondary-fixed-variant": "#354185",
+                        "inverse-on-surface": "#f0f1f1",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#364186",
+                        "on-tertiary-fixed": "#3e0022",
+                        "on-surface": "#1a1c1c",
+                        "surface": "#f9f9f9",
+                        "on-tertiary-container": "#ff57aa",
+                        "tertiary-container": "#62003a",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#4a0f6e",
+                        "inverse-surface": "#2f3131",
+                        "primary-fixed": "#f4d9ff",
+                        "tertiary": "#3c0022",
+                        "surface-variant": "#e2e2e2",
+                        "primary-fixed-dim": "#e4b5ff",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "container-max": "1280px",
+                        "md": "16px",
+                        "base": "4px",
+                        "xl": "40px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Arimo"],
+                        "body-md": ["Archivo Narrow"],
+                        "label-md": ["Domine"],
+                        "label-sm": ["Domine"],
+                        "body-lg": ["Archivo Narrow"],
+                        "headline-md": ["Arimo"],
+                        "headline-lg-mobile": ["Arimo"],
+                        "headline-xl": ["Arimo"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ribbon {
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 8px 50%);
+            padding-left: 1.5rem;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        .bento-item {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 2rem;
+            overflow: hidden;
+        }
+        /* Custom scrollbar for high density information */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-primary flex flex-col py-md z-40 shadow-sm transition-all duration-200 ease-in-out">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md text-on-primary">Mount Carmel</h1>
+<p class="font-label-sm text-label-sm text-on-primary opacity-80 uppercase tracking-widest">Admin Portal</p>
+</div>
+<nav class="flex-grow space-y-1">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary py-3 px-4 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-md">calendar_today</span>
+<span class="font-label-md text-label-md">Events Calendar</span>
+</a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-md">assignment_ind</span>
+<span class="font-label-md text-label-md">Participation Log</span>
+</a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-md">groups</span>
+<span class="font-label-md text-label-md">Clubs &amp; Houses</span>
+</a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-md">payments</span>
+<span class="font-label-md text-label-md">Budgeting</span>
+</a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-md">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+</nav>
+<div class="mt-auto px-1 space-y-1">
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-md">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-md">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen p-lg max-w-container-max mx-auto">
+<!-- Header / Top Bar Area -->
+<header class="flex justify-between items-center mb-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Extracurricular Participation</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Activity Coordinator Dashboard · Term 2, 2024</p>
+</div>
+<div class="flex items-center space-x-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 border border-outline-variant rounded-full font-body-md focus:outline-none focus:ring-2 focus:ring-primary w-64 bg-white transition-all" placeholder="Search student or activity..." type="text"/>
+</div>
+<button class="bg-primary text-white px-lg py-2 rounded-full font-headline-md text-sm hover:opacity-90 transition-all flex items-center">
+<span class="material-symbols-outlined mr-2">add</span>
+                    New Entry
+                </button>
+</div>
+</header>
+<!-- Bento Layout -->
+<div class="bento-grid">
+<!-- Quick Stats Row -->
+<div class="col-span-12 grid grid-cols-1 md:grid-cols-4 gap-lg">
+<div class="bento-item p-lg flex flex-col justify-center border-l-4 border-primary">
+<span class="text-label-sm font-label-sm uppercase text-outline">Total Clubs</span>
+<span class="text-headline-lg font-headline-lg text-primary">24</span>
+</div>
+<div class="bento-item p-lg flex flex-col justify-center border-l-4 border-secondary">
+<span class="text-label-sm font-label-sm uppercase text-outline">Active Students</span>
+<span class="text-headline-lg font-headline-lg text-secondary">842</span>
+</div>
+<div class="bento-item p-lg flex flex-col justify-center border-l-4 border-on-tertiary-container">
+<span class="text-label-sm font-label-sm uppercase text-outline">Pending Points</span>
+<span class="text-headline-lg font-headline-lg text-on-tertiary-container">128</span>
+</div>
+<div class="bento-item p-lg flex flex-col justify-center border-l-4 border-error">
+<span class="text-label-sm font-label-sm uppercase text-outline">Urgent Tasks</span>
+<span class="text-headline-lg font-headline-lg text-error">3</span>
+</div>
+</div>
+<!-- Active Clubs (Left Stack) -->
+<div class="col-span-12 md:col-span-4 flex flex-col gap-lg">
+<div class="bento-item flex flex-col h-full">
+<div class="bg-surface-container-low px-lg py-md border-b border-outline-variant">
+<h3 class="font-label-md text-label-md text-primary flex items-center">
+<span class="material-symbols-outlined mr-2 text-sm">groups_2</span> Active Clubs
+                        </h3>
+</div>
+<div class="p-lg space-y-md">
+<!-- Club Card -->
+<div class="flex items-center p-md bg-surface-bright border border-outline-variant rounded-xl hover:shadow-sm transition-all group">
+<div class="w-12 h-12 bg-primary-fixed text-primary flex items-center justify-center rounded-lg mr-md">
+<span class="material-symbols-outlined">forum</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-headline-md text-sm">Debate Society</h4>
+<p class="font-body-md text-xs text-outline">42 Members · Room 302</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors cursor-pointer">chevron_right</span>
+</div>
+<!-- Club Card -->
+<div class="flex items-center p-md bg-surface-bright border border-outline-variant rounded-xl hover:shadow-sm transition-all group">
+<div class="w-12 h-12 bg-secondary-fixed text-secondary flex items-center justify-center rounded-lg mr-md">
+<span class="material-symbols-outlined">sports_soccer</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-headline-md text-sm">Varsity Sports</h4>
+<p class="font-body-md text-xs text-outline">156 Members · Main Field</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors cursor-pointer">chevron_right</span>
+</div>
+<!-- Club Card -->
+<div class="flex items-center p-md bg-surface-bright border border-outline-variant rounded-xl hover:shadow-sm transition-all group">
+<div class="w-12 h-12 bg-tertiary-fixed text-on-tertiary-fixed-variant flex items-center justify-center rounded-lg mr-md">
+<span class="material-symbols-outlined">music_note</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-headline-md text-sm">Senior Choir</h4>
+<p class="font-body-md text-xs text-outline">38 Members · Chapel Hall</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors cursor-pointer">chevron_right</span>
+</div>
+</div>
+<div class="mt-auto p-lg pt-0">
+<button class="w-full text-center py-2 text-label-sm font-label-sm text-primary hover:underline">View All 24 Clubs</button>
+</div>
+</div>
+</div>
+<!-- Inter-House Calendar (Middle) -->
+<div class="col-span-12 md:col-span-8 bento-item flex flex-col">
+<div class="bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-label-md text-label-md text-primary flex items-center">
+<span class="material-symbols-outlined mr-2 text-sm">calendar_month</span> Inter-House Events
+                    </h3>
+<div class="flex space-x-2">
+<button class="p-1 hover:bg-outline-variant rounded"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+<span class="font-label-sm text-label-sm py-1">October 2024</span>
+<button class="p-1 hover:bg-outline-variant rounded"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+<div class="p-lg grid grid-cols-1 md:grid-cols-2 gap-lg flex-grow">
+<!-- High Priority Event -->
+<div class="relative bg-white border border-outline-variant rounded-2xl overflow-hidden group">
+<div class="h-24 bg-cover bg-center" data-alt="A dynamic action shot of high school students in colorful athletic jerseys competing on a lush green track field during a bright sunny afternoon. The atmosphere is energetic and professional, capturing a prestigious academic sports tradition with vibrant purple and white accents. Deep focus photography style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC50faO1XuwM6-Y8gC5-6QJi9DbSnRWtwVL6InwjE2tFiFVGo-9AYJeOx1upRKdqgvjpD-MspVb0E7LXxQleN-I0Z9teNYwW3yYHt6LMPECw-XNp0CXICyb6Xa1EuOVUXQ8Vhx8ct52yLhgIiiWeDQn-GoHM9rcdZR88ENWcB7WwExS8RBtB9IVNDEK39N4Tyn-E7IBQoW0qayI6lU3X9VyaGIIOXtt5mEEAk7VJMhEwPxtFujRzi084Ovb5n9W_0wKOShawNHlZceU')"></div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-on-tertiary-container text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter flex items-center">
+<span class="material-symbols-outlined text-[12px] mr-1" style="font-variation-settings: 'FILL' 1;">priority_high</span>
+                                    High Priority
+                                </span>
+<span class="text-label-sm font-label-sm text-outline">Oct 14</span>
+</div>
+<h4 class="font-headline-md text-md mb-1">Annual Sports Gala</h4>
+<p class="font-body-md text-xs text-on-surface-variant line-clamp-2">Inter-house track and field championships. Mandatory attendance for all students and house masters.</p>
+</div>
+<div class="px-md pb-md flex justify-between items-center mt-auto">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border border-white bg-slate-200"></div>
+<div class="w-6 h-6 rounded-full border border-white bg-slate-300"></div>
+<div class="w-6 h-6 rounded-full border border-white bg-slate-400"></div>
+</div>
+<button class="text-primary font-label-sm text-xs hover:underline">Manage Staff</button>
+</div>
+</div>
+<div class="space-y-md custom-scrollbar overflow-y-auto max-h-[350px] pr-2">
+<!-- Standard Event -->
+<div class="flex gap-md items-start p-md hover:bg-surface-container-low rounded-xl transition-all cursor-pointer">
+<div class="flex-shrink-0 w-12 text-center">
+<span class="block font-headline-lg text-primary text-xl leading-none">18</span>
+<span class="block font-label-sm text-[10px] uppercase text-outline">Oct</span>
+</div>
+<div class="flex-grow">
+<h5 class="font-label-md text-on-surface leading-tight">Inter-House Quiz Finals</h5>
+<p class="text-xs text-outline font-body-md">St. Peter's Hall · 2:30 PM</p>
+</div>
+<span class="material-symbols-outlined text-outline">event</span>
+</div>
+<div class="flex gap-md items-start p-md hover:bg-surface-container-low rounded-xl transition-all cursor-pointer">
+<div class="flex-shrink-0 w-12 text-center">
+<span class="block font-headline-lg text-primary text-xl leading-none">21</span>
+<span class="block font-label-sm text-[10px] uppercase text-outline">Oct</span>
+</div>
+<div class="flex-grow">
+<h5 class="font-label-md text-on-surface leading-tight">House Drama Auditions</h5>
+<p class="text-xs text-outline font-body-md">Main Theater · 4:00 PM</p>
+</div>
+<span class="material-symbols-outlined text-outline">event</span>
+</div>
+<!-- Urgent Event -->
+<div class="flex gap-md items-start p-md bg-on-tertiary-container/5 border border-on-tertiary-container/20 rounded-xl transition-all cursor-pointer">
+<div class="flex-shrink-0 w-12 text-center">
+<span class="block font-headline-lg text-on-tertiary-container text-xl leading-none">25</span>
+<span class="block font-label-sm text-[10px] uppercase text-on-tertiary-container">Oct</span>
+</div>
+<div class="flex-grow">
+<h5 class="font-label-md text-on-surface leading-tight">Founder's Day Parade</h5>
+<p class="text-xs text-on-tertiary-container font-bold font-body-md">Grand Court · 8:00 AM</p>
+</div>
+<span class="material-symbols-outlined text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Student Participation Log (Wide Bottom Section) -->
+<div class="col-span-12 bento-item flex flex-col">
+<div class="bg-surface-container-low px-lg py-md border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-md">
+<h3 class="font-label-md text-label-md text-primary flex items-center">
+<span class="material-symbols-outlined mr-2 text-sm">history_edu</span> Participation Log
+                    </h3>
+<div class="flex flex-wrap gap-sm">
+<select class="text-xs font-body-md border-outline-variant rounded-full bg-white px-md py-1 focus:ring-primary">
+<option>All Houses</option>
+<option>St. Gabriel</option>
+<option>St. Michael</option>
+<option>St. Raphael</option>
+</select>
+<select class="text-xs font-body-md border-outline-variant rounded-full bg-white px-md py-1 focus:ring-primary">
+<option>All Grades</option>
+<option>Grade 9</option>
+<option>Grade 10</option>
+<option>Grade 11</option>
+<option>Grade 12</option>
+</select>
+<button class="bg-surface-bright border border-outline-variant px-md py-1 rounded-full text-xs font-label-sm hover:bg-outline-variant transition-colors">Export CSV</button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-secondary-container/10 border-b border-outline-variant">
+<tr>
+<th class="px-lg py-4 font-label-md text-sm text-secondary">Student Name</th>
+<th class="px-lg py-4 font-label-md text-sm text-secondary">ID Number</th>
+<th class="px-lg py-4 font-label-md text-sm text-secondary">Activity</th>
+<th class="px-lg py-4 font-label-md text-sm text-secondary">Role</th>
+<th class="px-lg py-4 font-label-md text-sm text-secondary">Points Earned</th>
+<th class="px-lg py-4 font-label-md text-sm text-secondary text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-4 font-headline-md text-sm">Elena Rodriguez</td>
+<td class="px-lg py-4 font-body-md text-sm text-outline">MC-2024-0012</td>
+<td class="px-lg py-4">
+<span class="bg-primary-fixed text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase">Debate Society</span>
+</td>
+<td class="px-lg py-4 font-body-md text-sm">Captain</td>
+<td class="px-lg py-4">
+<div class="flex items-center text-on-tertiary-container font-bold">
+<span class="material-symbols-outlined text-sm mr-1">star</span> 25
+                                    </div>
+</td>
+<td class="px-lg py-4 text-right">
+<button class="text-primary hover:bg-primary-container/10 p-2 rounded-full transition-all">
+<span class="material-symbols-outlined">edit_note</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-4 font-headline-md text-sm">Marcus Chen</td>
+<td class="px-lg py-4 font-body-md text-sm text-outline">MC-2024-0451</td>
+<td class="px-lg py-4">
+<span class="bg-secondary-fixed text-secondary px-3 py-1 rounded-full text-[10px] font-bold uppercase">Varsity Soccer</span>
+</td>
+<td class="px-lg py-4 font-body-md text-sm">Striker</td>
+<td class="px-lg py-4">
+<div class="flex items-center text-secondary font-bold">
+<span class="material-symbols-outlined text-sm mr-1">star</span> 15
+                                    </div>
+</td>
+<td class="px-lg py-4 text-right">
+<button class="text-primary hover:bg-primary-container/10 p-2 rounded-full transition-all">
+<span class="material-symbols-outlined">edit_note</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-4 font-headline-md text-sm">Sarah Jenkins</td>
+<td class="px-lg py-4 font-body-md text-sm text-outline">MC-2023-0192</td>
+<td class="px-lg py-4">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase">Senior Choir</span>
+</td>
+<td class="px-lg py-4 font-body-md text-sm">Soprano</td>
+<td class="px-lg py-4">
+<div class="flex items-center text-on-tertiary-fixed-variant font-bold">
+<span class="material-symbols-outlined text-sm mr-1">star</span> 10
+                                    </div>
+</td>
+<td class="px-lg py-4 text-right">
+<button class="text-primary hover:bg-primary-container/10 p-2 rounded-full transition-all">
+<span class="material-symbols-outlined">edit_note</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-lg flex items-center justify-between border-t border-outline-variant bg-surface-container-low">
+<span class="font-body-md text-xs text-outline">Showing 1-10 of 1,240 entries</span>
+<div class="flex space-x-2">
+<button class="px-4 py-1 border border-outline-variant rounded-lg text-xs font-label-md hover:bg-white">Previous</button>
+<button class="px-4 py-1 bg-primary text-white rounded-lg text-xs font-label-md">Next</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="ml-64 w-[calc(100%-16rem)] py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary text-on-secondary">
+<div>
+<h4 class="font-headline-md text-headline-md text-on-secondary mb-2">Mount Carmel Secondary</h4>
+<p class="font-label-sm text-label-sm opacity-80">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>
+</div>
+<div class="flex justify-start md:justify-end space-x-lg mt-md md:mt-0">
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Campus Safety</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Contact Us</a>
+</div>
+</footer>
+<!-- Floating Action Button for Points Logging -->
+<button class="fixed bottom-lg right-lg w-16 h-16 bg-on-tertiary-container text-white rounded-full shadow-lg hover:scale-105 transition-all flex items-center justify-center z-50 group">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+<span class="absolute right-full mr-4 bg-primary text-white px-3 py-1 rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Record Points</span>
+</button>
+<script>
+        // Micro-interaction: Search Bar Focus
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-105');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-105');
+        });
+
+        // Simulating loading data effects
+        document.querySelectorAll('.bento-item').forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                item.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    </script>
+</body></html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mount Carmel Secondary - Library Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&family=Archivo+Narrow:wght@400;600&family=Domine:wght@500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&family=Arimo:wght@100..900&family=Domine:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ribbon-tag {
+            position: relative;
+            clip-path: polygon(100% 0%, 90% 50%, 100% 100%, 0% 100%, 0% 0%);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cfc2d1;
+            border-radius: 10px;
+        }
+        .card-shadow {
+            box-shadow: 0px 4px 12px rgba(30, 42, 110, 0.08);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#62003a",
+                        "on-tertiary-fixed": "#3e0022",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-primary-container": "#ba80df",
+                        "surface-container-high": "#e8e8e8",
+                        "on-error": "#ffffff",
+                        "primary-container": "#4a0f6e",
+                        "on-secondary-fixed": "#031159",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffd9e5",
+                        "on-tertiary-container": "#ff57aa",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-primary": "#e4b5ff",
+                        "secondary-fixed": "#dee0ff",
+                        "outline-variant": "#cfc2d1",
+                        "primary-fixed-dim": "#e4b5ff",
+                        "primary": "#2e004a",
+                        "on-primary-fixed-variant": "#632c87",
+                        "inverse-surface": "#2f3131",
+                        "on-primary-fixed": "#2f004c",
+                        "inverse-on-surface": "#f0f1f1",
+                        "background": "#f9f9f9",
+                        "on-secondary-container": "#364186",
+                        "surface-container-low": "#f3f3f3",
+                        "tertiary-fixed-dim": "#ffb0ce",
+                        "on-background": "#1a1c1c",
+                        "on-surface": "#1a1c1c",
+                        "secondary-container": "#a6b1fe",
+                        "secondary-fixed-dim": "#bbc3ff",
+                        "surface-tint": "#7d46a1",
+                        "tertiary": "#3c0022",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#dadada",
+                        "surface-bright": "#f9f9f9",
+                        "on-secondary-fixed-variant": "#354185",
+                        "primary-fixed": "#f4d9ff",
+                        "surface-container": "#eeeeee",
+                        "surface": "#f9f9f9",
+                        "secondary": "#4e599f",
+                        "outline": "#7e7481",
+                        "on-surface-variant": "#4c4450",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#8c0055",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "base": "4px",
+                        "md": "16px",
+                        "gutter": "24px",
+                        "sm": "8px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Arimo"],
+                        "body-lg": ["Archivo Narrow"],
+                        "label-sm": ["Domine"],
+                        "label-md": ["Domine"],
+                        "body-md": ["Archivo Narrow"],
+                        "headline-md": ["Arimo"],
+                        "headline-xl": ["Arimo"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Main Navigation Shell (SideNavBar) -->
+<nav class="fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary w-64 shadow-sm">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-on-primary leading-tight">Mount Carmel</h1>
+<p class="font-label-sm text-label-sm text-on-primary/70 uppercase tracking-widest">Admin Portal</p>
+</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-xs overflow-y-auto custom-scrollbar">
+<a class="text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md text-label-md">Students</span>
+</a>
+<!-- Active Library State: Note that 'Library' is the active context -->
+<a class="border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary py-3 px-6 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+<span class="font-label-md text-label-md">Library</span>
+</a>
+<a class="text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Finance</span>
+</a>
+<a class="text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-md text-label-md">Attendance</span>
+</a>
+<a class="text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+</div>
+<div class="mt-auto px-lg border-t border-on-primary/10 pt-md flex flex-col gap-xs">
+<a class="text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-4 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-4 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined text-error">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Content Canvas -->
+<main class="ml-64 min-h-screen flex flex-col bg-background">
+<!-- TopNavBar (Large) -->
+<header class="sticky top-0 z-30 w-full bg-surface border-b border-outline-variant h-16 flex items-center px-gutter">
+<div class="flex-1 flex items-center gap-lg">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Search catalog, student ID or ISBN..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs hover:opacity-90 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+                    Issue Book
+                </button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<div class="ml-2 w-8 h-8 rounded-full border-2 border-primary-container/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a female academic administrator with a kind but authoritative expression, wearing a tailored navy blazer and spectacles. She is positioned against a clean, softly lit office background with hints of bookshelves. The lighting is crisp and the style is a high-fidelity photographic look that emphasizes institutional trust." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZggfMfYBVmkIo12Q4U46YT3qnTC7QdNaQQHJ6JARK8MjgYcVFHGLA28kzut-APjtiCy_dHPTE4lIuZI6OTx1lq8MbjR6JgzE97JOrhRVQMcTXIpobgYCczW2ctIeq0dMThjOgbGjSRjuhuVtjZSs04vYz3OjsjwzJEY8e3YN2jRz8q2LJmsDhPutHw3vkWhubh_WTDMWGpRbNx2DDp4LWvNmczBCGDzthoHsYhGlHRDzlibHGzAqy9d7O7vfJyI_cT6R2SFYXNJDl"/>
+</div>
+</div>
+</header>
+<!-- Main Scrollable Dashboard Area -->
+<div class="p-gutter flex flex-col gap-lg overflow-y-auto h-[calc(100vh-64px)] custom-scrollbar">
+<!-- Dashboard Stats Header -->
+<div class="grid grid-cols-4 gap-lg">
+<div class="bg-white border border-outline-variant p-lg rounded-lg card-shadow flex items-center justify-between">
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase tracking-wider mb-xs">Total Catalog</p>
+<h3 class="text-headline-lg font-headline-lg text-primary">12,482</h3>
+</div>
+<div class="w-12 h-12 bg-primary-fixed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+</div>
+</div>
+<div class="bg-white border border-outline-variant p-lg rounded-lg card-shadow flex items-center justify-between">
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase tracking-wider mb-xs">Issued Books</p>
+<h3 class="text-headline-lg font-headline-lg text-secondary">341</h3>
+</div>
+<div class="w-12 h-12 bg-secondary-fixed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-fixed" style="font-variation-settings: 'FILL' 1;">sync_alt</span>
+</div>
+</div>
+<div class="bg-white border border-outline-variant p-lg rounded-lg card-shadow flex items-center justify-between">
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase tracking-wider mb-xs">Overdue Items</p>
+<h3 class="text-headline-lg font-headline-lg text-tertiary-container">24</h3>
+</div>
+<div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-fixed" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+</div>
+<div class="bg-white border border-outline-variant p-lg rounded-lg card-shadow flex items-center justify-between">
+<div>
+<p class="text-label-sm font-label-sm text-outline uppercase tracking-wider mb-xs">Active Readers</p>
+<h3 class="text-headline-lg font-headline-lg text-on-primary-fixed-variant">892</h3>
+</div>
+<div class="w-12 h-12 bg-primary-fixed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">groups</span>
+</div>
+</div>
+</div>
+<!-- Main Workspace: Bento Grid Style -->
+<div class="grid grid-cols-12 gap-lg h-full">
+<!-- Book Catalog Table Section (Col-8) -->
+<section class="col-span-8 bg-white border border-outline-variant rounded-lg overflow-hidden card-shadow flex flex-col">
+<div class="bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md text-primary">Library Catalog</h2>
+<div class="flex gap-sm">
+<button class="flex items-center gap-xs px-3 py-1.5 border border-outline-variant rounded-full text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                                Filter
+                            </button>
+<button class="flex items-center gap-xs px-3 py-1.5 border border-outline-variant rounded-full text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                                Export
+                            </button>
+</div>
+</div>
+<div class="flex-1 overflow-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-secondary text-on-secondary font-label-md text-label-md z-10">
+<tr>
+<th class="px-lg py-4 font-label-md">Book Title & Author</th>
+<th class="px-lg py-4 font-label-md">ISBN</th>
+<th class="px-lg py-4 font-label-md">Category</th>
+<th class="px-lg py-4 font-label-md text-center">Status</th>
+<th class="px-lg py-4 font-label-md text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Table Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-4">
+<div class="flex items-center gap-md">
+<div class="w-10 h-14 bg-surface-container border border-outline-variant rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A book cover design for 'A Tale of Two Cities' featuring a minimalist historical architectural sketch. The palette uses deep ivory, charcoal, and aged parchment tones to evoke classical literature. The aesthetic is clean and academic, suitable for a prestigious secondary school library." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYNqWq08D-sEFD6XUMbtRW695mDuJh9SH-bm-nIIUKdGDv9WljrnSAVHShxsprAlnChRNFcnOvyLqRJ9mj5cLDe2EZP2aUbR5XJ0nPkSzCUpJajR4yWm_DkuFdWnWSpJZwn34tCPyyy-L7qt4wTRixcHre9d-5OaPZJFoJSk2HT1VPpQEA31E65jUOnZKLVGddSPErjqN-n6kpRXudTD3WUSEF4ohdEbeSRRthApPRImraMlOXNcJX81pEIf_qu2LJDcW4-wncLD3I"/>
+</div>
+<div>
+<p class="font-headline-md text-body-md text-on-surface leading-tight">A Tale of Two Cities</p>
+<p class="text-label-sm font-label-sm text-outline">Charles Dickens</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-4 font-body-md text-body-md text-on-surface-variant">978-0141439600</td>
+<td class="px-lg py-4">
+<span class="px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-label-sm font-label-sm">Classic Lit</span>
+</td>
+<td class="px-lg py-4 text-center">
+<span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-label-sm font-label-sm rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></span>
+                                            Available
+                                        </span>
+</td>
+<td class="px-lg py-4 text-right">
+<button class="text-primary hover:text-on-primary-fixed-variant transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Table Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-4">
+<div class="flex items-center gap-md">
+<div class="w-10 h-14 bg-surface-container border border-outline-variant rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A modern scientific book cover titled 'Quantum Mechanics for Beginners' with abstract glowing blue wave patterns and mathematical notations. High-contrast design with clean typography, conveying technical precision and intellectual depth, fitting for an advanced academic library interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDspknW7sh-ghaY_JeOFmKldzTtSlsi4qlKMUPT1DOi8Sf6fu_BZ35T2ewLaVNhyDrmnMa0zEn57wCEnYMVa1IlRIATWJ-MBkqJSBXOpS1wLrpcSU39DjCRVM8Yhi4JHh0XkcqZQm7NAnMVHZkFH6YjiscfoZujscvoKclL6aCsOCVk0I0S_Oq8cCEMk5JxuLn-1K3aQkeaCyHXL_6iDzWzcIzq2pCsQ74e7vEpNpEfFcdvKhOHwTV6_aKGlac-3qp0L4KK-pMMkAr"/>
+</div>
+<div>
+<p class="font-headline-md text-body-md text-on-surface leading-tight">Quantum Mechanics</p>
+<p class="text-label-sm font-label-sm text-outline">Richard Feynman</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-4 font-body-md text-body-md text-on-surface-variant">978-0465025015</td>
+<td class="px-lg py-4">
+<span class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-label-sm font-label-sm">Physics</span>
+</td>
+<td class="px-lg py-4 text-center">
+<span class="inline-flex items-center px-3 py-1 bg-amber-100 text-amber-800 text-label-sm font-label-sm rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-2"></span>
+                                            Checked Out
+                                        </span>
+</td>
+<td class="px-lg py-4 text-right">
+<button class="text-primary hover:text-on-primary-fixed-variant transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Table Row 3 (Overdue Highlight) -->
+<tr class="hover:bg-surface-container-low transition-colors bg-tertiary-fixed/10">
+<td class="px-lg py-4">
+<div class="flex items-center gap-md">
+<div class="w-10 h-14 bg-surface-container border border-outline-variant rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Cover of 'The Great Gatsby' in an Art Deco style with gold and black accents. The illustration shows a minimalist eye and light motif from the era. Elegant, prestigious, and instantly recognizable as a literary masterpiece for a high-quality library management system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDukOLyMjp01pozUzwr54Wu-Y6gZfMMFyBlesJt5EUW0DOpAL81OOhaCPBSt11GINanmB7VY99BBGO5ZXTx4ajpFHvrJi9bqAkYB9MM9TFSjmf9iu9Hp49CyHBiHjRJrSlGEa1WqB46-u5PIDIA-hKNw6Vhkul0urzyrc_B5hb9IDqscFkO5Mp03zmwyiRPAHwEAbomU3aJYkgqKh2zdSVm-Xw2mGFq_AjkmRqPyfx2Z4OrBDko-WiSyEzW2JX33ZDCYnoT0ADUQVKR"/>
+</div>
+<div>
+<p class="font-headline-md text-body-md text-on-surface leading-tight">The Great Gatsby</p>
+<p class="text-label-sm font-label-sm text-outline">F. Scott Fitzgerald</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-4 font-body-md text-body-md text-on-surface-variant">978-0743273565</td>
+<td class="px-lg py-4">
+<span class="px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-label-sm font-label-sm">Classic Lit</span>
+</td>
+<td class="px-lg py-4 text-center">
+<span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 text-label-sm font-label-sm rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-2"></span>
+                                            Overdue
+                                        </span>
+</td>
+<td class="px-lg py-4 text-right">
+<button class="text-primary hover:text-on-primary-fixed-variant transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- More mock rows for scroll... -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-4">
+<div class="flex items-center gap-md">
+<div class="w-10 h-14 bg-surface-container border border-outline-variant rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A textbook cover for 'Advanced Calculus' with geometric lattice structures and vibrant magenta highlights. The design is clean, symmetrical, and conveys a sense of rigorous academic challenge, aligning with the school's theme of academic authority." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlya2iuuEYBOZA7L-iKV_NhZjUQaYiel663V4mhbUrVx68TXhkxu2Nx2sFQZdK-fNorVoBvw8F_b7mPhY5u1GUS17AW4a3mbUjmtd6pG-zWhq6pQYIYtNfYnML130rog9hXO_fzHsvIFgbHsd-oNFL6ukrkimjul0YttEW6Q69M3XAFk-4IEM8eU2Ue1tM7B5DKmzaZGwaAAgfmR733vOFqswRUUh7knL6B9EUmIc4ATa7lGEtv_rqlLMGHpStKUku_WwwdXHDa9fU"/>
+</div>
+<div>
+<p class="font-headline-md text-body-md text-on-surface leading-tight">Advanced Calculus</p>
+<p class="text-label-sm font-label-sm text-outline">G. B. Thomas</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-4 font-body-md text-body-md text-on-surface-variant">978-0321587992</td>
+<td class="px-lg py-4">
+<span class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-label-sm font-label-sm">Mathematics</span>
+</td>
+<td class="px-lg py-4 text-center">
+<span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-label-sm font-label-sm rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></span>
+                                            Available
+                                        </span>
+</td>
+<td class="px-lg py-4 text-right">
+<button class="text-primary hover:text-on-primary-fixed-variant transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Activity & Overdue Sidebar (Col-4) -->
+<aside class="col-span-4 flex flex-col gap-lg overflow-y-auto">
+<!-- Overdue Tracker Section (Highlighted Magenta) -->
+<section class="bg-white border border-tertiary-container/30 rounded-lg card-shadow overflow-hidden">
+<div class="bg-tertiary-container px-lg py-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h2 class="font-headline-md text-headline-md text-white">Overdue Tracker</h2>
+</div>
+<div class="p-lg flex flex-col gap-md">
+<div class="bg-tertiary-fixed/30 border border-tertiary-fixed-dim p-md rounded-md flex items-start gap-md">
+<div class="w-10 h-10 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center flex-shrink-0">
+<span class="font-label-md text-label-md">JD</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-headline-md text-body-md font-bold text-on-tertiary-fixed">John Doe</h4>
+<span class="ribbon-tag bg-tertiary-container text-white px-3 py-0.5 text-label-sm font-label-sm">8 Days Late</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-tertiary-fixed/70 mt-xs">"The Great Gatsby" (#GAT-202)</p>
+<div class="mt-md flex gap-sm">
+<button class="px-4 py-1.5 bg-tertiary text-white rounded-full text-label-sm font-label-sm hover:opacity-90 transition-all">Send Notice</button>
+<button class="px-4 py-1.5 border border-tertiary text-tertiary rounded-full text-label-sm font-label-sm hover:bg-tertiary-fixed/20 transition-all">Mark Found</button>
+</div>
+</div>
+</div>
+<div class="bg-tertiary-fixed/10 border border-outline-variant p-md rounded-md flex items-start gap-md opacity-80">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center flex-shrink-0">
+<span class="font-label-md text-label-md">SA</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-headline-md text-body-md font-bold text-on-surface">Sarah Ahmed</h4>
+<span class="ribbon-tag bg-tertiary text-white px-3 py-0.5 text-label-sm font-label-sm">3 Days Late</span>
+</div>
+<p class="text-label-sm font-label-sm text-outline mt-xs">"Modern Chemistry" (#CHM-105)</p>
+</div>
+</div>
+<a class="text-center font-label-md text-label-md text-on-tertiary-fixed-variant hover:underline pt-2 transition-all" href="#">View All 24 Overdue Items</a>
+</div>
+</section>
+<!-- Borrow/Return Log -->
+<section class="bg-white border border-outline-variant rounded-lg card-shadow overflow-hidden flex-1 flex flex-col">
+<div class="bg-surface-container-low px-lg py-md border-b border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-primary">Recent Activity</h2>
+</div>
+<div class="p-lg flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-lg">
+<!-- Activity Item 1 (Return) -->
+<div class="relative pl-8 border-l-2 border-green-500/30 py-1">
+<div class="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-white border-2 border-green-500 flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px] text-green-600 font-bold">keyboard_return</span>
+</div>
+<p class="text-body-md text-on-surface"><strong>Returned:</strong> Biology 101</p>
+<p class="text-label-sm font-label-sm text-outline">Student: Alex Chen • 14 mins ago</p>
+</div>
+<!-- Activity Item 2 (Borrow) -->
+<div class="relative pl-8 border-l-2 border-blue-500/30 py-1">
+<div class="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-white border-2 border-blue-500 flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px] text-blue-600 font-bold">send</span>
+</div>
+<p class="text-body-md text-on-surface"><strong>Borrowed:</strong> Hamlet (Shakespeare)</p>
+<p class="text-label-sm font-label-sm text-outline">Student: Maria Garcia • 42 mins ago</p>
+</div>
+<!-- Activity Item 3 (Issue) -->
+<div class="relative pl-8 border-l-2 border-primary/30 py-1">
+<div class="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-white border-2 border-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px] text-primary font-bold">add</span>
+</div>
+<p class="text-body-md text-on-surface"><strong>New Entry:</strong> Data Science Handbook</p>
+<p class="text-label-sm font-label-sm text-outline">Librarian: Mrs. Halloway • 2 hours ago</p>
+</div>
+<!-- Activity Item 4 (Return) -->
+<div class="relative pl-8 border-l-2 border-green-500/30 py-1">
+<div class="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-white border-2 border-green-500 flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px] text-green-600 font-bold">keyboard_return</span>
+</div>
+<p class="text-body-md text-on-surface"><strong>Returned:</strong> The Odyssey</p>
+<p class="text-label-sm font-label-sm text-outline">Student: Leo Smith • 3 hours ago</p>
+</div>
+</div>
+</section>
+</aside>
+</div>
+</div>
+<!-- Sticky Footer -->
+<footer class="mt-auto w-full py-md px-gutter flex justify-between items-center bg-secondary text-on-secondary font-label-sm text-label-sm">
+<div class="flex gap-lg">
+<a class="opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="opacity-80 hover:opacity-100 transition-opacity" href="#">Campus Safety</a>
+<a class="opacity-80 hover:opacity-100 transition-opacity" href="#">Contact Us</a>
+</div>
+<p>© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>
+</footer>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Simple search highlighting logic
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if (text.includes(term)) {
+                    row.style.display = '';
+                    row.style.opacity = '1';
+                } else {
+                    row.style.opacity = '0.3';
+                    // We keep it visible but faded for a nicer UX than just vanishing
+                }
+            });
+        });
+
+        // Add visual feedback on click for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.style.transform = 'scale(0.98)';
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Library Attendant Portal | Mount Carmel Secondary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&amp;family=Domine:wght@400;500;600;700&amp;family=Archivo+Narrow:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f9f9f9",
+                        "surface-container": "#eeeeee",
+                        "tertiary-fixed": "#ffd9e5",
+                        "on-tertiary-fixed": "#3e0022",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#7d46a1",
+                        "surface": "#f9f9f9",
+                        "primary-fixed": "#f4d9ff",
+                        "on-secondary-fixed-variant": "#354185",
+                        "surface-dim": "#dadada",
+                        "secondary-fixed": "#dee0ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-surface": "#1a1c1c",
+                        "on-background": "#1a1c1c",
+                        "on-tertiary-container": "#ff57aa",
+                        "on-primary-fixed": "#2f004c",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb0ce",
+                        "on-surface-variant": "#4c4450",
+                        "surface-container-high": "#e8e8e8",
+                        "on-error-container": "#93000a",
+                        "primary": "#2e004a",
+                        "outline-variant": "#cfc2d1",
+                        "on-primary-container": "#ba80df",
+                        "on-secondary-container": "#364186",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#632c87",
+                        "outline": "#7e7481",
+                        "inverse-primary": "#e4b5ff",
+                        "secondary-fixed-dim": "#bbc3ff",
+                        "background": "#f9f9f9",
+                        "tertiary-container": "#62003a",
+                        "primary-container": "#4a0f6e",
+                        "tertiary": "#3c0022",
+                        "inverse-surface": "#2f3131",
+                        "primary-fixed-dim": "#e4b5ff",
+                        "surface-container-low": "#f3f3f3",
+                        "secondary-container": "#a6b1fe",
+                        "secondary": "#4e599f",
+                        "on-secondary-fixed": "#031159",
+                        "inverse-on-surface": "#f0f1f1",
+                        "surface-variant": "#e2e2e2",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#8c0055",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "md": "16px",
+                        "gutter": "24px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Domine"],
+                        "headline-md": ["Arimo"],
+                        "headline-lg-mobile": ["Arimo"],
+                        "body-lg": ["Archivo Narrow"],
+                        "label-md": ["Domine"],
+                        "headline-xl": ["Arimo"],
+                        "headline-lg": ["Arimo"],
+                        "body-md": ["Archivo Narrow"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ribbon-tag {
+            position: relative;
+            clip-path: polygon(100% 0%, 90% 50%, 100% 100%, 0% 100%, 0% 0%);
+            padding-right: 1.5rem;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2e004a;
+            border-radius: 10px;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-x-hidden">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-primary flex flex-col py-md z-40 shadow-sm">
+<div class="px-md mb-xl">
+<h1 class="font-headline-md text-headline-md text-on-primary font-bold">Mount Carmel</h1>
+<p class="font-label-sm text-label-sm text-on-primary/60">Library Portal</p>
+</div>
+<nav class="flex-1 space-y-2"><!-- Dashboard Tab (Inactive) -->
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<!-- Catalog Tab (Active) -->
+<a class="flex items-center gap-md border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary py-3 px-6 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">book</span>
+<span class="font-label-md text-label-md">Catalog</span>
+</a>
+<!-- Borrow/Return Tab (Inactive) -->
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">swap_horiz</span>
+<span class="font-label-md text-label-md">Borrow/Return</span>
+</a>
+<!-- Overdue Tracker Tab (Inactive) -->
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">history_toggle_off</span>
+<span class="font-label-md text-label-md">Overdue Tracker</span>
+</a>
+<!-- Profile Tab (Inactive) -->
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a></nav>
+<div class="mt-auto border-t border-on-primary/10 pt-md">
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-xl max-w-container-max mx-auto">
+<!-- Header -->
+<header class="flex justify-between items-end mb-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Library Catalog</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage collection items, circulation status, and resource categorization.</p>
+</div>
+<div class="flex gap-md">
+<button class="bg-surface-container-lowest border border-outline px-md py-sm rounded-DEFAULT flex items-center gap-xs hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+<span class="font-label-md text-label-md">Filters</span>
+</button>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-DEFAULT font-label-md text-label-md hover:opacity-90 transition-all shadow-sm">
+                    + Add New Book
+                </button>
+</div>
+</header>
+<!-- Stats Overview (Asymmetric Bento) -->
+<section class="bento-grid mb-xl">
+<div class="col-span-8 bg-surface-container-lowest border border-outline-variant p-lg rounded-lg flex justify-between items-center relative overflow-hidden">
+<div class="relative z-10">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Live Circulation</p>
+<h3 class="font-headline-xl text-headline-xl text-primary">2,481</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-sm">Total items currently in active collection.</p>
+</div>
+<div class="h-24 w-48 bg-primary-container/10 rounded-full blur-3xl absolute -right-10 -top-10"></div>
+<div class="flex gap-lg z-10">
+<div class="text-center">
+<span class="block font-headline-md text-headline-md text-secondary">156</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Borrowed</span>
+</div>
+<div class="text-center">
+<span class="block font-headline-md text-headline-md text-error">24</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Overdue</span>
+</div>
+</div>
+</div>
+<div class="col-span-4 bg-secondary text-on-secondary p-lg rounded-lg flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-[32px]">auto_stories</span>
+<span class="bg-on-secondary/20 px-sm py-xs rounded-full font-label-sm text-label-sm">Active Now</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md mb-xs">Attendant Shift</h4>
+<p class="font-body-md text-body-md opacity-80">Logged in as: Sister Mary Grace<br>Shift ends in 2h 15m</p>
+</div>
+</div>
+</section>
+<!-- Search & Catalog Table -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm overflow-x-auto">
+<div class="p-lg border-b border-outline-variant bg-surface-container-low flex items-center gap-lg">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-xl pr-md py-sm bg-white border border-outline rounded-DEFAULT focus:ring-2 focus:ring-primary focus:border-primary outline-none font-body-md text-body-md transition-all" placeholder="Search by Title, Author, or ISBN..." type="text">
+</div>
+<select class="bg-white border border-outline rounded-DEFAULT px-md py-sm font-label-md text-label-md outline-none cursor-pointer">
+<option>All Genres</option>
+<option>Theology</option>
+<option>Sciences</option>
+<option>Literature</option>
+<option>History</option>
+</select>
+</div>
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-primary text-on-primary">
+<th class="px-lg py-md font-label-md text-label-md">RESOURCE</th>
+<th class="px-lg py-md font-label-md text-label-md">AUTHOR / ISBN</th>
+<th class="px-lg py-md font-label-md text-label-md">GENRE</th>
+<th class="px-lg py-md font-label-md text-label-md">STATUS</th>
+<th class="px-lg py-md font-label-md text-label-md">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md">
+<!-- Row 1 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-16 bg-surface-container-high rounded shadow-sm overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A classic book cover with gold-embossed title and ornate borders, sitting on a dark wood surface. The lighting is dramatic and academic, emphasizing the rich purple texture of the cover. High-contrast and professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_t5PcALD_CizRC8PseX5ZHmMk4gCrIO_Dt7S0p1GAjyLyldf9O-WdNdIEDXfyzkBKwFo9oUcOKvGSyuQGMfu4pNVtVvFHv0wXbhnxR3gO4nMOTCIsdXWv_fCmyinoTq_nO1YvXnnDnxuef1KQPfkzi3wJUZ1NM_vY1dzEFuGB6rQ-BKiTGTNx4NtSm-9eWM7LYgDvIYGOQ3S46HUMaOFtEd-5KBtYfeiv7sxTuC4vNZmHLMWtr6Yc19vwaxw3ZbzCQl_cZDhESBJ3">
+</div>
+<div>
+<span class="block font-bold text-primary">Confessions of St. Augustine</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Shelf 4A-22</span>
+</div>
+</div>
+</td>
+<td class="px-lg py-md text-on-surface-variant">
+<span class="block">St. Augustine</span>
+<span class="text-xs font-mono">978-0140441147</span>
+</td>
+<td class="px-lg py-md">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-sm py-xs rounded-full font-label-sm text-label-sm">Theology</span>
+</td>
+<td class="px-lg py-md">
+<div class="inline-block bg-secondary-container/30 text-on-secondary-container px-md py-xs ribbon-tag font-label-sm text-label-md">
+                                AVAILABLE
+                            </div>
+</td>
+<td class="px-lg py-md">
+<button class="text-primary hover:bg-primary/10 p-xs rounded transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="text-primary hover:bg-primary/10 p-xs rounded transition-colors ml-xs"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-16 bg-surface-container-high rounded shadow-sm overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A modern science textbook cover with a stylized DNA helix and molecular structures in vibrant blue and magenta. The design is clean, technical, and academic, fitting a high-end school portal. Studio lighting with soft shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEVF-ltP_oQTMYUppslI0X9oqGnXgE2Eq4L9krrdfj0-EI9SsEMSg1y3D0ov8q3jKc4Rx8-V3Ee2D4otWAnA3EOi740L-50pSrClxIu8jW5KBNTbttuiwpBvVG4F7hzchVfnY602-UmtYjKf908_CtzJIPW-hjbgGUAVLY7w0iSTyV-_pq8zaeq_Cev6SgaEVNhSZuvfE92sgV3WazuMMNU2z699srLhJdSi7EF-LbR1YfoagFB5Pfb1S0b6nMX9_-Hw_FGS4m7-45">
+</div>
+<div>
+<span class="block font-bold text-primary">Principles of Biology v2</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Shelf 12C-04</span>
+</div>
+</div>
+</td>
+<td class="px-lg py-md text-on-surface-variant">
+<span class="block">Dr. Robert Chen</span>
+<span class="text-xs font-mono">978-0131404467</span>
+</td>
+<td class="px-lg py-md">
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant px-sm py-xs rounded-full font-label-sm text-label-sm">Sciences</span>
+</td>
+<td class="px-lg py-md">
+<div class="inline-block bg-error-container text-on-error-container px-md py-xs ribbon-tag font-label-sm text-label-md">
+                                BORROWED
+                            </div>
+</td>
+<td class="px-lg py-md">
+<button class="text-primary hover:bg-primary/10 p-xs rounded transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="text-primary hover:bg-primary/10 p-xs rounded transition-colors ml-xs"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-16 bg-surface-container-high rounded shadow-sm overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A literary classic book cover featuring an elegant minimalist quill sketch on ivory paper texture. Sophisticated purple and gold accents reflect the prestige of Mount Carmel Secondary. High-resolution textures and artistic depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVjzLFudwDomx_oZAaY-zr9ND-5ROx-ld18YLxVFNwL7XoaeWXjZNGZAjQZ2tvoDv5t93EAw11L1L-U9Qw0HMWhaD3Z8rdZQ3zDxs6cZ3A37g270cMmnBqr-b91IeXeg--OQAQI2D-tXxB8pnZwjr0cBboUIL3-w3fkaCusolvtMyNwAMX2yYDYhl4E4j43Cjs8M6z09aj9-lfl-YNeQM0hk44PNUtgKTgn2Hdmeqq3jB932WvuWUd98DEYdZjSJcROyyiMz9O-g5A">
+</div>
+<div>
+<span class="block font-bold text-primary">Great Expectations</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Shelf 7B-11</span>
+</div>
+</div>
+</td>
+<td class="px-lg py-md text-on-surface-variant">
+<span class="block">Charles Dickens</span>
+<span class="text-xs font-mono">978-0141439563</span>
+</td>
+<td class="px-lg py-md">
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-sm py-xs rounded-full font-label-sm text-label-sm">Literature</span>
+</td>
+<td class="px-lg py-md">
+<div class="inline-block bg-secondary-container/30 text-on-secondary-container px-md py-xs ribbon-tag font-label-sm text-label-md">
+                                AVAILABLE
+                            </div>
+</td>
+<td class="px-lg py-md">
+<button class="text-primary hover:bg-primary/10 p-xs rounded transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="text-primary hover:bg-primary/10 p-xs rounded transition-colors ml-xs"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-lg border-t border-outline-variant bg-surface-container-low flex justify-between items-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Showing 1-10 of 2,481 entries</p>
+<div class="flex gap-xs">
+<button class="px-sm py-xs bg-white border border-outline rounded hover:bg-surface-container transition-colors min-h-[44px]"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>
+<button class="px-md py-xs bg-primary text-on-primary rounded font-label-sm min-h-[44px]">1</button>
+<button class="px-md py-xs bg-white border border-outline rounded hover:bg-surface-container transition-colors font-label-sm min-h-[44px]">2</button>
+<button class="px-md py-xs bg-white border border-outline rounded hover:bg-surface-container transition-colors font-label-sm min-h-[44px]">3</button>
+<button class="px-sm py-xs bg-white border border-outline rounded hover:bg-surface-container transition-colors min-h-[44px]"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+</div>
+</div>
+</section>
+<!-- Contextual Help / Shortcuts -->
+<section class="mt-xl grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="bg-white border border-outline-variant p-md rounded-lg flex gap-md items-center shadow-sm">
+<div class="bg-primary-container/20 p-sm rounded-full">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">qr_code_scanner</span>
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-primary">Bulk Check-out</h5>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Rapid scanner mode for classes.</p>
+</div>
+</div>
+<div class="bg-white border border-outline-variant p-md rounded-lg flex gap-md items-center shadow-sm">
+<div class="bg-tertiary-container/20 p-sm rounded-full">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant" style="font-variation-settings: 'FILL' 1;">assignment_late</span>
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-primary">Report Damage</h5>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Flag items for preservation.</p>
+</div>
+</div>
+<div class="bg-white border border-outline-variant p-md rounded-lg flex gap-md items-center shadow-sm">
+<div class="bg-secondary-container/20 p-sm rounded-full">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">local_library</span>
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-primary">Inter-Library Loan</h5>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Request from partner schools.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Shell -->
+<footer class="ml-64 w-auto py-xl px-xl grid grid-cols-1 md:grid-cols-2 items-center bg-secondary text-on-secondary mt-xl">
+<div>
+<p class="font-headline-md text-headline-md text-on-secondary font-bold">Mount Carmel Secondary</p>
+<p class="font-body-md text-body-md opacity-80 mt-xs">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>
+</div>
+<div class="flex flex-wrap gap-lg justify-end mt-lg md:mt-0">
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Campus Safety</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Contact Us</a>
+</div>
+</footer>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('click', function(e) {
+                if(this.getAttribute('href') === '#') e.preventDefault();
+                this.classList.add('scale-95', 'opacity-80');
+                setTimeout(() => {
+                    this.classList.remove('scale-95', 'opacity-80');
+                }, 150);
+            });
+        });
+
+        // Search Bar Focus Effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+        });
+    </script>
+
+
+</body></html>

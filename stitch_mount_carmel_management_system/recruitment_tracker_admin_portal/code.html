@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Recruitment Portal | Mount Carmel Secondary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&family=Archivo+Narrow:wght@400;500;600&family=Domine:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&family=Arimo:wght@100..900&family=Domine:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#62003a",
+                    "on-tertiary-fixed": "#3e0022",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-primary-container": "#ba80df",
+                    "surface-container-high": "#e8e8e8",
+                    "on-error": "#ffffff",
+                    "primary-container": "#4a0f6e",
+                    "on-secondary-fixed": "#031159",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#ffd9e5",
+                    "on-tertiary-container": "#ff57aa",
+                    "surface-variant": "#e2e2e2",
+                    "inverse-primary": "#e4b5ff",
+                    "secondary-fixed": "#dee0ff",
+                    "outline-variant": "#cfc2d1",
+                    "primary-fixed-dim": "#e4b5ff",
+                    "primary": "#2e004a",
+                    "on-primary-fixed-variant": "#632c87",
+                    "inverse-surface": "#2f3131",
+                    "on-primary-fixed": "#2f004c",
+                    "inverse-on-surface": "#f0f1f1",
+                    "background": "#f9f9f9",
+                    "on-secondary-container": "#364186",
+                    "surface-container-low": "#f3f3f3",
+                    "tertiary-fixed-dim": "#ffb0ce",
+                    "on-background": "#1a1c1c",
+                    "on-surface": "#1a1c1c",
+                    "secondary-container": "#a6b1fe",
+                    "secondary-fixed-dim": "#bbc3ff",
+                    "surface-tint": "#7d46a1",
+                    "tertiary": "#3c0022",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#dadada",
+                    "surface-bright": "#f9f9f9",
+                    "on-secondary-fixed-variant": "#354185",
+                    "primary-fixed": "#f4d9ff",
+                    "surface-container": "#eeeeee",
+                    "surface": "#f9f9f9",
+                    "secondary": "#4e599f",
+                    "outline": "#7e7481",
+                    "on-surface-variant": "#4c4450",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed-variant": "#8c0055",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "xl": "40px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "md": "16px",
+                    "gutter": "24px",
+                    "sm": "8px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Arimo"],
+                    "body-lg": ["Archivo Narrow"],
+                    "label-sm": ["Domine"],
+                    "label-md": ["Domine"],
+                    "body-md": ["Archivo Narrow"],
+                    "headline-md": ["Arimo"],
+                    "headline-xl": ["Arimo"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .ribbon-status {
+            position: relative;
+            padding-right: 1.5rem;
+        }
+        .ribbon-status::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 12px;
+            background-color: inherit;
+            clip-path: polygon(0 0, 0% 100%, 100% 50%);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #4a0f6e;
+        }
+
+        .kanban-column {
+            min-height: calc(100vh - 380px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar (Authority Source: JSON & Style Guidance) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary w-64 shadow-sm">
+<div class="px-gutter mb-xl flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-on-primary flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-on-primary leading-none">Mount Carmel</h1>
+<p class="font-label-sm text-label-sm text-on-primary opacity-70">Admin Portal</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs overflow-y-auto px-xs">
+<!-- Nav Items -->
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md text-label-md">Students</span>
+</a>
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-label-md text-label-md">Academics</span>
+</a>
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Finance</span>
+</a>
+<!-- Active State Hierarchy: HR & Staff / Recruitment maps to a generic HR/Staff section if exists, but here we treat 'Recruitment' as the primary intent -->
+<div class="mt-4 px-4 py-2 border-l-4 border-tertiary-container bg-primary-container/20">
+<div class="flex items-center gap-md text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">badge</span>
+<span class="font-label-md text-label-md">HR & Staff</span>
+</div>
+<div class="ml-10 mt-2 flex flex-col gap-2">
+<a class="text-on-primary text-label-md font-bold" href="#">Recruitment</a>
+<a class="text-on-primary/60 text-label-md hover:text-on-primary transition-colors" href="#">Payroll</a>
+<a class="text-on-primary/60 text-label-md hover:text-on-primary transition-colors" href="#">Performance</a>
+</div>
+</div>
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+</nav>
+<div class="mt-auto px-xs flex flex-col gap-xs pt-md border-t border-on-primary/10">
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 min-h-screen flex flex-col">
+<!-- TopNavBar (Authority Source: JSON) -->
+<header class="sticky top-0 z-30 bg-surface border-b border-outline-variant flex justify-between items-center w-full px-gutter h-16">
+<div class="flex items-center gap-lg">
+<div class="relative">
+<span class="absolute inset-y-0 left-3 flex items-center text-outline">
+<span class="material-symbols-outlined">search</span>
+</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:outline-none focus:ring-2 focus:ring-primary-container w-80" placeholder="Search applicants, jobs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">apps</span>
+</button>
+</div>
+<div class="h-8 w-px bg-outline-variant"></div>
+<button class="flex items-center gap-sm px-4 py-2 bg-primary-container text-white rounded-full hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+<span class="font-label-md">Post New Job</span>
+</button>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full border-2 border-primary-container p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="A professional headshot of a middle-aged female school administrator with a warm, confident expression. She is wearing a tailored navy blazer and a string of pearls, standing against a backdrop of a blurred, classic academic hallway with wooden paneling. The lighting is soft and flattering, emphasizing a mood of leadership and institutional authority." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbO11sVXVgxEruxvO6npd-tPL5lXyJSCibn-MHEYxDD4dSKAj7xOVMWX8dgQCQAEmw92PiWLBf7DUeDKo_zRDfOp6WKNcpu3oiCiYAlboZzqE1iUQetVVOG4v96L3ULz19KbbjhiTm1yIwBJVXqmNMhfGIUwjHRRzSHeGXmBfARvbyMwJtANuqfilAg582Eb1AMISQLcmAZQlvcEh0KAp3oM6UvZvyEUnqdd0u07qrGNKxgTZRDF3oblSIKBLbDpZpUd9lre2ig0PG"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Recruitment Dashboard Content -->
+<div class="p-lg space-y-xl max-w-container-max mx-auto w-full">
+<!-- Page Header -->
+<div class="flex justify-between items-end">
+<div>
+<nav class="flex items-center gap-xs text-on-surface-variant mb-xs">
+<span class="font-label-sm">HR & Staff</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="font-label-sm text-primary font-bold">Recruitment</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-primary">Applicant Tracking System</h2>
+</div>
+<div class="flex gap-md">
+<div class="flex items-center bg-white border border-outline-variant rounded-lg p-1">
+<button class="px-4 py-2 bg-primary-container text-white rounded font-label-md transition-all">Kanban View</button>
+<button class="px-4 py-2 text-on-surface-variant hover:bg-surface-container-low rounded font-label-md transition-all">Table View</button>
+</div>
+</div>
+</div>
+<!-- Stats Overview (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg">
+<div class="bg-white p-lg border border-outline-variant rounded-lg shadow-sm hover:border-primary-container/30 transition-all">
+<p class="text-on-surface-variant font-label-md mb-xs">Total Openings</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-xl text-headline-xl text-primary leading-none">12</span>
+<span class="material-symbols-outlined text-primary-container text-4xl opacity-20">work</span>
+</div>
+<div class="mt-md text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>2 active this week</span>
+</div>
+</div>
+<div class="bg-white p-lg border border-outline-variant rounded-lg shadow-sm hover:border-primary-container/30 transition-all">
+<p class="text-on-surface-variant font-label-md mb-xs">Total Applicants</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-xl text-headline-xl text-primary leading-none">148</span>
+<span class="material-symbols-outlined text-primary-container text-4xl opacity-20">groups</span>
+</div>
+<div class="mt-md text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>+15% from last month</span>
+</div>
+</div>
+<div class="bg-white p-lg border border-outline-variant rounded-lg shadow-sm hover:border-primary-container/30 transition-all">
+<p class="text-on-surface-variant font-label-md mb-xs">Interviews Set</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-xl text-headline-xl text-primary leading-none">24</span>
+<span class="material-symbols-outlined text-primary-container text-4xl opacity-20">event</span>
+</div>
+<div class="mt-md text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span>8 scheduled today</span>
+</div>
+</div>
+<div class="bg-white p-lg border border-outline-variant rounded-lg shadow-sm hover:border-primary-container/30 transition-all">
+<p class="text-on-surface-variant font-label-md mb-xs">Time to Hire</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-xl text-headline-xl text-primary leading-none">18d</span>
+<span class="material-symbols-outlined text-primary-container text-4xl opacity-20">timer</span>
+</div>
+<div class="mt-md text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+<span>Target: < 21 days</span>
+</div>
+</div>
+</div>
+<!-- Kanban Board -->
+<div class="overflow-x-auto pb-lg custom-scrollbar">
+<div class="flex gap-lg min-w-[1200px]">
+<!-- Applied Column -->
+<div class="flex-1 min-w-[280px]">
+<div class="flex items-center justify-between mb-md px-2">
+<h3 class="font-label-md text-label-md text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+                                APPLIED
+                                <span class="text-on-surface-variant font-normal">(42)</span>
+</h3>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_horiz</button>
+</div>
+<div class="kanban-column flex flex-col gap-md">
+<!-- Card 1 -->
+<div class="bg-white p-md border border-outline-variant rounded-lg shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex flex-col">
+<span class="font-label-md text-primary">Michael Henderson</span>
+<span class="text-label-sm text-on-surface-variant">Lead Physics Teacher</span>
+</div>
+<img class="w-8 h-8 rounded-full" data-alt="A small square profile photo of a male applicant in his 30s wearing glasses and a crisp white shirt, looking professional and approachable. Minimalist lighting, white studio background, high contrast modern style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHmZfEiBanAO8DSzQFGrdyTAY9TTGY8u6SeS4p1T93IPqyf18GPoPmf1Oga5fuVu_2zBAjG9U354hz8drm63Jp_doYSQCC13VdmHEh7VPUc26QANJMpHhtu_lMFrDl8Tuni82z3-nWYzac7mtVVGPwkeZJlsAurMn-x3uSUziwccVOwctspYIzMeFysi0ZneA7QvF7EcFBiUmt1VlIOIiXXcs20bRWwUqxVzV8BKjG-fQF_0Ow0KYms_ZzXbgqA-geTnS_zoYXedAD"/>
+</div>
+<div class="flex items-center gap-sm mb-md">
+<span class="bg-secondary-fixed text-on-secondary-fixed text-[10px] px-2 py-0.5 rounded-full font-bold">INTERNAL</span>
+<span class="text-[10px] text-outline">Applied 2h ago</span>
+</div>
+<div class="flex justify-between items-center pt-md border-t border-outline-variant">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border border-white bg-surface-container-high flex items-center justify-center text-[10px] font-bold">JD</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-lg">attachment</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-white p-md border border-outline-variant rounded-lg shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex flex-col">
+<span class="font-label-md text-primary">Sarah O'Connor</span>
+<span class="text-label-sm text-on-surface-variant">Administrative Assistant</span>
+</div>
+<img class="w-8 h-8 rounded-full" data-alt="A portrait of a smiling female applicant with long dark hair, wearing a professional green blouse. The image is clean and bright, set in a modern office environment with a shallow depth of field. Professional corporate photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRCo9cBdG6XQtffwdkXTHkO2JQUCjFZy8IK0yababwwyxlcfEwbOanbhQDqOQNmTymC7bEGWhePcrYACogz_VSOv3KJcH9wtyUnk5nGiFakrxhtdFwdh35AwsD6v5AVAiQ7DqA-lIWGaL6iItwLENnTLMgcJepmIVfQUFAPNOEcupw0x22h5PVDdFvz5Nwo5MFjrn_V4SWwStBaLG1wj1XrvPrR5Ty2HWQqQGoB2aFJdSWmRmjYvKPn2TT0wEDu8YNMATHEVAxae5Q"/>
+</div>
+<div class="flex items-center gap-sm mb-md">
+<span class="bg-surface-container-high text-on-surface-variant text-[10px] px-2 py-0.5 rounded-full font-bold">EXTERNAL</span>
+<span class="text-[10px] text-outline">Applied 5h ago</span>
+</div>
+<div class="flex justify-between items-center pt-md border-t border-outline-variant">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border border-white bg-surface-container-high flex items-center justify-center text-[10px] font-bold">MS</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-lg">attachment</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Interview Column -->
+<div class="flex-1 min-w-[280px]">
+<div class="flex items-center justify-between mb-md px-2">
+<h3 class="font-label-md text-label-md text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+                                INTERVIEW
+                                <span class="text-on-surface-variant font-normal">(18)</span>
+</h3>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_horiz</button>
+</div>
+<div class="kanban-column flex flex-col gap-md">
+<div class="bg-white p-md border-l-4 border-primary-container border-y border-r border-outline-variant rounded-lg shadow-sm hover:shadow-md transition-all">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex flex-col">
+<span class="font-label-md text-primary">Dr. Alistair Vance</span>
+<span class="text-label-sm text-on-surface-variant">Head of Mathematics</span>
+</div>
+<img class="w-8 h-8 rounded-full" data-alt="A distinguished senior male applicant with grey hair and a refined demeanor, wearing a charcoal grey suit. He is posed in a modern library setting, reflecting high intellectual capability and institutional prestige. Soft, directional lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-e4hBIFyaWwfTmbpRBdfXRFuRwfhU55xHDXwaD3zAY64TFTp3phpNZCm8bjweeteYxOalPyzQu0UDldjwBV4CGoQQC4fo4WddQQot2QlWRRyJZAuyY0NMBgD4wHqnzfvgZiggWsim9tzglq-WNlF8JzOC1AZY8BN_-c3o-wkIZSS5fT3aRYmVs8Rd9KZAkikP1kZq1JZuRMZPn3SXmSlZukfWgj_s59dx5gIneSB5KKcOWIYu-TrtOLBms2QBZUwwnzgcH2ZS3Ioc"/>
+</div>
+<div class="bg-primary-fixed text-on-primary-fixed text-[11px] p-2 rounded-md mb-md border border-primary-fixed-dim">
+<div class="flex items-center gap-2 font-bold mb-1">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+                                        Panel Interview 2
+                                    </div>
+<span class="opacity-80">Today @ 14:30 in Boardroom A</span>
+</div>
+<div class="flex justify-between items-center pt-md border-t border-outline-variant">
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border-2 border-white" data-alt="A small avatar of a school administrator, middle-aged male, academic style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDZuOmhK8PAdVAofT6-yB3qhojHhr1xlGMWeI4N5dO7JHENiu5B7ynCC3RHyUnmS9QnTjcnBAGfjA4PXERk3N8B7P-dkDNYsgswBxoDESH1MbkjYKg7aTcrAdtzMU6mxDwH69PIHjUvem7wTt4Qc35RIsbPkFKaPv6ITwFuco5aW-k4ESo6TKfAw6TgUr9AelVkHmQFFZ6PTHH3P6Xfljn6aKKMLXweUFkMdj2vuQKGue22T0NUuo-4gvqxEPobjc3XUgaORRsNd3g"/>
+<img class="w-6 h-6 rounded-full border-2 border-white" data-alt="A small avatar of a teacher, young female, professional academic style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANsjti7RO5QR_meqJbfqHERmI3or44c8l_OGl5TrEVq9d_PzCVb-d4sQhak3vGFtq3h3Whvu4rZAHyvBEgMrdl0CumKND4noFP6HZPQAHsHl0HFoW6yzuNXV00FEZR_3qGMExSfnx2i165662aDyNEUSESvJHyy4hKeT4osBndzJBg-XaipaQNYqJ13W_FDU0o60IZxgtalhBThY2J8RTuQQYBEC5BpwQK7tJtHQSKdkJTjsqlXVbVduNAhC4H0Tq5_83ppbGvf6W9"/>
+</div>
+<span class="text-[10px] font-bold text-primary-container uppercase">Urgent</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Offered Column -->
+<div class="flex-1 min-w-[280px]">
+<div class="flex items-center justify-between mb-md px-2">
+<h3 class="font-label-md text-label-md text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary-container"></span>
+                                OFFERED
+                                <span class="text-on-surface-variant font-normal">(5)</span>
+</h3>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_horiz</button>
+</div>
+<div class="kanban-column flex flex-col gap-md">
+<div class="bg-white p-md border border-outline-variant rounded-lg shadow-sm hover:shadow-md transition-all">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex flex-col">
+<span class="font-label-md text-primary">Eleanor Rigby</span>
+<span class="text-label-sm text-on-surface-variant">School Counselor</span>
+</div>
+<img class="w-8 h-8 rounded-full" data-alt="A warm and friendly female professional in her 40s, wearing a colorful scarf and a navy cardigan. She exudes empathy and reliability, set against a soft-focus background of a school campus courtyard. Warm, natural daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK1zrFpFM7dzD2db0kxA-KgpzgyVqIg0FrUm4sp5Ugz1y22LD4bcJHL7zJ25AnUAAuLwKuF2IxyJ1dWXTaUWNDQmzmq0F499ekDe4J4UU_Db6LtAZjdSrihwpMHldZm74F_qHUazm-YwOclLlE8P7Byu9jhqHx2ujqp29JSba5Qu60iOggdyBGWFvnuwmQNBjYU-8-w5yH9HZV2_kNKI5qzpNGo0LHtEhQ-ez5CKXGSKAMIFEnGLUX30Fp_0I7JnZOAIuya5GNQPfS"/>
+</div>
+<div class="flex items-center gap-sm mb-md">
+<span class="ribbon-status bg-tertiary-fixed text-on-tertiary-fixed text-[10px] px-2 py-0.5 font-bold uppercase">Pending Response</span>
+</div>
+<div class="flex justify-between items-center pt-md border-t border-outline-variant">
+<span class="text-[10px] text-outline italic">Exp. Nov 24, 2024</span>
+<span class="material-symbols-outlined text-tertiary text-lg">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Rejected/Hold Column -->
+<div class="flex-1 min-w-[280px]">
+<div class="flex items-center justify-between mb-md px-2">
+<h3 class="font-label-md text-label-md text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+                                REJECTED
+                                <span class="text-on-surface-variant font-normal">(83)</span>
+</h3>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_horiz</button>
+</div>
+<div class="kanban-column bg-surface-container-low/50 rounded-lg border-2 border-dashed border-outline-variant/30 flex flex-col p-4 items-center justify-center text-on-surface-variant gap-2">
+<span class="material-symbols-outlined text-4xl opacity-10">archive</span>
+<p class="font-label-sm">Archive Drop Zone</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Job Postings List -->
+<section class="bg-white border border-outline-variant rounded-lg shadow-sm overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h3 class="font-headline-md text-headline-md text-primary">Active Job Postings</h3>
+<button class="text-primary font-label-md hover:underline">View All Postings</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-primary text-white font-label-sm">
+<tr>
+<th class="px-lg py-3 font-medium uppercase tracking-wider">Position Title</th>
+<th class="px-lg py-3 font-medium uppercase tracking-wider">Department</th>
+<th class="px-lg py-3 font-medium uppercase tracking-wider">Applicants</th>
+<th class="px-lg py-3 font-medium uppercase tracking-wider">Status</th>
+<th class="px-lg py-3 font-medium uppercase tracking-wider">Posted Date</th>
+<th class="px-lg py-3 font-medium uppercase tracking-wider">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-on-surface-variant divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-lg py-4">
+<div class="font-bold text-primary">Lead Physics Teacher</div>
+<div class="text-[12px]">Full-Time • On-Campus</div>
+</td>
+<td class="px-lg py-4">Science Department</td>
+<td class="px-lg py-4">
+<div class="flex items-center gap-2">
+<span class="font-bold">24</span>
+<span class="text-tertiary text-xs font-bold">(3 New)</span>
+</div>
+</td>
+<td class="px-lg py-4">
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[11px] font-bold uppercase tracking-tight">Active</span>
+</td>
+<td class="px-lg py-4">Oct 12, 2024</td>
+<td class="px-lg py-4">
+<button class="p-1 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1 hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-lg py-4">
+<div class="font-bold text-primary">Head of Mathematics</div>
+<div class="text-[12px]">Executive • Full-Time</div>
+</td>
+<td class="px-lg py-4">Administration</td>
+<td class="px-lg py-4">
+<div class="flex items-center gap-2">
+<span class="font-bold">12</span>
+<span class="text-on-surface-variant text-xs">(0 New)</span>
+</div>
+</td>
+<td class="px-lg py-4">
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[11px] font-bold uppercase tracking-tight">Active</span>
+</td>
+<td class="px-lg py-4">Oct 05, 2024</td>
+<td class="px-lg py-4">
+<button class="p-1 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1 hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-lg py-4">
+<div class="font-bold text-primary">School Counselor</div>
+<div class="text-[12px]">Full-Time • Student Welfare</div>
+</td>
+<td class="px-lg py-4">Wellness Dept.</td>
+<td class="px-lg py-4">
+<div class="flex items-center gap-2">
+<span class="font-bold">48</span>
+<span class="text-tertiary text-xs font-bold">(12 New)</span>
+</div>
+</td>
+<td class="px-lg py-4">
+<span class="px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-[11px] font-bold uppercase tracking-tight">Offer Sent</span>
+</td>
+<td class="px-lg py-4">Sept 28, 2024</td>
+<td class="px-lg py-4">
+<button class="p-1 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1 hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Footer (Authority Source: JSON) -->
+<footer class="mt-auto w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary text-on-secondary">
+<div>
+<p class="font-body-md text-body-md opacity-80">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>
+</div>
+<div class="flex flex-wrap gap-lg justify-end mt-md md:mt-0">
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Campus Safety</a>
+<a class="font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity" href="#">Contact Us</a>
+</div>
+</footer>
+</main>
+<script>
+        // Micro-interaction for kanban cards
+        document.querySelectorAll('.kanban-column .bg-white').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-4px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Simple tab switching logic for view mode
+        const viewButtons = document.querySelectorAll('.flex.items-center.bg-white.border button');
+        viewButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                viewButtons.forEach(b => {
+                    b.classList.remove('bg-primary-container', 'text-white');
+                    b.classList.add('text-on-surface-variant', 'hover:bg-surface-container-low');
+                });
+                btn.classList.add('bg-primary-container', 'text-white');
+                btn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-low');
+            });
+        });
+    </script>
+</body></html>
