@@ -1,7 +1,166 @@
-import StitchScreen from '../../components/StitchScreen.jsx';
-
-const html = "<!-- TopNavBar (Shared Component) -->\n<header class=\"bg-surface sticky top-0 z-50 border-b border-outline-variant w-full\">\n<div class=\"flex justify-between items-center w-full px-lg py-sm max-w-container-max mx-auto\">\n<div class=\"flex items-center gap-md\">\n<span class=\"font-headline-md text-headline-md font-bold text-primary\">Mount Carmel Secondary</span>\n</div>\n<div class=\"flex items-center gap-lg\">\n<div class=\"hidden md:flex items-center bg-surface-container-low px-md py-xs rounded-full border border-outline-variant\">\n<span class=\"material-symbols-outlined text-on-surface-variant mr-xs\">search</span>\n<input class=\"bg-transparent border-none focus:ring-0 text-body-md w-64\" placeholder=\"Search Portal...\" type=\"text\"/>\n</div>\n<div class=\"flex items-center gap-md\">\n<button class=\"hover:bg-surface-container-low transition-colors p-xs rounded-full relative\">\n<span class=\"material-symbols-outlined text-primary\">notifications</span>\n<span class=\"absolute top-1 right-1 w-2 h-2 bg-error rounded-full\"></span>\n</button>\n<button class=\"hover:bg-surface-container-low transition-colors p-xs rounded-full\">\n<span class=\"material-symbols-outlined text-primary\">settings</span>\n</button>\n<div class=\"w-10 h-10 rounded-full border-2 border-primary overflow-hidden\">\n<img class=\"w-full h-full object-cover\" data-alt=\"Professional studio portrait of a young West African male student in a crisp white school uniform shirt against a neutral academic background. The lighting is bright and even, reflecting a light-mode high-trust institutional aesthetic. The student has a focused and proud expression, representing the heritage of Mount Carmel Secondary school.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDc6K3McMw7zCNQ05ktuSCEuktZQBdGjlH7QD5RItRsQDctp5U-eXpl4nuwhnfpsLFe_OlyyAOWAc6DRXotKpHKFLYTYS34Icz5fyBEDTMUlOK3heW9w3--7yHYxLFhQcssVGEhMe2_TPLTvlPoG-UTc5lISIcRoLX2VjJkf5PvB6boA6v0kgCZ0aREdobmNvXRllM8UXm56CIV3_dyWo2Nm8nUh0RNTQkyCdDvO0Tr-2PeTQ8aAY0OYJIighXGfB9mbsKXPQL8_28A\"/>\n</div>\n</div>\n</div>\n</div>\n</header>\n<!-- SideNavBar (Shared Component) -->\n<aside class=\"hidden lg:flex flex-col h-full fixed left-0 top-0 z-40 bg-primary w-64 pt-20\">\n<div class=\"px-lg py-md mb-lg\">\n<div class=\"flex items-center gap-sm mb-xs\">\n<div class=\"w-10 h-10 bg-on-primary rounded flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-primary\" style=\"font-variation-settings: 'FILL' 1;\">school</span>\n</div>\n<div>\n<h2 class=\"font-headline-sm text-headline-sm text-on-primary\">MCSS Portal</h2>\n<p class=\"font-label-sm text-label-sm text-on-primary/70\">Academic Excellence</p>\n</div>\n</div>\n</div>\n<nav class=\"flex-1 px-sm\">\n<a class=\"border-l-4 border-on-tertiary-container bg-primary-container text-on-primary-container font-bold px-md py-sm mb-xs flex items-center gap-sm transition-all translate-x-1\" href=\"#\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<a class=\"text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm mb-xs flex items-center gap-sm transition-all rounded-r-lg\" href=\"#\">\n<span class=\"material-symbols-outlined\">school</span>\n<span class=\"font-label-md text-label-md\">Academics</span>\n</a>\n<a class=\"text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm mb-xs flex items-center gap-sm transition-all rounded-r-lg\" href=\"#\">\n<span class=\"material-symbols-outlined\">payments</span>\n<span class=\"font-label-md text-label-md\">Finance</span>\n</a>\n<a class=\"text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm mb-xs flex items-center gap-sm transition-all rounded-r-lg\" href=\"#\">\n<span class=\"material-symbols-outlined\">calendar_today</span>\n<span class=\"font-label-md text-label-md\">Schedule</span>\n</a>\n<a class=\"text-on-primary/70 hover:text-on-primary hover:bg-primary-container/20 px-md py-sm mb-xs flex items-center gap-sm transition-all rounded-r-lg\" href=\"#\">\n<span class=\"material-symbols-outlined\">menu</span>\n<span class=\"font-label-md text-label-md\">More</span>\n</a>\n</nav>\n<div class=\"p-md mt-auto mb-lg\">\n<div class=\"bg-primary-container/10 p-md rounded-xl border border-on-primary/10\">\n<p class=\"text-on-primary/80 text-sm italic\">\"Scientia et Virtus\"</p>\n<p class=\"text-on-primary text-xs mt-xs opacity-50\">Est. 1954</p>\n</div>\n</div>\n</aside>\n<!-- Main Content Canvas -->\n<main class=\"lg:ml-64 p-gutter max-w-container-max mx-auto\">\n<!-- Welcome Section -->\n<section class=\"mb-xl animate-fade-in\">\n<div class=\"relative bg-white border border-outline-variant p-lg rounded-lg overflow-hidden flex flex-col md:flex-row items-center gap-lg shadow-sm\">\n<!-- Ribbon Tag -->\n<div class=\"absolute top-0 right-0 ribbon-tag bg-secondary text-on-secondary px-lg py-xs font-label-md shadow-sm\">\n                    Active Student\n                </div>\n<div class=\"w-32 h-32 rounded-lg border-4 border-primary/10 overflow-hidden shadow-inner\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A close-up high-resolution photo of Adebayo Oluwaseun Samuel, a handsome student in his senior secondary school years. He is wearing the traditional purple and white school tie and blazer of Mount Carmel Secondary. The lighting is warm and directional, creating a sophisticated academic mood that emphasizes character and scholarly achievement.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuBQF-eA7_lpBJ1x-jYsCVKumoj85m6cuSF_GmBQZs5B1xx31aKpA98icEnrNolEPKSN7IqNz5YlaNtjwdLKDu1dXnKvI_aM76bbS0yT2SfD8rtSGIE-k254hWbglqY0VhA57gQZ0SlnWNiPdAPKWWGhMaWYOEPF3Ma96k9kcL9LaMlkbtGtHSHBJPJgTwv_SlOnLAI0j9moEUjwkJDLQA9rv7jPXB2-JhslOC7banufwzhW5ODGICsx0PZp6oDylrA5TwiyawR__dsY\"/>\n</div>\n<div class=\"flex-1 text-center md:text-left\">\n<h1 class=\"font-headline-xl text-headline-xl text-primary mb-xs\">Welcome back, Adebayo</h1>\n<p class=\"font-body-lg text-body-lg text-on-surface-variant\">Adebayo Oluwaseun Samuel • <span class=\"font-bold text-secondary\">SS2A (Science)</span></p>\n<div class=\"flex flex-wrap gap-sm mt-md justify-center md:justify-start\">\n<span class=\"bg-surface-container px-md py-xs rounded-full font-label-sm flex items-center gap-xs\">\n<span class=\"material-symbols-outlined text-[16px]\">id_card</span> 2024/MCSS/772\n                        </span>\n<span class=\"bg-surface-container px-md py-xs rounded-full font-label-sm flex items-center gap-xs\">\n<span class=\"material-symbols-outlined text-[16px]\">location_on</span> St. Augustine Block\n                        </span>\n</div>\n</div>\n</div>\n</section>\n<!-- Stats Bento Grid -->\n<section class=\"grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl\">\n<!-- Term Average -->\n<div class=\"bg-white border border-outline-variant p-lg rounded-lg shadow-sm hover:shadow-md transition-shadow group\">\n<div class=\"flex justify-between items-start mb-md\">\n<div class=\"p-sm bg-secondary-container rounded-lg text-on-secondary-container\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">analytics</span>\n</div>\n<span class=\"text-xs font-bold text-on-surface-variant\">TERM 2</span>\n</div>\n<h3 class=\"font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs\">Term Average</h3>\n<div class=\"flex items-baseline gap-sm\">\n<span class=\"font-headline-lg text-headline-lg text-primary\">78.4%</span>\n<span class=\"text-success text-sm font-bold flex items-center text-[#2e7d32]\">\n<span class=\"material-symbols-outlined text-sm\">arrow_upward</span> 2.1%\n                    </span>\n</div>\n<div class=\"mt-md w-full bg-surface-container h-2 rounded-full overflow-hidden\">\n<div class=\"bg-primary h-full w-[78.4%] group-hover:scale-x-105 transition-transform origin-left\"></div>\n</div>\n</div>\n<!-- Attendance -->\n<div class=\"bg-white border border-outline-variant p-lg rounded-lg shadow-sm hover:shadow-md transition-shadow group\">\n<div class=\"flex justify-between items-start mb-md\">\n<div class=\"p-sm bg-tertiary-fixed rounded-lg text-on-tertiary-fixed\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">calendar_month</span>\n</div>\n<span class=\"text-xs font-bold text-on-surface-variant\">LATEST MONTH</span>\n</div>\n<h3 class=\"font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs\">Attendance</h3>\n<div class=\"flex items-baseline gap-sm\">\n<span class=\"font-headline-lg text-headline-lg text-tertiary\">96%</span>\n<span class=\"text-on-surface-variant text-sm font-medium\">Excellent</span>\n</div>\n<div class=\"mt-md flex gap-1\">\n<div class=\"h-2 flex-1 bg-tertiary rounded-full\"></div>\n<div class=\"h-2 flex-1 bg-tertiary rounded-full\"></div>\n<div class=\"h-2 flex-1 bg-tertiary rounded-full\"></div>\n<div class=\"h-2 flex-1 bg-tertiary rounded-full\"></div>\n<div class=\"h-2 flex-1 bg-outline-variant rounded-full opacity-30\"></div>\n</div>\n</div>\n<!-- Outstanding Fees -->\n<div class=\"bg-white border border-outline-variant p-lg rounded-lg shadow-sm hover:shadow-md transition-shadow\">\n<div class=\"flex justify-between items-start mb-md\">\n<div class=\"p-sm bg-primary-fixed rounded-lg text-on-primary-fixed\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">account_balance_wallet</span>\n</div>\n</div>\n<h3 class=\"font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs\">Outstanding Fees</h3>\n<div class=\"flex items-baseline gap-sm\">\n<span class=\"font-headline-lg text-headline-lg text-on-background\">₦0</span>\n<div class=\"px-sm py-1 bg-[#e8f5e9] text-[#2e7d32] rounded text-xs font-bold uppercase\">Paid</div>\n</div>\n<p class=\"mt-md text-body-md text-on-surface-variant\">Receipt No: MCSS/2024/042-B</p>\n</div>\n</section>\n<!-- Lower Dashboard Section -->\n<div class=\"grid grid-cols-1 lg:grid-cols-3 gap-xl\">\n<!-- Upcoming Exams Widget (2/3 width) -->\n<div class=\"lg:col-span-2\">\n<div class=\"bg-white border border-outline-variant rounded-lg shadow-sm overflow-hidden h-full\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center\">\n<div class=\"flex items-center gap-sm\">\n<span class=\"material-symbols-outlined text-primary\">event_note</span>\n<h2 class=\"font-headline-md text-headline-md text-primary\">Upcoming Exams</h2>\n</div>\n<button class=\"text-secondary font-label-md hover:underline\">Full Schedule</button>\n</div>\n<div class=\"p-lg overflow-x-auto\">\n<table class=\"w-full text-left border-collapse\">\n<thead>\n<tr class=\"bg-primary text-white font-label-md\">\n<th class=\"p-md font-label-md\">Subject</th>\n<th class=\"p-md font-label-md\">Date</th>\n<th class=\"p-md font-label-md\">Time</th>\n<th class=\"p-md font-label-md\">Venue</th>\n<th class=\"p-md font-label-md\">Status</th>\n</tr>\n</thead>\n<tbody class=\"font-body-md divide-y divide-outline-variant\">\n<tr class=\"hover:bg-surface-container-lowest transition-colors\">\n<td class=\"p-md font-bold text-on-surface\">Further Mathematics</td>\n<td class=\"p-md\">May 14, 2024</td>\n<td class=\"p-md\">09:00 AM</td>\n<td class=\"p-md\">Assembly Hall</td>\n<td class=\"p-md\"><span class=\"px-sm py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-xs font-bold\">UPCOMING</span></td>\n</tr>\n<tr class=\"hover:bg-surface-container-lowest transition-colors\">\n<td class=\"p-md font-bold text-on-surface\">Physics (Theory)</td>\n<td class=\"p-md\">May 15, 2024</td>\n<td class=\"p-md\">01:30 PM</td>\n<td class=\"p-md\">Lab A</td>\n<td class=\"p-md\"><span class=\"px-sm py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-xs font-bold\">UPCOMING</span></td>\n</tr>\n<tr class=\"hover:bg-surface-container-lowest transition-colors\">\n<td class=\"p-md font-bold text-on-surface\">English Literature</td>\n<td class=\"p-md\">May 17, 2024</td>\n<td class=\"p-md\">11:00 AM</td>\n<td class=\"p-md\">St. Paul B</td>\n<td class=\"p-md\"><span class=\"px-sm py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-xs font-bold\">UPCOMING</span></td>\n</tr>\n<tr class=\"hover:bg-surface-container-lowest transition-colors\">\n<td class=\"p-md font-bold text-on-surface\">Chemistry Practical</td>\n<td class=\"p-md\">May 18, 2024</td>\n<td class=\"p-md\">08:00 AM</td>\n<td class=\"p-md\">Main Lab</td>\n<td class=\"p-md\"><span class=\"px-sm py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full text-xs font-bold\">UPCOMING</span></td>\n</tr>\n</tbody>\n</table>\n</div>\n</div>\n</div>\n<!-- Recent Announcements Feed (1/3 width) -->\n<div class=\"lg:col-span-1\">\n<div class=\"bg-white border border-outline-variant rounded-lg shadow-sm h-full flex flex-col\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant flex items-center gap-sm\">\n<span class=\"material-symbols-outlined text-tertiary\">campaign</span>\n<h2 class=\"font-headline-md text-headline-md text-tertiary\">Announcements</h2>\n</div>\n<div class=\"p-lg flex-1 overflow-y-auto space-y-md\">\n<!-- Announcement Item -->\n<div class=\"relative pl-md border-l-2 border-tertiary-fixed-dim py-1\">\n<div class=\"absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-tertiary\"></div>\n<p class=\"text-xs font-bold text-tertiary-fixed-dim uppercase mb-1\">Today, 08:30 AM</p>\n<h4 class=\"font-headline-sm text-sm font-bold text-on-surface mb-xs\">Inter-House Sports Final</h4>\n<p class=\"text-body-md text-sm text-on-surface-variant line-clamp-2\">The final list of track events for Friday has been posted on the main notice board.</p>\n</div>\n<!-- Announcement Item -->\n<div class=\"relative pl-md border-l-2 border-outline-variant py-1 opacity-70\">\n<p class=\"text-xs font-bold text-on-surface-variant uppercase mb-1\">Yesterday</p>\n<h4 class=\"font-headline-sm text-sm font-bold text-on-surface mb-xs\">Maths Olympiad Trials</h4>\n<p class=\"text-body-md text-sm text-on-surface-variant line-clamp-2\">Students interested in the Olympiad should register with Mr. Okafor by 2 PM.</p>\n</div>\n<!-- Announcement Item -->\n<div class=\"relative pl-md border-l-2 border-outline-variant py-1 opacity-70\">\n<p class=\"text-xs font-bold text-on-surface-variant uppercase mb-1\">May 02, 2024</p>\n<h4 class=\"font-headline-sm text-sm font-bold text-on-surface mb-xs\">Term Break Notification</h4>\n<p class=\"text-body-md text-sm text-on-surface-variant line-clamp-2\">The draft schedule for the mid-term break has been approved by the Principal.</p>\n</div>\n</div>\n<div class=\"p-md border-t border-outline-variant\">\n<button class=\"w-full py-sm bg-surface-container hover:bg-surface-container-high text-primary font-bold rounded-lg transition-colors flex items-center justify-center gap-sm\">\n                            View All Feed <span class=\"material-symbols-outlined text-sm\">open_in_new</span>\n</button>\n</div>\n</div>\n</div>\n</div>\n<!-- Quick Actions (Institutional Authority Style) -->\n<section class=\"mt-xl grid grid-cols-2 md:grid-cols-4 gap-md\">\n<button class=\"flex flex-col items-center justify-center p-lg bg-white border border-outline-variant rounded-lg hover:border-primary transition-all group\">\n<div class=\"w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-md group-hover:bg-primary transition-colors\">\n<span class=\"material-symbols-outlined text-primary group-hover:text-white transition-colors\">download_for_offline</span>\n</div>\n<span class=\"font-label-md text-on-surface\">Report Card</span>\n</button>\n<button class=\"flex flex-col items-center justify-center p-lg bg-white border border-outline-variant rounded-lg hover:border-primary transition-all group\">\n<div class=\"w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-md group-hover:bg-primary transition-colors\">\n<span class=\"material-symbols-outlined text-primary group-hover:text-white transition-colors\">library_books</span>\n</div>\n<span class=\"font-label-md text-on-surface\">E-Library</span>\n</button>\n<button class=\"flex flex-col items-center justify-center p-lg bg-white border border-outline-variant rounded-lg hover:border-primary transition-all group\">\n<div class=\"w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-md group-hover:bg-primary transition-colors\">\n<span class=\"material-symbols-outlined text-primary group-hover:text-white transition-colors\">chat_bubble</span>\n</div>\n<span class=\"font-label-md text-on-surface\">Ask Tutor</span>\n</button>\n<button class=\"flex flex-col items-center justify-center p-lg bg-white border border-outline-variant rounded-lg hover:border-primary transition-all group\">\n<div class=\"w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-md group-hover:bg-primary transition-colors\">\n<span class=\"material-symbols-outlined text-primary group-hover:text-white transition-colors\">person_search</span>\n</div>\n<span class=\"font-label-md text-on-surface\">Attendance Log</span>\n</button>\n</section>\n</main>\n<!-- BottomNavBar (Shared Component - Mobile Only) -->\n<nav class=\"fixed bottom-md left-0 right-0 w-[calc(100%-48px)] mx-auto z-50 flex justify-around items-center py-sm px-md lg:hidden bg-inverse-surface rounded-full shadow-lg\">\n<a class=\"flex flex-col items-center justify-center text-on-tertiary-container bg-tertiary-container/20 rounded-full p-2 scale-95 duration-100\" href=\"#\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">home</span>\n<span class=\"font-label-sm text-[10px] text-white\">Home</span>\n</a>\n<a class=\"flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform\" href=\"#\">\n<span class=\"material-symbols-outlined\">grade</span>\n<span class=\"font-label-sm text-[10px]\">Grades</span>\n</a>\n<a class=\"flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform\" href=\"#\">\n<span class=\"material-symbols-outlined\">account_balance_wallet</span>\n<span class=\"font-label-sm text-[10px]\">Fees</span>\n</a>\n<a class=\"flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform\" href=\"#\">\n<span class=\"material-symbols-outlined\">event_note</span>\n<span class=\"font-label-sm text-[10px]\">Time</span>\n</a>\n<a class=\"flex flex-col items-center justify-center text-on-primary/60 p-2 hover:scale-105 transition-transform\" href=\"#\">\n<span class=\"material-symbols-outlined\">more_vert</span>\n<span class=\"font-label-sm text-[10px]\">More</span>\n</a>\n</nav>";
+import AppShell from '../../components/layout/AppShell.jsx';
+import Card from '../../components/ui/Card.jsx';
+import StatCard from '../../components/ui/StatCard.jsx';
+import Badge from '../../components/ui/Badge.jsx';
+import Button from '../../components/ui/Button.jsx';
+import {
+  student,
+  termAverage,
+  attendance,
+  outstandingFees,
+  upcomingExams,
+  announcements,
+  quickActions,
+} from './dashboardData.js';
 
 export default function StudentDashboard() {
-  return <StitchScreen title="Student Dashboard" bodyClassName="bg-background text-on-surface font-body-md min-h-screen" html={html} />;
+  return (
+    <AppShell portalId="student" pageTitle="Student Dashboard" user={{ name: student.fullName, avatarUrl: student.photoUrl }}>
+      <div className="space-y-lg sm:space-y-xl">
+        {/* Welcome banner */}
+        <Card padding="lg" className="relative overflow-hidden flex flex-col md:flex-row items-center gap-lg">
+          <Badge tone="secondary" variant="ribbon" className="absolute top-0 right-0">
+            Active Student
+          </Badge>
+          <div className="w-32 h-32 rounded-lg border-4 border-primary/10 overflow-hidden shrink-0">
+            <img src={student.photoUrl} alt={student.fullName} className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="font-headline-xl text-headline-xl text-primary mb-xs">Welcome back, {student.firstName}</h1>
+            <p className="font-body-lg text-body-lg text-on-surface-variant">
+              {student.fullName} · <span className="font-bold text-secondary">{student.className}</span>
+            </p>
+            <div className="flex flex-wrap gap-sm mt-md justify-center md:justify-start">
+              <span className="bg-surface-container px-md py-xs rounded-full font-label-sm flex items-center gap-xs">
+                <span className="material-symbols-outlined text-body-md">id_card</span> {student.studentId}
+              </span>
+              <span className="bg-surface-container px-md py-xs rounded-full font-label-sm flex items-center gap-xs">
+                <span className="material-symbols-outlined text-body-md">location_on</span> {student.house}
+              </span>
+            </div>
+          </div>
+        </Card>
+
+        {/* Stats grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
+          <StatCard
+            icon="analytics"
+            iconTone="secondary"
+            label={`Term Average · ${termAverage.term}`}
+            value={`${termAverage.percent}%`}
+            delta={{ direction: 'up', text: termAverage.deltaText }}
+            progress={{ percent: termAverage.percent }}
+          />
+          <StatCard
+            icon="calendar_month"
+            iconTone="tertiary"
+            label="Attendance · Latest Month"
+            value={`${attendance.percent}%`}
+            helperText={attendance.status}
+            progress={{ percent: (attendance.monthsFilled / attendance.monthsTotal) * 100 }}
+          />
+          <StatCard
+            icon="account_balance_wallet"
+            iconTone="primary"
+            label="Outstanding Fees"
+            value={outstandingFees.amount}
+            valueBadge={{ text: outstandingFees.status, tone: 'success' }}
+            helperText={`Receipt No: ${outstandingFees.receiptNo}`}
+          />
+        </div>
+
+        {/* Exams + announcements */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+          <Card padding="none" className="lg:col-span-2 overflow-hidden">
+            <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex justify-between items-center">
+              <div className="flex items-center gap-sm">
+                <span className="material-symbols-outlined text-primary">event_note</span>
+                <h2 className="font-headline-md text-headline-md text-primary">Upcoming Exams</h2>
+              </div>
+              <Button variant="ghost" size="sm">
+                Full Schedule
+              </Button>
+            </div>
+            <div className="p-lg overflow-x-auto">
+              <table className="w-full min-w-140 text-left border-collapse">
+                <thead>
+                  <tr className="bg-primary text-on-primary">
+                    <th className="p-md font-label-md text-label-md">Subject</th>
+                    <th className="p-md font-label-md text-label-md">Date</th>
+                    <th className="p-md font-label-md text-label-md">Time</th>
+                    <th className="p-md font-label-md text-label-md">Venue</th>
+                    <th className="p-md font-label-md text-label-md">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="font-body-md text-body-md divide-y divide-outline/10">
+                  {upcomingExams.map((exam) => (
+                    <tr key={exam.subject} className="hover:bg-surface-container-lowest transition-colors">
+                      <td className="p-md font-bold text-on-surface">{exam.subject}</td>
+                      <td className="p-md">{exam.date}</td>
+                      <td className="p-md">{exam.time}</td>
+                      <td className="p-md">{exam.venue}</td>
+                      <td className="p-md">
+                        <Badge tone="secondary">Upcoming</Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <Card padding="none" className="lg:col-span-1 flex flex-col">
+            <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex items-center gap-sm">
+              <span className="material-symbols-outlined text-tertiary">campaign</span>
+              <h2 className="font-headline-md text-headline-md text-tertiary">Announcements</h2>
+            </div>
+            <div className="p-lg flex-1 space-y-md">
+              {announcements.map((item) => (
+                <div
+                  key={item.title}
+                  className={`relative pl-md border-l-2 py-1 ${
+                    item.highlighted ? 'border-tertiary-fixed-dim' : 'border-outline/20 opacity-70'
+                  }`}
+                >
+                  {item.highlighted && <div className="absolute -left-1.25 top-1 w-2 h-2 rounded-full bg-tertiary" />}
+                  <p
+                    className={`text-xs font-bold uppercase mb-1 ${
+                      item.highlighted ? 'text-tertiary-fixed-dim' : 'text-on-surface-variant'
+                    }`}
+                  >
+                    {item.timestamp}
+                  </p>
+                  <h4 className="font-headline-sm text-sm font-bold text-on-surface mb-xs">{item.title}</h4>
+                  <p className="text-sm text-on-surface-variant line-clamp-2">{item.body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="p-md border-t border-outline/10">
+              <Button variant="ghost" className="w-full justify-center" iconRight="open_in_new">
+                View All Feed
+              </Button>
+            </div>
+          </Card>
+        </div>
+
+        {/* Quick actions */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
+          {quickActions.map((action) => (
+            <button
+              key={action.label}
+              type="button"
+              className="flex flex-col items-center justify-center p-lg bg-surface-container-lowest border border-outline/10 rounded-lg hover:border-primary transition-all group"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-md group-hover:bg-primary transition-colors">
+                <span className="material-symbols-outlined text-primary group-hover:text-on-primary transition-colors">
+                  {action.icon}
+                </span>
+              </div>
+              <span className="font-label-md text-label-md text-on-surface">{action.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </AppShell>
+  );
 }

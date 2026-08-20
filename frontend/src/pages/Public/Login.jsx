@@ -1,7 +1,238 @@
-import StitchScreen from '../../components/StitchScreen.jsx';
+import { useEffect, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { categories, familyRoles, staffRoles, superAdmin, detectFamilyRole } from './loginData.js';
 
-const html = "<main class=\"flex min-h-screen w-full\">\n<!-- Left Panel: Brand Authority & Heritage -->\n<section class=\"hidden lg:flex flex-col justify-between w-[45%] bg-primary p-xl relative overflow-hidden\">\n<!-- Background Decoration -->\n<div class=\"absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none\"></div>\n<div class=\"absolute -bottom-20 -left-20 w-80 h-80 bg-primary-container rounded-full blur-[100px] opacity-30\"></div>\n<div class=\"relative z-10 flex flex-col h-full\">\n<!-- Branding -->\n<div class=\"flex items-center gap-md\">\n<div class=\"w-16 h-16 flex items-center justify-center bg-surface-container-lowest rounded-lg shadow-md p-sm\">\n<!-- School Crest Placeholder -->\n<img class=\"w-full h-full object-contain\" data-alt=\"A formal, heraldic academic crest for Mount Carmel Secondary School, featuring traditional religious symbols, a torch of knowledge, and an open book. The design is rendered in high-contrast Royal Purple and Gold on a white shield, evoking a sense of deep historical prestige and high-level educational authority in a modern institutional style.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuC1be7EySMEFB_ow7TL3QFW3aWiHY9YhKK2JirOHSnxoHB42EkvJUyMZriNBayfhIxzDcbcOnqPyD5WoOfGFagr5zxcsWoz92p0GiLjSu_ELNIDCGCb8xOnP8CnyfjeurdaTTThHEdGb6GGKiP8nDrAPGTU32m0R4oiQHDqv61vlLFLtRH63cn1Q0K1Um-5_7ZNV1xrE0FbNtifoqJB1NC45lhMNLVLp_k_XXie9_gZj3-3t_ge21OgMWx42_7p7niPde-sxWyLwJv7\"/>\n</div>\n<div>\n<h1 class=\"font-headline-md text-on-primary leading-tight\">Mount Carmel</h1>\n<p class=\"font-label-md text-on-primary-container tracking-[0.1em] uppercase\">Secondary School</p>\n</div>\n</div>\n<div class=\"mt-auto mb-12\">\n<h2 class=\"font-headline-xl text-on-primary max-w-md\">Cultivating Excellence through Faith and Knowledge.</h2>\n<div class=\"mt-lg h-1 w-24 bg-tertiary-container\"></div>\n</div>\n<!-- Footer elements on the left side -->\n<div class=\"flex gap-lg mt-auto text-on-primary-container font-label-md opacity-80\">\n<a class=\"hover:text-on-primary transition-colors\" href=\"#\">Portals Guide</a>\n<a class=\"hover:text-on-primary transition-colors\" href=\"#\">IT Support</a>\n<a class=\"hover:text-on-primary transition-colors\" href=\"#\">Campus Safety</a>\n</div>\n</div>\n</section>\n<!-- Right Panel: The Formal Login Form -->\n<section class=\"flex-1 flex flex-col bg-surface overflow-y-auto\">\n<!-- Mobile Branding Header (Hidden on Desktop) -->\n<div class=\"lg:hidden p-lg flex items-center justify-between border-b border-outline-variant\">\n<div class=\"flex items-center gap-sm\">\n<div class=\"w-8 h-8 bg-primary rounded p-1\">\n<img class=\"w-full h-full object-contain\" data-alt=\"A simplified minimalist version of the school crest for Mount Carmel Secondary School, centered within a small purple square. The icon style is clean and professional, using gold accents to symbolize academic excellence against a deep institutional background.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCnUPOOCjRI8k0TI8OJvVRU_EZz4k51EoxYeneY0fGsWooVJiBKmZO6VkSUs_DO9fpatfXXTGLgSVte29vlhZixgP2Uegw4cy_crrNd6D8RhTJWW5boraOO0OnBFuX75o8Bd8l2SwR-ywzuPXU4EOynLIoQnrxk9gEbvvnflqdfsXRJK7WAhMBR5JSfsM_fQt_AU6grzfYywc7DIpclMtJjK-fnGMiNtjrmyzvAvRuO8atjcq4vjEk5lhWRm0HeHEWJVhWlfQVh-ooZ\"/>\n</div>\n<span class=\"font-headline-md text-primary\">MCSS Portal</span>\n</div>\n<span class=\"material-symbols-outlined text-on-surface-variant\">apps</span>\n</div>\n<!-- Login Container -->\n<div class=\"max-w-md w-full mx-auto my-auto p-lg flex flex-col gap-xl\">\n<!-- Form Header -->\n<header class=\"flex flex-col gap-sm\">\n<span class=\"font-label-md text-primary tracking-widest uppercase\">Secure Access</span>\n<h2 class=\"font-headline-lg text-on-surface\">Institutional Portal</h2>\n<p class=\"font-body-md text-on-surface-variant\">Please authenticate your credentials to access the Mount Carmel management ecosystem.</p>\n</header>\n<!-- Role Selector Tabs -->\n<nav class=\"flex border-b border-outline-variant overflow-x-auto no-scrollbar\" id=\"role-selector\">\n<button class=\"role-tab flex-none px-md py-sm font-label-md transition-all role-tab-active\" data-role=\"Student\" onclick=\"switchRole('Student')\">Student</button>\n<button class=\"role-tab flex-none px-md py-sm font-label-md text-on-surface-variant transition-all hover:bg-surface-container\" data-role=\"Parent\" onclick=\"switchRole('Parent')\">Parent</button>\n<button class=\"role-tab flex-none px-md py-sm font-label-md text-on-surface-variant transition-all hover:bg-surface-container\" data-role=\"Teacher\" onclick=\"switchRole('Teacher')\">Teacher</button>\n<button class=\"role-tab flex-none px-md py-sm font-label-md text-on-surface-variant transition-all hover:bg-surface-container\" data-role=\"Admin\" onclick=\"switchRole('Admin')\">Admin</button>\n<button class=\"role-tab flex-none px-md py-sm font-label-md text-on-surface-variant transition-all hover:bg-surface-container\" data-role=\"Bursary\" onclick=\"switchRole('Bursary')\">Bursary</button>\n</nav>\n<!-- Credentials Form -->\n<form class=\"flex flex-col gap-lg\" onsubmit=\"event.preventDefault();\">\n<div class=\"flex flex-col gap-base\">\n<label class=\"font-label-md text-on-surface-variant\" for=\"identifier\" id=\"label-identifier\">Student ID Number</label>\n<div class=\"relative group\">\n<span class=\"absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant\">person</span>\n<input class=\"w-full bg-surface-container-lowest border border-outline px-xl py-md font-body-md text-on-surface rounded transition-all hover:border-primary\" id=\"identifier\" placeholder=\"e.g. MC-2024-001\" type=\"text\"/>\n</div>\n</div>\n<div class=\"flex flex-col gap-base\">\n<div class=\"flex justify-between items-end\">\n<label class=\"font-label-md text-on-surface-variant\" for=\"password\">Password</label>\n<a class=\"font-label-sm text-secondary hover:underline\" href=\"#\">Reset access?</a>\n</div>\n<div class=\"relative group\">\n<span class=\"absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant\">lock</span>\n<input class=\"w-full bg-surface-container-lowest border border-outline px-xl py-md font-body-md text-on-surface rounded transition-all hover:border-primary\" id=\"password\" placeholder=\"••••••••\" type=\"password\"/>\n<button class=\"absolute right-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant hover:text-primary\" type=\"button\">visibility</button>\n</div>\n</div>\n<div class=\"flex items-center gap-sm\">\n<input class=\"w-4 h-4 rounded border-outline text-primary focus:ring-primary-fixed\" id=\"remember\" type=\"checkbox\"/>\n<label class=\"font-label-md text-on-surface-variant cursor-pointer select-none\" for=\"remember\">Remember this device for 30 days</label>\n</div>\n<button class=\"bg-secondary text-on-secondary font-label-md py-md rounded shadow-sm hover:bg-on-secondary-fixed-variant transition-all active:scale-[0.98] flex items-center justify-center gap-sm mt-md\">\n                        AUTHENTICATE SECURELY\n                        <span class=\"material-symbols-outlined text-[20px]\">login</span>\n</button>\n</form>\n<!-- Secondary Actions -->\n<footer class=\"flex flex-col gap-md pt-lg border-t border-outline-variant\">\n<div class=\"flex justify-between items-center text-on-surface-variant font-label-sm\">\n<span>Need account activation?</span>\n<a class=\"text-primary font-label-md underline\" href=\"#\">Request Access</a>\n</div>\n<!-- Notice Banner -->\n<div class=\"bg-surface-container-high p-md rounded-lg flex gap-md items-start\">\n<span class=\"material-symbols-outlined text-secondary\">info</span>\n<p class=\"font-label-sm text-on-surface-variant\">\n                            By logging in, you agree to the MCSS Acceptable Use Policy. All activity is monitored for institutional security.\n                        </p>\n</div>\n</footer>\n</div>\n<!-- Global Footer (Copyright) -->\n<div class=\"mt-auto py-lg px-xl flex justify-center lg:justify-end\">\n<span class=\"font-label-sm text-on-surface-variant opacity-60\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</span>\n</div>\n</section>\n</main>";
+const inputClasses =
+  'w-full bg-surface-container-lowest border border-outline/30 pl-11 pr-4 py-3 font-body-md text-on-surface rounded transition-all hover:border-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none';
 
 export default function Login() {
-  return <StitchScreen title="Portal Login" bodyClassName="bg-background text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed overflow-hidden" html={html} />;
+  const navigate = useNavigate();
+  const [activeCategory, setActiveCategory] = useState(categories[0].key);
+  const [showPassword, setShowPassword] = useState(false);
+  const [identifier, setIdentifier] = useState('');
+  const [selectedStaffRole, setSelectedStaffRole] = useState(null);
+
+  useEffect(() => {
+    document.title = 'Portal Login | MCSS Portal';
+  }, []);
+
+  useEffect(() => {
+    setIdentifier('');
+    setSelectedStaffRole(null);
+  }, [activeCategory]);
+
+  const detectedFamily = activeCategory === 'family' ? detectFamilyRole(identifier) : null;
+
+  const idField =
+    activeCategory === 'family'
+      ? { label: 'Student ID or Parent Email/Phone', placeholder: 'e.g. MC-2024-001 or parent@email.com' }
+      : activeCategory === 'staff'
+        ? { label: selectedStaffRole ? `${selectedStaffRole.label} ID Number` : 'Staff ID Number', placeholder: 'e.g. MC-STAFF-021' }
+        : { label: superAdmin.idLabel, placeholder: superAdmin.placeholder };
+
+  const canSubmit =
+    identifier.trim().length > 0 && (activeCategory === 'family' ? !!detectedFamily : activeCategory === 'staff' ? !!selectedStaffRole : true);
+
+  const submitLabel =
+    activeCategory === 'family'
+      ? detectedFamily
+        ? `Continue as ${familyRoles[detectedFamily].label}`
+        : 'Authenticate Securely'
+      : activeCategory === 'staff'
+        ? selectedStaffRole
+          ? `Continue as ${selectedStaffRole.label}`
+          : 'Select a role to continue'
+        : 'Authenticate as Super Admin';
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!canSubmit) return;
+    if (activeCategory === 'family') navigate(familyRoles[detectedFamily].homePath);
+    else if (activeCategory === 'staff') navigate(selectedStaffRole.homePath);
+    else navigate(superAdmin.homePath);
+  };
+
+  return (
+    <main className="flex min-h-screen w-full bg-surface-container-lowest">
+      <section className="hidden lg:flex flex-col justify-between w-[45%] bg-primary p-xl relative overflow-hidden">
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-primary-container rounded-full blur-[100px] opacity-30" />
+        <div className="relative z-10 flex flex-col h-full">
+          <Link to="/" className="flex items-center gap-md">
+            <div className="w-16 h-16 flex items-center justify-center bg-surface-container-lowest rounded-lg shadow-md p-sm shrink-0">
+              <span className="material-symbols-outlined text-primary text-3xl">school</span>
+            </div>
+            <div>
+              <h1 className="font-headline-md text-headline-md text-on-primary leading-tight">Mount Carmel</h1>
+              <p className="font-label-md text-on-primary/70 tracking-[0.1em] uppercase">Secondary School</p>
+            </div>
+          </Link>
+
+          <div className="mt-auto mb-12">
+            <h2 className="font-headline-xl text-headline-lg text-on-primary max-w-md">Cultivating Excellence through Faith and Knowledge.</h2>
+            <div className="mt-lg h-1 w-24 bg-tertiary-container" />
+          </div>
+
+          <div className="flex gap-lg mt-auto text-on-primary/70 font-label-md">
+            <Link to="/" className="hover:text-on-primary transition-colors">
+              Back to Site
+            </Link>
+            <a className="hover:text-on-primary transition-colors" href="#">
+              IT Support
+            </a>
+            <a className="hover:text-on-primary transition-colors" href="#">
+              Campus Safety
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section className="flex-1 flex flex-col overflow-y-auto">
+        <div className="lg:hidden p-lg flex items-center justify-between border-b border-outline/10">
+          <Link to="/" className="flex items-center gap-sm">
+            <div className="w-8 h-8 bg-primary rounded p-1 flex items-center justify-center">
+              <span className="material-symbols-outlined text-on-primary text-lg">school</span>
+            </div>
+            <span className="font-headline-md text-headline-sm text-primary">MCSS Portal</span>
+          </Link>
+        </div>
+
+        <div className="max-w-md w-full mx-auto my-auto p-lg flex flex-col gap-xl">
+          <header className="flex flex-col gap-xs animate-fade-slide-in">
+            <span className="font-label-md text-primary tracking-widest uppercase">Secure Access</span>
+            <h2 className="font-headline-lg text-headline-md text-on-surface">Institutional Portal</h2>
+            <p className="font-body-md text-on-surface-variant">Choose your portal category to authenticate.</p>
+          </header>
+
+          <div className="grid grid-cols-3 gap-sm">
+            {categories.map((cat) => (
+              <button
+                key={cat.key}
+                type="button"
+                onClick={() => setActiveCategory(cat.key)}
+                className={`flex flex-col items-center justify-center gap-1 py-md px-sm rounded-lg border-2 transition-all duration-300 ${
+                  activeCategory === cat.key
+                    ? 'border-primary bg-primary text-on-primary shadow-md scale-[1.02]'
+                    : 'border-outline/15 bg-surface-container-lowest text-on-surface-variant hover:border-primary/40'
+                }`}
+              >
+                <span className="material-symbols-outlined text-xl">{cat.icon}</span>
+                <span className="font-label-sm text-label-sm font-bold text-center leading-tight">{cat.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <form className="flex flex-col gap-lg" onSubmit={handleSubmit}>
+            <div key={activeCategory} className="flex flex-col gap-lg animate-fade-slide-in">
+              <p className="font-label-sm text-label-sm text-on-surface-variant -mt-xs">{categories.find((c) => c.key === activeCategory).description}</p>
+
+              {activeCategory === 'staff' && (
+                <div className="grid grid-cols-3 gap-xs">
+                  {staffRoles.map((role) => (
+                    <button
+                      key={role.key}
+                      type="button"
+                      onClick={() => setSelectedStaffRole(role)}
+                      className={`flex flex-col items-center justify-center gap-1 p-xs py-sm rounded-lg border transition-all duration-200 ${
+                        selectedStaffRole?.key === role.key ? 'border-primary bg-primary/5 text-primary' : 'border-outline/15 text-on-surface-variant hover:border-primary/40'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-lg">{role.icon}</span>
+                      <span className="font-label-sm text-[10px] font-bold text-center leading-tight">{role.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex flex-col gap-xs">
+                <label className="font-label-md text-on-surface-variant" htmlFor="identifier">
+                  {idField.label}
+                </label>
+                <div className="relative">
+                  <span className="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">person</span>
+                  <input
+                    className={inputClasses}
+                    id="identifier"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder={idField.placeholder}
+                    type="text"
+                  />
+                </div>
+                {activeCategory === 'family' && (
+                  <div className="min-h-6">
+                    {detectedFamily && (
+                      <span
+                        key={detectedFamily}
+                        className="animate-fade-slide-in inline-flex items-center gap-xs bg-secondary-container text-on-secondary-container px-sm py-1 rounded-full font-label-sm text-label-sm font-bold mt-xs"
+                      >
+                        <span className="material-symbols-outlined text-sm">{familyRoles[detectedFamily].icon}</span>
+                        Detected: {familyRoles[detectedFamily].label} Portal
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-xs">
+              <div className="flex justify-between items-end">
+                <label className="font-label-md text-on-surface-variant" htmlFor="password">
+                  Password
+                </label>
+                <a className="font-label-sm text-secondary hover:underline" href="#">
+                  Reset access?
+                </a>
+              </div>
+              <div className="relative">
+                <span className="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">lock</span>
+                <input className={inputClasses} id="password" placeholder="••••••••" type={showPassword ? 'text' : 'password'} />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant hover:text-primary"
+                >
+                  {showPassword ? 'visibility_off' : 'visibility'}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-sm">
+              <input className="w-4 h-4 rounded border-outline text-primary focus:ring-primary" id="remember" type="checkbox" />
+              <label className="font-label-md text-on-surface-variant cursor-pointer select-none" htmlFor="remember">
+                Remember this device for 30 days
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              className="bg-secondary text-on-secondary font-label-md font-bold py-md rounded shadow-sm hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none transition-all active:scale-[0.98] flex items-center justify-center gap-sm mt-xs"
+            >
+              {submitLabel}
+              <span className="material-symbols-outlined text-body-md">login</span>
+            </button>
+          </form>
+
+          <footer className="flex flex-col gap-md pt-lg border-t border-outline/10">
+            <div className="flex justify-between items-center text-on-surface-variant font-label-sm">
+              <span>Need account activation?</span>
+              <a className="text-primary font-label-md underline" href="#">
+                Request Access
+              </a>
+            </div>
+            <div className="bg-surface-container-high p-md rounded-lg flex gap-md items-start">
+              <span className="material-symbols-outlined text-secondary">info</span>
+              <p className="font-label-sm text-on-surface-variant">
+                By logging in, you agree to the MCSS Acceptable Use Policy. All activity is monitored for institutional security.
+              </p>
+            </div>
+          </footer>
+        </div>
+
+        <div className="mt-auto py-lg px-xl flex justify-center lg:justify-end">
+          <span className="font-label-sm text-on-surface-variant opacity-60">© 2024 Mount Carmel Secondary School. All Rights Reserved.</span>
+        </div>
+      </section>
+    </main>
+  );
 }

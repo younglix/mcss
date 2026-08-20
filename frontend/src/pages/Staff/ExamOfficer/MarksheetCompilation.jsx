@@ -1,7 +1,149 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
-
-const html = "<!-- SideNavBar (Authority: JSON & Contextual Overrides) -->\n<aside class=\"fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary dark:bg-surface-container-lowest w-64 shadow-sm\">\n<div class=\"px-gutter mb-xl\">\n<h1 class=\"font-headline-md text-headline-md text-on-primary dark:text-primary\">Mount Carmel</h1>\n<p class=\"font-label-sm text-label-sm text-on-primary/70 uppercase tracking-widest\">Exam Officer</p>\n</div>\n<nav class=\"flex-1 space-y-1\" data-audit=\"scoped-access-verified\">\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">event_available</span>\n<span class=\"font-label-md text-label-md\">Exam Schedule</span>\n</a>\n<!-- Active Navigation State for Marksheets -->\n<a class=\"flex items-center border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary dark:text-primary-fixed-dim py-3 px-4\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\" style=\"font-variation-settings: 'FILL' 1;\">description</span>\n<span class=\"font-label-md text-label-md\">Marksheets</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">settings</span>\n<span class=\"font-label-md text-label-md\">Grading Config</span>\n</a>\n</nav>\n<div class=\"mt-auto px-4 space-y-1\">\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 rounded-lg\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Main Canvas -->\n<main class=\"ml-64 min-h-screen p-gutter\">\n<!-- Header / Top Bar Area -->\n<header class=\"flex justify-between items-end mb-xl\">\n<div>\n<nav class=\"text-on-surface-variant font-label-sm mb-xs flex items-center gap-2\">\n<span class=\"\">Academic Year 2023/24</span>\n<span class=\"material-symbols-outlined text-[12px]\">chevron_right</span>\n<span class=\"\">Term 2</span>\n</nav>\n<h2 class=\"font-headline-lg text-headline-lg text-primary\">SS3 Science - Marksheet Compilation</h2>\n</div>\n<div class=\"flex gap-md\">\n<button class=\"flex items-center gap-2 bg-surface-container-lowest border border-outline-variant px-lg py-sm rounded-md text-secondary font-label-md hover:bg-surface-container transition-colors\">\n<span class=\"material-symbols-outlined text-[20px]\">print</span>\n                    Print Preview\n                </button>\n<button class=\"flex items-center gap-2 bg-primary text-on-primary px-lg py-sm rounded-md font-label-md hover:opacity-90 transition-opacity\">\n<span class=\"material-symbols-outlined text-[20px]\">ios_share</span>\n                    Export CSV\n                </button>\n</div>\n</header>\n<!-- Stats Bento Row -->\n<div class=\"grid grid-cols-1 md:grid-cols-4 gap-lg mb-xl\">\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm\">\n<p class=\"font-label-sm text-on-surface-variant uppercase mb-xs\">Total Students</p>\n<p class=\"font-headline-md text-headline-md\">42</p>\n</div>\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm\">\n<p class=\"font-label-sm text-on-surface-variant uppercase mb-xs\">Data Completeness</p>\n<p class=\"font-headline-md text-headline-md text-error\">92.4%</p>\n</div>\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm relative overflow-hidden\">\n<div class=\"relative z-10\">\n<p class=\"font-label-sm text-on-surface-variant uppercase mb-xs\">Missing Scores</p>\n<p class=\"font-headline-md text-headline-md text-on-tertiary-container\">14 Entries</p>\n</div>\n<div class=\"absolute right-0 bottom-0 opacity-10\">\n<span class=\"material-symbols-outlined text-[64px]\" style=\"font-variation-settings: 'FILL' 1;\">warning</span>\n</div>\n</div>\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm\">\n<p class=\"font-label-sm text-on-surface-variant uppercase mb-xs\">Class Average</p>\n<p class=\"font-headline-md text-headline-md\">74.2%</p>\n</div>\n</div>\n<!-- Filter Bar -->\n<div class=\"bg-surface-container-low p-md rounded-t-lg border-x border-t border-outline-variant flex items-center gap-xl\">\n<div class=\"flex items-center gap-md\">\n<span class=\"font-label-md text-on-surface-variant\">Filter by:</span>\n<select class=\"bg-surface-container-lowest border-outline-variant rounded-md text-body-md py-1\">\n<option>All Students</option>\n<option>Missing Data Only</option>\n<option>Borderline Passes</option>\n</select>\n</div>\n<div class=\"flex-1 relative\">\n<span class=\"material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline\">search</span>\n<input class=\"w-full pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-md focus:ring-primary focus:border-primary outline-none text-body-md\" placeholder=\"Search by name or admission number...\" type=\"text\">\n</div>\n</div>\n<!-- High Density Data Table -->\n<div class=\"bg-surface-container-lowest border border-outline-variant rounded-b-lg overflow-hidden shadow-sm\">\n<div class=\"overflow-x-auto scroll-hide w-full\">\n<table class=\"w-full text-left border-collapse font-body-md\">\n<thead>\n<tr class=\"bg-primary text-on-primary\">\n<th class=\"px-4 py-3 font-label-md border-r border-on-primary/20 sticky left-0 bg-primary z-10 w-48\">Student Name</th>\n<th class=\"px-4 py-3 font-label-md border-r border-on-primary/20\">Math</th>\n<th class=\"px-4 py-3 font-label-md border-r border-on-primary/20\">English</th>\n<th class=\"px-4 py-3 font-label-md border-r border-on-primary/20\">Physics</th>\n<th class=\"px-4 py-3 font-label-md border-r border-on-primary/20\">Chemistry</th>\n<th class=\"px-4 py-3 font-label-md border-r border-on-primary/20\">Biology</th>\n<th class=\"px-4 py-3 font-label-md border-r border-on-primary/20\">Civics</th>\n<th class=\"px-4 py-3 font-label-md border-r border-on-primary/20\">Geography</th>\n<th class=\"px-4 py-3 font-label-md\">Average</th>\n</tr>\n</thead>\n<tbody class=\"divide-y divide-outline-variant\">\n<!-- Row 1 -->\n<tr class=\"hover:bg-surface-container transition-colors\">\n<td class=\"px-4 py-3 border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-container z-10\">\n<div class=\"flex flex-col\">\n<span class=\"font-bold text-primary\">Adebayo, Samuel</span>\n<span class=\"text-[10px] text-on-surface-variant\">MCSS-2023-001</span>\n</div>\n</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">85</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">78</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">92</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">88</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">74</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">81</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">79</td>\n<td class=\"px-4 py-3 font-bold text-center\">82.4%</td>\n</tr>\n<!-- Row 2 - Missing Data Highlight -->\n<tr class=\"hover:bg-surface-container transition-colors\">\n<td class=\"px-4 py-3 border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-container z-10\">\n<div class=\"flex flex-col\">\n<span class=\"font-bold text-primary\">Chen, Wei</span>\n<span class=\"text-[10px] text-on-surface-variant\">MCSS-2023-014</span>\n</div>\n</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">72</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">84</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center bg-tertiary-container/10 text-on-tertiary-container font-bold italic\">Missing</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">68</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">91</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">75</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center bg-tertiary-container/10 text-on-tertiary-container font-bold italic\">Missing</td>\n<td class=\"px-4 py-3 font-bold text-center opacity-40\">N/A</td>\n</tr>\n<!-- Row 3 -->\n<tr class=\"hover:bg-surface-container transition-colors\">\n<td class=\"px-4 py-3 border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-container z-10\">\n<div class=\"flex flex-col\">\n<span class=\"font-bold text-primary\">Ibrahim, Fatima</span>\n<span class=\"text-[10px] text-on-surface-variant\">MCSS-2023-025</span>\n</div>\n</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">95</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">91</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">89</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">94</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">88</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">92</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">90</td>\n<td class=\"px-4 py-3 font-bold text-center\">91.3%</td>\n</tr>\n<!-- Row 4 -->\n<tr class=\"hover:bg-surface-container transition-colors\">\n<td class=\"px-4 py-3 border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-container z-10\">\n<div class=\"flex flex-col\">\n<span class=\"font-bold text-primary\">Musa, Daniel</span>\n<span class=\"text-[10px] text-on-surface-variant\">MCSS-2023-038</span>\n</div>\n</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center bg-tertiary-container/10 text-on-tertiary-container font-bold italic\">Missing</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">61</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">54</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">59</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">63</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">60</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">58</td>\n<td class=\"px-4 py-3 font-bold text-center opacity-40\">N/A</td>\n</tr>\n<!-- Row 5 -->\n<tr class=\"hover:bg-surface-container transition-colors\">\n<td class=\"px-4 py-3 border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-container z-10\">\n<div class=\"flex flex-col\">\n<span class=\"font-bold text-primary\">Okonkwo, Ifeanyi</span>\n<span class=\"text-[10px] text-on-surface-variant\">MCSS-2023-042</span>\n</div>\n</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">78</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">82</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">85</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">80</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">77</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">84</td>\n<td class=\"px-4 py-3 border-r border-outline-variant text-center\">81</td>\n<td class=\"px-4 py-3 font-bold text-center\">81.0%</td>\n</tr>\n</tbody>\n</table>\n</div>\n</div>\n<!-- Legend and Meta -->\n<div class=\"mt-md flex justify-between items-center px-md\">\n<div class=\"flex gap-lg items-center\">\n<div class=\"flex items-center gap-2\">\n<div class=\"w-4 h-4 bg-tertiary-container/20 border border-tertiary-container\"></div>\n<span class=\"font-label-sm text-on-surface-variant\">Incomplete Entry</span>\n</div>\n<div class=\"flex items-center gap-2\">\n<div class=\"w-4 h-4 bg-primary\"></div>\n<span class=\"font-label-sm text-on-surface-variant\">Confirmed Column</span>\n</div>\n</div>\n<p class=\"font-label-sm text-outline italic\">Last synchronized: 12 minutes ago by Head of Department (Science)</p>\n</div>\n<!-- Footer Overlay (Task-Focused Suppression Logic: Minimal Footer) -->\n<footer class=\"mt-xl pt-lg border-t border-outline-variant flex justify-between items-center text-on-surface-variant font-label-sm opacity-60\">\n<div class=\"\">© 2024 Mount Carmel Secondary School. Academic Portal v2.4.0</div>\n<div class=\"flex gap-lg\">\n<a class=\"hover:underline\" href=\"#\">Contact Support</a>\n<a class=\"hover:underline\" href=\"#\">Documentation</a>\n</div>\n</footer>\n</main>\n<!-- FAB for Quick Entry Correction (Contextual) -->\n<button class=\"fixed bottom-lg right-lg bg-tertiary-container text-on-tertiary-container w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform group\" title=\"Bulk Correct Missing Marks\">\n<span class=\"material-symbols-outlined text-[24px]\">edit_note</span>\n<span class=\"absolute right-16 bg-primary text-on-primary px-3 py-1 rounded-md text-label-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity\">Quick Entry</span>\n</button>";
+import AppShell from '../../../components/layout/AppShell.jsx';
+import Card from '../../../components/ui/Card.jsx';
+import Button from '../../../components/ui/Button.jsx';
+import FabButton from '../../../components/ui/FabButton.jsx';
+import { context, stats, subjects, students, averageFor, lastSynced } from './marksheetData.js';
 
 export default function ExamOfficerMarksheet() {
-  return <StitchScreen title="Exam Officer Marksheet" bodyClassName="bg-background text-on-background font-body-md selection:bg-secondary-container selection:text-on-secondary-container" html={html} />;
+  return (
+    <AppShell portalId="examOfficer" pageTitle="Exam Officer Marksheet" user={{ name: 'Exam Officer' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <div className="flex justify-between items-end flex-wrap gap-lg">
+          <div>
+            <nav className="text-on-surface-variant font-label-sm text-label-sm mb-xs flex items-center gap-xs">
+              <span>{context.academicYear}</span>
+              <span className="material-symbols-outlined text-body-md">chevron_right</span>
+              <span>{context.term}</span>
+            </nav>
+            <h1 className="font-headline-lg text-headline-lg text-primary">{context.className} - Marksheet Compilation</h1>
+          </div>
+          <div className="flex gap-md">
+            <Button variant="secondary" iconLeft="print">
+              Print Preview
+            </Button>
+            <Button variant="primary" iconLeft="ios_share">
+              Export CSV
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
+          <Card padding="lg">
+            <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Total Students</p>
+            <p className="font-headline-md text-headline-md">{stats.totalStudents}</p>
+          </Card>
+          <Card padding="lg">
+            <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Data Completeness</p>
+            <p className="font-headline-md text-headline-md text-error">{stats.dataCompleteness}</p>
+          </Card>
+          <Card padding="lg" className="relative overflow-hidden">
+            <div className="relative z-10">
+              <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Missing Scores</p>
+              <p className="font-headline-md text-headline-md text-on-tertiary-container">{stats.missingScores} Entries</p>
+            </div>
+            <span className="material-symbols-outlined absolute right-0 bottom-0 text-[64px] opacity-10">warning</span>
+          </Card>
+          <Card padding="lg">
+            <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Class Average</p>
+            <p className="font-headline-md text-headline-md">{stats.classAverage}</p>
+          </Card>
+        </div>
+
+        <Card padding="none" className="overflow-hidden">
+          <div className="bg-surface-container-low p-md border-b border-outline/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-md">
+            <div className="flex items-center gap-md">
+              <span className="font-label-md text-label-md text-on-surface-variant">Filter by:</span>
+              <select className="bg-surface-container-lowest border border-outline-variant rounded-md text-body-md py-1 px-2">
+                <option>All Students</option>
+                <option>Missing Data Only</option>
+                <option>Borderline Passes</option>
+              </select>
+            </div>
+            <div className="flex-1 relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+              <input
+                className="w-full pl-10 pr-md py-2 bg-surface-container-lowest border border-outline-variant rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-body-md"
+                placeholder="Search by name or admission number..."
+                type="text"
+              />
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-200 text-left border-collapse font-body-md">
+              <thead>
+                <tr className="bg-primary text-on-primary">
+                  <th className="px-4 py-3 font-label-md text-label-md border-r border-on-primary/20 sticky left-0 bg-primary z-20 w-48">
+                    Student Name
+                  </th>
+                  {subjects.map((subject) => (
+                    <th key={subject} className="px-4 py-3 font-label-md text-label-md border-r border-on-primary/20">
+                      {subject}
+                    </th>
+                  ))}
+                  <th className="px-4 py-3 font-label-md text-label-md">Average</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-outline-variant">
+                {students.map((student) => {
+                  const avg = averageFor(student.scores);
+                  return (
+                    <tr key={student.id} className="hover:bg-surface-container transition-colors">
+                      <td className="px-4 py-3 border-r border-outline-variant sticky left-0 bg-surface-container-lowest z-10">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-primary">{student.name}</span>
+                          <span className="text-[10px] text-on-surface-variant">{student.id}</span>
+                        </div>
+                      </td>
+                      {student.scores.map((score, i) => (
+                        <td
+                          key={i}
+                          className={`px-4 py-3 text-center ${
+                            score === null ? 'bg-tertiary-container/10 text-on-tertiary-container font-bold italic' : ''
+                          }`}
+                        >
+                          {score === null ? 'Missing' : score}
+                        </td>
+                      ))}
+                      <td className={`px-4 py-3 font-bold text-center ${avg === null ? 'opacity-40' : ''}`}>
+                        {avg === null ? 'N/A' : `${avg}%`}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md px-md">
+          <div className="flex gap-lg items-center flex-wrap">
+            <div className="flex items-center gap-xs">
+              <div className="w-4 h-4 bg-tertiary-container/20 border border-tertiary-container" />
+              <span className="font-label-sm text-label-sm text-on-surface-variant">Incomplete Entry</span>
+            </div>
+            <div className="flex items-center gap-xs">
+              <div className="w-4 h-4 bg-primary" />
+              <span className="font-label-sm text-label-sm text-on-surface-variant">Confirmed Column</span>
+            </div>
+          </div>
+          <p className="font-label-sm text-label-sm text-outline italic">{lastSynced}</p>
+        </div>
+
+        <footer className="pt-lg border-t border-outline/10 flex flex-col sm:flex-row justify-between items-center gap-sm text-on-surface-variant font-label-sm text-label-sm opacity-60">
+          <div>© 2024 Mount Carmel Secondary School. Academic Portal v2.4.0</div>
+          <div className="flex gap-lg">
+            <a className="hover:underline" href="#">
+              Contact Support
+            </a>
+            <a className="hover:underline" href="#">
+              Documentation
+            </a>
+          </div>
+        </footer>
+      </div>
+
+      <FabButton icon="edit_note" label="Bulk Correct Missing Marks" tone="tertiary" />
+    </AppShell>
+  );
 }

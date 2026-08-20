@@ -1,7 +1,167 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
-
-const html = "<!-- SideNavBar Anchor -->\n<aside class=\"fixed left-0 top-0 h-full w-64 bg-primary flex flex-col py-md z-40 shadow-sm hidden lg:flex\">\n<div class=\"px-gutter mb-xl\">\n<h1 class=\"font-headline-md text-headline-md text-on-primary font-bold\">Mount Carmel</h1>\n<p class=\"font-label-md text-label-md text-on-primary/70\">Admin Portal</p>\n</div>\n<nav class=\"flex-1 space-y-1\">\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md min-h-[48px]\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">dashboard</span> Dashboard\n            </a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md min-h-[48px]\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">school</span> Students\n            </a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md min-h-[48px]\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">auto_stories</span> Academics\n            </a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md min-h-[48px]\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">payments</span> Finance\n            </a>\n<!-- Active State: Mess/Dining (mapped to Dashboard/Operations flow) -->\n<a class=\"flex items-center border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary py-3 px-4 transition-all duration-200 ease-in-out font-label-md min-h-[48px]\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">restaurant</span> Mess/Dining\n            </a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md min-h-[48px]\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">description</span> Reports\n            </a>\n</nav>\n<div class=\"mt-auto border-t border-on-primary/10 pt-md\">\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">settings</span> Settings\n            </a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out font-label-md\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">logout</span> Logout\n            </a>\n</div>\n</aside>\n<!-- TopNavBar Anchor -->\n<header class=\"fixed top-0 left-64 right-0 bg-surface h-16 border-b border-outline-variant z-30 left-0 lg:left-64\">\n<div class=\"flex justify-between items-center w-full px-gutter h-full\">\n<div class=\"flex items-center gap-md\">\n<div class=\"relative\">\n<span class=\"material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant\">search</span>\n<input class=\"pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:outline-none focus:border-primary w-64 transition-all\" placeholder=\"Search menu items...\" type=\"text\">\n</div>\n</div>\n<div class=\"flex items-center gap-lg\">\n<div class=\"flex gap-md text-on-surface-variant\">\n<button class=\"hover:text-primary transition-colors\"><span class=\"material-symbols-outlined\">notifications</span></button>\n<button class=\"hover:text-primary transition-colors\"><span class=\"material-symbols-outlined\">apps</span></button>\n</div>\n<div class=\"h-8 w-px bg-outline-variant\"></div>\n<div class=\"flex items-center gap-sm\">\n<div class=\"text-right\">\n<p class=\"font-label-md text-label-md text-on-surface leading-none\">Admin Office</p>\n<p class=\"text-[10px] text-on-surface-variant font-label-sm uppercase tracking-wider\">Staff Login</p>\n</div>\n<div class=\"w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A professional studio portrait of a school administrator in a navy blue blazer, set against a blurred institutional background of high-end library bookshelves. The lighting is soft and directional, creating a sense of academic authority and technical precision. The color palette is dominated by deep blues and warm wood tones, reflecting a prestigious secondary school environment.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAHfuvWkZLCu_LsvBwYhA58Awc20oWjmsizhmvFPp7DwO4tOoWTSbrGdyfbNeTl_6v26dSMubXCGVmgYDla9E6xVwbdEevFAI9-3W0On29tszGKTThsPzbgMr5OilyKGYTwK6IGhtxOFrFj_HF8Y1o-CLXRfv3F7UY92eDwL5biArhhGwO0YTvvRagNPwyXoHhVL5R_7AiJrEN_qI6zPjEAN-JBGylBaOWJm3CFjWkgSZ5M1Z5FMjW6SFOm_AElFVBkGZsTJ4konprK\">\n</div>\n</div>\n</div>\n</div>\n</header>\n<!-- Main Content Canvas -->\n<main class=\"ml-64 pt-16 min-h-screen bg-background ml-0 lg:ml-64\">\n<div class=\"p-xl max-w-container-max mx-auto\">\n<!-- Header Section -->\n<div class=\"mb-xl flex justify-between items-end\">\n<div>\n<h2 class=\"font-headline-lg text-headline-lg text-primary\">Mess &amp; Dining Management</h2>\n<p class=\"font-body-lg text-body-lg text-on-surface-variant\">Administer nutritional plans, schedules, and inventory for academic excellence.</p>\n</div>\n<div class=\"flex gap-md\">\n<button class=\"px-md py-2 border border-secondary text-secondary rounded-full font-label-md hover:bg-secondary-fixed-dim transition-all flex items-center gap-xs\">\n<span class=\"material-symbols-outlined text-[20px]\">print</span> Export Menu\n                    </button>\n<button class=\"px-md py-2 bg-primary text-on-primary rounded-full font-label-md hover:opacity-90 transition-all flex items-center gap-xs shadow-sm\">\n<span class=\"material-symbols-outlined text-[20px]\">add</span> Update Plan\n                    </button>\n</div>\n</div>\n<!-- Bento Grid Layout -->\n<div class=\"bento-grid\">\n<!-- Weekly Meal Plan (Large Centerpiece) -->\n<section class=\"col-span-8 bg-surface border border-outline-variant rounded-lg overflow-hidden shadow-sm flex flex-col col-span-12 lg:col-span-8\">\n<div class=\"bg-surface-container-low p-md border-b border-outline-variant flex justify-between items-center\">\n<h3 class=\"font-label-md text-label-md text-secondary uppercase tracking-widest flex items-center gap-sm\">\n<span class=\"material-symbols-outlined text-primary\">calendar_month</span> Weekly Meal Plan: Oct 21 - Oct 27\n                        </h3>\n<div class=\"flex items-center gap-sm bg-white rounded-full p-1 border border-outline-variant\">\n<button class=\"p-1 hover:bg-surface-container rounded-full transition-colors\"><span class=\"material-symbols-outlined\">chevron_left</span></button>\n<span class=\"font-label-sm text-on-surface px-2\">Next Week</span>\n<button class=\"p-1 hover:bg-surface-container rounded-full transition-colors\"><span class=\"material-symbols-outlined\">chevron_right</span></button>\n</div>\n</div>\n<div class=\"p-0 overflow-x-auto\">\n<table class=\"w-full border-collapse font-body-md\">\n<thead class=\"bg-primary text-on-primary\">\n<tr>\n<th class=\"py-4 px-4 text-left font-label-md border-r border-on-primary/10\">Session</th>\n<th class=\"py-4 px-4 text-left font-label-md\">Monday</th>\n<th class=\"py-4 px-4 text-left font-label-md\">Tuesday</th>\n<th class=\"py-4 px-4 text-left font-label-md\">Wednesday</th>\n<th class=\"py-4 px-4 text-left font-label-md\">Thursday</th>\n<th class=\"py-4 px-4 text-left font-label-md\">Friday</th>\n</tr>\n</thead>\n<tbody class=\"text-on-surface-variant divide-y divide-outline-variant\">\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"bg-surface-container-low py-4 px-4 font-bold border-r border-outline-variant text-primary\">Breakfast</td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Oatmeal &amp; Fruits</p><span class=\"text-xs\">Milk, Nuts, Tea</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Whole Grain Toast</p><span class=\"text-xs\">Eggs, Juice</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Cornflakes</p><span class=\"text-xs\">Fruit Platter, Milk</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Pancakes</p><span class=\"text-xs\">Syrup, Yogurt</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Scrambled Eggs</p><span class=\"text-xs\">Avocado, Bread</span></td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"bg-surface-container-low py-4 px-4 font-bold border-r border-outline-variant text-primary\">Lunch</td>\n<td class=\"p-4 bg-primary-container/5\"><p class=\"font-semibold text-on-surface\">Grilled Chicken</p><span class=\"text-xs\">Quinoa Salad, Peas</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Beef Stew</p><span class=\"text-xs\">Mashed Potatoes</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Vegetable Pasta</p><span class=\"text-xs\">Garlic Bread, Corn</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Fish Fillet</p><span class=\"text-xs\">Rice, Steamed Veg</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Roast Turkey</p><span class=\"text-xs\">Sweet Potato, Broccoli</span></td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"bg-surface-container-low py-4 px-4 font-bold border-r border-outline-variant text-primary\">Dinner</td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Lentil Soup</p><span class=\"text-xs\">Dinner Roll, Salad</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Stir-fry Veggies</p><span class=\"text-xs\">Tofu, Brown Rice</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Chicken Curry</p><span class=\"text-xs\">Naan, Cucumber Raita</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Shepherd's Pie</p><span class=\"text-xs\">Mixed Greens</span></td>\n<td class=\"p-4\"><p class=\"font-semibold text-on-surface\">Taco Bar</p><span class=\"text-xs\">Beans, Salsa, Cheese</span></td>\n</tr>\n</tbody>\n</table>\n</div>\n</section>\n<!-- Hostel-wise Dining Schedule (Vertical Column) -->\n<aside class=\"col-span-4 space-y-lg col-span-12 lg:col-span-4\">\n<div class=\"bg-surface border border-outline-variant rounded-lg p-lg shadow-sm\">\n<div class=\"flex justify-between items-center mb-md\">\n<h3 class=\"font-label-md text-label-md text-secondary uppercase tracking-widest\">Dining Rotation</h3>\n<span class=\"material-symbols-outlined text-primary\">schedule</span>\n</div>\n<div class=\"space-y-md\">\n<div class=\"flex items-center justify-between p-md bg-surface-container-low rounded-md border-l-4 border-tertiary\">\n<div>\n<p class=\"font-label-md text-primary\">St. Jude’s House</p>\n<p class=\"text-xs text-on-surface-variant\">07:00 AM - 07:45 AM</p>\n</div>\n<div class=\"bg-tertiary-fixed text-on-tertiary-fixed text-[10px] px-2 py-1 rounded font-bold uppercase\">Current</div>\n</div>\n<div class=\"flex items-center justify-between p-md bg-white border border-outline-variant rounded-md\">\n<div>\n<p class=\"font-label-md text-on-surface\">St. Mary’s House</p>\n<p class=\"text-xs text-on-surface-variant\">07:45 AM - 08:30 AM</p>\n</div>\n<div class=\"text-[10px] text-on-surface-variant font-bold uppercase\">Next</div>\n</div>\n<div class=\"flex items-center justify-between p-md bg-white border border-outline-variant rounded-md\">\n<div>\n<p class=\"font-label-md text-on-surface\">St. Francis House</p>\n<p class=\"text-xs text-on-surface-variant\">08:30 AM - 09:15 AM</p>\n</div>\n</div>\n<div class=\"flex items-center justify-between p-md bg-white border border-outline-variant rounded-md\">\n<div>\n<p class=\"font-label-md text-on-surface\">St. Peter’s House</p>\n<p class=\"text-xs text-on-surface-variant\">09:15 AM - 10:00 AM</p>\n</div>\n</div>\n</div>\n<button class=\"w-full mt-lg py-2 text-primary font-label-md hover:underline decoration-2 underline-offset-4\">Adjust Timings</button>\n</div>\n<div class=\"bg-secondary p-lg rounded-lg text-on-secondary shadow-sm relative overflow-hidden h-48\">\n<div class=\"relative z-10\">\n<h3 class=\"font-headline-md text-[20px] mb-xs\">Inventory Status</h3>\n<p class=\"font-body-md opacity-80 mb-md text-sm\">Critical stock levels for upcoming festive banquet.</p>\n<div class=\"space-y-sm\">\n<div class=\"w-full bg-white/20 h-2 rounded-full overflow-hidden\">\n<div class=\"bg-on-primary-container h-full w-[85%]\"></div>\n</div>\n<div class=\"flex justify-between text-xs font-label-md\">\n<span class=\"\">Grains &amp; Pulses</span>\n<span class=\"\">85% Sufficient</span>\n</div>\n</div>\n</div>\n<div class=\"absolute -right-4 -bottom-4 opacity-10\">\n<span class=\"material-symbols-outlined text-[120px]\">inventory_2</span>\n</div>\n</div>\n</aside>\n<!-- Menu Management (Wide Horizontal) -->\n<section class=\"col-span-12 glass-card rounded-lg p-lg border border-outline-variant\">\n<div class=\"flex justify-between items-center mb-lg\">\n<h3 class=\"font-label-md text-label-md text-secondary uppercase tracking-widest\">Active Menu Items &amp; Allergens</h3>\n<div class=\"flex gap-sm\">\n<button class=\"px-3 py-1 text-xs font-bold border border-outline rounded-full text-on-surface-variant hover:bg-surface-container transition-all\">All Categories</button>\n<button class=\"px-3 py-1 text-xs font-bold bg-primary text-on-primary rounded-full\">Vegetarian</button>\n<button class=\"px-3 py-1 text-xs font-bold border border-outline rounded-full text-on-surface-variant\">Gluten-Free</button>\n</div>\n</div>\n<div class=\"grid grid-cols-4 gap-lg grid-cols-1 sm:grid-cols-2 lg:grid-cols-4\">\n<!-- Menu Item Card 1 -->\n<div class=\"group border border-outline-variant rounded-lg p-md hover:border-primary transition-all bg-white\">\n<div class=\"aspect-video w-full rounded-md mb-md overflow-hidden bg-surface-container-high\">\n<img class=\"w-full h-full object-cover group-hover:scale-105 transition-transform\" data-alt=\"A high-definition culinary photograph of a vibrant Mediterranean quinoa salad with roasted chickpeas and lemon zest, presented in a minimalist ceramic bowl. The lighting is crisp and natural, emphasizing textures and colors. The style is modern institutional, clean and high-trust, suitable for an elite academic dining menu.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCsNR1TuHQdAMvfN7x_m-XcFfa8Mvp7BY1PntlP89HGc9NjnGMU5609Jh2aueRJj7JACSIthkZfp2dOyqDywrbvl9Pn6JjavZ0r-_DwLN38Bznoj-R4b-qtIltZPP7XpbFiB3TuylkrCF5uGZi9IndPW9waA-FgLIODchB6kGgC9wcV8MwDzEhrrgR9qCo_MeRYNFpO4SyQ3uJqn7T58OmuvrjZiU1Oi6Jfle2gdqeWM7dFNLPsxAa_1D2S0RCTL95X0Jx3h6wYGlqK\">\n</div>\n<div class=\"flex justify-between items-start\">\n<h4 class=\"font-label-md text-on-surface\">Zesty Quinoa Salad</h4>\n<span class=\"material-symbols-outlined text-primary text-sm\">edit</span>\n</div>\n<div class=\"mt-sm flex flex-wrap gap-xs\">\n<span class=\"ribbon-tag bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5\">High Fiber</span>\n<span class=\"bg-surface-container-highest text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded-full\">Vegan</span>\n</div>\n</div>\n<!-- Menu Item Card 2 -->\n<div class=\"group border border-outline-variant rounded-lg p-md hover:border-primary transition-all bg-white\">\n<div class=\"aspect-video w-full rounded-md mb-md overflow-hidden bg-surface-container-high\">\n<img class=\"w-full h-full object-cover group-hover:scale-105 transition-transform\" data-alt=\"A gourmet close-up shot of a herb-crusted grilled chicken breast served with roasted root vegetables. The plate is elegantly arranged on a dark stone surface, lit with dramatic, focused lighting that highlights the golden-brown crust. Professional food photography style, representing the high standard of nutrition and meal quality at a prestigious secondary school.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDDDS_e15MOVCc8V5sXRh1QpbKawSEKMOC6z0mHbw3oWF99FjLCppuaesnOzTUx9j8uS71JvzB5JXoCjPhG9DUdwQDH4QElIatB12IbtxRom0cwIqmuvo0OL8uVyHL9JvpDSPrcSqhqLCdC0rA8cV88zHykH7PcpimebIgzdY1TXpiet9VRFo1Ft5j_SxKzrg9KD6iYTiuOPkjVKKHhDdEqnExt6PwCfDR4qWmjiw2RdowukaetBCfxg2QfMuKPR1bEMDQNAgWOuC9t\">\n</div>\n<div class=\"flex justify-between items-start\">\n<h4 class=\"font-label-md text-on-surface\">Herb-Crusted Chicken</h4>\n<span class=\"material-symbols-outlined text-primary text-sm\">edit</span>\n</div>\n<div class=\"mt-sm flex flex-wrap gap-xs\">\n<span class=\"ribbon-tag bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5\">Protein Rich</span>\n<span class=\"bg-surface-container-highest text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded-full\">Nut-Free</span>\n</div>\n</div>\n<!-- Menu Item Card 3 -->\n<div class=\"group border border-outline-variant rounded-lg p-md hover:border-primary transition-all bg-white\">\n<div class=\"aspect-video w-full rounded-md mb-md overflow-hidden bg-surface-container-high\">\n<img class=\"w-full h-full object-cover group-hover:scale-105 transition-transform\" data-alt=\"A warm, steaming bowl of artisanal lentil soup garnished with fresh parsley and a drizzle of olive oil, served alongside a toasted whole-grain baguette. The composition uses soft, warm lighting to create an inviting and wholesome mood. High-contrast colors and clean lines align with a modern institutional aesthetic for a premium school dining module.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDtrX40Tu7YVQnRK3g280_BAImiWcjMV8aKXvzMcT6Phs_-Vqzw4zGfQhUu1Tp5OUTO_EC1t-drS9Hj_H6wWmvjpALNsx9r830Oz-y-wNYR1FqcQo2FYtO76NaEHb65cv5HpnBTx-uqgyo-Nets688-O3TtGX0xX7aA_6g6-P52kmvDuqSlFVYP1mUsSxVAk8iHW_VLbVN88DSBNr-83u2yuQPNVECyHq_OsvXF427YPZC2-hhy8NV4KZAMuvCRKn1_-8jokkHRha5d\">\n</div>\n<div class=\"flex justify-between items-start\">\n<h4 class=\"font-label-md text-on-surface\">Artisan Lentil Stew</h4>\n<span class=\"material-symbols-outlined text-primary text-sm\">edit</span>\n</div>\n<div class=\"mt-sm flex flex-wrap gap-xs\">\n<span class=\"ribbon-tag bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5\">Gluten-Free</span>\n<span class=\"bg-surface-container-highest text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded-full\">Vegetarian</span>\n</div>\n</div>\n<!-- Add New Item Slot -->\n<button class=\"border-2 border-dashed border-outline-variant rounded-lg flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all\">\n<span class=\"material-symbols-outlined text-[40px] mb-xs\">add_circle</span>\n<span class=\"font-label-md\">Add Menu Item</span>\n</button>\n</div>\n</section>\n</div>\n</div>\n</main>\n<!-- Footer Anchor -->\n<footer class=\"ml-64 w-[calc(100%-16rem)] py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary text-on-secondary ml-0 w-full lg:ml-64 lg:w-[calc(100%-16rem)]\">\n<div>\n<h2 class=\"font-headline-md text-headline-md text-on-secondary font-bold mb-xs\">Mount Carmel Secondary</h2>\n<p class=\"font-label-sm text-label-sm opacity-80\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap gap-lg justify-end\">\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity underline font-bold\" href=\"#\">Contact Us</a>\n</div>\n</footer>";
+import AppShell from '../../../components/layout/AppShell.jsx';
+import PageHeader from '../../../components/ui/PageHeader.jsx';
+import Card from '../../../components/ui/Card.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
+import Button from '../../../components/ui/Button.jsx';
+import { weekRange, days, mealPlan, diningRotation, inventoryStatus, menuItems } from './messData.js';
 
 export default function AdminMessDashboard() {
-  return <StitchScreen title="Mess Admin" bodyClassName="bg-background text-on-surface font-body-md" html={html} />;
+  return (
+    <AppShell portalId="admin" pageTitle="Mess Admin" user={{ name: 'Admin Office' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader
+          title="Mess & Dining Management"
+          subtitle="Administer nutritional plans, schedules, and inventory for academic excellence."
+          actions={
+            <>
+              <Button variant="secondary" iconLeft="print">
+                Export Menu
+              </Button>
+              <Button variant="primary" iconLeft="add">
+                Update Plan
+              </Button>
+            </>
+          }
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+          <Card padding="none" className="lg:col-span-8 overflow-hidden">
+            <div className="bg-surface-container-low p-md border-b border-outline/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-sm">
+              <h3 className="font-label-md text-label-md text-secondary uppercase tracking-widest flex items-center gap-sm">
+                <span className="material-symbols-outlined text-primary">calendar_month</span> Weekly Meal Plan: {weekRange}
+              </h3>
+              <div className="flex items-center gap-sm bg-surface-container-lowest rounded-full p-1 border border-outline/10">
+                <button className="p-1 hover:bg-surface-container rounded-full transition-colors">
+                  <span className="material-symbols-outlined">chevron_left</span>
+                </button>
+                <span className="font-label-sm text-label-sm text-on-surface px-2">Next Week</span>
+                <button className="p-1 hover:bg-surface-container rounded-full transition-colors">
+                  <span className="material-symbols-outlined">chevron_right</span>
+                </button>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-175 border-collapse font-body-md">
+                <thead className="bg-primary text-on-primary">
+                  <tr>
+                    <th className="py-4 px-4 text-left font-label-md border-r border-on-primary/10">Session</th>
+                    {days.map((day) => (
+                      <th key={day} className="py-4 px-4 text-left font-label-md">
+                        {day}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="text-on-surface-variant divide-y divide-outline/10">
+                  {mealPlan.map((row) => (
+                    <tr key={row.session} className="hover:bg-surface-container-low transition-colors">
+                      <td className="bg-surface-container-low py-4 px-4 font-bold border-r border-outline/10 text-primary">{row.session}</td>
+                      {row.meals.map((meal, i) => (
+                        <td key={i} className="p-4">
+                          <p className="font-semibold text-on-surface">{meal.dish}</p>
+                          <span className="text-xs">{meal.sides}</span>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <aside className="lg:col-span-4 space-y-lg">
+            <Card padding="lg">
+              <div className="flex justify-between items-center mb-md">
+                <h3 className="font-label-md text-label-md text-secondary uppercase tracking-widest">Dining Rotation</h3>
+                <span className="material-symbols-outlined text-primary">schedule</span>
+              </div>
+              <div className="space-y-md">
+                {diningRotation.map((entry) => (
+                  <div
+                    key={entry.house}
+                    className={`flex items-center justify-between p-md rounded-md ${
+                      entry.status === 'Current' ? 'bg-surface-container-low border-l-4 border-tertiary' : 'bg-surface-container-lowest border border-outline/10'
+                    }`}
+                  >
+                    <div>
+                      <p className={`font-label-md ${entry.status === 'Current' ? 'text-primary' : 'text-on-surface'}`}>{entry.house}</p>
+                      <p className="text-xs text-on-surface-variant">{entry.time}</p>
+                    </div>
+                    {entry.status && (
+                      <div
+                        className={
+                          entry.status === 'Current'
+                            ? 'bg-tertiary-container text-on-tertiary-container text-[10px] px-2 py-1 rounded font-bold uppercase'
+                            : 'text-[10px] text-on-surface-variant font-bold uppercase'
+                        }
+                      >
+                        {entry.status}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button className="w-full mt-lg py-2 text-primary font-label-md hover:underline decoration-2 underline-offset-4">
+                Adjust Timings
+              </button>
+            </Card>
+
+            <Card padding="lg" className="bg-secondary text-on-secondary border-none relative overflow-hidden h-48">
+              <div className="relative z-10">
+                <h3 className="font-headline-md text-[20px] mb-xs">Inventory Status</h3>
+                <p className="font-body-md opacity-80 mb-md text-sm">{inventoryStatus.note}</p>
+                <div className="space-y-sm">
+                  <div className="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                    <div className="bg-on-secondary h-full" style={{ width: `${inventoryStatus.percent}%` }} />
+                  </div>
+                  <div className="flex justify-between text-xs font-label-md">
+                    <span>{inventoryStatus.label}</span>
+                    <span>{inventoryStatus.percent}% Sufficient</span>
+                  </div>
+                </div>
+              </div>
+              <span className="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] opacity-10">inventory_2</span>
+            </Card>
+          </aside>
+
+          <Card padding="lg" className="lg:col-span-12">
+            <div className="flex justify-between items-center mb-lg flex-wrap gap-sm">
+              <h3 className="font-label-md text-label-md text-secondary uppercase tracking-widest">Active Menu Items &amp; Allergens</h3>
+              <div className="flex gap-sm">
+                <button className="px-3 py-1 text-xs font-bold border border-outline/20 rounded-full text-on-surface-variant hover:bg-surface-container transition-all">
+                  All Categories
+                </button>
+                <button className="px-3 py-1 text-xs font-bold bg-primary text-on-primary rounded-full">Vegetarian</button>
+                <button className="px-3 py-1 text-xs font-bold border border-outline/20 rounded-full text-on-surface-variant">Gluten-Free</button>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-lg">
+              {menuItems.map((item) => (
+                <div key={item.name} className="group border border-outline/10 rounded-lg p-md hover:border-primary transition-all">
+                  <div className="aspect-video w-full rounded-md mb-md overflow-hidden bg-surface-container-high">
+                    <img src={item.photoUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-label-md text-on-surface">{item.name}</h4>
+                    <span className="material-symbols-outlined text-primary text-sm">edit</span>
+                  </div>
+                  <div className="mt-sm flex flex-wrap gap-xs">
+                    {item.tags.map((tag) => (
+                      <Badge key={tag} tone="secondary">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <button className="border-2 border-dashed border-outline/20 rounded-lg flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all min-h-40">
+                <span className="material-symbols-outlined text-[40px] mb-xs">add_circle</span>
+                <span className="font-label-md">Add Menu Item</span>
+              </button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </AppShell>
+  );
 }

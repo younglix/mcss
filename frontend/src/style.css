@@ -1,6 +1,30 @@
 @import "tailwindcss";
 
 @theme {
+  --max-width-3xs: 16rem;
+  --max-width-2xs: 18rem;
+  --max-width-xs: 20rem;
+  --max-width-sm: 24rem;
+  --max-width-md: 28rem;
+  --max-width-lg: 32rem;
+  --max-width-xl: 36rem;
+  --max-width-2xl: 42rem;
+  --max-width-3xl: 48rem;
+  --max-width-4xl: 56rem;
+  --max-width-5xl: 64rem;
+  --max-width-6xl: 72rem;
+  --max-width-7xl: 80rem;
+  --width-xs: 20rem;
+  --width-sm: 24rem;
+  --width-md: 28rem;
+  --width-lg: 32rem;
+  --width-xl: 36rem;
+  --min-width-xs: 20rem;
+  --min-width-sm: 24rem;
+  --min-width-md: 28rem;
+  --min-width-lg: 32rem;
+  --min-width-xl: 36rem;
+
   --color-on-tertiary: #ffffff;
   --color-error-container: #ffdad6;
   --color-on-secondary-fixed: #031159;
@@ -59,22 +83,44 @@
   --font-display: Arimo, sans-serif;
   --font-body: "Archivo Narrow", sans-serif;
   --font-label: Domine, serif;
-  --font-headline-lg: "Playfair Display", serif;
-  --font-headline-md: "Playfair Display", serif;
-  --font-body-lg: Geist, sans-serif;
-  --font-headline-lg-mobile: "Playfair Display", serif;
-  --font-label-sm: Geist, sans-serif;
-  --font-headline-xl: "Playfair Display", serif;
-  --font-label-md: Geist, sans-serif;
-  --font-body-md: Geist, sans-serif;
+  --font-headline-lg: Arimo, sans-serif;
+  --font-headline-md: Arimo, sans-serif;
+  --font-headline-sm: Arimo, sans-serif;
+  --font-body-lg: "Archivo Narrow", sans-serif;
+  --font-headline-lg-mobile: Arimo, sans-serif;
+  --font-label-sm: Domine, serif;
+  --font-headline-xl: Arimo, sans-serif;
+  --font-label-md: Domine, serif;
+  --font-body-md: "Archivo Narrow", sans-serif;
   --text-headline-lg: 32px;
   --text-headline-md: 24px;
+  --text-headline-sm: 18px;
   --text-body-lg: 18px;
   --text-headline-lg-mobile: 28px;
   --text-label-sm: 12px;
   --text-headline-xl: 48px;
   --text-label-md: 14px;
   --text-body-md: 16px;
+  --radius: 1rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 1.5rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+}
+
+@keyframes fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-in {
+  animation: fade-slide-in 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html,
@@ -215,88 +261,11 @@ textarea {
   -webkit-font-smoothing: antialiased;
 }
 
-.mcss-route-navigator {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 9999;
-  font-family: Geist, system-ui, sans-serif;
-}
-
-.mcss-route-navigator details {
-  position: relative;
-}
-
-.mcss-route-navigator summary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 0 16px;
-  color: #ffffff;
-  background: #4a0f6e;
-  border: 1px solid rgba(255,255,255,0.2);
-  box-shadow: 0 16px 40px rgba(46,0,74,0.28);
-  cursor: pointer;
-  list-style: none;
-}
-
-.mcss-route-navigator summary::-webkit-details-marker {
-  display: none;
-}
-
-.mcss-route-panel {
-  position: absolute;
-  right: 0;
-  bottom: 60px;
-  width: min(360px, calc(100vw - 36px));
-  max-height: min(620px, calc(100vh - 96px));
-  overflow: auto;
-  padding: 14px;
-  background: rgba(255,255,255,0.98);
-  border: 1px solid #cfc2d1;
-  box-shadow: 0 20px 60px rgba(26,28,28,0.22);
-}
-
-.mcss-route-panel section + section {
-  margin-top: 14px;
-}
-
-.mcss-route-panel h2 {
-  margin: 0 0 8px;
-  color: #2e004a;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.mcss-route-panel div {
-  display: grid;
-  gap: 6px;
-}
-
-.mcss-route-panel a {
-  display: block;
-  padding: 9px 10px;
-  color: #1a1c1c;
-  background: #f9f9f9;
-  border: 1px solid transparent;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.mcss-route-panel a.active,
-.mcss-route-panel a:hover {
-  color: #ffffff;
-  background: #2e004a;
-}
-
-@media (max-width: 640px) {
-  .mcss-route-navigator {
-    right: 12px;
-    bottom: 12px;
-  }
+/* Shared component layer (src/components/ui, src/components/layout).
+   Namespaced under mcss- to avoid collisions with the unscoped,
+   last-one-wins duplicate selectors in stitch-exported.css. */
+.mcss-badge-ribbon {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
 }
 
 @media (max-width: 1023px) {
@@ -604,38 +573,6 @@ textarea {
   .stitch-screen [class*="bottom-lg"][class*="right-lg"] {
     bottom: 92px !important;
     right: 16px !important;
-  }
-
-  .mcss-route-navigator {
-    display: block;
-    left: 12px;
-    right: auto;
-    bottom: calc(12px + env(safe-area-inset-bottom));
-    z-index: 10000;
-  }
-
-  .mcss-route-navigator summary {
-    width: 46px;
-    min-width: 46px;
-    height: 46px;
-    min-height: 46px;
-    padding: 0;
-    justify-content: center;
-    border-radius: 999px;
-    font-size: 0;
-  }
-
-  .mcss-route-navigator summary .material-symbols-outlined {
-    font-size: 22px;
-  }
-
-  .mcss-route-panel {
-    left: 0;
-    right: auto;
-    bottom: 56px;
-    width: min(330px, calc(100vw - 24px));
-    max-height: min(520px, calc(100vh - 120px));
-    border-radius: 16px;
   }
 
   .stitch-screen[data-screen-title="Public Landing"] > div > div:first-child {

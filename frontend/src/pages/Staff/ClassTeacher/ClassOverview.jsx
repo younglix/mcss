@@ -1,7 +1,158 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
-
-const html = "<!-- SideNavBar (Desktop) -->\n<aside class=\"fixed left-0 top-0 h-full w-64 bg-primary flex flex-col py-md z-40 shadow-sm md:flex hidden\">\n<div class=\"px-lg mb-xl\">\n<h1 class=\"font-headline-md text-headline-md text-on-primary\">Mount Carmel</h1>\n<p class=\"font-label-sm text-label-sm text-on-primary/70\">Admin Portal</p>\n</div>\n<nav class=\"flex-grow flex flex-col gap-xs\">\n<a class=\"border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary py-3 px-4 flex items-center gap-3 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<a class=\"text-on-primary/70 py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\">school</span>\n<span class=\"font-label-md text-label-md\">My Class</span>\n</a>\n<div class=\"mt-4 px-4 pb-2\">\n<span class=\"text-on-primary/40 font-label-sm uppercase tracking-wider\">Academics</span>\n</div>\n<a class=\"text-on-primary/70 py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\">event_available</span>\n<span class=\"font-label-md text-label-md\">Attendance</span>\n</a>\n<a class=\"text-on-primary/70 py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\">auto_stories</span>\n<span class=\"font-label-md text-label-md\">Score Entry</span>\n</a>\n\n</nav>\n<div class=\"mt-auto border-t border-on-primary/10 pt-4\">\n<a class=\"text-on-primary/70 py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\">settings</span>\n<span class=\"font-label-md text-label-md\">Settings</span>\n</a>\n<a class=\"text-on-primary/70 py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Main Content Canvas -->\n<main class=\"md:ml-64 min-h-screen pb-xl\">\n<!-- TopNavBar (Large) -->\n<header class=\"sticky top-0 bg-surface z-30 border-b border-outline-variant\">\n<div class=\"flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16\">\n<div class=\"flex items-center gap-lg\">\n<span class=\"font-headline-md text-headline-md font-bold text-primary\">SS2A - Saint Jude</span>\n<div class=\"hidden lg:flex items-center bg-surface-container rounded-full px-4 py-1.5 gap-2 border border-outline-variant/30\">\n<span class=\"material-symbols-outlined text-outline text-[20px]\">search</span>\n<input class=\"bg-transparent border-none focus:ring-0 font-body-md text-body-md w-64\" placeholder=\"Search student by name...\" type=\"text\">\n</div>\n</div>\n<div class=\"flex items-center gap-md\">\n<button class=\"p-2 text-on-surface-variant hover:text-primary transition-colors\">\n<span class=\"material-symbols-outlined\">notifications</span>\n</button>\n<button class=\"p-2 text-on-surface-variant hover:text-primary transition-colors\">\n<span class=\"material-symbols-outlined\">apps</span>\n</button>\n<div class=\"h-8 w-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container overflow-hidden\">\n<img class=\"object-cover w-full h-full\" data-alt=\"A professional headshot of a middle-aged academic administrator with a warm smile, wearing a traditional formal academic blazer. The lighting is soft and studio-quality, emphasizing a high-trust, institutional atmosphere. The background is a blurred ivory library wall, maintaining the royal purple and navy blue prestige of Mount Carmel Secondary School.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCNuxs8HCsJIcBq7KUDGjDq0vCrl8e0nVufPhRZSpuxMlc9NBxZa5IMkSDjmYL_Wvj7hln2r-et2w8LZYIRPdmPDW0vAgFsJ1IvQcscnlCkreTeG6KsLHlKRxAdfDAAt5U9RTbWXGBwzU89Hrom0BBOfjc3yBl1bwDH3EYnj_gl_htxX3Myvwl1T3NsbPDCVeT09-bDToYYb6uKoEcq9qzX_wmq4EumeyG_5KVnTHPRHZnq-P4GCdEQIEZ4kZgfwz9zUz-vZcC59YvZ\">\n</div>\n<span class=\"font-label-md text-label-md text-primary hidden sm:inline\">Form Master Portal</span>\n</div>\n</div>\n</header>\n<!-- Dashboard Content -->\n<div class=\"px-gutter max-w-container-max mx-auto pt-lg\">\n<!-- Summary Bento Grid -->\n<div class=\"grid grid-cols-1 lg:grid-cols-3 gap-lg mb-lg\">\n<!-- Class Overview Card -->\n<div class=\"lg:col-span-2 bg-white rounded-lg border border-outline-variant p-lg shadow-sm flex flex-col md:flex-row gap-lg\">\n<div class=\"flex-shrink-0 w-full md:w-48 h-48 bg-surface-container-low rounded-DEFAULT overflow-hidden relative border border-outline-variant/20\">\n<img class=\"object-cover w-full h-full\" data-alt=\"A high-resolution wide shot of a bright, modern classroom at Mount Carmel Secondary School. The room features dark wood paneling and large windows letting in natural daylight. In the center, a group of students in crisp navy blue and purple uniforms are engaged in a collaborative study session. The aesthetic is clean, academic, and prestigious.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCKjmTcoyijxwv2Jn4QbLYtPwzHQ-lpJs84d7ex_2uvMipEJ46L8s6tToPpcI_Fih9auToX9QoVB32wgTPPj46yQMLUXmYf9eGG3i581L46IunWxLlDQRZ3wZ8mmPQR1b0W7b0ZAX8y3dBpefZzKQ4Z6LtYMdUwZ-4IdJ-M2QV_Firo6_wxwJsrn0eBvHkaA1AdHtUzQ7UOpZqSGVuYj-gqo6kCVDGIUCW218kBh1W_Y3QLH8Fh48UBrBegRKTndmwk5HA3DohRnMfd\">\n<div class=\"absolute top-2 left-0 bg-primary text-white font-label-sm text-label-sm px-4 py-1 ribbon-tag\">CURRENT CLASS</div>\n</div>\n<div class=\"flex-grow flex flex-col justify-between\">\n<div>\n<h2 class=\"font-label-md text-label-md text-secondary-fixed-dim uppercase tracking-widest mb-1\">Academic Year 2024/25</h2>\n<h3 class=\"font-headline-lg text-headline-lg text-primary\">Senior Secondary 2A</h3>\n<p class=\"font-body-md text-body-md text-on-surface-variant mt-2 leading-relaxed\">\n                                Form Master: <span class=\"font-bold text-primary\">Mr. Bernard Augustus</span><br>\n                                Total Students: 32 | Male: 14 | Female: 18\n                            </p>\n</div>\n<div class=\"flex gap-md mt-lg\">\n<button class=\"bg-primary text-white font-label-md text-label-md px-6 py-3 rounded-DEFAULT hover:opacity-90 transition-all flex items-center gap-2\">\n<span class=\"material-symbols-outlined text-[18px]\">group</span>\n                                View Class List\n                            </button>\n<button class=\"border border-secondary text-secondary font-label-md text-label-md px-6 py-3 rounded-DEFAULT hover:bg-secondary/5 transition-all\">\n                                Send Memo\n                            </button>\n</div>\n</div>\n</div>\n<!-- Term Progress Card -->\n<div class=\"bg-white rounded-lg border border-outline-variant p-lg shadow-sm\">\n<div class=\"flex justify-between items-start mb-6\">\n<h3 class=\"font-label-md text-label-md text-primary uppercase\">Report Card Status</h3>\n<span class=\"bg-tertiary-container text-on-tertiary-container text-label-sm px-2 py-1 rounded\">TERM 2</span>\n</div>\n<div class=\"space-y-6\">\n<div>\n<div class=\"flex justify-between text-label-sm mb-2\">\n<span class=\"\">Comments Completed</span>\n<span class=\"font-bold\">24 / 32</span>\n</div>\n<div class=\"w-full bg-surface-container rounded-full h-2\">\n<div class=\"bg-primary h-2 rounded-full\" style=\"width: 75%\"></div>\n</div>\n</div>\n<div>\n<div class=\"flex justify-between text-label-sm mb-2\">\n<span class=\"\">Subject Entry Verified</span>\n<span class=\"font-bold\">18 / 32</span>\n</div>\n<div class=\"w-full bg-surface-container rounded-full h-2\">\n<div class=\"bg-secondary h-2 rounded-full\" style=\"width: 56%\"></div>\n</div>\n</div>\n<button class=\"w-full mt-4 py-3 bg-surface-container-high text-primary font-label-md text-label-md rounded-DEFAULT hover:bg-surface-container-highest transition-colors\">\n                            Enter Form Master Remarks\n                        </button>\n</div>\n</div>\n</div>\n<!-- Main Content Area: Attendance Heatmap & Student Grid -->\n<div class=\"grid grid-cols-1 xl:grid-cols-4 gap-lg\">\n<!-- Attendance Heatmap (Side Column) -->\n<div class=\"xl:col-span-1 bg-white rounded-lg border border-outline-variant p-lg shadow-sm\">\n<div class=\"flex items-center gap-2 mb-lg\">\n<span class=\"material-symbols-outlined text-primary\">calendar_month</span>\n<h3 class=\"font-label-md text-label-md text-primary uppercase\">Class Attendance Today</h3>\n</div>\n<div class=\"grid grid-cols-5 gap-2 mb-lg\">\n<!-- Simulated Heatmap Grid of 32 students -->\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors cursor-help\" title=\"Student 1: Present\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\" title=\"Student 2: Present\"></div>\n<div class=\"aspect-square bg-error/40 rounded-sm hover:bg-error transition-colors\" title=\"Student 3: Absent\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-error/40 rounded-sm hover:bg-error transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-error/40 rounded-sm hover:bg-error transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n<div class=\"aspect-square bg-primary/20 rounded-sm hover:bg-primary transition-colors\"></div>\n</div>\n<div class=\"space-y-3\">\n<div class=\"flex items-center justify-between text-label-sm border-b border-outline-variant/30 pb-2\">\n<span class=\"text-on-surface-variant\">Present</span>\n<span class=\"font-bold text-primary\">29</span>\n</div>\n<div class=\"flex items-center justify-between text-label-sm border-b border-outline-variant/30 pb-2\">\n<span class=\"text-on-surface-variant\">Absent</span>\n<span class=\"font-bold text-error\">3</span>\n</div>\n<div class=\"flex items-center justify-between text-label-sm\">\n<span class=\"text-on-surface-variant\">Lateness</span>\n<span class=\"font-bold text-secondary\">2</span>\n</div>\n</div>\n<button class=\"w-full mt-lg border border-primary text-primary font-label-sm text-label-sm py-2.5 rounded-DEFAULT hover:bg-primary/5 transition-all\">\n                        Take Roll Call\n                    </button>\n</div>\n<!-- Student Profile Grid -->\n<div class=\"xl:col-span-3 space-y-lg\">\n<div class=\"flex items-center justify-between\">\n<h3 class=\"font-label-md text-label-md text-primary uppercase\">Quick Student Profiles</h3>\n<div class=\"flex gap-2\">\n<button class=\"p-1 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant\">\n<span class=\"material-symbols-outlined\">grid_view</span>\n</button>\n<button class=\"p-1 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant\">\n<span class=\"material-symbols-outlined\">list</span>\n</button>\n</div>\n</div>\n<div class=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md\">\n<!-- Student Card 1 -->\n<div class=\"bg-white rounded-lg border border-outline-variant p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-16 h-16 rounded-DEFAULT bg-surface-container-low border border-outline-variant/50 overflow-hidden\">\n<img class=\"object-cover w-full h-full\" data-alt=\"A focused student portrait of a teenage boy with dark hair, wearing a clean, pressed white shirt and a purple and navy tie. The image has a professional, high-school yearbook quality, lit with clear, natural window light. The background is a soft-focus classroom setting with the institutional royal purple color scheme in the accents.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAir7emBDhQQSKQzi_V7s-zz2fE-5V5ZMql7rvfrNjYMKLiACcVPD3jSRgxtbOZ8qmt74pC2mDW4iUDzqIw9gUV1GZtFgk51ZK9oC5Odgl4uQxp3pcU--npm5ZlTlP2DPVkWq2dj7JI75W57FfSuCnOu-2RjN4gM98p1fDb6KqltXLMyrsocFP-moZSZNh2ycATXPeYMHcLRjdC_H5Wt6DrGWGJWNbTAzy4amNyGk8ONSQnOyz77fEgRR0MYe6tng4623q2HA_2VhoW\">\n</div>\n<div class=\"flex-grow\">\n<h4 class=\"font-label-md text-label-md text-primary\">Adebayor, Tolu</h4>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">MCSS/24/0112</p>\n<div class=\"flex gap-1 mt-1\">\n<span class=\"text-[10px] bg-secondary-container/30 text-on-secondary-container px-1.5 py-0.5 rounded uppercase font-bold\">Science</span>\n<span class=\"text-[10px] bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded uppercase font-bold\">A-Avg</span>\n</div>\n</div>\n</div>\n</div>\n<!-- Student Card 2 -->\n<div class=\"bg-white rounded-lg border border-outline-variant p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-error\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-16 h-16 rounded-DEFAULT bg-surface-container-low border border-outline-variant/50 overflow-hidden\">\n<img class=\"object-cover w-full h-full\" data-alt=\"A teenage girl with braided hair and a cheerful expression, wearing a navy blue secondary school sweater over a white collar. Her portrait is clean and sharp, styled like a professional academic profile photograph. The lighting is balanced and airy, reflecting a high-quality educational environment with professional composition.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDqZ_ZH3sZs_OOPguA3fQwKOCi4IScL5UrgCGHVWrtBz8HDzfeL_Hs0rQTh6Fe2OKuvSFzZYfRgD02JavCptvJ5NyCQlFH6Ot9IvRiwZeHvggx4sH13thVQebWX-DdHjGFP6PNHwQyniyjijmY6PO4tl47a3U9OfQU4JE3X-vQFa8Cr2CGPrzeb36Pf9B8zGhSo3o1DX1uEik2EV78zFt4AwGapjkjr3xNlNuMNfcbc51pmkGPOGlt1UdAYN9RTjtt1uJ28wltJ483p\">\n</div>\n<div class=\"flex-grow\">\n<h4 class=\"font-label-md text-label-md text-primary\">Okeke, Chiamaka</h4>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">MCSS/24/0045</p>\n<div class=\"flex gap-1 mt-1\">\n<span class=\"text-[10px] bg-error-container text-on-error-container px-1.5 py-0.5 rounded uppercase font-bold\">Alert</span>\n<span class=\"text-[10px] bg-secondary-container/30 text-on-secondary-container px-1.5 py-0.5 rounded uppercase font-bold\">Art</span>\n</div>\n</div>\n</div>\n</div>\n<!-- Student Card 3 -->\n<div class=\"bg-white rounded-lg border border-outline-variant p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-16 h-16 rounded-DEFAULT bg-surface-container-low border border-outline-variant/50 overflow-hidden\">\n<img class=\"object-cover w-full h-full\" data-alt=\"A portrait of a teenage boy wearing a navy school blazer with a silver crest, looking confident. He is standing against a warm limestone wall that suggests old-world academic architecture. The lighting is warm and directional, creating a prestigious and intellectual mood. The overall visual style is crisp and modern yet deeply traditional.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAGVm5AKR6LUPKHChgZSNuHpMwmS_F-uFiepDYom1qhHUuGoFod_wIRGq9b8ZEqbppSzj--aMM8lcZISX3j0Nwd2Fjx_yMquYEfJ6Aq-chhsc9vULxoEuDDzIJhKNJHTE9bobjcjCr7wfEHl3ftWbTXAoEh_imytOBVpkntc9u9srpgxBYxyRGYVRrsU-4dNrlboJqYg3vfVaLHQ2rgDaql03PpNJ66UAlkwj4vL1oK5Vi6iKrdOKdvk3Qisb-2yvKZ8mjof2IELA6D\">\n</div>\n<div class=\"flex-grow\">\n<h4 class=\"font-label-md text-label-md text-primary\">Williams, David</h4>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">MCSS/24/0239</p>\n<div class=\"flex gap-1 mt-1\">\n<span class=\"text-[10px] bg-secondary-container/30 text-on-secondary-container px-1.5 py-0.5 rounded uppercase font-bold\">Science</span>\n<span class=\"text-[10px] bg-surface-container-highest text-on-surface-variant px-1.5 py-0.5 rounded uppercase font-bold\">Prefect</span>\n</div>\n</div>\n</div>\n</div>\n<!-- Student Card 4 -->\n<div class=\"bg-white rounded-lg border border-outline-variant p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-16 h-16 rounded-DEFAULT bg-surface-container-low border border-outline-variant/50 overflow-hidden\">\n<img class=\"object-cover w-full h-full\" data-alt=\"A teenage girl with spectacles and a thoughtful look, dressed in a purple secondary school uniform blouse. She is holding a textbook in a soft-lit campus hallway. The image follows the high-trust institutional aesthetic of Mount Carmel, with clear focus on the subject and a professional depth of field.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCWd2TVBQ5tkIcVH0tG0BwNK-SETzHwXXQ5BMLKD_LXZI6Ko8_fZT6HtsUHs9PC4Sd8uCp4sTNeuD4TnL0fvcKvKvKaDHbNdRCMmWFbvU2wcFyZePThpCFTMt5yqRA0YMsW8UwbtWbgKrONK4araINjkG8C0RJYdH9sAzjrvInaguGDBF91GAsd4_QOsOsNoYzordP67OIMMr-OCItFpdEyRcV5LsNwKQaB7qKbmI4vjo6-7Ws8IFgTHw-dnAqh_Jd1gDGedCEVweRO\">\n</div>\n<div class=\"flex-grow\">\n<h4 class=\"font-label-md text-label-md text-primary\">Fatima, Zahra</h4>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">MCSS/24/0155</p>\n<div class=\"flex gap-1 mt-1\">\n<span class=\"text-[10px] bg-secondary-container/30 text-on-secondary-container px-1.5 py-0.5 rounded uppercase font-bold\">Commercial</span>\n</div>\n</div>\n</div>\n</div>\n<!-- Student Card 5 -->\n<div class=\"bg-white rounded-lg border border-outline-variant p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-16 h-16 rounded-DEFAULT bg-surface-container-low border border-outline-variant/50 overflow-hidden\">\n<img class=\"object-cover w-full h-full\" data-alt=\"A portrait of a teenage boy in a white school shirt with a navy blue tie, smiling gently. The background is a clean, academic white wall with subtle shadows of tree leaves. The lighting is bright and cheerful, suggesting a positive learning environment. High-fidelity photography suitable for a school management system.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuARx82V2-lr-8DqOGpdJ-x55mN_pGE4R-N6-lZh4Anf4UN4R9rQq5MtVg3BpeE6Y1LLUrDmiYfx9cTZJF8_-vtHCea1fgoGq-JepnWrU3u-l3R4EASTuLdEBopBGZSmH4WzCcZqK2VLVjTdrd5L0yFBSfmzt-lJqgS6C4nFcKdO6B0KadO7ow9bhKUqksm7ExyYV-W_thYhuvglKtXW__EKuE3JlvLEL4L_qNV3eE7-7YeMuFab_D-EJlVUDi1JrD6LW33jxw7MHBVh\">\n</div>\n<div class=\"flex-grow\">\n<h4 class=\"font-label-md text-label-md text-primary\">Ibrahim, Musa</h4>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">MCSS/24/0301</p>\n<div class=\"flex gap-1 mt-1\">\n<span class=\"text-[10px] bg-secondary-container/30 text-on-secondary-container px-1.5 py-0.5 rounded uppercase font-bold\">Art</span>\n<span class=\"text-[10px] bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded uppercase font-bold\">A-Avg</span>\n</div>\n</div>\n</div>\n</div>\n<!-- Add Student Placeholder -->\n<div class=\"bg-surface-container-low rounded-lg border-2 border-dashed border-outline-variant p-4 flex flex-col items-center justify-center text-on-surface-variant hover:border-primary hover:text-primary transition-all cursor-pointer\">\n<span class=\"material-symbols-outlined text-[32px]\">add_circle</span>\n<span class=\"font-label-sm text-label-sm mt-2\">Add New Student</span>\n</div>\n</div>\n</div>\n</div>\n</div>\n</main>\n<!-- Footer (Shared Component) -->\n<footer class=\"w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary md:ml-64 w-[calc(100%-16rem)]\">\n<div>\n<span class=\"font-headline-md text-headline-md text-on-secondary\">Mount Carmel</span>\n<p class=\"font-body-md text-body-md text-on-secondary/80 mt-2\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap gap-lg md:justify-end mt-lg md:mt-0\">\n<a class=\"font-label-sm text-label-sm text-on-secondary opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm text-on-secondary opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm text-on-secondary opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm text-on-secondary opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</footer>\n<!-- FAB (Suppressed on Details, visible here as a Dashboard feature) -->\n<button class=\"fixed bottom-lg right-lg bg-primary text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform z-50\">\n<span class=\"material-symbols-outlined text-[28px]\">edit_note</span>\n</button>";
+import AppShell from '../../../components/layout/AppShell.jsx';
+import Card from '../../../components/ui/Card.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
+import Button from '../../../components/ui/Button.jsx';
+import FabButton from '../../../components/ui/FabButton.jsx';
+import { classInfo, reportCardStatus, attendanceHeatmap, attendanceSummary, students } from './classOverviewData.js';
 
 export default function ClassTeacherOverview() {
-  return <StitchScreen title="Class Teacher Overview" bodyClassName="bg-background font-body-md text-on-surface" html={html} />;
+  const commentsPct = Math.round((reportCardStatus.commentsCompleted / reportCardStatus.total) * 100);
+  const verifiedPct = Math.round((reportCardStatus.subjectEntryVerified / reportCardStatus.total) * 100);
+
+  return (
+    <AppShell portalId="classTeacher" pageTitle="Class Teacher Overview" user={{ name: classInfo.formMaster }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+          <Card padding="lg" className="lg:col-span-2 flex flex-col md:flex-row gap-lg">
+            <div className="shrink-0 w-full md:w-48 h-48 rounded overflow-hidden relative border border-outline/10">
+              <img src={classInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+              <div className="absolute top-2 left-0">
+                <Badge tone="primary" variant="ribbon">
+                  Current Class
+                </Badge>
+              </div>
+            </div>
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                <p className="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">{classInfo.academicYear}</p>
+                <h2 className="font-headline-lg text-headline-lg text-primary">{classInfo.className}</h2>
+                <p className="font-body-md text-body-md text-on-surface-variant mt-sm leading-relaxed">
+                  Form Master: <span className="font-bold text-primary">{classInfo.formMaster}</span>
+                  <br />
+                  Total Students: {classInfo.totalStudents} | Male: {classInfo.male} | Female: {classInfo.female}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-md mt-lg">
+                <Button variant="primary" iconLeft="group">
+                  View Class List
+                </Button>
+                <Button variant="secondary">Send Memo</Button>
+              </div>
+            </div>
+          </Card>
+
+          <Card padding="lg">
+            <div className="flex justify-between items-start mb-lg">
+              <h3 className="font-label-md text-label-md text-primary uppercase">Report Card Status</h3>
+              <Badge tone="tertiary">Term 2</Badge>
+            </div>
+            <div className="space-y-lg">
+              <div>
+                <div className="flex justify-between text-label-sm mb-xs">
+                  <span>Comments Completed</span>
+                  <span className="font-bold">
+                    {reportCardStatus.commentsCompleted} / {reportCardStatus.total}
+                  </span>
+                </div>
+                <div className="w-full bg-surface-container rounded-full h-2">
+                  <div className="bg-primary h-2 rounded-full" style={{ width: `${commentsPct}%` }} />
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-label-sm mb-xs">
+                  <span>Subject Entry Verified</span>
+                  <span className="font-bold">
+                    {reportCardStatus.subjectEntryVerified} / {reportCardStatus.total}
+                  </span>
+                </div>
+                <div className="w-full bg-surface-container rounded-full h-2">
+                  <div className="bg-secondary h-2 rounded-full" style={{ width: `${verifiedPct}%` }} />
+                </div>
+              </div>
+              <Button variant="ghost" className="w-full justify-center bg-surface-container-high">
+                Enter Form Master Remarks
+              </Button>
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-lg">
+          <Card padding="lg" className="xl:col-span-1">
+            <div className="flex items-center gap-sm mb-lg">
+              <span className="material-symbols-outlined text-primary">calendar_month</span>
+              <h3 className="font-label-md text-label-md text-primary uppercase">Class Attendance Today</h3>
+            </div>
+            <div className="grid grid-cols-5 gap-sm mb-lg">
+              {attendanceHeatmap.map((status, i) => (
+                <div
+                  key={i}
+                  className={`aspect-square rounded-sm transition-colors ${
+                    status === 'absent' ? 'bg-error/40 hover:bg-error' : 'bg-primary/20 hover:bg-primary'
+                  }`}
+                />
+              ))}
+            </div>
+            <div className="space-y-sm">
+              <div className="flex justify-between text-label-sm border-b border-outline/10 pb-xs">
+                <span className="text-on-surface-variant">Present</span>
+                <span className="font-bold text-primary">{attendanceSummary.present}</span>
+              </div>
+              <div className="flex justify-between text-label-sm border-b border-outline/10 pb-xs">
+                <span className="text-on-surface-variant">Absent</span>
+                <span className="font-bold text-error">{attendanceSummary.absent}</span>
+              </div>
+              <div className="flex justify-between text-label-sm">
+                <span className="text-on-surface-variant">Lateness</span>
+                <span className="font-bold text-secondary">{attendanceSummary.lateness}</span>
+              </div>
+            </div>
+            <Button variant="secondary" className="w-full justify-center mt-lg">
+              Take Roll Call
+            </Button>
+          </Card>
+
+          <div className="xl:col-span-3 space-y-lg">
+            <h3 className="font-label-md text-label-md text-primary uppercase">Quick Student Profiles</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
+              {students.map((student) => (
+                <Card
+                  key={student.id}
+                  padding="sm"
+                  className={`hover:shadow-md transition-shadow cursor-pointer ${
+                    student.alert ? 'border-l-4 border-l-error' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-md">
+                    <div className="w-16 h-16 rounded overflow-hidden shrink-0 bg-surface-container-low border border-outline/10">
+                      <img src={student.photoUrl} alt={student.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-label-md text-label-md text-primary truncate">{student.name}</h4>
+                      <p className="font-label-sm text-label-sm text-on-surface-variant">{student.id}</p>
+                      <div className="flex gap-xs mt-1 flex-wrap">
+                        {student.tags.map((tag) => (
+                          <Badge key={tag} tone={tag === 'Alert' ? 'error' : 'secondary'}>
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+              <button
+                type="button"
+                className="bg-surface-container-low rounded-lg border-2 border-dashed border-outline/30 p-4 flex flex-col items-center justify-center text-on-surface-variant hover:border-primary hover:text-primary transition-all"
+              >
+                <span className="material-symbols-outlined text-headline-lg">add_circle</span>
+                <span className="font-label-sm text-label-sm mt-sm">Add New Student</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <FabButton icon="edit_note" label="Quick class actions" />
+    </AppShell>
+  );
 }

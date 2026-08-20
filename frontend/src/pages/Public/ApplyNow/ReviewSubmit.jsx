@@ -1,7 +1,166 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import PublicHeader from '../../../components/public/PublicHeader.jsx';
+import PublicFooter from '../../../components/public/PublicFooter.jsx';
+import ApplyStepper from '../../../components/public/ApplyStepper.jsx';
+import { applicantSummary } from './applyData.js';
 
-const html = "<!-- Top Navigation Bar -->\n<nav class=\"bg-surface dark:bg-surface-container-high border-b border-outline-variant dark:border-outline fixed top-0 w-full z-50\">\n<div class=\"flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16\">\n<div class=\"flex items-center gap-lg\">\n<span class=\"font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed\">Mount Carmel Secondary</span>\n<div class=\"hidden md:flex gap-md\">\n<a class=\"font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors\" href=\"#\">Admissions</a>\n<a class=\"font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors\" href=\"#\">Academics</a>\n<a class=\"font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors\" href=\"#\">Portal</a>\n<a class=\"font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors\" href=\"#\">Support</a>\n</div>\n</div>\n<div class=\"flex items-center gap-md\">\n<span class=\"material-symbols-outlined text-on-surface-variant\">notifications</span>\n<span class=\"material-symbols-outlined text-on-surface-variant\">apps</span>\n<button class=\"bg-primary text-on-primary px-md py-2 rounded-full font-label-md text-label-md hover:opacity-80 transition-all\">Staff Login</button>\n</div>\n</div>\n</nav>\n<main class=\"pt-24 pb-xl px-gutter max-w-container-max mx-auto\">\n<!-- Progress Header -->\n<header class=\"mb-xl\">\n<div class=\"flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg\">\n<div>\n<h1 class=\"font-headline-xl text-headline-xl text-primary leading-tight\">Step 4: Review &amp; Submit</h1>\n<p class=\"font-body-lg text-body-lg text-on-surface-variant max-w-2xl\">Final verification of your application profile. Please ensure all information is accurate before institutional submission.</p>\n</div>\n<div class=\"flex items-center gap-xs\">\n<div class=\"w-8 h-2 rounded-full bg-primary\"></div>\n<div class=\"w-8 h-2 rounded-full bg-primary\"></div>\n<div class=\"w-8 h-2 rounded-full bg-primary\"></div>\n<div class=\"w-16 h-2 rounded-full bg-primary\"></div>\n</div>\n</div>\n</header>\n<!-- Bento Grid Layout for Summary -->\n<div class=\"grid grid-cols-1 md:grid-cols-12 gap-lg mb-xl\">\n<!-- Bio Data Section (Wide) -->\n<section class=\"md:col-span-8 bento-card overflow-hidden\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center\">\n<h2 class=\"font-headline-md text-headline-md text-primary\">Student Bio-Data</h2>\n<button class=\"flex items-center gap-xs text-secondary font-label-md\">\n<span class=\"material-symbols-outlined text-[18px]\">edit</span> Edit\n                    </button>\n</div>\n<div class=\"p-lg grid grid-cols-1 sm:grid-cols-2 gap-lg\">\n<div class=\"space-y-xs\">\n<label class=\"font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider\">Full Legal Name</label>\n<p class=\"font-headline-md text-headline-md text-on-surface\">Dominic Savio Okon</p>\n</div>\n<div class=\"space-y-xs\">\n<label class=\"font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider\">Date of Birth</label>\n<p class=\"font-body-lg text-body-lg text-on-surface\">14 October 2011</p>\n</div>\n<div class=\"space-y-xs\">\n<label class=\"font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider\">Nationality</label>\n<p class=\"font-body-lg text-body-lg text-on-surface\">Nigerian</p>\n</div>\n<div class=\"space-y-xs\">\n<label class=\"font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider\">Applying For</label>\n<p class=\"font-body-lg text-body-lg text-on-surface\">JS1 (Year 7) - Boarding</p>\n</div>\n<div class=\"sm:col-span-2 space-y-xs pt-md border-t border-outline-variant\">\n<label class=\"font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider\">Residential Address</label>\n<p class=\"font-body-lg text-body-lg text-on-surface\">12 Catholic Mission Street, Lagos Island, Lagos State</p>\n</div>\n</div>\n</section>\n<!-- Profile Image (Square-ish) -->\n<section class=\"md:col-span-4 bento-card flex flex-col items-center justify-center p-lg relative overflow-hidden group\">\n<div class=\"absolute inset-0 grid-accent opacity-20 pointer-events-none\"></div>\n<div class=\"w-40 h-40 rounded-full border-4 border-primary p-1 mb-md\">\n<img class=\"w-full h-full object-cover rounded-full\" data-alt=\"A professional passport-sized photograph of a young male student in a formal white shirt, set against a solid light blue studio background. The lighting is bright and even, typical of institutional identity documentation, conveying a sense of academic readiness and discipline.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDIMrfENqgMpRIVjJk65Z1X0BDFsjYOyjbYuwicg1367_wU9MgGQssCdR5wiRYQBKI8LZEDl1e1pVF19vJkWunTqPHMDqxqmmDWoV6q4vPjUVjUzl-UjnbmoASQeq8eHL9HXybORlRp8jmTOR623TI0zEHBDpI_Dl5mIFHKEyXf6RB1fS93pPizmX877jNd4KZzQCHtIPU9RKWGECFCO8OlA3E-PCxBO-959SUUfYZGYcl3IetFhRqRu3NfRs8eTNwdaB-SkiNpCvlj\"/>\n</div>\n<div class=\"ribbon-tag absolute top-4 right-0 font-label-sm\">CANDIDATE ID: 2024/098</div>\n<p class=\"font-label-md text-label-md text-primary mt-2\">Official Passport Photograph</p>\n</section>\n<!-- Guardian Info Section (Vertical) -->\n<section class=\"md:col-span-4 bento-card\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center\">\n<h2 class=\"font-headline-md text-headline-md text-primary\">Guardian</h2>\n<button class=\"flex items-center gap-xs text-secondary font-label-md\">\n<span class=\"material-symbols-outlined text-[18px]\">edit</span>\n</button>\n</div>\n<div class=\"p-lg space-y-lg\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-12 h-12 rounded-lg bg-secondary-container flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-on-secondary-container\">person</span>\n</div>\n<div>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Primary Guardian</p>\n<p class=\"font-label-md text-label-md\">Mrs. Mary Okon</p>\n</div>\n</div>\n<div class=\"flex items-center gap-md\">\n<div class=\"w-12 h-12 rounded-lg bg-secondary-container flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-on-secondary-container\">call</span>\n</div>\n<div>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Phone Number</p>\n<p class=\"font-label-md text-label-md\">+234 801 234 5678</p>\n</div>\n</div>\n<div class=\"flex items-center gap-md\">\n<div class=\"w-12 h-12 rounded-lg bg-secondary-container flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-on-secondary-container\">mail</span>\n</div>\n<div>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Email Address</p>\n<p class=\"font-label-md text-label-md\">m.okon@example.com</p>\n</div>\n</div>\n</div>\n</section>\n<!-- Documents Section (Wide List) -->\n<section class=\"md:col-span-8 bento-card\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center\">\n<h2 class=\"font-headline-md text-headline-md text-primary\">Uploaded Documents</h2>\n<button class=\"flex items-center gap-xs text-secondary font-label-md\">\n<span class=\"material-symbols-outlined text-[18px]\">add_circle</span> Add More\n                    </button>\n</div>\n<div class=\"p-lg\">\n<div class=\"grid grid-cols-1 sm:grid-cols-2 gap-md\">\n<!-- Doc 1 -->\n<div class=\"flex items-center p-md border border-outline-variant rounded-xl hover:bg-surface-container transition-colors cursor-pointer\">\n<span class=\"material-symbols-outlined text-primary mr-md\" style=\"font-variation-settings: 'FILL' 1;\">description</span>\n<div class=\"flex-grow\">\n<p class=\"font-label-md text-label-md\">Birth_Certificate.pdf</p>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">2.4 MB • Verified</p>\n</div>\n<span class=\"material-symbols-outlined text-on-surface-variant\">visibility</span>\n</div>\n<!-- Doc 2 -->\n<div class=\"flex items-center p-md border border-outline-variant rounded-xl hover:bg-surface-container transition-colors cursor-pointer\">\n<span class=\"material-symbols-outlined text-primary mr-md\" style=\"font-variation-settings: 'FILL' 1;\">description</span>\n<div class=\"flex-grow\">\n<p class=\"font-label-md text-label-md\">Last_School_Report.pdf</p>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">1.8 MB • Verified</p>\n</div>\n<span class=\"material-symbols-outlined text-on-surface-variant\">visibility</span>\n</div>\n<!-- Doc 3 -->\n<div class=\"flex items-center p-md border border-outline-variant rounded-xl hover:bg-surface-container transition-colors cursor-pointer\">\n<span class=\"material-symbols-outlined text-primary mr-md\" style=\"font-variation-settings: 'FILL' 1;\">description</span>\n<div class=\"flex-grow\">\n<p class=\"font-label-md text-label-md\">Medical_Fitness.pdf</p>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">3.1 MB • Verified</p>\n</div>\n<span class=\"material-symbols-outlined text-on-surface-variant\">visibility</span>\n</div>\n<!-- Doc 4 -->\n<div class=\"flex items-center p-md border border-outline-variant rounded-xl hover:bg-surface-container transition-colors cursor-pointer\">\n<span class=\"material-symbols-outlined text-primary mr-md\" style=\"font-variation-settings: 'FILL' 1;\">description</span>\n<div class=\"flex-grow\">\n<p class=\"font-label-md text-label-md\">Baptismal_Certificate.pdf</p>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">1.2 MB • Verified</p>\n</div>\n<span class=\"material-symbols-outlined text-on-surface-variant\">visibility</span>\n</div>\n</div>\n</div>\n</section>\n</div>\n<!-- Submission Controls -->\n<section class=\"max-w-4xl mx-auto space-y-lg\">\n<div class=\"bg-surface-container-high p-lg rounded-xl border border-primary/20\">\n<div class=\"flex items-start gap-md\">\n<input class=\"mt-1 w-6 h-6 rounded border-outline text-primary focus:ring-primary\" id=\"declaration\" type=\"checkbox\"/>\n<label class=\"font-body-md text-body-md text-on-surface\" for=\"declaration\">\n<strong>Declaration:</strong> I hereby certify that the information provided in this application is true and correct to the best of my knowledge. I understand that any false statements or omission of facts may be grounds for rejection of this application or subsequent dismissal from Mount Carmel Secondary School. I agree to abide by the rules and regulations of the institution if admitted.\n                    </label>\n</div>\n</div>\n<div class=\"flex flex-col md:flex-row items-center justify-between gap-lg pt-lg\">\n<button class=\"w-full md:w-auto px-xl py-4 border-2 border-secondary text-secondary font-headline-md rounded-lg hover:bg-secondary/10 transition-all flex items-center justify-center gap-md\">\n<span class=\"material-symbols-outlined\">arrow_back</span>\n                    Previous Step\n                </button>\n<button class=\"w-full md:w-auto px-xl py-4 bg-primary text-on-primary font-headline-md rounded-lg shadow-lg hover:bg-primary-container transition-all flex items-center justify-center gap-md group\" id=\"submitBtn\">\n                    Submit Final Application\n                    <span class=\"material-symbols-outlined group-hover:translate-x-1 transition-transform\">send</span>\n</button>\n</div>\n</section>\n</main>\n<!-- Footer -->\n<footer class=\"bg-secondary dark:bg-secondary-fixed-dim text-on-secondary dark:text-on-secondary-fixed\">\n<div class=\"w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center max-w-container-max mx-auto\">\n<div>\n<span class=\"font-headline-md text-headline-md font-bold mb-md block\">Mount Carmel Secondary</span>\n<p class=\"font-body-md text-body-md opacity-80\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap gap-lg md:justify-end mt-lg md:mt-0\">\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</div>\n</footer>\n<!-- Submission Modal (Micro-interaction) -->\n<div class=\"fixed inset-0 bg-primary/40 backdrop-blur-sm z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-300\" id=\"successModal\">\n<div class=\"bg-white p-xl rounded-xl max-w-md w-full shadow-2xl text-center space-y-lg scale-95 transition-transform duration-300\">\n<div class=\"w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto\">\n<span class=\"material-symbols-outlined text-5xl\" style=\"font-variation-settings: 'wght' 700;\">check_circle</span>\n</div>\n<h3 class=\"font-headline-lg text-headline-lg text-primary\">Application Submitted!</h3>\n<p class=\"font-body-lg text-body-lg text-on-surface-variant\">Your application has been successfully sent to the Admissions Office. An acknowledgement email has been sent to your primary guardian's address.</p>\n<button class=\"w-full py-4 bg-primary text-on-primary font-headline-md rounded-lg\" onclick=\"window.location.reload()\">Return to Dashboard</button>\n</div>\n</div>";
+const bioFields = [
+  ['Full Legal Name', applicantSummary.fullName],
+  ['Date of Birth', applicantSummary.dob],
+  ['Nationality', applicantSummary.nationality],
+  ['Applying For', applicantSummary.applyingFor],
+];
 
 export default function ApplyReviewSubmit() {
-  return <StitchScreen title="Apply Review" bodyClassName="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container" html={html} />;
+  const navigate = useNavigate();
+  const [declared, setDeclared] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Apply: Review & Submit | MCSS Portal';
+  }, []);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-surface-container-lowest">
+      <PublicHeader />
+      <main className="grow pb-xl px-gutter max-w-container-max mx-auto w-full pt-xl">
+        <header className="mb-xl">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
+            <div>
+              <h1 className="font-headline-xl text-headline-lg text-primary leading-tight">Step 4: Review &amp; Submit</h1>
+              <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                Final verification of your application profile. Please ensure all information is accurate before institutional submission.
+              </p>
+            </div>
+          </div>
+          <ApplyStepper current={4} />
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-lg mb-xl">
+          <section className="md:col-span-8 bg-surface-container-lowest border border-outline/10 rounded-lg overflow-hidden">
+            <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex justify-between items-center">
+              <h2 className="font-headline-md text-headline-sm text-primary">Student Bio-Data</h2>
+              <button type="button" className="flex items-center gap-xs text-secondary font-label-md">
+                <span className="material-symbols-outlined text-sm">edit</span> Edit
+              </button>
+            </div>
+            <div className="p-lg grid grid-cols-1 sm:grid-cols-2 gap-lg">
+              {bioFields.map(([label, value]) => (
+                <div key={label} className="space-y-xs">
+                  <label className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{label}</label>
+                  <p className="font-headline-md text-headline-sm text-on-surface">{value}</p>
+                </div>
+              ))}
+              <div className="sm:col-span-2 space-y-xs pt-md border-t border-outline/10">
+                <label className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Residential Address</label>
+                <p className="font-body-lg text-body-lg text-on-surface">{applicantSummary.address}</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="md:col-span-4 bg-surface-container-lowest border border-outline/10 rounded-lg flex flex-col items-center justify-center p-lg relative overflow-hidden">
+            <div className="w-40 h-40 rounded-full border-4 border-primary p-1 mb-md flex items-center justify-center bg-surface-container-low">
+              <span className="material-symbols-outlined text-outline text-5xl">person</span>
+            </div>
+            <div className="bg-tertiary-container text-on-tertiary-container px-md py-1 rounded-full font-label-sm text-label-sm absolute top-md right-md">
+              CANDIDATE ID: {applicantSummary.candidateId}
+            </div>
+            <p className="font-label-md text-label-md text-primary mt-2">Official Passport Photograph</p>
+          </section>
+
+          <section className="md:col-span-4 bg-surface-container-lowest border border-outline/10 rounded-lg overflow-hidden">
+            <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex justify-between items-center">
+              <h2 className="font-headline-md text-headline-sm text-primary">Guardian</h2>
+              <button type="button" className="flex items-center gap-xs text-secondary font-label-md">
+                <span className="material-symbols-outlined text-sm">edit</span>
+              </button>
+            </div>
+            <div className="p-lg space-y-lg">
+              <div className="flex items-center gap-md">
+                <div className="w-12 h-12 rounded-lg bg-secondary-container flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-on-secondary-container">person</span>
+                </div>
+                <div>
+                  <p className="font-label-sm text-label-sm text-on-surface-variant">Primary Guardian</p>
+                  <p className="font-label-md text-label-md">{applicantSummary.guardian.name}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-md">
+                <div className="w-12 h-12 rounded-lg bg-secondary-container flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-on-secondary-container">call</span>
+                </div>
+                <div>
+                  <p className="font-label-sm text-label-sm text-on-surface-variant">Phone Number</p>
+                  <p className="font-label-md text-label-md">{applicantSummary.guardian.phone}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-md">
+                <div className="w-12 h-12 rounded-lg bg-secondary-container flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-on-secondary-container">mail</span>
+                </div>
+                <div>
+                  <p className="font-label-sm text-label-sm text-on-surface-variant">Email Address</p>
+                  <p className="font-label-md text-label-md">{applicantSummary.guardian.email}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="md:col-span-8 bg-surface-container-lowest border border-outline/10 rounded-lg">
+            <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex justify-between items-center">
+              <h2 className="font-headline-md text-headline-sm text-primary">Uploaded Documents</h2>
+              <button type="button" className="flex items-center gap-xs text-secondary font-label-md">
+                <span className="material-symbols-outlined text-sm">add_circle</span> Add More
+              </button>
+            </div>
+            <div className="p-lg grid grid-cols-1 sm:grid-cols-2 gap-md">
+              {applicantSummary.documents.map((doc) => (
+                <div key={doc.name} className="flex items-center p-md border border-outline/10 rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer">
+                  <span className="material-symbols-outlined text-primary mr-md">description</span>
+                  <div className="flex-grow min-w-0">
+                    <p className="font-label-md text-label-md truncate">{doc.name}</p>
+                    <p className="font-label-sm text-label-sm text-on-surface-variant">{doc.meta}</p>
+                  </div>
+                  <span className="material-symbols-outlined text-on-surface-variant shrink-0">visibility</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <section className="max-w-4xl mx-auto space-y-lg">
+          <div className="bg-surface-container-high p-lg rounded-xl border border-primary/20">
+            <div className="flex items-start gap-md">
+              <input checked={declared} onChange={(e) => setDeclared(e.target.checked)} className="mt-1 w-6 h-6 rounded border-outline text-primary focus:ring-primary" id="declaration" type="checkbox" />
+              <label className="font-body-md text-body-md text-on-surface" htmlFor="declaration">
+                <strong>Declaration:</strong> I hereby certify that the information provided in this application is true and correct to the best of my
+                knowledge. I understand that any false statements or omission of facts may be grounds for rejection of this application or subsequent
+                dismissal from Mount Carmel Secondary School. I agree to abide by the rules and regulations of the institution if admitted.
+              </label>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-lg pt-lg">
+            <button
+              type="button"
+              onClick={() => navigate('/apply/documents')}
+              className="w-full md:w-auto px-xl py-4 border-2 border-secondary text-secondary font-headline-md rounded-lg hover:bg-secondary/10 transition-all flex items-center justify-center gap-md"
+            >
+              <span className="material-symbols-outlined">arrow_back</span>
+              Previous Step
+            </button>
+            <button
+              type="button"
+              disabled={!declared}
+              onClick={() => navigate('/apply/confirmation')}
+              className="w-full md:w-auto px-xl py-4 bg-primary text-on-primary font-headline-md rounded-lg shadow-lg hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center gap-md group"
+            >
+              Submit Final Application
+              <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">send</span>
+            </button>
+          </div>
+        </section>
+      </main>
+      <PublicFooter />
+    </div>
+  );
 }

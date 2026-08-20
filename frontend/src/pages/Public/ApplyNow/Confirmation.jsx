@@ -1,7 +1,103 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
-
-const html = "<!-- TopNavBar (Shell Hidden for Transactional Success Screen) -->\n<!-- Applying \"Shell Visibility & Relevance\" rule: Suppress navigation for Success/Confirmation splash screens -->\n<main class=\"min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-gutter py-xl\">\n<!-- Atmospheric Background Elements -->\n<div class=\"absolute top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden\">\n<div class=\"absolute -top-24 -left-24 w-96 h-96 bg-primary opacity-[0.03] rounded-full blur-3xl\"></div>\n<div class=\"absolute -bottom-24 -right-24 w-[32rem] h-[32rem] bg-secondary opacity-[0.05] rounded-full blur-3xl\"></div>\n</div>\n<div class=\"w-full max-w-[800px] z-10 flex flex-col items-center\">\n<!-- Celebration Badge -->\n<div class=\"mb-lg float-anim\">\n<div class=\"w-24 h-24 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-lg ring-8 ring-primary-container/20\">\n<span class=\"material-symbols-outlined !text-[48px]\" style=\"font-variation-settings: 'FILL' 1;\">verified</span>\n</div>\n</div>\n<!-- Success Header -->\n<div class=\"text-center mb-xl\">\n<h1 class=\"font-headline-xl text-headline-xl text-primary mb-sm\">Application Received</h1>\n<p class=\"font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto\">\n                    Welcome to the Mount Carmel family. Your application for the 2024 Academic Year has been successfully submitted and is now under formal review by our admissions committee.\n                </p>\n</div>\n<!-- Bento Grid Summary -->\n<div class=\"grid grid-cols-1 md:grid-cols-12 gap-gutter w-full mb-xl\">\n<!-- Reference Number Card -->\n<div class=\"md:col-span-7 bg-surface-container-lowest border border-outline-variant p-xl rounded-lg shadow-sm flex flex-col justify-center relative overflow-hidden\">\n<div class=\"absolute top-0 right-0 p-md opacity-10\">\n<span class=\"material-symbols-outlined !text-[120px]\">assignment_turned_in</span>\n</div>\n<span class=\"font-label-md text-label-md text-secondary-fixed-variant mb-xs\">REFERENCE NUMBER</span>\n<h2 class=\"font-headline-lg text-headline-lg text-primary tracking-widest uppercase\">APP-2024-8294</h2>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant mt-sm\">Keep this number for all future correspondence with the Admissions Office.</p>\n</div>\n<!-- Download Summary Card -->\n<button class=\"md:col-span-5 group bg-primary text-on-primary p-xl rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-all hover:bg-primary-container hover:text-on-primary-container hover:shadow-md active:scale-[0.98]\">\n<span class=\"material-symbols-outlined !text-[40px] mb-sm group-hover:scale-110 transition-transform\">picture_as_pdf</span>\n<span class=\"font-headline-md text-headline-md\">Download Summary</span>\n<p class=\"font-label-sm text-label-sm opacity-80 mt-xs\">PDF Document • 2.4 MB</p>\n</button>\n<!-- What Happens Next - Timeline/Bento Segment -->\n<div class=\"md:col-span-12 bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden\">\n<div class=\"bg-primary px-lg py-md flex items-center gap-sm\">\n<span class=\"material-symbols-outlined text-on-primary\">info</span>\n<h3 class=\"font-headline-md text-headline-md text-on-primary\">What Happens Next</h3>\n</div>\n<div class=\"p-xl grid grid-cols-1 md:grid-cols-3 gap-lg\">\n<!-- Step 1 -->\n<div class=\"flex flex-col\">\n<div class=\"flex items-center gap-sm mb-sm\">\n<span class=\"w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold font-label-md\">1</span>\n<div class=\"ribbon-tag font-label-sm\">CURRENT</div>\n</div>\n<h4 class=\"font-label-md text-label-md text-primary mb-xs\">Document Verification</h4>\n<p class=\"font-body-md text-body-md text-on-surface-variant\">Our registrar is currently verifying your transcripts and submitted documents for authenticity.</p>\n</div>\n<!-- Step 2 -->\n<div class=\"flex flex-col opacity-60\">\n<div class=\"flex items-center gap-sm mb-sm\">\n<span class=\"w-8 h-8 rounded-full bg-outline text-surface flex items-center justify-center font-bold font-label-md\">2</span>\n</div>\n<h4 class=\"font-label-md text-label-md text-primary mb-xs\">Entrance Assessment</h4>\n<p class=\"font-body-md text-body-md text-on-surface-variant\">Once verified, you will receive an invitation via email to schedule the entrance aptitude test.</p>\n</div>\n<!-- Step 3 -->\n<div class=\"flex flex-col opacity-60\">\n<div class=\"flex items-center gap-sm mb-sm\">\n<span class=\"w-8 h-8 rounded-full bg-outline text-surface flex items-center justify-center font-bold font-label-md\">3</span>\n</div>\n<h4 class=\"font-label-md text-label-md text-primary mb-xs\">Formal Interview</h4>\n<p class=\"font-body-md text-body-md text-on-surface-variant\">Final candidates will be invited for a personal interview with the academic dean.</p>\n</div>\n</div>\n</div>\n</div>\n<!-- Action Cluster -->\n<div class=\"flex flex-col md:flex-row items-center gap-md w-full justify-center\">\n<button class=\"w-full md:w-auto px-xl py-md bg-primary text-on-primary rounded-[16px] font-headline-md text-headline-md shadow-sm hover:opacity-90 transition-all flex items-center justify-center gap-sm\">\n<span class=\"material-symbols-outlined\">analytics</span>\n                    Check Application Status\n                </button>\n<button class=\"w-full md:w-auto px-xl py-md border-2 border-secondary text-secondary rounded-[16px] font-headline-md text-headline-md hover:bg-secondary/5 transition-all flex items-center justify-center gap-sm\">\n<span class=\"material-symbols-outlined\">home</span>\n                    Return to Homepage\n                </button>\n</div>\n<div class=\"mt-xl text-center\">\n<p class=\"font-body-md text-body-md text-on-surface-variant italic\">\n                    A confirmation email has been sent to the primary guardian's address. \n                    <br/>Need assistance? Contact us at <span class=\"text-primary font-bold\">admissions@mountcarmel.edu</span>\n</p>\n</div>\n</div>\n</main>\n<!-- Footer Segment -->\n<footer class=\"w-full py-xl px-gutter bg-secondary text-on-secondary border-t border-outline-variant\">\n<div class=\"max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-md\">\n<div>\n<p class=\"font-headline-md text-headline-md text-on-secondary font-bold mb-xs\">Mount Carmel Secondary</p>\n<p class=\"font-label-sm text-label-sm opacity-80 uppercase tracking-widest\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap gap-lg md:justify-end\">\n<a class=\"font-label-sm text-label-sm hover:underline opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm hover:underline opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm hover:underline opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm hover:underline opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</div>\n</footer>\n<!-- Simple Interactivity for the Check Status Button -->";
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import PublicFooter from '../../../components/public/PublicFooter.jsx';
+import { referenceNumber, nextSteps } from './applyData.js';
 
 export default function ApplyConfirmation() {
-  return <StitchScreen title="Apply Confirmation" bodyClassName="bg-surface-bright text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container" html={html} />;
+  useEffect(() => {
+    document.title = 'Application Received | MCSS Portal';
+  }, []);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-surface-container-lowest">
+      <main className="grow flex flex-col items-center justify-center relative overflow-hidden px-gutter py-xl">
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary opacity-[0.03] rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-128 h-128 bg-secondary opacity-[0.05] rounded-full blur-3xl" />
+        </div>
+
+        <div className="w-full max-w-200 z-10 flex flex-col items-center">
+          <div className="mb-lg">
+            <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-lg ring-8 ring-primary/10">
+              <span className="material-symbols-outlined text-5xl">verified</span>
+            </div>
+          </div>
+
+          <div className="text-center mb-xl">
+            <h1 className="font-headline-xl text-headline-lg text-primary mb-sm">Application Received</h1>
+            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+              Welcome to the Mount Carmel family. Your application for the 2024 Academic Year has been successfully submitted and is now under formal
+              review by our admissions committee.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-lg w-full mb-xl">
+            <div className="md:col-span-7 bg-surface-container-lowest border border-outline/10 p-xl rounded-lg shadow-sm flex flex-col justify-center relative overflow-hidden">
+              <span className="material-symbols-outlined absolute top-0 right-0 p-md opacity-10 text-8xl">assignment_turned_in</span>
+              <span className="font-label-md text-label-md text-secondary mb-xs">REFERENCE NUMBER</span>
+              <h2 className="font-headline-lg text-headline-md text-primary tracking-widest uppercase">{referenceNumber}</h2>
+              <p className="font-label-sm text-label-sm text-on-surface-variant mt-sm">Keep this number for all future correspondence with the Admissions Office.</p>
+            </div>
+            <button
+              type="button"
+              className="md:col-span-5 group bg-primary text-on-primary p-xl rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-all hover:bg-primary-container hover:text-on-primary-container active:scale-[0.98]"
+            >
+              <span className="material-symbols-outlined text-4xl mb-sm group-hover:scale-110 transition-transform">picture_as_pdf</span>
+              <span className="font-headline-md text-headline-sm">Download Summary</span>
+              <p className="font-label-sm text-label-sm opacity-80 mt-xs">PDF Document • 2.4 MB</p>
+            </button>
+
+            <div className="md:col-span-12 bg-surface-container-low border border-outline/10 rounded-lg overflow-hidden">
+              <div className="bg-primary px-lg py-md flex items-center gap-sm">
+                <span className="material-symbols-outlined text-on-primary">info</span>
+                <h3 className="font-headline-md text-headline-sm text-on-primary">What Happens Next</h3>
+              </div>
+              <div className="p-xl grid grid-cols-1 md:grid-cols-3 gap-lg">
+                {nextSteps.map((step, i) => (
+                  <div key={step.title} className={`flex flex-col ${step.status === 'pending' ? 'opacity-60' : ''}`}>
+                    <div className="flex items-center gap-sm mb-sm">
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold font-label-md ${step.status === 'current' ? 'bg-secondary text-on-secondary' : 'bg-outline text-surface'}`}>
+                        {i + 1}
+                      </span>
+                      {step.status === 'current' && (
+                        <span className="bg-secondary-container text-on-secondary-container px-sm py-0.5 rounded-full font-label-sm text-[10px] uppercase font-bold">Current</span>
+                      )}
+                    </div>
+                    <h4 className="font-label-md text-label-md text-primary mb-xs">{step.title}</h4>
+                    <p className="font-body-md text-body-md text-on-surface-variant">{step.body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center gap-md w-full justify-center">
+            <Link
+              to="/apply/status"
+              className="w-full md:w-auto px-xl py-md bg-primary text-on-primary rounded-lg font-headline-md text-headline-sm shadow-sm hover:opacity-90 transition-all flex items-center justify-center gap-sm"
+            >
+              <span className="material-symbols-outlined">analytics</span>
+              Check Application Status
+            </Link>
+            <Link
+              to="/"
+              className="w-full md:w-auto px-xl py-md border-2 border-secondary text-secondary rounded-lg font-headline-md text-headline-sm hover:bg-secondary/5 transition-all flex items-center justify-center gap-sm"
+            >
+              <span className="material-symbols-outlined">home</span>
+              Return to Homepage
+            </Link>
+          </div>
+
+          <div className="mt-xl text-center">
+            <p className="font-body-md text-body-md text-on-surface-variant italic">
+              A confirmation email has been sent to the primary guardian&apos;s address.
+              <br />
+              Need assistance? Contact us at <span className="text-primary font-bold not-italic">admissions@mountcarmel.edu</span>
+            </p>
+          </div>
+        </div>
+      </main>
+      <PublicFooter />
+    </div>
+  );
 }

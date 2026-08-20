@@ -1,7 +1,193 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
+import { useState } from 'react';
+import AppShell from '../../../components/layout/AppShell.jsx';
+import PageHeader from '../../../components/ui/PageHeader.jsx';
+import Card from '../../../components/ui/Card.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
+import Button from '../../../components/ui/Button.jsx';
+import { totals, categories, items, statusTone, recentActivity, pendingRequests } from './inventoryData.js';
 
-const html = "<!-- Sidebar Navigation Shell -->\n<aside class=\"fixed left-0 top-0 h-full w-64 bg-primary dark:bg-surface-container-lowest flex flex-col py-md z-40 shadow-sm transition-all duration-200 ease-in-out hidden md:flex\">\n<div class=\"px-6 mb-10 flex items-center space-x-3\">\n<div class=\"w-10 h-10 bg-on-primary rounded-lg flex items-center justify-center text-primary font-bold overflow-hidden shadow-inner\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A professional crest for Mount Carmel Secondary School, featuring a minimalist shield design with academic symbols like an open book and a torch. The aesthetic is traditional yet clean, utilizing a royal purple and ivory white color palette. Soft studio lighting highlights the textures of the crest.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCiYEqhHMg9DVjprWyiWTzUOGEBGb_cTQLnWsNSbwRXTEgPMtXOPdRNoNZBmIp4_NwKL6Eo6wE1zs1BHGlcIHrKSTQntHIa1LiK2jwDKp37kQOMjXyQ8kOjnYOGrxaBdJdmmIi1eru6QAfQnWip3cwFMGu8IyEnhnW2xUFbLP98AoB5MeNCMHsl6FoI1mOmpK-Aa0pCyGAzIWu8nW0E3OJDQXzFHcRccGSDRGl5_toiPkf6Zd13RClH_rInm-gNOBm1nk1Vaurm11d9\">\n</div>\n<div>\n<h2 class=\"font-headline-md text-headline-sm text-on-primary dark:text-primary leading-tight\">Mount Carmel</h2>\n<p class=\"font-label-sm text-label-sm text-on-primary/60\">Admin Portal</p>\n</div>\n</div>\n<nav class=\"flex-1 space-y-1\">\n<!-- Navigation Items Mapping -->\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">school</span>\n<span class=\"font-label-md text-label-md\">Students</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">auto_stories</span>\n<span class=\"font-label-md text-label-md\">Academics</span>\n</a>\n<!-- Inventory Active State (Semantic interpretation of Finance/Resources) -->\n<a class=\"flex items-center border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary dark:text-primary-fixed-dim py-3 px-4\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">inventory_2</span>\n<span class=\"font-label-md text-label-md\">Inventory</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">event_available</span>\n<span class=\"font-label-md text-label-md\">Attendance</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">description</span>\n<span class=\"font-label-md text-label-md\">Reports</span>\n</a>\n</nav>\n<div class=\"mt-auto px-4 space-y-1\">\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">settings</span>\n<span class=\"font-label-md text-label-md\">Settings</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3 text-red-400\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Top AppBar -->\n<header class=\"fixed top-0 right-0 left-64 h-16 bg-surface dark:bg-surface-container-high border-b border-outline-variant dark:border-outline z-30 left-0 md:left-64\">\n<div class=\"flex justify-between items-center h-full px-gutter max-w-container-max mx-auto\">\n<div class=\"flex items-center gap-lg\">\n<h1 class=\"font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed\">Inventory Module</h1>\n<div class=\"relative\">\n<span class=\"absolute inset-y-0 left-3 flex items-center text-outline\">\n<span class=\"material-symbols-outlined text-[20px]\">search</span>\n</span>\n<input class=\"pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:ring-primary focus:border-primary w-64 transition-all\" placeholder=\"Search school assets...\" type=\"text\">\n</div>\n</div>\n<div class=\"flex items-center gap-md\">\n<button class=\"p-2 text-on-surface-variant hover:text-primary transition-colors\">\n<span class=\"material-symbols-outlined\">notifications</span>\n</button>\n<button class=\"p-2 text-on-surface-variant hover:text-primary transition-colors\">\n<span class=\"material-symbols-outlined\">apps</span>\n</button>\n<div class=\"flex items-center gap-sm ml-4 pl-4 border-l border-outline-variant\">\n<div class=\"text-right hidden xl:block\">\n<p class=\"font-label-md text-label-md text-primary\">Admin User</p>\n<p class=\"text-[10px] text-outline uppercase tracking-wider font-bold\">School Registrar</p>\n</div>\n<div class=\"w-10 h-10 rounded-full border-2 border-primary-container overflow-hidden\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A clean, professional headshot of a middle-aged female administrator wearing a navy blazer and white blouse. The background is a soft-focus library or office setting with warm wood tones. The lighting is flattering and professional, reflecting an institutional and authoritative atmosphere.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCB2idzsPJSrQLR2Czw9tFcwO8Zt6yhNtFwbpfM9aN3ua9ILZ4EROLf3LRBkM-ZEqHmazJPzI_yobyDeA_Ye42D6lNRh6JaGqK2157-QYqUJ-EOE_UVam2WE7q-ie91tNf0mxKdjZwkcPpbnh7jRVc5gZC1TwPtyb2E2jr6gGHgAunaJHP-KpP36Rk0xMBy-7_EdEsecjh1fEXuTzAwOgapQoOuYGiE3dfc4HKUlTFXtONlAVg_Q0vVQCxRhH5VgF6CVyRMg7LfKZKt\">\n</div>\n</div>\n</div>\n</div>\n</header>\n<!-- Main Content Canvas -->\n<main class=\"ml-64 pt-24 px-gutter pb-xl min-h-screen ml-0 md:ml-64 pt-20 md:pt-24\">\n<div class=\"max-w-container-max mx-auto space-y-lg\">\n<!-- Dashboard Stats Summary (Asymmetric Layout) -->\n<div class=\"grid grid-cols-12 gap-gutter\">\n<div class=\"col-span-8 bg-white p-lg rounded-lg border border-outline-variant shadow-sm flex items-center justify-between overflow-hidden relative col-span-12 md:col-span-8\">\n<div class=\"relative z-10\">\n<h3 class=\"font-label-md text-label-md text-outline uppercase tracking-widest mb-2\">Total Assets Tracked</h3>\n<p class=\"font-headline-xl text-headline-xl text-primary\">1,428</p>\n<div class=\"mt-4 flex gap-md\">\n<span class=\"flex items-center text-green-600 font-bold text-sm\">\n<span class=\"material-symbols-outlined mr-1\">trending_up</span> +12%\n                            </span>\n<span class=\"text-on-surface-variant/60 text-sm\">Since last quarter</span>\n</div>\n</div>\n<div class=\"w-1/3 h-full relative opacity-20\">\n<!-- Decorative element simulating data flow -->\n<div class=\"absolute inset-0 bg-gradient-to-l from-primary-container to-transparent\"></div>\n</div>\n<button class=\"absolute top-lg right-lg bg-primary text-white px-md py-sm rounded-md font-label-md text-label-md hover:bg-primary-container transition-all flex items-center gap-sm\">\n<span class=\"material-symbols-outlined text-[18px]\">add_circle</span>\n                        Add Stock\n                    </button>\n</div>\n<div class=\"col-span-4 bg-tertiary-container p-lg rounded-lg border border-tertiary text-white shadow-sm flex flex-col justify-between col-span-12 md:col-span-8 md:col-span-4\">\n<div>\n<h3 class=\"font-label-md text-label-md text-tertiary-fixed opacity-80 uppercase tracking-widest mb-2\">Low Stock Alerts</h3>\n<p class=\"font-headline-xl text-headline-xl\">24 <span class=\"text-headline-md font-normal\">items</span></p>\n</div>\n<button class=\"w-full py-sm bg-tertiary text-white border border-tertiary-fixed/30 rounded-md font-label-md text-label-md hover:bg-tertiary/80 transition-all\">\n                        View Alerts\n                    </button>\n</div>\n</div>\n<!-- Filters & Controls -->\n<div class=\"flex items-center justify-between bg-surface-container-low p-md rounded-lg border border-outline-variant\">\n<div class=\"flex items-center gap-md\">\n<span class=\"font-label-md text-label-md text-primary\">Filter By:</span>\n<button class=\"px-4 py-2 bg-primary text-white rounded-full font-label-md text-label-md\">All Items</button>\n<button class=\"px-4 py-2 bg-white text-on-surface-variant border border-outline-variant rounded-full font-label-md text-label-md hover:border-primary transition-colors\">Science Lab</button>\n<button class=\"px-4 py-2 bg-white text-on-surface-variant border border-outline-variant rounded-full font-label-md text-label-md hover:border-primary transition-colors\">Stationery</button>\n<button class=\"px-4 py-2 bg-white text-on-surface-variant border border-outline-variant rounded-full font-label-md text-label-md hover:border-primary transition-colors\">Electronics</button>\n<button class=\"px-4 py-2 bg-white text-on-surface-variant border border-outline-variant rounded-full font-label-md text-label-md hover:border-primary transition-colors\">Sports</button>\n</div>\n<div class=\"flex items-center gap-sm\">\n<button class=\"p-2 border border-outline-variant rounded bg-white text-on-surface-variant\">\n<span class=\"material-symbols-outlined\">filter_list</span>\n</button>\n<button class=\"p-2 border border-outline-variant rounded bg-white text-on-surface-variant\">\n<span class=\"material-symbols-outlined\">download</span>\n</button>\n</div>\n</div>\n<!-- Data Table Card -->\n<div class=\"bg-white rounded-lg border border-outline-variant overflow-hidden shadow-sm\">\n<div class=\"bg-primary px-lg py-md flex items-center\">\n<h2 class=\"font-label-md text-label-md text-white font-headline-sm\">Master Stock Registry</h2>\n<span class=\"ml-4 px-2 py-0.5 bg-primary-container text-white text-[10px] font-bold rounded uppercase tracking-tighter\">Updated 2m ago</span>\n</div>\n<div class=\"overflow-x-auto custom-scrollbar\"><div class=\"md:hidden divide-y divide-outline-variant\">\n  <div class=\"p-4 space-y-2\">\n    <div class=\"flex justify-between items-start\">\n      <div>\n        <p class=\"text-xs text-outline\">#INV-8821</p>\n        <h4 class=\"font-bold text-primary\">Microscope Slides (Pack of 50)</h4>\n      </div>\n      <div class=\"ribbon-status bg-tertiary-container text-white text-[10px] font-bold px-3 py-1 uppercase\">Low Stock</div>\n    </div>\n    <div class=\"flex justify-between text-sm\">\n      <span class=\"text-on-surface-variant\">Science Lab</span>\n      <span class=\"font-bold text-on-tertiary-container\">Qty: 12</span>\n    </div>\n    <div class=\"flex justify-end pt-2\">\n      <button class=\"p-2 bg-primary-container/10 text-primary rounded-full\"><span class=\"material-symbols-outlined\">edit</span></button>\n    </div>\n  </div>\n  <div class=\"p-4 space-y-2\">\n    <div class=\"flex justify-between items-start\">\n      <div>\n        <p class=\"text-xs text-outline\">#INV-9023</p>\n        <h4 class=\"font-bold text-primary\">Whiteboard Markers (Blue)</h4>\n      </div>\n      <div class=\"px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full uppercase\">In Stock</div>\n    </div>\n    <div class=\"flex justify-between text-sm\">\n      <span class=\"text-on-surface-variant\">Stationery</span>\n      <span class=\"font-bold\">Qty: 420</span>\n    </div>\n    <div class=\"flex justify-end pt-2\">\n      <button class=\"p-2 bg-primary-container/10 text-primary rounded-full\"><span class=\"material-symbols-outlined\">edit</span></button>\n    </div>\n  </div>\n</div>\n<table class=\"w-full text-left border-collapse font-body-md hidden md:table\">\n<thead>\n<tr class=\"bg-surface-container-high border-b border-outline-variant\">\n<th class=\"px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider\">Item ID</th>\n<th class=\"px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider\">Item Name</th>\n<th class=\"px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider\">Category</th>\n<th class=\"px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider\">Quantity</th>\n<th class=\"px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider\">Storage Location</th>\n<th class=\"px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider\">Status</th>\n<th class=\"px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider text-center\">Actions</th>\n</tr>\n</thead>\n<tbody class=\"divide-y divide-outline-variant\">\n<!-- Low Stock Item -->\n<tr class=\"hover:bg-primary-container/5 transition-colors\">\n<td class=\"px-lg py-4 text-outline font-body-md\">#INV-8821</td>\n<td class=\"px-lg py-4 font-bold text-primary\">Microscope Slides (Pack of 50)</td>\n<td class=\"px-lg py-4\">Science Lab</td>\n<td class=\"px-lg py-4 font-bold text-on-tertiary-container\">12</td>\n<td class=\"px-lg py-4\">Lab Storage B-4</td>\n<td class=\"px-lg py-4\">\n<div class=\"ribbon-status bg-tertiary-container text-white text-[10px] font-bold px-3 py-1 inline-block uppercase tracking-widest\">\n                                        Low Stock\n                                    </div>\n</td>\n<td class=\"px-lg py-4 text-center\">\n<button class=\"text-primary hover:text-tertiary transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n</td>\n</tr>\n<!-- Regular Item -->\n<tr class=\"hover:bg-primary-container/5 transition-colors\">\n<td class=\"px-lg py-4 text-outline font-body-md\">#INV-9023</td>\n<td class=\"px-lg py-4 font-bold text-primary\">Whiteboard Markers (Blue)</td>\n<td class=\"px-lg py-4\">Stationery</td>\n<td class=\"px-lg py-4\">420</td>\n<td class=\"px-lg py-4\">Main Admin Store</td>\n<td class=\"px-lg py-4\">\n<div class=\"px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full inline-block uppercase tracking-widest\">\n                                        In Stock\n                                    </div>\n</td>\n<td class=\"px-lg py-4 text-center\">\n<button class=\"text-primary hover:text-tertiary transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n</td>\n</tr>\n<!-- Low Stock Item -->\n<tr class=\"hover:bg-primary-container/5 transition-colors\">\n<td class=\"px-lg py-4 text-outline font-body-md\">#INV-8845</td>\n<td class=\"px-lg py-4 font-bold text-primary\">Graphing Calculators TI-84</td>\n<td class=\"px-lg py-4\">Electronics</td>\n<td class=\"px-lg py-4 font-bold text-on-tertiary-container\">5</td>\n<td class=\"px-lg py-4\">Math Dept Office</td>\n<td class=\"px-lg py-4\">\n<div class=\"ribbon-status bg-tertiary-container text-white text-[10px] font-bold px-3 py-1 inline-block uppercase tracking-widest\">\n                                        Critical\n                                    </div>\n</td>\n<td class=\"px-lg py-4 text-center\">\n<button class=\"text-primary hover:text-tertiary transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n</td>\n</tr>\n<!-- Regular Item -->\n<tr class=\"hover:bg-primary-container/5 transition-colors\">\n<td class=\"px-lg py-4 text-outline font-body-md\">#INV-1029</td>\n<td class=\"px-lg py-4 font-bold text-primary\">A4 Printing Paper (Reams)</td>\n<td class=\"px-lg py-4\">Stationery</td>\n<td class=\"px-lg py-4\">85</td>\n<td class=\"px-lg py-4\">Main Admin Store</td>\n<td class=\"px-lg py-4\">\n<div class=\"px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full inline-block uppercase tracking-widest\">\n                                        In Stock\n                                    </div>\n</td>\n<td class=\"px-lg py-4 text-center\">\n<button class=\"text-primary hover:text-tertiary transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n</td>\n</tr>\n<!-- Regular Item -->\n<tr class=\"hover:bg-primary-container/5 transition-colors\">\n<td class=\"px-lg py-4 text-outline font-body-md\">#INV-4412</td>\n<td class=\"px-lg py-4 font-bold text-primary\">Basketballs (Wilson)</td>\n<td class=\"px-lg py-4\">Sports</td>\n<td class=\"px-lg py-4\">24</td>\n<td class=\"px-lg py-4\">Gymnasium Lockers</td>\n<td class=\"px-lg py-4\">\n<div class=\"px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full inline-block uppercase tracking-widest\">\n                                        In Stock\n                                    </div>\n</td>\n<td class=\"px-lg py-4 text-center\">\n<button class=\"text-primary hover:text-tertiary transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n</td>\n</tr>\n</tbody>\n</table>\n</div>\n<div class=\"bg-surface-container px-lg py-4 flex items-center justify-between border-t border-outline-variant\">\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Showing 1 to 5 of 1,428 entries</p>\n<div class=\"flex items-center gap-xs\">\n<button class=\"w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white text-outline disabled:opacity-50\" disabled=\"\"><span class=\"material-symbols-outlined text-sm\">chevron_left</span></button>\n<button class=\"w-8 h-8 flex items-center justify-center border border-primary rounded bg-primary text-white text-xs font-bold\">1</button>\n<button class=\"w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white text-on-surface-variant text-xs hover:border-primary\">2</button>\n<button class=\"w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white text-on-surface-variant text-xs hover:border-primary\">3</button>\n<span class=\"px-2 text-outline\">...</span>\n<button class=\"w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white text-on-surface-variant text-xs hover:border-primary\">286</button>\n<button class=\"w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white text-on-surface-variant\"><span class=\"material-symbols-outlined text-sm\">chevron_right</span></button>\n</div>\n</div>\n</div>\n<!-- Bento-Style Bottom Sections -->\n<div class=\"grid grid-cols-3 gap-gutter grid-cols-1 md:grid-cols-3\">\n<!-- Recent Activity -->\n<div class=\"bg-white p-lg rounded-lg border border-outline-variant shadow-sm h-full flex flex-col\">\n<h3 class=\"font-label-md text-label-md text-primary mb-lg flex items-center gap-sm\">\n<span class=\"material-symbols-outlined\">history</span>\n                        Recent Logins &amp; Inventory Changes\n                    </h3>\n<div class=\"space-y-md flex-1\">\n<div class=\"flex items-start gap-md pb-md border-b border-outline-variant/30\">\n<div class=\"w-8 h-8 bg-primary-container/10 text-primary rounded-full flex items-center justify-center flex-shrink-0\">\n<span class=\"material-symbols-outlined text-sm\">add_box</span>\n</div>\n<div>\n<p class=\"font-label-md text-label-md\">Added 500 units of A4 Paper</p>\n<p class=\"text-[10px] text-outline\">Today, 10:45 AM • Admin Smith</p>\n</div>\n</div>\n<div class=\"flex items-start gap-md pb-md border-b border-outline-variant/30\">\n<div class=\"w-8 h-8 bg-tertiary-container/10 text-tertiary rounded-full flex items-center justify-center flex-shrink-0\">\n<span class=\"material-symbols-outlined text-sm\">remove_done</span>\n</div>\n<div>\n<p class=\"font-label-md text-label-md\">Withdrawn 15 Microscope Slides</p>\n<p class=\"text-[10px] text-outline\">Yesterday, 03:20 PM • Biology Dept</p>\n</div>\n</div>\n<div class=\"flex items-start gap-md\">\n<div class=\"w-8 h-8 bg-secondary-container/10 text-secondary rounded-full flex items-center justify-center flex-shrink-0\">\n<span class=\"material-symbols-outlined text-sm\">inventory</span>\n</div>\n<div>\n<p class=\"font-label-md text-label-md\">Stock Audit Completed: Sports</p>\n<p class=\"text-[10px] text-outline\">Oct 24, 09:00 AM • System Task</p>\n</div>\n</div>\n</div>\n</div>\n<!-- Quick Actions / Request Inventory -->\n<div class=\"bg-surface-container-high p-lg rounded-lg border border-outline shadow-sm flex flex-col justify-between\">\n<div>\n<h3 class=\"font-label-md text-label-md text-primary mb-md\">Departmental Requests</h3>\n<p class=\"text-body-md text-on-surface-variant mb-lg\">There are 8 pending item requests awaiting approval from the Bursar's office.</p>\n</div>\n<div class=\"space-y-sm\">\n<button class=\"w-full py-2 bg-secondary text-white rounded-md font-label-md text-label-md hover:opacity-90 transition-opacity\">Review Requests</button>\n<button class=\"w-full py-2 bg-white text-secondary border border-secondary rounded-md font-label-md text-label-md hover:bg-secondary-container/10 transition-colors\">Generate Requisition</button>\n</div>\n</div>\n<!-- Warehouse Map / Quick Link -->\n<div class=\"relative rounded-lg border border-outline-variant overflow-hidden shadow-sm group\">\n<div class=\"absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105\" data-alt=\"A detailed digital architectural map of a school campus warehouse and storage facility. The style is clean and technical, using shades of grey and royal purple for zoning. High-legibility labels denote different storage areas like Stationery, Science equipment, and Sports. The aesthetic is modern institutional, resembling a professional facility management dashboard.\" style=\"background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAt4L_AjbOdB2Yyh9Ff_Vn02ppaXxMrquQz3oLq9CnkDNwjy0q-a4hg2b6jyVPeXSJYc2J9EgmQzYlLN9Iq5j3RCxuXR6_KHGqDNoMpkrIKd51u2aYCm9yQLTFpASbKVi_t8quTczWNGoYTyqu-49UG-VA6ShYzp4u7eG3vX79ha3sGLN1iUmUtSPfTNkCzkHFrHmObSSb4sf8M-HkGmDyK0hK6xcoUryP5YHV-Yy70fyTowksEqhdukcuaVKiTxPgRPNET7f9vVE-m')\"></div>\n<div class=\"absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent\"></div>\n<div class=\"absolute bottom-lg left-lg right-lg text-white\">\n<h3 class=\"font-label-md text-label-md uppercase tracking-wider mb-1\">Storage Management</h3>\n<p class=\"font-headline-md text-headline-sm\">Locate Assets</p>\n<button class=\"mt-4 flex items-center gap-xs font-label-md text-label-sm hover:underline\">\n                            Open Interactive Map <span class=\"material-symbols-outlined text-[16px]\">arrow_forward</span>\n</button>\n</div>\n</div>\n</div>\n</div>\n</main>\n<!-- Footer -->\n<footer class=\"ml-64 w-[calc(100%-16rem)] py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary dark:bg-secondary-fixed-dim border-t border-white/10 ml-0 md:ml-64 w-full md:w-[calc(100%-16rem)] pb-24 md:pb-xl\">\n<div class=\"text-on-secondary dark:text-on-secondary-fixed\">\n<h4 class=\"font-headline-md text-headline-md mb-2\">Mount Carmel Secondary</h4>\n<p class=\"font-label-sm text-label-sm opacity-80\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex justify-end gap-lg\">\n<a class=\"font-label-sm text-label-sm text-on-secondary opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm text-on-secondary opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm text-on-secondary opacity-80 hover:opacity-100 transition-opacity underline font-bold\" href=\"#\">Contact Us</a>\n</div>\n</footer>\n<!-- Interactive Layer: Hover Effects and Micro-interactions -->";
+const activityIconTone = {
+  primary: 'bg-primary/10 text-primary',
+  tertiary: 'bg-tertiary-container text-on-tertiary-container',
+  secondary: 'bg-secondary-container text-on-secondary-container',
+};
 
 export default function AdminInventoryDashboard() {
-  return <StitchScreen title="Inventory Admin" bodyClassName="bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-white" html={html} />;
+  const [activeCategory, setActiveCategory] = useState(categories[0]);
+
+  return (
+    <AppShell portalId="admin" pageTitle="Inventory Admin" user={{ name: 'School Registrar' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader title="Inventory Module" subtitle="Track school assets, stock levels, and departmental requests." />
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-lg">
+          <Card padding="lg" className="md:col-span-8 flex items-center justify-between relative overflow-hidden">
+            <div>
+              <h3 className="font-label-md text-label-md text-outline uppercase tracking-widest mb-sm">Total Assets Tracked</h3>
+              <p className="font-headline-xl text-headline-xl text-primary">{totals.assets}</p>
+              <div className="mt-md flex gap-md items-center">
+                <span className="flex items-center text-secondary font-bold text-sm">
+                  <span className="material-symbols-outlined mr-1 text-body-md">trending_up</span> {totals.deltaText}
+                </span>
+                <span className="text-on-surface-variant/60 text-sm">{totals.deltaNote}</span>
+              </div>
+            </div>
+            <Button variant="primary" iconLeft="add_circle">
+              Add Stock
+            </Button>
+          </Card>
+
+          <Card padding="lg" className="md:col-span-4 bg-tertiary-container text-on-tertiary-container border-none flex flex-col justify-between">
+            <div>
+              <h3 className="font-label-md text-label-md opacity-80 uppercase tracking-widest mb-sm">Low Stock Alerts</h3>
+              <p className="font-headline-xl text-headline-xl">
+                {totals.lowStock} <span className="font-headline-md text-headline-md font-normal">items</span>
+              </p>
+            </div>
+            <Button variant="secondary" className="w-full justify-center border-on-tertiary-container/40 text-on-tertiary-container">
+              View Alerts
+            </Button>
+          </Card>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-md bg-surface-container-low p-md rounded-lg border border-outline/10">
+          <div className="flex items-center gap-sm flex-wrap">
+            <span className="font-label-md text-label-md text-primary">Filter By:</span>
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`px-md py-2 rounded-full font-label-md text-label-md transition-colors ${
+                  activeCategory === category
+                    ? 'bg-primary text-on-primary'
+                    : 'bg-surface-container-lowest text-on-surface-variant border border-outline/20 hover:border-primary'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-sm">
+            <button className="p-2 border border-outline/20 rounded bg-surface-container-lowest text-on-surface-variant">
+              <span className="material-symbols-outlined">filter_list</span>
+            </button>
+            <button className="p-2 border border-outline/20 rounded bg-surface-container-lowest text-on-surface-variant">
+              <span className="material-symbols-outlined">download</span>
+            </button>
+          </div>
+        </div>
+
+        <Card padding="none" className="overflow-hidden">
+          <div className="bg-primary px-lg py-md flex items-center gap-md">
+            <h2 className="font-label-md text-label-md text-on-primary">Master Stock Registry</h2>
+            <span className="px-2 py-0.5 bg-on-primary/15 text-on-primary text-[10px] font-bold rounded uppercase tracking-tighter">
+              Updated 2m ago
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-200 text-left border-collapse font-body-md">
+              <thead>
+                <tr className="bg-surface-container-high border-b border-outline/10">
+                  <th className="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Item ID</th>
+                  <th className="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Item Name</th>
+                  <th className="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Category</th>
+                  <th className="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Quantity</th>
+                  <th className="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Storage Location</th>
+                  <th className="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider">Status</th>
+                  <th className="px-lg py-4 font-label-md text-label-md text-primary uppercase tracking-wider text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-outline/10">
+                {items.map((item) => (
+                  <tr key={item.id} className="hover:bg-primary/5 transition-colors">
+                    <td className="px-lg py-4 text-outline font-body-md">{item.id}</td>
+                    <td className="px-lg py-4 font-bold text-primary">{item.name}</td>
+                    <td className="px-lg py-4">{item.category}</td>
+                    <td className={`px-lg py-4 ${item.status !== 'In Stock' ? 'font-bold text-on-tertiary-container' : ''}`}>{item.qty}</td>
+                    <td className="px-lg py-4">{item.location}</td>
+                    <td className="px-lg py-4">
+                      <Badge tone={statusTone[item.status]} variant="ribbon">
+                        {item.status}
+                      </Badge>
+                    </td>
+                    <td className="px-lg py-4 text-center">
+                      <button className="text-primary hover:text-tertiary-container transition-colors">
+                        <span className="material-symbols-outlined">edit</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="bg-surface-container px-lg py-4 flex items-center justify-between border-t border-outline/10">
+            <p className="font-label-sm text-label-sm text-on-surface-variant">Showing 1 to 5 of 1,428 entries</p>
+            <div className="flex items-center gap-xs">
+              <button className="w-8 h-8 flex items-center justify-center border border-outline/20 rounded bg-surface-container-lowest text-outline disabled:opacity-50" disabled>
+                <span className="material-symbols-outlined text-sm">chevron_left</span>
+              </button>
+              <button className="w-8 h-8 flex items-center justify-center border border-primary rounded bg-primary text-on-primary text-xs font-bold">1</button>
+              <button className="w-8 h-8 flex items-center justify-center border border-outline/20 rounded bg-surface-container-lowest text-on-surface-variant text-xs hover:border-primary">2</button>
+              <button className="w-8 h-8 flex items-center justify-center border border-outline/20 rounded bg-surface-container-lowest text-on-surface-variant text-xs hover:border-primary">3</button>
+              <span className="px-2 text-outline">...</span>
+              <button className="w-8 h-8 flex items-center justify-center border border-outline/20 rounded bg-surface-container-lowest text-on-surface-variant text-xs hover:border-primary">286</button>
+              <button className="w-8 h-8 flex items-center justify-center border border-outline/20 rounded bg-surface-container-lowest text-on-surface-variant">
+                <span className="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
+            </div>
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
+          <Card padding="lg" className="flex flex-col">
+            <h3 className="font-label-md text-label-md text-primary mb-lg flex items-center gap-sm">
+              <span className="material-symbols-outlined">history</span>
+              Recent Logins &amp; Inventory Changes
+            </h3>
+            <div className="space-y-md flex-1">
+              {recentActivity.map((entry, i) => (
+                <div key={i} className="flex items-start gap-md pb-md border-b border-outline/10 last:border-b-0 last:pb-0">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${activityIconTone[entry.tone]}`}>
+                    <span className="material-symbols-outlined text-sm">{entry.icon}</span>
+                  </div>
+                  <div>
+                    <p className="font-label-md text-label-md">{entry.text}</p>
+                    <p className="text-[10px] text-outline">{entry.meta}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card padding="lg" className="bg-surface-container-high flex flex-col justify-between">
+            <div>
+              <h3 className="font-label-md text-label-md text-primary mb-md">Departmental Requests</h3>
+              <p className="text-body-md text-on-surface-variant mb-lg">
+                There are {pendingRequests} pending item requests awaiting approval from the Bursar's office.
+              </p>
+            </div>
+            <div className="space-y-sm">
+              <Button variant="primary" className="w-full justify-center bg-secondary">
+                Review Requests
+              </Button>
+              <Button variant="secondary" className="w-full justify-center">
+                Generate Requisition
+              </Button>
+            </div>
+          </Card>
+
+          <Card padding="lg" className="bg-primary text-on-primary border-none flex flex-col justify-between">
+            <span className="material-symbols-outlined text-headline-lg">map</span>
+            <div>
+              <h3 className="font-label-md text-label-md uppercase tracking-wider mb-1 opacity-80">Storage Management</h3>
+              <p className="font-headline-md text-headline-sm">Locate Assets</p>
+              <button className="mt-md flex items-center gap-xs font-label-md text-label-sm hover:underline">
+                Open Interactive Map <span className="material-symbols-outlined text-body-md">arrow_forward</span>
+              </button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </AppShell>
+  );
 }

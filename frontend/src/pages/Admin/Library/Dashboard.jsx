@@ -1,7 +1,164 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
+import AppShell from '../../../components/layout/AppShell.jsx';
+import PageHeader from '../../../components/ui/PageHeader.jsx';
+import Card from '../../../components/ui/Card.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
+import Button from '../../../components/ui/Button.jsx';
+import { stats, catalog, statusTone, overdueItems, totalOverdue, recentActivity } from './libraryData.js';
 
-const html = "<!-- Main Navigation Shell (SideNavBar) -->\n<nav class=\"fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary w-64 shadow-sm\">\n<div class=\"px-lg mb-xl\">\n<div class=\"flex items-center gap-sm\">\n<div class=\"w-10 h-10 rounded-full bg-on-primary flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-primary\" style=\"font-variation-settings: 'FILL' 1;\">school</span>\n</div>\n<div>\n<h1 class=\"font-headline-md text-headline-md text-on-primary leading-tight\">Mount Carmel</h1>\n<p class=\"font-label-sm text-label-sm text-on-primary/70 uppercase tracking-widest\">Admin Portal</p>\n</div>\n</div>\n</div>\n<div class=\"flex-1 flex flex-col gap-xs overflow-y-auto custom-scrollbar\">\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">school</span>\n<span class=\"font-label-md text-label-md\">Students</span>\n</a>\n<!-- Active Library State: Note that 'Library' is the active context -->\n<a class=\"border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">auto_stories</span>\n<span class=\"font-label-md text-label-md\">Library</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">payments</span>\n<span class=\"font-label-md text-label-md\">Finance</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">event_available</span>\n<span class=\"font-label-md text-label-md\">Attendance</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">description</span>\n<span class=\"font-label-md text-label-md\">Reports</span>\n</a>\n</div>\n<div class=\"mt-auto px-lg border-t border-on-primary/10 pt-md flex flex-col gap-xs\">\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-4 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">settings</span>\n<span class=\"font-label-md text-label-md\">Settings</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-4 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined text-error\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</nav>\n<!-- Content Canvas -->\n<main class=\"ml-64 min-h-screen flex flex-col bg-background\">\n<!-- TopNavBar (Large) -->\n<header class=\"sticky top-0 z-30 w-full bg-surface border-b border-outline-variant h-16 flex items-center px-gutter\">\n<div class=\"flex-1 flex items-center gap-lg\">\n<div class=\"relative w-96\">\n<span class=\"material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline\">search</span>\n<input class=\"w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all\" placeholder=\"Search catalog, student ID or ISBN...\" type=\"text\"/>\n</div>\n</div>\n<div class=\"flex items-center gap-md\">\n<button class=\"bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md flex items-center gap-xs hover:opacity-90 transition-all shadow-sm\">\n<span class=\"material-symbols-outlined text-[20px]\">add_circle</span>\n                    Issue Book\n                </button>\n<div class=\"h-8 w-px bg-outline-variant mx-2\"></div>\n<button class=\"w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors\">\n<span class=\"material-symbols-outlined\">notifications</span>\n</button>\n<button class=\"w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors\">\n<span class=\"material-symbols-outlined\">apps</span>\n</button>\n<div class=\"ml-2 w-8 h-8 rounded-full border-2 border-primary-container/20 overflow-hidden\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A professional studio portrait of a female academic administrator with a kind but authoritative expression, wearing a tailored navy blazer and spectacles. She is positioned against a clean, softly lit office background with hints of bookshelves. The lighting is crisp and the style is a high-fidelity photographic look that emphasizes institutional trust.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAZggfMfYBVmkIo12Q4U46YT3qnTC7QdNaQQHJ6JARK8MjgYcVFHGLA28kzut-APjtiCy_dHPTE4lIuZI6OTx1lq8MbjR6JgzE97JOrhRVQMcTXIpobgYCczW2ctIeq0dMThjOgbGjSRjuhuVtjZSs04vYz3OjsjwzJEY8e3YN2jRz8q2LJmsDhPutHw3vkWhubh_WTDMWGpRbNx2DDp4LWvNmczBCGDzthoHsYhGlHRDzlibHGzAqy9d7O7vfJyI_cT6R2SFYXNJDl\"/>\n</div>\n</div>\n</header>\n<!-- Main Scrollable Dashboard Area -->\n<div class=\"p-gutter flex flex-col gap-lg overflow-y-auto h-[calc(100vh-64px)] custom-scrollbar\">\n<!-- Dashboard Stats Header -->\n<div class=\"grid grid-cols-4 gap-lg\">\n<div class=\"bg-white border border-outline-variant p-lg rounded-lg card-shadow flex items-center justify-between\">\n<div>\n<p class=\"text-label-sm font-label-sm text-outline uppercase tracking-wider mb-xs\">Total Catalog</p>\n<h3 class=\"text-headline-lg font-headline-lg text-primary\">12,482</h3>\n</div>\n<div class=\"w-12 h-12 bg-primary-fixed rounded-full flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-on-primary-fixed\" style=\"font-variation-settings: 'FILL' 1;\">menu_book</span>\n</div>\n</div>\n<div class=\"bg-white border border-outline-variant p-lg rounded-lg card-shadow flex items-center justify-between\">\n<div>\n<p class=\"text-label-sm font-label-sm text-outline uppercase tracking-wider mb-xs\">Issued Books</p>\n<h3 class=\"text-headline-lg font-headline-lg text-secondary\">341</h3>\n</div>\n<div class=\"w-12 h-12 bg-secondary-fixed rounded-full flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-on-secondary-fixed\" style=\"font-variation-settings: 'FILL' 1;\">sync_alt</span>\n</div>\n</div>\n<div class=\"bg-white border border-outline-variant p-lg rounded-lg card-shadow flex items-center justify-between\">\n<div>\n<p class=\"text-label-sm font-label-sm text-outline uppercase tracking-wider mb-xs\">Overdue Items</p>\n<h3 class=\"text-headline-lg font-headline-lg text-tertiary-container\">24</h3>\n</div>\n<div class=\"w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-on-tertiary-fixed\" style=\"font-variation-settings: 'FILL' 1;\">warning</span>\n</div>\n</div>\n<div class=\"bg-white border border-outline-variant p-lg rounded-lg card-shadow flex items-center justify-between\">\n<div>\n<p class=\"text-label-sm font-label-sm text-outline uppercase tracking-wider mb-xs\">Active Readers</p>\n<h3 class=\"text-headline-lg font-headline-lg text-on-primary-fixed-variant\">892</h3>\n</div>\n<div class=\"w-12 h-12 bg-primary-fixed rounded-full flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-on-primary-fixed\" style=\"font-variation-settings: 'FILL' 1;\">groups</span>\n</div>\n</div>\n</div>\n<!-- Main Workspace: Bento Grid Style -->\n<div class=\"grid grid-cols-12 gap-lg h-full\">\n<!-- Book Catalog Table Section (Col-8) -->\n<section class=\"col-span-8 bg-white border border-outline-variant rounded-lg overflow-hidden card-shadow flex flex-col\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center\">\n<h2 class=\"font-headline-md text-headline-md text-primary\">Library Catalog</h2>\n<div class=\"flex gap-sm\">\n<button class=\"flex items-center gap-xs px-3 py-1.5 border border-outline-variant rounded-full text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors\">\n<span class=\"material-symbols-outlined text-[18px]\">filter_list</span>\n                                Filter\n                            </button>\n<button class=\"flex items-center gap-xs px-3 py-1.5 border border-outline-variant rounded-full text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors\">\n<span class=\"material-symbols-outlined text-[18px]\">download</span>\n                                Export\n                            </button>\n</div>\n</div>\n<div class=\"flex-1 overflow-auto custom-scrollbar\">\n<table class=\"w-full text-left border-collapse\">\n<thead class=\"sticky top-0 bg-secondary text-on-secondary font-label-md text-label-md z-10\">\n<tr>\n<th class=\"px-lg py-4 font-label-md\">Book Title & Author</th>\n<th class=\"px-lg py-4 font-label-md\">ISBN</th>\n<th class=\"px-lg py-4 font-label-md\">Category</th>\n<th class=\"px-lg py-4 font-label-md text-center\">Status</th>\n<th class=\"px-lg py-4 font-label-md text-right\">Actions</th>\n</tr>\n</thead>\n<tbody class=\"divide-y divide-outline-variant\">\n<!-- Table Row 1 -->\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"px-lg py-4\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-10 h-14 bg-surface-container border border-outline-variant rounded overflow-hidden flex-shrink-0\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A book cover design for 'A Tale of Two Cities' featuring a minimalist historical architectural sketch. The palette uses deep ivory, charcoal, and aged parchment tones to evoke classical literature. The aesthetic is clean and academic, suitable for a prestigious secondary school library.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAYNqWq08D-sEFD6XUMbtRW695mDuJh9SH-bm-nIIUKdGDv9WljrnSAVHShxsprAlnChRNFcnOvyLqRJ9mj5cLDe2EZP2aUbR5XJ0nPkSzCUpJajR4yWm_DkuFdWnWSpJZwn34tCPyyy-L7qt4wTRixcHre9d-5OaPZJFoJSk2HT1VPpQEA31E65jUOnZKLVGddSPErjqN-n6kpRXudTD3WUSEF4ohdEbeSRRthApPRImraMlOXNcJX81pEIf_qu2LJDcW4-wncLD3I\"/>\n</div>\n<div>\n<p class=\"font-headline-md text-body-md text-on-surface leading-tight\">A Tale of Two Cities</p>\n<p class=\"text-label-sm font-label-sm text-outline\">Charles Dickens</p>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-4 font-body-md text-body-md text-on-surface-variant\">978-0141439600</td>\n<td class=\"px-lg py-4\">\n<span class=\"px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-label-sm font-label-sm\">Classic Lit</span>\n</td>\n<td class=\"px-lg py-4 text-center\">\n<span class=\"inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-label-sm font-label-sm rounded-full\">\n<span class=\"w-1.5 h-1.5 rounded-full bg-green-500 mr-2\"></span>\n                                            Available\n                                        </span>\n</td>\n<td class=\"px-lg py-4 text-right\">\n<button class=\"text-primary hover:text-on-primary-fixed-variant transition-colors\">\n<span class=\"material-symbols-outlined\">more_vert</span>\n</button>\n</td>\n</tr>\n<!-- Table Row 2 -->\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"px-lg py-4\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-10 h-14 bg-surface-container border border-outline-variant rounded overflow-hidden flex-shrink-0\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A modern scientific book cover titled 'Quantum Mechanics for Beginners' with abstract glowing blue wave patterns and mathematical notations. High-contrast design with clean typography, conveying technical precision and intellectual depth, fitting for an advanced academic library interface.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDDspknW7sh-ghaY_JeOFmKldzTtSlsi4qlKMUPT1DOi8Sf6fu_BZ35T2ewLaVNhyDrmnMa0zEn57wCEnYMVa1IlRIATWJ-MBkqJSBXOpS1wLrpcSU39DjCRVM8Yhi4JHh0XkcqZQm7NAnMVHZkFH6YjiscfoZujscvoKclL6aCsOCVk0I0S_Oq8cCEMk5JxuLn-1K3aQkeaCyHXL_6iDzWzcIzq2pCsQ74e7vEpNpEfFcdvKhOHwTV6_aKGlac-3qp0L4KK-pMMkAr\"/>\n</div>\n<div>\n<p class=\"font-headline-md text-body-md text-on-surface leading-tight\">Quantum Mechanics</p>\n<p class=\"text-label-sm font-label-sm text-outline\">Richard Feynman</p>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-4 font-body-md text-body-md text-on-surface-variant\">978-0465025015</td>\n<td class=\"px-lg py-4\">\n<span class=\"px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-label-sm font-label-sm\">Physics</span>\n</td>\n<td class=\"px-lg py-4 text-center\">\n<span class=\"inline-flex items-center px-3 py-1 bg-amber-100 text-amber-800 text-label-sm font-label-sm rounded-full\">\n<span class=\"w-1.5 h-1.5 rounded-full bg-amber-500 mr-2\"></span>\n                                            Checked Out\n                                        </span>\n</td>\n<td class=\"px-lg py-4 text-right\">\n<button class=\"text-primary hover:text-on-primary-fixed-variant transition-colors\">\n<span class=\"material-symbols-outlined\">more_vert</span>\n</button>\n</td>\n</tr>\n<!-- Table Row 3 (Overdue Highlight) -->\n<tr class=\"hover:bg-surface-container-low transition-colors bg-tertiary-fixed/10\">\n<td class=\"px-lg py-4\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-10 h-14 bg-surface-container border border-outline-variant rounded overflow-hidden flex-shrink-0\">\n<img class=\"w-full h-full object-cover\" data-alt=\"Cover of 'The Great Gatsby' in an Art Deco style with gold and black accents. The illustration shows a minimalist eye and light motif from the era. Elegant, prestigious, and instantly recognizable as a literary masterpiece for a high-quality library management system.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDukOLyMjp01pozUzwr54Wu-Y6gZfMMFyBlesJt5EUW0DOpAL81OOhaCPBSt11GINanmB7VY99BBGO5ZXTx4ajpFHvrJi9bqAkYB9MM9TFSjmf9iu9Hp49CyHBiHjRJrSlGEa1WqB46-u5PIDIA-hKNw6Vhkul0urzyrc_B5hb9IDqscFkO5Mp03zmwyiRPAHwEAbomU3aJYkgqKh2zdSVm-Xw2mGFq_AjkmRqPyfx2Z4OrBDko-WiSyEzW2JX33ZDCYnoT0ADUQVKR\"/>\n</div>\n<div>\n<p class=\"font-headline-md text-body-md text-on-surface leading-tight\">The Great Gatsby</p>\n<p class=\"text-label-sm font-label-sm text-outline\">F. Scott Fitzgerald</p>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-4 font-body-md text-body-md text-on-surface-variant\">978-0743273565</td>\n<td class=\"px-lg py-4\">\n<span class=\"px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-label-sm font-label-sm\">Classic Lit</span>\n</td>\n<td class=\"px-lg py-4 text-center\">\n<span class=\"inline-flex items-center px-3 py-1 bg-red-100 text-red-800 text-label-sm font-label-sm rounded-full\">\n<span class=\"w-1.5 h-1.5 rounded-full bg-red-500 mr-2\"></span>\n                                            Overdue\n                                        </span>\n</td>\n<td class=\"px-lg py-4 text-right\">\n<button class=\"text-primary hover:text-on-primary-fixed-variant transition-colors\">\n<span class=\"material-symbols-outlined\">more_vert</span>\n</button>\n</td>\n</tr>\n<!-- More mock rows for scroll... -->\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"px-lg py-4\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-10 h-14 bg-surface-container border border-outline-variant rounded overflow-hidden flex-shrink-0\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A textbook cover for 'Advanced Calculus' with geometric lattice structures and vibrant magenta highlights. The design is clean, symmetrical, and conveys a sense of rigorous academic challenge, aligning with the school's theme of academic authority.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAlya2iuuEYBOZA7L-iKV_NhZjUQaYiel663V4mhbUrVx68TXhkxu2Nx2sFQZdK-fNorVoBvw8F_b7mPhY5u1GUS17AW4a3mbUjmtd6pG-zWhq6pQYIYtNfYnML130rog9hXO_fzHsvIFgbHsd-oNFL6ukrkimjul0YttEW6Q69M3XAFk-4IEM8eU2Ue1tM7B5DKmzaZGwaAAgfmR733vOFqswRUUh7knL6B9EUmIc4ATa7lGEtv_rqlLMGHpStKUku_WwwdXHDa9fU\"/>\n</div>\n<div>\n<p class=\"font-headline-md text-body-md text-on-surface leading-tight\">Advanced Calculus</p>\n<p class=\"text-label-sm font-label-sm text-outline\">G. B. Thomas</p>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-4 font-body-md text-body-md text-on-surface-variant\">978-0321587992</td>\n<td class=\"px-lg py-4\">\n<span class=\"px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-label-sm font-label-sm\">Mathematics</span>\n</td>\n<td class=\"px-lg py-4 text-center\">\n<span class=\"inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-label-sm font-label-sm rounded-full\">\n<span class=\"w-1.5 h-1.5 rounded-full bg-green-500 mr-2\"></span>\n                                            Available\n                                        </span>\n</td>\n<td class=\"px-lg py-4 text-right\">\n<button class=\"text-primary hover:text-on-primary-fixed-variant transition-colors\">\n<span class=\"material-symbols-outlined\">more_vert</span>\n</button>\n</td>\n</tr>\n</tbody>\n</table>\n</div>\n</section>\n<!-- Activity & Overdue Sidebar (Col-4) -->\n<aside class=\"col-span-4 flex flex-col gap-lg overflow-y-auto\">\n<!-- Overdue Tracker Section (Highlighted Magenta) -->\n<section class=\"bg-white border border-tertiary-container/30 rounded-lg card-shadow overflow-hidden\">\n<div class=\"bg-tertiary-container px-lg py-md flex items-center gap-sm\">\n<span class=\"material-symbols-outlined text-white\" style=\"font-variation-settings: 'FILL' 1;\">warning</span>\n<h2 class=\"font-headline-md text-headline-md text-white\">Overdue Tracker</h2>\n</div>\n<div class=\"p-lg flex flex-col gap-md\">\n<div class=\"bg-tertiary-fixed/30 border border-tertiary-fixed-dim p-md rounded-md flex items-start gap-md\">\n<div class=\"w-10 h-10 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center flex-shrink-0\">\n<span class=\"font-label-md text-label-md\">JD</span>\n</div>\n<div class=\"flex-1\">\n<div class=\"flex justify-between items-start\">\n<h4 class=\"font-headline-md text-body-md font-bold text-on-tertiary-fixed\">John Doe</h4>\n<span class=\"ribbon-tag bg-tertiary-container text-white px-3 py-0.5 text-label-sm font-label-sm\">8 Days Late</span>\n</div>\n<p class=\"text-label-sm font-label-sm text-on-tertiary-fixed/70 mt-xs\">\"The Great Gatsby\" (#GAT-202)</p>\n<div class=\"mt-md flex gap-sm\">\n<button class=\"px-4 py-1.5 bg-tertiary text-white rounded-full text-label-sm font-label-sm hover:opacity-90 transition-all\">Send Notice</button>\n<button class=\"px-4 py-1.5 border border-tertiary text-tertiary rounded-full text-label-sm font-label-sm hover:bg-tertiary-fixed/20 transition-all\">Mark Found</button>\n</div>\n</div>\n</div>\n<div class=\"bg-tertiary-fixed/10 border border-outline-variant p-md rounded-md flex items-start gap-md opacity-80\">\n<div class=\"w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center flex-shrink-0\">\n<span class=\"font-label-md text-label-md\">SA</span>\n</div>\n<div class=\"flex-1\">\n<div class=\"flex justify-between items-start\">\n<h4 class=\"font-headline-md text-body-md font-bold text-on-surface\">Sarah Ahmed</h4>\n<span class=\"ribbon-tag bg-tertiary text-white px-3 py-0.5 text-label-sm font-label-sm\">3 Days Late</span>\n</div>\n<p class=\"text-label-sm font-label-sm text-outline mt-xs\">\"Modern Chemistry\" (#CHM-105)</p>\n</div>\n</div>\n<a class=\"text-center font-label-md text-label-md text-on-tertiary-fixed-variant hover:underline pt-2 transition-all\" href=\"#\">View All 24 Overdue Items</a>\n</div>\n</section>\n<!-- Borrow/Return Log -->\n<section class=\"bg-white border border-outline-variant rounded-lg card-shadow overflow-hidden flex-1 flex flex-col\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant\">\n<h2 class=\"font-headline-md text-headline-md text-primary\">Recent Activity</h2>\n</div>\n<div class=\"p-lg flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-lg\">\n<!-- Activity Item 1 (Return) -->\n<div class=\"relative pl-8 border-l-2 border-green-500/30 py-1\">\n<div class=\"absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-white border-2 border-green-500 flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-[12px] text-green-600 font-bold\">keyboard_return</span>\n</div>\n<p class=\"text-body-md text-on-surface\"><strong>Returned:</strong> Biology 101</p>\n<p class=\"text-label-sm font-label-sm text-outline\">Student: Alex Chen • 14 mins ago</p>\n</div>\n<!-- Activity Item 2 (Borrow) -->\n<div class=\"relative pl-8 border-l-2 border-blue-500/30 py-1\">\n<div class=\"absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-white border-2 border-blue-500 flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-[12px] text-blue-600 font-bold\">send</span>\n</div>\n<p class=\"text-body-md text-on-surface\"><strong>Borrowed:</strong> Hamlet (Shakespeare)</p>\n<p class=\"text-label-sm font-label-sm text-outline\">Student: Maria Garcia • 42 mins ago</p>\n</div>\n<!-- Activity Item 3 (Issue) -->\n<div class=\"relative pl-8 border-l-2 border-primary/30 py-1\">\n<div class=\"absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-white border-2 border-primary flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-[12px] text-primary font-bold\">add</span>\n</div>\n<p class=\"text-body-md text-on-surface\"><strong>New Entry:</strong> Data Science Handbook</p>\n<p class=\"text-label-sm font-label-sm text-outline\">Librarian: Mrs. Halloway • 2 hours ago</p>\n</div>\n<!-- Activity Item 4 (Return) -->\n<div class=\"relative pl-8 border-l-2 border-green-500/30 py-1\">\n<div class=\"absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-white border-2 border-green-500 flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-[12px] text-green-600 font-bold\">keyboard_return</span>\n</div>\n<p class=\"text-body-md text-on-surface\"><strong>Returned:</strong> The Odyssey</p>\n<p class=\"text-label-sm font-label-sm text-outline\">Student: Leo Smith • 3 hours ago</p>\n</div>\n</div>\n</section>\n</aside>\n</div>\n</div>\n<!-- Sticky Footer -->\n<footer class=\"mt-auto w-full py-md px-gutter flex justify-between items-center bg-secondary text-on-secondary font-label-sm text-label-sm\">\n<div class=\"flex gap-lg\">\n<a class=\"opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n<p>© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</footer>\n</main>\n<!-- Micro-interaction Scripts -->";
+const iconToneClasses = {
+  primary: 'bg-primary/10 text-primary',
+  secondary: 'bg-secondary/10 text-secondary',
+  tertiary: 'bg-tertiary-container text-on-tertiary-container',
+  success: 'text-secondary',
+};
 
 export default function AdminLibraryDashboard() {
-  return <StitchScreen title="Library Admin" bodyClassName="bg-background text-on-surface font-body-md overflow-hidden" html={html} />;
+  return (
+    <AppShell portalId="admin" pageTitle="Library Admin" user={{ name: 'Librarian' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader
+          title="Library Catalog"
+          subtitle="Track circulation, overdue items, and library activity."
+          actions={
+            <Button variant="primary" iconLeft="add_circle">
+              Issue Book
+            </Button>
+          }
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
+          {stats.map((stat) => (
+            <Card key={stat.label} padding="lg" className="flex items-center justify-between">
+              <div>
+                <p className="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-xs">{stat.label}</p>
+                <h3 className="font-headline-lg text-headline-lg text-primary">{stat.value}</h3>
+              </div>
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${iconToneClasses[stat.iconTone]}`}>
+                <span className="material-symbols-outlined">{stat.icon}</span>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+          <Card padding="none" className="lg:col-span-8 overflow-hidden">
+            <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex justify-between items-center">
+              <h2 className="font-headline-md text-headline-md text-primary">Library Catalog</h2>
+              <div className="flex gap-sm">
+                <Button variant="secondary" size="sm" iconLeft="filter_list">
+                  Filter
+                </Button>
+                <Button variant="secondary" size="sm" iconLeft="download">
+                  Export
+                </Button>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-175 text-left border-collapse">
+                <thead className="bg-secondary text-on-secondary">
+                  <tr>
+                    <th className="px-lg py-4 font-label-md text-label-md">Book Title &amp; Author</th>
+                    <th className="px-lg py-4 font-label-md text-label-md">ISBN</th>
+                    <th className="px-lg py-4 font-label-md text-label-md">Category</th>
+                    <th className="px-lg py-4 font-label-md text-label-md text-center">Status</th>
+                    <th className="px-lg py-4 font-label-md text-label-md text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-outline/10">
+                  {catalog.map((book) => (
+                    <tr key={book.title} className={`hover:bg-surface-container-low transition-colors ${book.status === 'Overdue' ? 'bg-tertiary-container/5' : ''}`}>
+                      <td className="px-lg py-4">
+                        <div>
+                          <p className="font-headline-md text-body-md text-on-surface leading-tight">{book.title}</p>
+                          <p className="text-label-sm font-label-sm text-outline">{book.author}</p>
+                        </div>
+                      </td>
+                      <td className="px-lg py-4 font-body-md text-body-md text-on-surface-variant">{book.isbn}</td>
+                      <td className="px-lg py-4">
+                        <Badge tone="secondary">{book.category}</Badge>
+                      </td>
+                      <td className="px-lg py-4 text-center">
+                        <Badge tone={statusTone[book.status]}>{book.status}</Badge>
+                      </td>
+                      <td className="px-lg py-4 text-right">
+                        <button className="text-primary hover:bg-primary/10 p-1.5 rounded transition-colors">
+                          <span className="material-symbols-outlined">more_vert</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <aside className="lg:col-span-4 space-y-lg">
+            <Card padding="none" className="overflow-hidden">
+              <div className="bg-tertiary-container px-lg py-md flex items-center gap-sm">
+                <span className="material-symbols-outlined text-on-tertiary-container">warning</span>
+                <h2 className="font-headline-md text-headline-md text-on-tertiary-container">Overdue Tracker</h2>
+              </div>
+              <div className="p-lg flex flex-col gap-md">
+                {overdueItems.map((item) => (
+                  <div
+                    key={item.name}
+                    className={`p-md rounded-md flex items-start gap-md ${item.urgent ? 'bg-tertiary-container/20 border border-tertiary-container/40' : 'bg-surface-container-low border border-outline/10 opacity-80'}`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0 font-label-md text-label-md">
+                      {item.initials}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start gap-sm">
+                        <h4 className="font-body-md text-body-md font-bold text-on-surface">{item.name}</h4>
+                        <Badge tone="warning" className="shrink-0">
+                          {item.daysLate}
+                        </Badge>
+                      </div>
+                      <p className="text-label-sm font-label-sm text-on-surface-variant mt-xs">{item.book}</p>
+                      {item.urgent && (
+                        <div className="mt-md flex gap-sm">
+                          <Button variant="primary" size="sm">
+                            Send Notice
+                          </Button>
+                          <Button variant="secondary" size="sm">
+                            Mark Found
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <a className="text-center font-label-md text-label-md text-tertiary-container hover:underline pt-xs" href="#">
+                  View All {totalOverdue} Overdue Items
+                </a>
+              </div>
+            </Card>
+
+            <Card padding="none" className="overflow-hidden">
+              <div className="bg-surface-container-low px-lg py-md border-b border-outline/10">
+                <h2 className="font-headline-md text-headline-md text-primary">Recent Activity</h2>
+              </div>
+              <div className="p-lg flex flex-col gap-lg">
+                {recentActivity.map((item, i) => (
+                  <div key={i} className="relative pl-8 border-l-2 border-outline/10 py-1">
+                    <div
+                      className={`absolute -left-2.5 top-0 w-5 h-5 rounded-full bg-surface-container-lowest border-2 flex items-center justify-center ${
+                        item.tone === 'success' ? 'border-secondary' : item.tone === 'secondary' ? 'border-secondary' : 'border-primary'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-label-sm text-primary font-bold">{item.icon}</span>
+                    </div>
+                    <p className="text-body-md text-on-surface">
+                      <strong>{item.title}:</strong> {item.detail}
+                    </p>
+                    <p className="text-label-sm font-label-sm text-outline">{item.meta}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </aside>
+        </div>
+      </div>
+    </AppShell>
+  );
 }

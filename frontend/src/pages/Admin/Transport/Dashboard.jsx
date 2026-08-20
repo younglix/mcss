@@ -1,7 +1,176 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
-
-const html = "<!-- SideNavBar (Shared Component) -->\n<aside class=\"fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary dark:bg-surface-container-lowest docked left-0 h-full w-64 shadow-sm\">\n<div class=\"px-gutter mb-xl\">\n<div class=\"flex items-center gap-sm\">\n<div class=\"w-10 h-10 bg-on-primary rounded-lg flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-primary\" style=\"font-variation-settings: 'FILL' 1;\">school</span>\n</div>\n<div>\n<h2 class=\"font-headline-md text-headline-md text-on-primary dark:text-primary leading-none\">Mount Carmel</h2>\n<p class=\"font-label-sm text-label-sm text-on-primary/60\">Admin Portal</p>\n</div>\n</div>\n</div>\n<nav class=\"flex-1 space-y-1\">\n<a class=\"flex items-center gap-md text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\" data-icon=\"dashboard\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\" data-icon=\"school\">school</span>\n<span class=\"font-label-md text-label-md\">Students</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\" data-icon=\"auto_stories\">auto_stories</span>\n<span class=\"font-label-md text-label-md\">Academics</span>\n</a>\n<!-- Transport Active State -->\n<a class=\"flex items-center gap-md border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary dark:text-primary-fixed-dim py-3 px-4 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\" data-icon=\"directions_bus\" style=\"font-variation-settings: 'FILL' 1;\">directions_bus</span>\n<span class=\"font-label-md text-label-md\">Transport</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\" data-icon=\"payments\">payments</span>\n<span class=\"font-label-md text-label-md\">Finance</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\" data-icon=\"event_available\">event_available</span>\n<span class=\"font-label-md text-label-md\">Attendance</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all duration-200\" href=\"#\">\n<span class=\"material-symbols-outlined\" data-icon=\"description\">description</span>\n<span class=\"font-label-md text-label-md\">Reports</span>\n</a>\n</nav>\n<div class=\"mt-auto border-t border-on-primary/10 pt-md\">\n<a class=\"flex items-center gap-md text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined\" data-icon=\"settings\">settings</span>\n<span class=\"font-label-md text-label-md\">Settings</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined\" data-icon=\"logout\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Main Content Canvas -->\n<main class=\"ml-64 min-h-screen flex flex-col\">\n<!-- TopNavBar (Shared Component) -->\n<header class=\"sticky top-0 z-30 w-full bg-surface dark:bg-surface-container-high border-b border-outline-variant dark:border-outline h-16 flex items-center px-gutter\">\n<div class=\"flex justify-between items-center w-full max-w-container-max mx-auto\">\n<div class=\"flex items-center gap-lg\">\n<h1 class=\"font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed\">Transport Logistics</h1>\n<div class=\"relative hidden lg:block\">\n<span class=\"material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline\" data-icon=\"search\">search</span>\n<input class=\"pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:outline-none focus:ring-2 focus:ring-primary/20 w-64 transition-all\" placeholder=\"Search routes or students...\" type=\"text\"/>\n</div>\n</div>\n<div class=\"flex items-center gap-md\">\n<button class=\"p-2 rounded-full hover:bg-surface-container transition-colors relative\">\n<span class=\"material-symbols-outlined\" data-icon=\"notifications\">notifications</span>\n<span class=\"absolute top-2 right-2 w-2 h-2 bg-error rounded-full\"></span>\n</button>\n<button class=\"p-2 rounded-full hover:bg-surface-container transition-colors\">\n<span class=\"material-symbols-outlined\" data-icon=\"apps\">apps</span>\n</button>\n<div class=\"h-8 w-[1px] bg-outline-variant mx-2\"></div>\n<div class=\"flex items-center gap-sm\">\n<img class=\"w-10 h-10 rounded-full object-cover border border-outline-variant\" data-alt=\"A professional portrait of a school administrator in a bright, modern office setting. They are wearing formal attire, and the background features a clean, high-contrast academic environment with soft, professional lighting. The style is crisp and high-trust, consistent with the school's prestigious identity.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCO0L1flxLzWZHWDvCqktLuq1p0Wb1MpR8h6W5VRInekW7zFl6vMDu3ySpvOU-g-CgX5Elh5z7pjJzoSi0miJuJaZozfPOwvFUxj1-WK4eqs1FXTuoiKVkyvZ0-LDUKx0odcSDm07BJWBWj1pSpa6ANT1N4W3T-qMxblVPhEuwJ6dLHCmFsYvkpRki0hFOmw4OtFs49-amtzlB2Jv1jWslMUjFk3iTAcmEaa1T3vOgJL7omRjicQjR2kaVwe6ZVqx4DByQUJubi6a8f\"/>\n<div class=\"hidden xl:block\">\n<p class=\"font-label-md text-label-md text-primary\">Admin User</p>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Logistics Dept</p>\n</div>\n</div>\n</div>\n</div>\n</header>\n<!-- Module Content -->\n<div class=\"p-gutter flex-1 space-y-lg max-w-container-max mx-auto w-full\">\n<!-- Hero Actions / Stats -->\n<div class=\"grid grid-cols-1 md:grid-cols-4 gap-gutter\">\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between group hover:border-primary transition-all\">\n<div>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider\">Active Routes</p>\n<h3 class=\"font-headline-lg text-headline-lg text-primary mt-xs\">12</h3>\n</div>\n<div class=\"flex items-center justify-between mt-md\">\n<span class=\"text-on-secondary-fixed-variant font-label-md\">98% punctuality</span>\n<span class=\"material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform\" data-icon=\"trending_up\">trending_up</span>\n</div>\n</div>\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between\">\n<div>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider\">Total Students</p>\n<h3 class=\"font-headline-lg text-headline-lg text-primary mt-xs\">482</h3>\n</div>\n<div class=\"mt-md h-1 bg-surface-container-high rounded-full overflow-hidden\">\n<div class=\"bg-secondary-container h-full w-[85%]\"></div>\n</div>\n</div>\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between\">\n<div>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider\">Operational Fleet</p>\n<h3 class=\"font-headline-lg text-headline-lg text-primary mt-xs\">15/16</h3>\n</div>\n<div class=\"mt-md\">\n<span class=\"px-sm py-1 bg-tertiary-fixed text-on-tertiary-fixed font-label-sm rounded-full\">1 in Maintenance</span>\n</div>\n</div>\n<div class=\"bg-primary flex flex-col items-center justify-center gap-sm p-lg rounded-lg border border-primary shadow-lg cursor-pointer hover:bg-primary-container transition-all text-on-primary\">\n<span class=\"material-symbols-outlined text-[32px]\" data-icon=\"add_road\">add_road</span>\n<span class=\"font-headline-md text-headline-md\">Add New Route</span>\n</div>\n</div>\n<!-- Main Interactive Area: Bento Grid Layout -->\n<div class=\"grid grid-cols-1 lg:grid-cols-3 gap-gutter h-full\">\n<!-- Bus Routes List (Bento Large) -->\n<div class=\"lg:col-span-2 bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm flex flex-col overflow-hidden\">\n<div class=\"p-lg border-b border-outline-variant flex items-center justify-between bg-surface-container-low\">\n<h2 class=\"font-headline-md text-headline-md text-primary\">Active Bus Routes</h2>\n<div class=\"flex gap-sm\">\n<button class=\"p-1 rounded-md border border-outline-variant hover:bg-surface-container transition-colors\"><span class=\"material-symbols-outlined\" data-icon=\"filter_list\">filter_list</span></button>\n<button class=\"p-1 rounded-md border border-outline-variant hover:bg-surface-container transition-colors\"><span class=\"material-symbols-outlined\" data-icon=\"more_vert\">more_vert</span></button>\n</div>\n</div>\n<div class=\"flex-1 overflow-y-auto custom-scrollbar\">\n<table class=\"w-full text-left border-collapse\">\n<thead class=\"bg-secondary-fixed text-on-secondary-fixed sticky top-0 z-10\">\n<tr>\n<th class=\"px-lg py-md font-label-md uppercase tracking-wider\">Route ID</th>\n<th class=\"px-lg py-md font-label-md uppercase tracking-wider\">Primary Destination</th>\n<th class=\"px-lg py-md font-label-md uppercase tracking-wider\">Stops</th>\n<th class=\"px-lg py-md font-label-md uppercase tracking-wider\">Capacity</th>\n<th class=\"px-lg py-md font-label-md uppercase tracking-wider\">Status</th>\n<th class=\"px-lg py-md font-label-md uppercase tracking-wider\"></th>\n</tr>\n</thead>\n<tbody class=\"divide-y divide-outline-variant\">\n<tr class=\"hover:bg-surface-container-low transition-colors group cursor-pointer\">\n<td class=\"px-lg py-lg font-headline-sm text-primary\">R-101</td>\n<td class=\"px-lg py-lg font-body-md\">North Ridge Estate</td>\n<td class=\"px-lg py-lg font-body-md\">8 Stops</td>\n<td class=\"px-lg py-lg\">\n<div class=\"flex items-center gap-sm\">\n<span class=\"font-label-md\">32/45</span>\n<div class=\"w-16 h-1.5 bg-surface-container-high rounded-full overflow-hidden\">\n<div class=\"bg-primary h-full w-[71%]\"></div>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-lg\">\n<div class=\"ribbon bg-on-secondary-container text-white px-md py-1 text-xs font-label-md inline-block\">ON TIME</div>\n</td>\n<td class=\"px-lg py-lg text-right\">\n<span class=\"material-symbols-outlined text-outline group-hover:text-primary transition-colors\" data-icon=\"chevron_right\">chevron_right</span>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors group cursor-pointer\">\n<td class=\"px-lg py-lg font-headline-sm text-primary\">R-102</td>\n<td class=\"px-lg py-lg font-body-md\">Green Valley Suburb</td>\n<td class=\"px-lg py-lg font-body-md\">12 Stops</td>\n<td class=\"px-lg py-lg\">\n<div class=\"flex items-center gap-sm\">\n<span class=\"font-label-md\">44/45</span>\n<div class=\"w-16 h-1.5 bg-surface-container-high rounded-full overflow-hidden\">\n<div class=\"bg-error h-full w-[97%]\"></div>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-lg\">\n<div class=\"ribbon bg-tertiary-container text-white px-md py-1 text-xs font-label-md inline-block\">DELAYED</div>\n</td>\n<td class=\"px-lg py-lg text-right\">\n<span class=\"material-symbols-outlined text-outline group-hover:text-primary transition-colors\" data-icon=\"chevron_right\">chevron_right</span>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors group cursor-pointer\">\n<td class=\"px-lg py-lg font-headline-sm text-primary\">R-103</td>\n<td class=\"px-lg py-lg font-body-md\">West Side Academic Block</td>\n<td class=\"px-lg py-lg font-body-md\">5 Stops</td>\n<td class=\"px-lg py-lg\">\n<div class=\"flex items-center gap-sm\">\n<span class=\"font-label-md\">12/30</span>\n<div class=\"w-16 h-1.5 bg-surface-container-high rounded-full overflow-hidden\">\n<div class=\"bg-primary h-full w-[40%]\"></div>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-lg\">\n<div class=\"ribbon bg-on-secondary-container text-white px-md py-1 text-xs font-label-md inline-block\">ON TIME</div>\n</td>\n<td class=\"px-lg py-lg text-right\">\n<span class=\"material-symbols-outlined text-outline group-hover:text-primary transition-colors\" data-icon=\"chevron_right\">chevron_right</span>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors group cursor-pointer\">\n<td class=\"px-lg py-lg font-headline-sm text-primary\">R-104</td>\n<td class=\"px-lg py-lg font-body-md\">Central Plaza Express</td>\n<td class=\"px-lg py-lg font-body-md\">3 Stops</td>\n<td class=\"px-lg py-lg\">\n<div class=\"flex items-center gap-sm\">\n<span class=\"font-label-md\">28/30</span>\n<div class=\"w-16 h-1.5 bg-surface-container-high rounded-full overflow-hidden\">\n<div class=\"bg-primary h-full w-[93%]\"></div>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-lg\">\n<div class=\"ribbon bg-on-secondary-container text-white px-md py-1 text-xs font-label-md inline-block\">ON TIME</div>\n</td>\n<td class=\"px-lg py-lg text-right\">\n<span class=\"material-symbols-outlined text-outline group-hover:text-primary transition-colors\" data-icon=\"chevron_right\">chevron_right</span>\n</td>\n</tr>\n</tbody>\n</table>\n</div>\n</div>\n<!-- Mapping & Vehicle Info (Bento Stack) -->\n<div class=\"flex flex-col gap-gutter\">\n<!-- Vehicle/Driver Detail (Glassmorphism inspired) -->\n<div class=\"glass-card p-lg rounded-lg border border-outline-variant shadow-lg relative overflow-hidden\">\n<div class=\"absolute -right-12 -top-12 w-32 h-32 bg-primary/5 rounded-full blur-3xl\"></div>\n<h3 class=\"font-headline-md text-headline-md text-primary mb-md\">Selected Route Fleet</h3>\n<div class=\"flex items-center gap-lg mb-lg\">\n<div class=\"w-16 h-16 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-[32px]\" data-icon=\"airport_shuttle\">airport_shuttle</span>\n</div>\n<div>\n<p class=\"font-label-md text-label-md\">Vehicle ID: MCSS-B12</p>\n<p class=\"font-body-md text-on-surface-variant\">Mercedes Benz Sprinter (2022)</p>\n</div>\n</div>\n<div class=\"space-y-md\">\n<div class=\"flex items-center justify-between border-b border-outline-variant/30 pb-sm\">\n<span class=\"font-label-sm text-outline\">Driver</span>\n<span class=\"font-label-md\">Robert Sterling</span>\n</div>\n<div class=\"flex items-center justify-between border-b border-outline-variant/30 pb-sm\">\n<span class=\"font-label-sm text-outline\">License Status</span>\n<span class=\"text-on-secondary-fixed-variant font-label-md flex items-center gap-xs\">\n<span class=\"material-symbols-outlined text-sm\" data-icon=\"verified\" style=\"font-variation-settings: 'FILL' 1;\">verified</span>\n                                    Valid until 2026\n                                </span>\n</div>\n<div class=\"flex items-center justify-between\">\n<span class=\"font-label-sm text-outline\">Last Inspection</span>\n<span class=\"font-label-md\">Oct 12, 2023</span>\n</div>\n</div>\n</div>\n<!-- Student Mapping Quick View -->\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm flex-1\">\n<div class=\"flex items-center justify-between mb-lg\">\n<h3 class=\"font-headline-md text-headline-md text-primary\">Student Mapping</h3>\n<button class=\"text-secondary font-label-md hover:underline\">View All</button>\n</div>\n<div class=\"space-y-md overflow-y-auto max-h-[300px] custom-scrollbar pr-2\">\n<div class=\"flex items-center justify-between p-md bg-surface-container-low rounded-lg border border-outline-variant/50\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-10 h-10 bg-secondary-fixed rounded-full flex items-center justify-center text-on-secondary-fixed font-bold\">JD</div>\n<div>\n<p class=\"font-label-md\">Jane Doe</p>\n<p class=\"font-label-sm text-on-surface-variant\">Grade 10-B • Route R-101</p>\n</div>\n</div>\n<button class=\"p-1 hover:bg-surface-container transition-colors rounded\">\n<span class=\"material-symbols-outlined text-primary\" data-icon=\"edit\">edit</span>\n</button>\n</div>\n<div class=\"flex items-center justify-between p-md bg-surface-container-low rounded-lg border border-outline-variant/50\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-10 h-10 bg-primary-fixed rounded-full flex items-center justify-center text-on-primary-fixed font-bold\">MK</div>\n<div>\n<p class=\"font-label-md\">Mark Knight</p>\n<p class=\"font-label-sm text-on-surface-variant\">Grade 8-A • Route R-101</p>\n</div>\n</div>\n<button class=\"p-1 hover:bg-surface-container transition-colors rounded\">\n<span class=\"material-symbols-outlined text-primary\" data-icon=\"edit\">edit</span>\n</button>\n</div>\n<div class=\"flex items-center justify-between p-md bg-surface-container-low rounded-lg border border-outline-variant/50\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-10 h-10 bg-secondary-container rounded-full flex items-center justify-center text-on-secondary-container font-bold\">SL</div>\n<div>\n<p class=\"font-label-md\">Sarah Lee</p>\n<p class=\"font-label-sm text-on-surface-variant\">Grade 12-C • Route R-101</p>\n</div>\n</div>\n<button class=\"p-1 hover:bg-surface-container transition-colors rounded\">\n<span class=\"material-symbols-outlined text-primary\" data-icon=\"edit\">edit</span>\n</button>\n</div>\n</div>\n<button class=\"w-full mt-lg py-md border-2 border-dashed border-outline-variant rounded-lg text-outline font-label-md hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-sm\">\n<span class=\"material-symbols-outlined\" data-icon=\"person_add\">person_add</span>\n                            Map New Student\n                        </button>\n</div>\n</div>\n</div>\n<!-- Bottom Data Section: Route Visualization Placeholder -->\n<div class=\"bg-surface-container-lowest rounded-lg border border-outline-variant shadow-sm overflow-hidden h-[400px] relative\">\n<div class=\"absolute top-lg left-lg z-10 bg-white/90 backdrop-blur p-md rounded-lg shadow-md border border-outline-variant\">\n<h4 class=\"font-headline-sm text-primary mb-xs\">Real-time Route Monitor</h4>\n<div class=\"flex items-center gap-sm text-on-surface-variant\">\n<span class=\"w-3 h-3 bg-on-secondary-container rounded-full animate-pulse\"></span>\n<span class=\"font-label-sm\">Tracking 12 Active Buses</span>\n</div>\n</div>\n<!-- Geographic Visualization Concept -->\n<div class=\"w-full h-full bg-surface-container-high flex items-center justify-center relative\">\n<div class=\"absolute inset-0 opacity-20\" style=\"background-image: radial-gradient(#2e004a 1px, transparent 1px); background-size: 24px 24px;\"></div>\n<div class=\"absolute inset-0 bg-cover bg-center grayscale opacity-40 mix-blend-multiply\" data-location=\"Chicago\" style=\"background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBIEP9esR7tPCG9ToKJfYbI8TyIcukIIGs_uzSPVCtSJ6HaLBNVC2zj2ssiG5mDegUROkxUQkUZdDZEfAxJLF0otCaIv_bd1wuyaA3dZr-omS_haaAZ0lx7aylZDg_lAv_e8Z2WyXrUa4j4_F3AZdW5R49xucbiNo98OdIPfNWMUNNEZe3-DMUssKsUA1ufpIaSjuEcwKOKin5zOIWYM26t-h2SnF5JImLgyjcOFRH7JWFUuXyWNwIv0m-n791Q7mODY5NSH8PlDGMg')\"></div>\n<div class=\"relative z-0 text-center\">\n<span class=\"material-symbols-outlined text-[64px] text-primary/20\" data-icon=\"map\">map</span>\n<p class=\"font-label-md text-on-surface-variant mt-md\">Interactive Map Interface Loading...</p>\n</div>\n<!-- Floating Map Pointers Simulation -->\n<div class=\"absolute top-1/4 left-1/3 bg-primary text-white p-2 rounded-full shadow-lg cursor-pointer transform hover:scale-110 transition-transform\">\n<span class=\"material-symbols-outlined text-sm\" data-icon=\"directions_bus\" style=\"font-variation-settings: 'FILL' 1;\">directions_bus</span>\n</div>\n<div class=\"absolute top-1/2 right-1/4 bg-tertiary-container text-white p-2 rounded-full shadow-lg cursor-pointer transform hover:scale-110 transition-transform animate-bounce\">\n<span class=\"material-symbols-outlined text-sm\" data-icon=\"warning\" style=\"font-variation-settings: 'FILL' 1;\">warning</span>\n</div>\n</div>\n</div>\n</div>\n<!-- Footer (Shared Component) -->\n<footer class=\"w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary dark:bg-secondary-fixed-dim mt-auto\">\n<div>\n<p class=\"font-body-md text-on-secondary dark:text-on-secondary-fixed opacity-80\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap justify-end gap-lg\">\n<a class=\"font-label-sm text-label-sm text-on-secondary dark:text-on-secondary-fixed opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm text-on-secondary dark:text-on-secondary-fixed opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm text-on-secondary dark:text-on-secondary-fixed opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm text-on-secondary dark:text-on-secondary-fixed opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</footer>\n</main>";
+import AppShell from '../../../components/layout/AppShell.jsx';
+import PageHeader from '../../../components/ui/PageHeader.jsx';
+import Card from '../../../components/ui/Card.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
+import Button from '../../../components/ui/Button.jsx';
+import Avatar from '../../../components/ui/Avatar.jsx';
+import { stats, routes, routeStatusTone, selectedFleet, studentMapping } from './transportData.js';
 
 export default function AdminTransportDashboard() {
-  return <StitchScreen title="Transport Admin" bodyClassName="bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container" html={html} />;
+  return (
+    <AppShell portalId="admin" pageTitle="Transport Admin" user={{ name: 'Admin User' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader title="Transport Logistics" subtitle="Routes, fleet status, and student-to-bus mapping." />
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
+          <Card padding="lg" className="flex flex-col justify-between hover:border-primary transition-all">
+            <div>
+              <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{stats[0].label}</p>
+              <h3 className="font-headline-lg text-headline-lg text-primary mt-xs">{stats[0].value}</h3>
+            </div>
+            <div className="flex items-center justify-between mt-md">
+              <span className="text-secondary font-label-md">{stats[0].note}</span>
+              <span className="material-symbols-outlined text-primary">{stats[0].icon}</span>
+            </div>
+          </Card>
+          <Card padding="lg" className="flex flex-col justify-between">
+            <div>
+              <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{stats[1].label}</p>
+              <h3 className="font-headline-lg text-headline-lg text-primary mt-xs">{stats[1].value}</h3>
+            </div>
+            <div className="mt-md h-1 bg-surface-container-high rounded-full overflow-hidden">
+              <div className="bg-secondary-container h-full" style={{ width: `${stats[1].progress}%` }} />
+            </div>
+          </Card>
+          <Card padding="lg" className="flex flex-col justify-between">
+            <div>
+              <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{stats[2].label}</p>
+              <h3 className="font-headline-lg text-headline-lg text-primary mt-xs">{stats[2].value}</h3>
+            </div>
+            <div className="mt-md">
+              <Badge tone="warning">{stats[2].badge}</Badge>
+            </div>
+          </Card>
+          <button className="bg-primary flex flex-col items-center justify-center gap-sm p-lg rounded-lg shadow-lg hover:bg-primary-container transition-all text-on-primary">
+            <span className="material-symbols-outlined text-[32px]">add_road</span>
+            <span className="font-headline-md text-headline-md">Add New Route</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+          <Card padding="none" className="lg:col-span-2 overflow-hidden flex flex-col">
+            <div className="p-lg border-b border-outline/10 flex items-center justify-between bg-surface-container-low">
+              <h2 className="font-headline-md text-headline-md text-primary">Active Bus Routes</h2>
+              <button className="p-1 rounded-md border border-outline/20 hover:bg-surface-container transition-colors">
+                <span className="material-symbols-outlined">filter_list</span>
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-175 text-left border-collapse">
+                <thead className="bg-secondary text-on-secondary">
+                  <tr>
+                    <th className="px-lg py-md font-label-md uppercase tracking-wider">Route ID</th>
+                    <th className="px-lg py-md font-label-md uppercase tracking-wider">Primary Destination</th>
+                    <th className="px-lg py-md font-label-md uppercase tracking-wider">Stops</th>
+                    <th className="px-lg py-md font-label-md uppercase tracking-wider">Capacity</th>
+                    <th className="px-lg py-md font-label-md uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-outline/10">
+                  {routes.map((route) => (
+                    <tr key={route.id} className="hover:bg-surface-container-low transition-colors group cursor-pointer">
+                      <td className="px-lg py-lg font-headline-md text-body-md text-primary">{route.id}</td>
+                      <td className="px-lg py-lg font-body-md">{route.destination}</td>
+                      <td className="px-lg py-lg font-body-md">{route.stops}</td>
+                      <td className="px-lg py-lg">
+                        <div className="flex items-center gap-sm">
+                          <span className="font-label-md">
+                            {route.filled}/{route.capacity}
+                          </span>
+                          <div className="w-16 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${route.status === 'Delayed' ? 'bg-error' : 'bg-primary'}`}
+                              style={{ width: `${(route.filled / route.capacity) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-lg py-lg">
+                        <Badge tone={routeStatusTone[route.status]} variant="ribbon">
+                          {route.status.toUpperCase()}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <div className="flex flex-col gap-lg">
+            <Card padding="lg">
+              <h3 className="font-headline-md text-headline-md text-primary mb-md">Selected Route Fleet</h3>
+              <div className="flex items-center gap-lg mb-lg">
+                <div className="w-16 h-16 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[32px]">airport_shuttle</span>
+                </div>
+                <div>
+                  <p className="font-label-md text-label-md">Vehicle ID: {selectedFleet.vehicleId}</p>
+                  <p className="font-body-md text-on-surface-variant">{selectedFleet.model}</p>
+                </div>
+              </div>
+              <div className="space-y-md">
+                <div className="flex items-center justify-between border-b border-outline/10 pb-sm">
+                  <span className="font-label-sm text-outline">Driver</span>
+                  <span className="font-label-md">{selectedFleet.driver}</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-outline/10 pb-sm">
+                  <span className="font-label-sm text-outline">License Status</span>
+                  <span className="text-secondary font-label-md flex items-center gap-xs">
+                    <span className="material-symbols-outlined text-sm">verified</span>
+                    {selectedFleet.licenseNote}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-label-sm text-outline">Last Inspection</span>
+                  <span className="font-label-md">{selectedFleet.lastInspection}</span>
+                </div>
+              </div>
+            </Card>
+
+            <Card padding="lg" className="flex-1">
+              <div className="flex items-center justify-between mb-lg">
+                <h3 className="font-headline-md text-headline-md text-primary">Student Mapping</h3>
+                <button className="text-secondary font-label-md hover:underline">View All</button>
+              </div>
+              <div className="space-y-md">
+                {studentMapping.map((student) => (
+                  <div key={student.name} className="flex items-center justify-between p-md bg-surface-container-low rounded-lg border border-outline/10">
+                    <div className="flex items-center gap-md">
+                      <Avatar size="sm" fallbackInitials={student.initials} alt={student.name} />
+                      <div>
+                        <p className="font-label-md">{student.name}</p>
+                        <p className="font-label-sm text-on-surface-variant">{student.meta}</p>
+                      </div>
+                    </div>
+                    <button className="p-1 hover:bg-surface-container transition-colors rounded">
+                      <span className="material-symbols-outlined text-primary">edit</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <Button variant="secondary" className="w-full justify-center mt-lg border-dashed" iconLeft="person_add">
+                Map New Student
+              </Button>
+            </Card>
+          </div>
+        </div>
+
+        <Card padding="lg" className="relative overflow-hidden bg-surface-container-high min-h-80 flex items-center justify-center">
+          <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#2e004a 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+          <div className="absolute top-lg left-lg z-10 bg-surface-container-lowest/90 backdrop-blur p-md rounded-lg shadow-md border border-outline/10">
+            <h4 className="font-headline-md text-body-md text-primary mb-xs">Real-time Route Monitor</h4>
+            <div className="flex items-center gap-sm text-on-surface-variant">
+              <span className="w-3 h-3 bg-secondary rounded-full animate-pulse" />
+              <span className="font-label-sm">Tracking 12 Active Buses</span>
+            </div>
+          </div>
+          <div className="relative z-0 text-center">
+            <span className="material-symbols-outlined text-[64px] text-primary/20">map</span>
+            <p className="font-label-md text-on-surface-variant mt-md">Interactive Map Interface Loading...</p>
+          </div>
+        </Card>
+      </div>
+    </AppShell>
+  );
 }

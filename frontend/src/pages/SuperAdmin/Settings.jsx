@@ -1,7 +1,212 @@
-import StitchScreen from '../../components/StitchScreen.jsx';
+import { useState } from 'react';
+import AppShell from '../../components/layout/AppShell.jsx';
+import PageHeader from '../../components/ui/PageHeader.jsx';
+import Card from '../../components/ui/Card.jsx';
+import Badge from '../../components/ui/Badge.jsx';
+import Button from '../../components/ui/Button.jsx';
+import { summaryCards, roles, permissionMatrix, auditLog } from './settingsData.js';
 
-const html = "<!-- SideNavBar -->\n<aside class=\"fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary dark:bg-surface-container-lowest text-on-primary dark:text-primary docked left-0 w-64 shadow-sm transition-all duration-200 ease-in-out\">\n<div class=\"px-md mb-xl\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-10 h-10 rounded-full bg-surface-container-lowest flex items-center justify-center overflow-hidden\">\n<img class=\"w-full h-full object-cover\" data-alt=\"The crest of Mount Carmel Secondary School, a sophisticated heraldic shield featuring traditional academic symbols like an open book and a torch, rendered in a modern flat design style with royal purple and gold accents against a clean white background.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCZP2ESanccNtB4gsF0Mmz85O6Cqhbqhd3x1JB7qhy330iBPiDSspibcICc94eSIJknzfPs9FpQd99g6NQlx14cIqONprLIleUzS0r9mN7WmOqTveR_5GT440SbLRMlvZQpN8yJOU_dze5EXlTcQQHJihxzc7-UEtcKhk6vL_QGELfMDIT2Ld9PTk8W3gEIQejG1YDRCmS77cM2xHJVTGn_3vMeLwl4FUVj1XjHaFF_TkWVxV8HzWGiJgqaNyJKvMf33OorxF44JXsn\"/>\n</div>\n<div>\n<h1 class=\"font-headline-md text-headline-md text-on-primary dark:text-primary leading-none\">Mount Carmel</h1>\n<span class=\"font-label-sm text-label-sm opacity-80\">Admin Portal</span>\n</div>\n</div>\n</div>\n<nav class=\"flex-1 flex flex-col gap-xs overflow-y-auto px-xs\">\n<a class=\"text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<a class=\"text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">school</span>\n<span class=\"font-label-md text-label-md\">Students</span>\n</a>\n<a class=\"text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">auto_stories</span>\n<span class=\"font-label-md text-label-md\">Academics</span>\n</a>\n<a class=\"text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">payments</span>\n<span class=\"font-label-md text-label-md\">Finance</span>\n</a>\n<a class=\"text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">event_available</span>\n<span class=\"font-label-md text-label-md\">Attendance</span>\n</a>\n<a class=\"text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">description</span>\n<span class=\"font-label-md text-label-md\">Reports</span>\n</a>\n</nav>\n<div class=\"mt-auto px-xs flex flex-col gap-xs pt-md border-t border-on-primary/10\">\n<a class=\"border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary dark:text-primary-fixed-dim py-3 px-4 flex items-center gap-md transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">settings</span>\n<span class=\"font-label-md text-label-md\">Settings</span>\n</a>\n<a class=\"text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high flex items-center gap-md rounded transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Main Canvas -->\n<main class=\"ml-64 min-h-screen\">\n<!-- TopNavBar -->\n<header class=\"bg-surface dark:bg-surface-container-high border-b border-outline-variant dark:border-outline sticky top-0 z-30 h-16\">\n<div class=\"flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-full\">\n<div class=\"flex items-center gap-xl\">\n<span class=\"font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed\">Platform Settings</span>\n<div class=\"hidden md:flex gap-lg\">\n<a class=\"text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed pb-1 font-label-md text-label-md transition-all\" href=\"#matrix\">Role Matrix</a>\n<a class=\"text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed font-label-md text-label-md transition-colors\" href=\"#branding\">Global Branding</a>\n<a class=\"text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed font-label-md text-label-md transition-colors\" href=\"#audit\">Audit Log</a>\n</div>\n</div>\n<div class=\"flex items-center gap-md\">\n<button class=\"w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container transition-colors\">\n<span class=\"material-symbols-outlined\">notifications</span>\n</button>\n<button class=\"w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container transition-colors\">\n<span class=\"material-symbols-outlined\">apps</span>\n</button>\n<div class=\"h-8 w-[1px] bg-outline-variant mx-2\"></div>\n<button class=\"bg-primary text-on-primary font-label-md text-label-md px-md py-2 rounded-full hover:opacity-90 transition-all\">\n                        Save Changes\n                    </button>\n<div class=\"w-10 h-10 rounded-full overflow-hidden border border-outline-variant ml-2\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A professional headshot of a female school administrator in her late 40s, wearing a charcoal grey suit and a subtle purple silk blouse. She has a confident and friendly expression, set against a softly blurred background of an institutional library with rich wooden bookshelves and warm lighting.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCCuTVnk3p7ULshiLERWQ6z3NJzd1KqB5RXWWaSLQUWdKkb8ke0CB99JPxw1Ulz8yAbHqEUrsVYEoR0lfx8kDzaIPYTR_Ztn1UaLYHXlJfpVv0QvNQPqPM0XZTEO7z4KzQL31LsQvrySZu1DyBwVqUkW0PcvhbyZC2VYSPZhm3E0vIdJz6YQBkB7ail9fRTIcVFIBv7QeBkOmoDejeR9JezZUVQXACwIE5FyxTTKL7m8kKQn70RFqLN6R5ufuMrYfjXy0QzAc7DMOum\"/>\n</div>\n</div>\n</div>\n</header>\n<!-- Content Area -->\n<div class=\"p-xl max-w-container-max mx-auto space-y-xl\">\n<!-- Section: Header Info -->\n<section class=\"grid grid-cols-1 md:grid-cols-3 gap-lg\">\n<div class=\"bg-surface-container-lowest border border-outline-variant p-lg rounded-lg shadow-sm\">\n<div class=\"flex items-center gap-md mb-md\">\n<div class=\"w-12 h-12 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">security</span>\n</div>\n<div>\n<h3 class=\"font-headline-md text-headline-md text-primary\">Access Control</h3>\n<p class=\"font-body-md text-body-md text-on-surface-variant\">4 Active Global Roles</p>\n</div>\n</div>\n<div class=\"w-full bg-surface-container-high h-2 rounded-full overflow-hidden\">\n<div class=\"bg-primary w-3/4 h-full\"></div>\n</div>\n</div>\n<div class=\"bg-surface-container-lowest border border-outline-variant p-lg rounded-lg shadow-sm\">\n<div class=\"flex items-center gap-md mb-md\">\n<div class=\"w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">palette</span>\n</div>\n<div>\n<h3 class=\"font-headline-md text-headline-md text-secondary\">Brand Identity</h3>\n<p class=\"font-body-md text-body-md text-on-surface-variant\">Last updated 2 days ago</p>\n</div>\n</div>\n<div class=\"flex gap-xs\">\n<div class=\"w-6 h-6 rounded-full bg-primary\"></div>\n<div class=\"w-6 h-6 rounded-full bg-secondary\"></div>\n<div class=\"w-6 h-6 rounded-full bg-tertiary-container\"></div>\n<div class=\"w-6 h-6 rounded-full border border-outline\"></div>\n</div>\n</div>\n<div class=\"bg-surface-container-lowest border border-outline-variant p-lg rounded-lg shadow-sm\">\n<div class=\"flex items-center gap-md mb-md\">\n<div class=\"w-12 h-12 bg-error-container text-on-error-container rounded-full flex items-center justify-center\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">history</span>\n</div>\n<div>\n<h3 class=\"font-headline-md text-headline-md text-error\">System Integrity</h3>\n<p class=\"font-body-md text-body-md text-on-surface-variant\">12.4k Logs this month</p>\n</div>\n</div>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider\">Health Status: <span class=\"text-emerald-600 font-bold\">OPTIMAL</span></p>\n</div>\n</section>\n<!-- Section: Role/Permission Matrix -->\n<section class=\"bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm\" id=\"matrix\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center\">\n<div>\n<h2 class=\"font-headline-md text-headline-md text-primary\">Role/Permission Matrix</h2>\n<p class=\"font-body-md text-body-md text-on-surface-variant\">Configure cross-module access for primary system roles.</p>\n</div>\n<button class=\"flex items-center gap-sm text-primary font-label-md text-label-md hover:underline\">\n<span class=\"material-symbols-outlined text-[20px]\">add_circle</span>\n                        Create New Role\n                    </button>\n</div>\n<div class=\"overflow-x-auto custom-scrollbar\">\n<table class=\"w-full text-left border-collapse\">\n<thead>\n<tr class=\"bg-primary text-on-primary\">\n<th class=\"p-lg font-label-md text-label-md border-r border-on-primary/20 sticky left-0 bg-primary z-10\">Module Name</th>\n<th class=\"p-lg font-label-md text-label-md text-center\">Super Admin</th>\n<th class=\"p-lg font-label-md text-label-md text-center\">Principal</th>\n<th class=\"p-lg font-label-md text-label-md text-center\">Finance Lead</th>\n<th class=\"p-lg font-label-md text-label-md text-center\">Department Head</th>\n<th class=\"p-lg font-label-md text-label-md text-center\">Staff/Teacher</th>\n</tr>\n</thead>\n<tbody class=\"font-body-md text-body-md\">\n<tr class=\"border-b border-outline-variant hover:bg-surface-container-low transition-colors\">\n<td class=\"p-lg font-bold text-on-surface sticky left-0 bg-surface-container-lowest border-r border-outline-variant\">User Management</td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-emerald-600\">check_circle</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-emerald-600\">check_circle</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-outline\">radio_button_unchecked</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-outline\">radio_button_unchecked</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-outline\">radio_button_unchecked</span></td>\n</tr>\n<tr class=\"border-b border-outline-variant hover:bg-surface-container-low transition-colors\">\n<td class=\"p-lg font-bold text-on-surface sticky left-0 bg-surface-container-lowest border-r border-outline-variant\">Financial Ledger</td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-emerald-600\">check_circle</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-on-tertiary-container\">visibility</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-emerald-600\">check_circle</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-outline\">radio_button_unchecked</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-outline\">radio_button_unchecked</span></td>\n</tr>\n<tr class=\"border-b border-outline-variant hover:bg-surface-container-low transition-colors\">\n<td class=\"p-lg font-bold text-on-surface sticky left-0 bg-surface-container-lowest border-r border-outline-variant\">Academic Curriculum</td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-emerald-600\">check_circle</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-emerald-600\">check_circle</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-outline\">radio_button_unchecked</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-emerald-600\">check_circle</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-on-tertiary-container\">visibility</span></td>\n</tr>\n<tr class=\"border-b border-outline-variant hover:bg-surface-container-low transition-colors\">\n<td class=\"p-lg font-bold text-on-surface sticky left-0 bg-surface-container-lowest border-r border-outline-variant\">Audit Logs</td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-emerald-600\">check_circle</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-on-tertiary-container\">visibility</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-outline\">radio_button_unchecked</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-outline\">radio_button_unchecked</span></td>\n<td class=\"p-lg text-center\"><span class=\"material-symbols-outlined text-outline\">radio_button_unchecked</span></td>\n</tr>\n</tbody>\n</table>\n</div>\n</section>\n<!-- Section: Branding & Logs (Asymmetric Layout) -->\n<div class=\"grid grid-cols-1 lg:grid-cols-12 gap-xl\">\n<!-- Branding Settings -->\n<section class=\"lg:col-span-5 space-y-lg\" id=\"branding\">\n<div class=\"bg-surface-container-lowest border border-outline-variant rounded-lg p-lg shadow-sm\">\n<h2 class=\"font-headline-md text-headline-md text-primary mb-md\">Global Branding</h2>\n<div class=\"space-y-md\">\n<div>\n<label class=\"font-label-md text-label-md text-on-surface mb-xs block\">Institution Name</label>\n<input class=\"w-full px-md py-2 border border-outline rounded text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all\" type=\"text\" value=\"Mount Carmel Secondary\"/>\n</div>\n<div class=\"grid grid-cols-2 gap-md\">\n<div>\n<label class=\"font-label-md text-label-md text-on-surface mb-xs block\">Primary Color</label>\n<div class=\"flex items-center gap-sm\">\n<div class=\"w-10 h-10 rounded border border-outline-variant bg-primary\"></div>\n<input class=\"w-full px-md py-2 border border-outline rounded text-label-md\" type=\"text\" value=\"#2e004a\"/>\n</div>\n</div>\n<div>\n<label class=\"font-label-md text-label-md text-on-surface mb-xs block\">Secondary Color</label>\n<div class=\"flex items-center gap-sm\">\n<div class=\"w-10 h-10 rounded border border-outline-variant bg-secondary\"></div>\n<input class=\"w-full px-md py-2 border border-outline rounded text-label-md\" type=\"text\" value=\"#4e599f\"/>\n</div>\n</div>\n</div>\n<div>\n<label class=\"font-label-md text-label-md text-on-surface mb-xs block\">Logo Asset</label>\n<div class=\"border-2 border-dashed border-outline-variant rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group\">\n<span class=\"material-symbols-outlined text-primary text-[48px] mb-sm group-hover:scale-110 transition-transform\">cloud_upload</span>\n<p class=\"font-label-md text-label-md text-on-surface-variant\">Click to upload SVG or PNG</p>\n<p class=\"text-[10px] text-outline mt-xs uppercase\">Max size: 2MB</p>\n</div>\n</div>\n<div class=\"pt-md border-t border-outline-variant flex justify-end gap-md\">\n<button class=\"px-md py-2 font-label-md text-label-md text-on-surface-variant border border-outline rounded hover:bg-surface-container transition-all\">Reset Defaults</button>\n<button class=\"px-md py-2 font-label-md text-label-md bg-secondary text-on-secondary rounded hover:opacity-90 transition-all\">Update Identity</button>\n</div>\n</div>\n</div>\n<div class=\"bg-primary dark:bg-surface-container-lowest text-on-primary dark:text-primary rounded-lg p-lg flex items-center justify-between shadow-lg overflow-hidden relative group\">\n<div class=\"relative z-10\">\n<h4 class=\"font-headline-md text-headline-md mb-xs\">Maintenance Mode</h4>\n<p class=\"font-body-md text-body-md opacity-80 max-w-[240px]\">Restrict platform access for all non-admin users during updates.</p>\n</div>\n<label class=\"relative inline-flex items-center cursor-pointer z-10\">\n<input class=\"sr-only peer\" type=\"checkbox\" value=\"\"/>\n<div class=\"w-14 h-7 bg-on-primary/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-tertiary-container\"></div>\n</label>\n<!-- Subtle Background Pattern -->\n<div class=\"absolute -right-8 -bottom-8 opacity-10 group-hover:scale-110 transition-transform duration-700\">\n<span class=\"material-symbols-outlined text-[160px]\">construction</span>\n</div>\n</div>\n</section>\n<!-- Audit Log -->\n<section class=\"lg:col-span-7\" id=\"audit\">\n<div class=\"bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm h-full flex flex-col\">\n<div class=\"p-lg border-b border-outline-variant flex items-center justify-between bg-surface-container-low rounded-t-lg\">\n<div>\n<h2 class=\"font-headline-md text-headline-md text-primary\">System Audit Log</h2>\n<p class=\"font-body-md text-body-md text-on-surface-variant\">Live feed of all administrative actions across the platform.</p>\n</div>\n<button class=\"w-10 h-10 flex items-center justify-center rounded border border-outline-variant hover:bg-surface-container transition-colors\">\n<span class=\"material-symbols-outlined\">filter_list</span>\n</button>\n</div>\n<div class=\"flex-1 overflow-y-auto custom-scrollbar p-lg space-y-md\" style=\"max-height: 600px;\">\n<!-- Log Entry 1 -->\n<div class=\"flex gap-md border-l-4 border-emerald-500 pl-md py-xs bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-r\">\n<div class=\"pt-1\">\n<span class=\"material-symbols-outlined text-emerald-600\" style=\"font-variation-settings: 'FILL' 1;\">person_add</span>\n</div>\n<div class=\"flex-1\">\n<div class=\"flex justify-between items-start mb-xs\">\n<p class=\"font-body-md text-body-md\"><strong>Administrator</strong> added a new role <strong>'Sub-Warden'</strong></p>\n<span class=\"font-label-sm text-label-sm text-outline\">12:45 PM</span>\n</div>\n<div class=\"ribbon-tag bg-emerald-100 text-emerald-800 px-md py-xs inline-block font-label-sm text-label-sm\">SECURITY_EVENT</div>\n</div>\n</div>\n<!-- Log Entry 2 -->\n<div class=\"flex gap-md border-l-4 border-primary pl-md py-xs bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-r\">\n<div class=\"pt-1\">\n<span class=\"material-symbols-outlined text-primary\" style=\"font-variation-settings: 'FILL' 1;\">settings_brightness</span>\n</div>\n<div class=\"flex-1\">\n<div class=\"flex justify-between items-start mb-xs\">\n<p class=\"font-body-md text-body-md\"><strong>System</strong> auto-archived logs from March 2024</p>\n<span class=\"font-label-sm text-label-sm text-outline\">11:20 AM</span>\n</div>\n<div class=\"ribbon-tag bg-primary-container/20 text-primary-container px-md py-xs inline-block font-label-sm text-label-sm\">SYSTEM_MAINTENANCE</div>\n</div>\n</div>\n<!-- Log Entry 3 -->\n<div class=\"flex gap-md border-l-4 border-error pl-md py-xs bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-r\">\n<div class=\"pt-1\">\n<span class=\"material-symbols-outlined text-error\" style=\"font-variation-settings: 'FILL' 1;\">warning</span>\n</div>\n<div class=\"flex-1\">\n<div class=\"flex justify-between items-start mb-xs\">\n<p class=\"font-body-md text-body-md\">Multiple failed login attempts detected for user <strong>'finance_user_02'</strong></p>\n<span class=\"font-label-sm text-label-sm text-outline\">09:15 AM</span>\n</div>\n<div class=\"ribbon-tag bg-error-container text-on-error-container px-md py-xs inline-block font-label-sm text-label-sm\">THREAT_ALERT</div>\n</div>\n</div>\n<!-- Log Entry 4 -->\n<div class=\"flex gap-md border-l-4 border-secondary pl-md py-xs bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-r\">\n<div class=\"pt-1\">\n<span class=\"material-symbols-outlined text-secondary\" style=\"font-variation-settings: 'FILL' 1;\">edit_square</span>\n</div>\n<div class=\"flex-1\">\n<div class=\"flex justify-between items-start mb-xs\">\n<p class=\"font-body-md text-body-md\"><strong>Principal</strong> updated school fee structure for Term 2</p>\n<span class=\"font-label-sm text-label-sm text-outline\">Yesterday</span>\n</div>\n<div class=\"ribbon-tag bg-secondary-container text-on-secondary-container px-md py-xs inline-block font-label-sm text-label-sm\">FINANCE_CHANGE</div>\n</div>\n</div>\n<!-- Log Entry 5 -->\n<div class=\"flex gap-md border-l-4 border-tertiary-container pl-md py-xs bg-surface-container-low/30 hover:bg-surface-container-low transition-colors rounded-r\">\n<div class=\"pt-1\">\n<span class=\"material-symbols-outlined text-tertiary-container\" style=\"font-variation-settings: 'FILL' 1;\">school</span>\n</div>\n<div class=\"flex-1\">\n<div class=\"flex justify-between items-start mb-xs\">\n<p class=\"font-body-md text-body-md\"><strong>Curriculum Lead</strong> added <strong>'Advanced Physics'</strong> to Academic Calendar</p>\n<span class=\"font-label-sm text-label-sm text-outline\">Yesterday</span>\n</div>\n<div class=\"ribbon-tag bg-tertiary-fixed text-on-tertiary-fixed px-md py-xs inline-block font-label-sm text-label-sm\">ACADEMIC_LOG</div>\n</div>\n</div>\n</div>\n<div class=\"p-md bg-surface-container-low border-t border-outline-variant text-center\">\n<button class=\"font-label-md text-label-md text-primary hover:underline\">View Full Historical Audit</button>\n</div>\n</div>\n</section>\n</div>\n</div>\n<!-- Footer -->\n<footer class=\"w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary dark:bg-secondary-fixed-dim text-on-secondary dark:text-on-secondary-fixed mt-xl\">\n<div>\n<p class=\"font-body-md text-body-md opacity-80\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap gap-lg md:justify-end mt-md md:mt-0\">\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</footer>\n</main>\n<!-- Micro-interactions Script -->";
+const accessIcon = {
+  full: { icon: 'check_circle', tone: 'text-secondary' },
+  view: { icon: 'visibility', tone: 'text-tertiary-container' },
+  none: { icon: 'radio_button_unchecked', tone: 'text-outline' },
+};
+
+const logTone = {
+  success: { border: 'border-secondary', text: 'text-secondary' },
+  primary: { border: 'border-primary', text: 'text-primary' },
+  error: { border: 'border-error', text: 'text-error' },
+  secondary: { border: 'border-secondary', text: 'text-secondary' },
+  tertiary: { border: 'border-tertiary-container', text: 'text-tertiary-container' },
+};
+
+const inputClasses = 'w-full px-md py-2 border border-outline/20 rounded text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all';
 
 export default function SuperAdminSettings() {
-  return <StitchScreen title="Platform Settings" bodyClassName="bg-background text-on-background font-body-md min-h-screen" html={html} />;
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+
+  return (
+    <AppShell portalId="superAdmin" pageTitle="Platform Settings" user={{ name: 'Super Admin' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader
+          title="Platform Settings"
+          subtitle="Access control, branding, and platform-wide audit history."
+          actions={<Button variant="primary">Save Changes</Button>}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
+          {summaryCards.map((card) => (
+            <Card key={card.title} padding="lg">
+              <div className="flex items-center gap-md mb-md">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${card.iconTone}`}>
+                  <span className="material-symbols-outlined">{card.icon}</span>
+                </div>
+                <div>
+                  <h3 className={`font-headline-md text-headline-md ${card.tone}`}>{card.title}</h3>
+                  <p className="font-body-md text-body-md text-on-surface-variant">{card.note}</p>
+                </div>
+              </div>
+              {card.progress != null && (
+                <div className="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+                  <div className="bg-primary h-full" style={{ width: `${card.progress}%` }} />
+                </div>
+              )}
+              {card.swatches && (
+                <div className="flex gap-xs">
+                  <div className="w-6 h-6 rounded-full bg-primary" />
+                  <div className="w-6 h-6 rounded-full bg-secondary" />
+                  <div className="w-6 h-6 rounded-full bg-tertiary-container" />
+                  <div className="w-6 h-6 rounded-full border border-outline/30" />
+                </div>
+              )}
+              {card.status && (
+                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+                  Health Status: <span className="text-secondary font-bold">{card.status}</span>
+                </p>
+              )}
+            </Card>
+          ))}
+        </div>
+
+        <Card padding="none" className="overflow-hidden" id="matrix">
+          <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex flex-col sm:flex-row justify-between sm:items-center gap-sm">
+            <div>
+              <h2 className="font-headline-md text-headline-md text-primary">Role/Permission Matrix</h2>
+              <p className="font-body-md text-body-md text-on-surface-variant">Configure cross-module access for primary system roles.</p>
+            </div>
+            <button className="flex items-center gap-sm text-primary font-label-md text-label-md hover:underline">
+              <span className="material-symbols-outlined text-body-md">add_circle</span>
+              Create New Role
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-175 text-left border-collapse">
+              <thead>
+                <tr className="bg-primary text-on-primary">
+                  <th className="p-lg font-label-md text-label-md border-r border-on-primary/10">Module Name</th>
+                  {roles.map((role) => (
+                    <th key={role} className="p-lg font-label-md text-label-md text-center">
+                      {role}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="font-body-md text-body-md">
+                {permissionMatrix.map((row) => (
+                  <tr key={row.module} className="border-b border-outline/10 hover:bg-surface-container-low transition-colors">
+                    <td className="p-lg font-bold text-on-surface border-r border-outline/10">{row.module}</td>
+                    {row.access.map((level, i) => (
+                      <td key={i} className="p-lg text-center">
+                        <span className={`material-symbols-outlined ${accessIcon[level].tone}`}>{accessIcon[level].icon}</span>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-xl">
+          <section className="lg:col-span-5 space-y-lg" id="branding">
+            <Card padding="lg">
+              <h2 className="font-headline-md text-headline-md text-primary mb-md">Global Branding</h2>
+              <div className="space-y-md">
+                <div>
+                  <label className="font-label-md text-label-md text-on-surface mb-xs block">Institution Name</label>
+                  <input className={inputClasses} type="text" defaultValue="Mount Carmel Secondary" />
+                </div>
+                <div className="grid grid-cols-2 gap-md">
+                  <div>
+                    <label className="font-label-md text-label-md text-on-surface mb-xs block">Primary Color</label>
+                    <div className="flex items-center gap-sm">
+                      <div className="w-10 h-10 rounded border border-outline/20 bg-primary shrink-0" />
+                      <input className={`${inputClasses} font-label-md`} type="text" defaultValue="#2e004a" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="font-label-md text-label-md text-on-surface mb-xs block">Secondary Color</label>
+                    <div className="flex items-center gap-sm">
+                      <div className="w-10 h-10 rounded border border-outline/20 bg-secondary shrink-0" />
+                      <input className={`${inputClasses} font-label-md`} type="text" defaultValue="#4e599f" />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label className="font-label-md text-label-md text-on-surface mb-xs block">Logo Asset</label>
+                  <div className="border-2 border-dashed border-outline/20 rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+                    <span className="material-symbols-outlined text-primary text-[48px] mb-sm group-hover:scale-110 transition-transform">cloud_upload</span>
+                    <p className="font-label-md text-label-md text-on-surface-variant">Click to upload SVG or PNG</p>
+                    <p className="text-[10px] text-outline mt-xs uppercase">Max size: 2MB</p>
+                  </div>
+                </div>
+                <div className="pt-md border-t border-outline/10 flex justify-end gap-md">
+                  <Button variant="secondary" className="text-on-surface-variant border-outline/20">
+                    Reset Defaults
+                  </Button>
+                  <Button variant="primary" className="bg-secondary">
+                    Update Identity
+                  </Button>
+                </div>
+              </div>
+            </Card>
+
+            <Card padding="lg" className="bg-primary text-on-primary border-none flex items-center justify-between relative overflow-hidden">
+              <div className="relative z-10">
+                <h4 className="font-headline-md text-headline-md mb-xs">Maintenance Mode</h4>
+                <p className="font-body-md text-body-md opacity-80 max-w-60">Restrict platform access for all non-admin users during updates.</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={maintenanceMode}
+                onClick={() => setMaintenanceMode((v) => !v)}
+                className={`relative z-10 w-14 h-7 rounded-full transition-colors shrink-0 ${maintenanceMode ? 'bg-tertiary-container' : 'bg-on-primary/20'}`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 bg-white rounded-full h-6 w-6 transition-transform ${maintenanceMode ? 'translate-x-7' : ''}`}
+                />
+              </button>
+              <span className="material-symbols-outlined absolute -right-8 -bottom-8 text-[160px] opacity-10">construction</span>
+            </Card>
+          </section>
+
+          <section className="lg:col-span-7" id="audit">
+            <Card padding="none" className="h-full flex flex-col">
+              <div className="p-lg border-b border-outline/10 flex items-center justify-between bg-surface-container-low">
+                <div>
+                  <h2 className="font-headline-md text-headline-md text-primary">System Audit Log</h2>
+                  <p className="font-body-md text-body-md text-on-surface-variant">Live feed of all administrative actions across the platform.</p>
+                </div>
+                <button className="w-10 h-10 flex items-center justify-center rounded border border-outline/20 hover:bg-surface-container transition-colors">
+                  <span className="material-symbols-outlined">filter_list</span>
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-lg space-y-md max-h-150">
+                {auditLog.map((entry, i) => (
+                  <div key={i} className={`flex gap-md border-l-4 ${logTone[entry.tone].border} pl-md py-xs hover:bg-surface-container-low transition-colors rounded-r`}>
+                    <div className="pt-1">
+                      <span className={`material-symbols-outlined ${logTone[entry.tone].text}`}>{entry.icon}</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start gap-sm mb-xs">
+                        <p className="font-body-md text-body-md">
+                          {entry.actor && <strong>{entry.actor}</strong>} {entry.action}
+                        </p>
+                        <span className="font-label-sm text-label-sm text-outline shrink-0">{entry.time}</span>
+                      </div>
+                      <Badge tone={entry.tagTone}>{entry.tag}</Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="p-md bg-surface-container-low border-t border-outline/10 text-center">
+                <button className="font-label-md text-label-md text-primary hover:underline">View Full Historical Audit</button>
+              </div>
+            </Card>
+          </section>
+        </div>
+      </div>
+    </AppShell>
+  );
 }

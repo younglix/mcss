@@ -1,7 +1,182 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
-
-const html = "<!-- SideNavBar (Authority Source: JSON & Style Guidance) -->\n<aside class=\"fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary w-64 shadow-sm\">\n<div class=\"px-gutter mb-xl flex items-center gap-md\">\n<div class=\"w-10 h-10 rounded-full bg-on-primary flex items-center justify-center text-primary\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">school</span>\n</div>\n<div>\n<h1 class=\"font-headline-md text-headline-md text-on-primary leading-none\">Mount Carmel</h1>\n<p class=\"font-label-sm text-label-sm text-on-primary opacity-70\">Admin Portal</p>\n</div>\n</div>\n<nav class=\"flex-1 flex flex-col gap-xs overflow-y-auto px-xs\">\n<!-- Nav Items -->\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group\" href=\"#\">\n<span class=\"material-symbols-outlined\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group\" href=\"#\">\n<span class=\"material-symbols-outlined\">school</span>\n<span class=\"font-label-md text-label-md\">Students</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group\" href=\"#\">\n<span class=\"material-symbols-outlined\">auto_stories</span>\n<span class=\"font-label-md text-label-md\">Academics</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group\" href=\"#\">\n<span class=\"material-symbols-outlined\">payments</span>\n<span class=\"font-label-md text-label-md\">Finance</span>\n</a>\n<!-- Active State Hierarchy: HR & Staff / Recruitment maps to a generic HR/Staff section if exists, but here we treat 'Recruitment' as the primary intent -->\n<div class=\"mt-4 px-4 py-2 border-l-4 border-tertiary-container bg-primary-container/20\">\n<div class=\"flex items-center gap-md text-on-primary\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">badge</span>\n<span class=\"font-label-md text-label-md\">HR & Staff</span>\n</div>\n<div class=\"ml-10 mt-2 flex flex-col gap-2\">\n<a class=\"text-on-primary text-label-md font-bold\" href=\"#\">Recruitment</a>\n<a class=\"text-on-primary/60 text-label-md hover:text-on-primary transition-colors\" href=\"#\">Payroll</a>\n<a class=\"text-on-primary/60 text-label-md hover:text-on-primary transition-colors\" href=\"#\">Performance</a>\n</div>\n</div>\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group\" href=\"#\">\n<span class=\"material-symbols-outlined\">description</span>\n<span class=\"font-label-md text-label-md\">Reports</span>\n</a>\n</nav>\n<div class=\"mt-auto px-xs flex flex-col gap-xs pt-md border-t border-on-primary/10\">\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group\" href=\"#\">\n<span class=\"material-symbols-outlined\">settings</span>\n<span class=\"font-label-md text-label-md\">Settings</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group\" href=\"#\">\n<span class=\"material-symbols-outlined\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Main Content Canvas -->\n<main class=\"flex-1 ml-64 min-h-screen flex flex-col\">\n<!-- TopNavBar (Authority Source: JSON) -->\n<header class=\"sticky top-0 z-30 bg-surface border-b border-outline-variant flex justify-between items-center w-full px-gutter h-16\">\n<div class=\"flex items-center gap-lg\">\n<div class=\"relative\">\n<span class=\"absolute inset-y-0 left-3 flex items-center text-outline\">\n<span class=\"material-symbols-outlined\">search</span>\n</span>\n<input class=\"pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:outline-none focus:ring-2 focus:ring-primary-container w-80\" placeholder=\"Search applicants, jobs...\" type=\"text\"/>\n</div>\n</div>\n<div class=\"flex items-center gap-lg\">\n<div class=\"flex items-center gap-md\">\n<button class=\"p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors relative\">\n<span class=\"material-symbols-outlined\">notifications</span>\n<span class=\"absolute top-2 right-2 w-2 h-2 bg-error rounded-full\"></span>\n</button>\n<button class=\"p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors\">\n<span class=\"material-symbols-outlined\">apps</span>\n</button>\n</div>\n<div class=\"h-8 w-px bg-outline-variant\"></div>\n<button class=\"flex items-center gap-sm px-4 py-2 bg-primary-container text-white rounded-full hover:opacity-90 transition-all\">\n<span class=\"material-symbols-outlined text-sm\">add</span>\n<span class=\"font-label-md\">Post New Job</span>\n</button>\n<div class=\"flex items-center gap-sm\">\n<div class=\"w-10 h-10 rounded-full border-2 border-primary-container p-0.5\">\n<img class=\"w-full h-full rounded-full object-cover\" data-alt=\"A professional headshot of a middle-aged female school administrator with a warm, confident expression. She is wearing a tailored navy blazer and a string of pearls, standing against a backdrop of a blurred, classic academic hallway with wooden paneling. The lighting is soft and flattering, emphasizing a mood of leadership and institutional authority.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDbO11sVXVgxEruxvO6npd-tPL5lXyJSCibn-MHEYxDD4dSKAj7xOVMWX8dgQCQAEmw92PiWLBf7DUeDKo_zRDfOp6WKNcpu3oiCiYAlboZzqE1iUQetVVOG4v96L3ULz19KbbjhiTm1yIwBJVXqmNMhfGIUwjHRRzSHeGXmBfARvbyMwJtANuqfilAg582Eb1AMISQLcmAZQlvcEh0KAp3oM6UvZvyEUnqdd0u07qrGNKxgTZRDF3oblSIKBLbDpZpUd9lre2ig0PG\"/>\n</div>\n</div>\n</div>\n</header>\n<!-- Recruitment Dashboard Content -->\n<div class=\"p-lg space-y-xl max-w-container-max mx-auto w-full\">\n<!-- Page Header -->\n<div class=\"flex justify-between items-end\">\n<div>\n<nav class=\"flex items-center gap-xs text-on-surface-variant mb-xs\">\n<span class=\"font-label-sm\">HR & Staff</span>\n<span class=\"material-symbols-outlined text-sm\">chevron_right</span>\n<span class=\"font-label-sm text-primary font-bold\">Recruitment</span>\n</nav>\n<h2 class=\"font-headline-lg text-headline-lg text-primary\">Applicant Tracking System</h2>\n</div>\n<div class=\"flex gap-md\">\n<div class=\"flex items-center bg-white border border-outline-variant rounded-lg p-1\">\n<button class=\"px-4 py-2 bg-primary-container text-white rounded font-label-md transition-all\">Kanban View</button>\n<button class=\"px-4 py-2 text-on-surface-variant hover:bg-surface-container-low rounded font-label-md transition-all\">Table View</button>\n</div>\n</div>\n</div>\n<!-- Stats Overview (Bento Style) -->\n<div class=\"grid grid-cols-1 md:grid-cols-4 gap-lg\">\n<div class=\"bg-white p-lg border border-outline-variant rounded-lg shadow-sm hover:border-primary-container/30 transition-all\">\n<p class=\"text-on-surface-variant font-label-md mb-xs\">Total Openings</p>\n<div class=\"flex items-center justify-between\">\n<span class=\"font-headline-xl text-headline-xl text-primary leading-none\">12</span>\n<span class=\"material-symbols-outlined text-primary-container text-4xl opacity-20\">work</span>\n</div>\n<div class=\"mt-md text-label-sm text-secondary flex items-center gap-1\">\n<span class=\"material-symbols-outlined text-sm\">trending_up</span>\n<span>2 active this week</span>\n</div>\n</div>\n<div class=\"bg-white p-lg border border-outline-variant rounded-lg shadow-sm hover:border-primary-container/30 transition-all\">\n<p class=\"text-on-surface-variant font-label-md mb-xs\">Total Applicants</p>\n<div class=\"flex items-center justify-between\">\n<span class=\"font-headline-xl text-headline-xl text-primary leading-none\">148</span>\n<span class=\"material-symbols-outlined text-primary-container text-4xl opacity-20\">groups</span>\n</div>\n<div class=\"mt-md text-label-sm text-secondary flex items-center gap-1\">\n<span class=\"material-symbols-outlined text-sm\">trending_up</span>\n<span>+15% from last month</span>\n</div>\n</div>\n<div class=\"bg-white p-lg border border-outline-variant rounded-lg shadow-sm hover:border-primary-container/30 transition-all\">\n<p class=\"text-on-surface-variant font-label-md mb-xs\">Interviews Set</p>\n<div class=\"flex items-center justify-between\">\n<span class=\"font-headline-xl text-headline-xl text-primary leading-none\">24</span>\n<span class=\"material-symbols-outlined text-primary-container text-4xl opacity-20\">event</span>\n</div>\n<div class=\"mt-md text-label-sm text-secondary flex items-center gap-1\">\n<span class=\"material-symbols-outlined text-sm\">schedule</span>\n<span>8 scheduled today</span>\n</div>\n</div>\n<div class=\"bg-white p-lg border border-outline-variant rounded-lg shadow-sm hover:border-primary-container/30 transition-all\">\n<p class=\"text-on-surface-variant font-label-md mb-xs\">Time to Hire</p>\n<div class=\"flex items-center justify-between\">\n<span class=\"font-headline-xl text-headline-xl text-primary leading-none\">18d</span>\n<span class=\"material-symbols-outlined text-primary-container text-4xl opacity-20\">timer</span>\n</div>\n<div class=\"mt-md text-label-sm text-secondary flex items-center gap-1\">\n<span class=\"material-symbols-outlined text-sm\">check_circle</span>\n<span>Target: < 21 days</span>\n</div>\n</div>\n</div>\n<!-- Kanban Board -->\n<div class=\"overflow-x-auto pb-lg custom-scrollbar\">\n<div class=\"flex gap-lg min-w-[1200px]\">\n<!-- Applied Column -->\n<div class=\"flex-1 min-w-[280px]\">\n<div class=\"flex items-center justify-between mb-md px-2\">\n<h3 class=\"font-label-md text-label-md text-primary flex items-center gap-2\">\n<span class=\"w-2 h-2 rounded-full bg-secondary-container\"></span>\n                                APPLIED\n                                <span class=\"text-on-surface-variant font-normal\">(42)</span>\n</h3>\n<button class=\"material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors\">more_horiz</button>\n</div>\n<div class=\"kanban-column flex flex-col gap-md\">\n<!-- Card 1 -->\n<div class=\"bg-white p-md border border-outline-variant rounded-lg shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing\">\n<div class=\"flex justify-between items-start mb-sm\">\n<div class=\"flex flex-col\">\n<span class=\"font-label-md text-primary\">Michael Henderson</span>\n<span class=\"text-label-sm text-on-surface-variant\">Lead Physics Teacher</span>\n</div>\n<img class=\"w-8 h-8 rounded-full\" data-alt=\"A small square profile photo of a male applicant in his 30s wearing glasses and a crisp white shirt, looking professional and approachable. Minimalist lighting, white studio background, high contrast modern style.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCHmZfEiBanAO8DSzQFGrdyTAY9TTGY8u6SeS4p1T93IPqyf18GPoPmf1Oga5fuVu_2zBAjG9U354hz8drm63Jp_doYSQCC13VdmHEh7VPUc26QANJMpHhtu_lMFrDl8Tuni82z3-nWYzac7mtVVGPwkeZJlsAurMn-x3uSUziwccVOwctspYIzMeFysi0ZneA7QvF7EcFBiUmt1VlIOIiXXcs20bRWwUqxVzV8BKjG-fQF_0Ow0KYms_ZzXbgqA-geTnS_zoYXedAD\"/>\n</div>\n<div class=\"flex items-center gap-sm mb-md\">\n<span class=\"bg-secondary-fixed text-on-secondary-fixed text-[10px] px-2 py-0.5 rounded-full font-bold\">INTERNAL</span>\n<span class=\"text-[10px] text-outline\">Applied 2h ago</span>\n</div>\n<div class=\"flex justify-between items-center pt-md border-t border-outline-variant\">\n<div class=\"flex -space-x-2\">\n<div class=\"w-6 h-6 rounded-full border border-white bg-surface-container-high flex items-center justify-center text-[10px] font-bold\">JD</div>\n</div>\n<span class=\"material-symbols-outlined text-on-surface-variant text-lg\">attachment</span>\n</div>\n</div>\n<!-- Card 2 -->\n<div class=\"bg-white p-md border border-outline-variant rounded-lg shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing\">\n<div class=\"flex justify-between items-start mb-sm\">\n<div class=\"flex flex-col\">\n<span class=\"font-label-md text-primary\">Sarah O'Connor</span>\n<span class=\"text-label-sm text-on-surface-variant\">Administrative Assistant</span>\n</div>\n<img class=\"w-8 h-8 rounded-full\" data-alt=\"A portrait of a smiling female applicant with long dark hair, wearing a professional green blouse. The image is clean and bright, set in a modern office environment with a shallow depth of field. Professional corporate photography style.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDRCo9cBdG6XQtffwdkXTHkO2JQUCjFZy8IK0yababwwyxlcfEwbOanbhQDqOQNmTymC7bEGWhePcrYACogz_VSOv3KJcH9wtyUnk5nGiFakrxhtdFwdh35AwsD6v5AVAiQ7DqA-lIWGaL6iItwLENnTLMgcJepmIVfQUFAPNOEcupw0x22h5PVDdFvz5Nwo5MFjrn_V4SWwStBaLG1wj1XrvPrR5Ty2HWQqQGoB2aFJdSWmRmjYvKPn2TT0wEDu8YNMATHEVAxae5Q\"/>\n</div>\n<div class=\"flex items-center gap-sm mb-md\">\n<span class=\"bg-surface-container-high text-on-surface-variant text-[10px] px-2 py-0.5 rounded-full font-bold\">EXTERNAL</span>\n<span class=\"text-[10px] text-outline\">Applied 5h ago</span>\n</div>\n<div class=\"flex justify-between items-center pt-md border-t border-outline-variant\">\n<div class=\"flex -space-x-2\">\n<div class=\"w-6 h-6 rounded-full border border-white bg-surface-container-high flex items-center justify-center text-[10px] font-bold\">MS</div>\n</div>\n<span class=\"material-symbols-outlined text-on-surface-variant text-lg\">attachment</span>\n</div>\n</div>\n</div>\n</div>\n<!-- Interview Column -->\n<div class=\"flex-1 min-w-[280px]\">\n<div class=\"flex items-center justify-between mb-md px-2\">\n<h3 class=\"font-label-md text-label-md text-primary flex items-center gap-2\">\n<span class=\"w-2 h-2 rounded-full bg-primary-container\"></span>\n                                INTERVIEW\n                                <span class=\"text-on-surface-variant font-normal\">(18)</span>\n</h3>\n<button class=\"material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors\">more_horiz</button>\n</div>\n<div class=\"kanban-column flex flex-col gap-md\">\n<div class=\"bg-white p-md border-l-4 border-primary-container border-y border-r border-outline-variant rounded-lg shadow-sm hover:shadow-md transition-all\">\n<div class=\"flex justify-between items-start mb-sm\">\n<div class=\"flex flex-col\">\n<span class=\"font-label-md text-primary\">Dr. Alistair Vance</span>\n<span class=\"text-label-sm text-on-surface-variant\">Head of Mathematics</span>\n</div>\n<img class=\"w-8 h-8 rounded-full\" data-alt=\"A distinguished senior male applicant with grey hair and a refined demeanor, wearing a charcoal grey suit. He is posed in a modern library setting, reflecting high intellectual capability and institutional prestige. Soft, directional lighting.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuB-e4hBIFyaWwfTmbpRBdfXRFuRwfhU55xHDXwaD3zAY64TFTp3phpNZCm8bjweeteYxOalPyzQu0UDldjwBV4CGoQQC4fo4WddQQot2QlWRRyJZAuyY0NMBgD4wHqnzfvgZiggWsim9tzglq-WNlF8JzOC1AZY8BN_-c3o-wkIZSS5fT3aRYmVs8Rd9KZAkikP1kZq1JZuRMZPn3SXmSlZukfWgj_s59dx5gIneSB5KKcOWIYu-TrtOLBms2QBZUwwnzgcH2ZS3Ioc\"/>\n</div>\n<div class=\"bg-primary-fixed text-on-primary-fixed text-[11px] p-2 rounded-md mb-md border border-primary-fixed-dim\">\n<div class=\"flex items-center gap-2 font-bold mb-1\">\n<span class=\"material-symbols-outlined text-sm\">calendar_today</span>\n                                        Panel Interview 2\n                                    </div>\n<span class=\"opacity-80\">Today @ 14:30 in Boardroom A</span>\n</div>\n<div class=\"flex justify-between items-center pt-md border-t border-outline-variant\">\n<div class=\"flex -space-x-2\">\n<img class=\"w-6 h-6 rounded-full border-2 border-white\" data-alt=\"A small avatar of a school administrator, middle-aged male, academic style.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDDZuOmhK8PAdVAofT6-yB3qhojHhr1xlGMWeI4N5dO7JHENiu5B7ynCC3RHyUnmS9QnTjcnBAGfjA4PXERk3N8B7P-dkDNYsgswBxoDESH1MbkjYKg7aTcrAdtzMU6mxDwH69PIHjUvem7wTt4Qc35RIsbPkFKaPv6ITwFuco5aW-k4ESo6TKfAw6TgUr9AelVkHmQFFZ6PTHH3P6Xfljn6aKKMLXweUFkMdj2vuQKGue22T0NUuo-4gvqxEPobjc3XUgaORRsNd3g\"/>\n<img class=\"w-6 h-6 rounded-full border-2 border-white\" data-alt=\"A small avatar of a teacher, young female, professional academic style.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuANsjti7RO5QR_meqJbfqHERmI3or44c8l_OGl5TrEVq9d_PzCVb-d4sQhak3vGFtq3h3Whvu4rZAHyvBEgMrdl0CumKND4noFP6HZPQAHsHl0HFoW6yzuNXV00FEZR_3qGMExSfnx2i165662aDyNEUSESvJHyy4hKeT4osBndzJBg-XaipaQNYqJ13W_FDU0o60IZxgtalhBThY2J8RTuQQYBEC5BpwQK7tJtHQSKdkJTjsqlXVbVduNAhC4H0Tq5_83ppbGvf6W9\"/>\n</div>\n<span class=\"text-[10px] font-bold text-primary-container uppercase\">Urgent</span>\n</div>\n</div>\n</div>\n</div>\n<!-- Offered Column -->\n<div class=\"flex-1 min-w-[280px]\">\n<div class=\"flex items-center justify-between mb-md px-2\">\n<h3 class=\"font-label-md text-label-md text-primary flex items-center gap-2\">\n<span class=\"w-2 h-2 rounded-full bg-tertiary-container\"></span>\n                                OFFERED\n                                <span class=\"text-on-surface-variant font-normal\">(5)</span>\n</h3>\n<button class=\"material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors\">more_horiz</button>\n</div>\n<div class=\"kanban-column flex flex-col gap-md\">\n<div class=\"bg-white p-md border border-outline-variant rounded-lg shadow-sm hover:shadow-md transition-all\">\n<div class=\"flex justify-between items-start mb-sm\">\n<div class=\"flex flex-col\">\n<span class=\"font-label-md text-primary\">Eleanor Rigby</span>\n<span class=\"text-label-sm text-on-surface-variant\">School Counselor</span>\n</div>\n<img class=\"w-8 h-8 rounded-full\" data-alt=\"A warm and friendly female professional in her 40s, wearing a colorful scarf and a navy cardigan. She exudes empathy and reliability, set against a soft-focus background of a school campus courtyard. Warm, natural daylight.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDK1zrFpFM7dzD2db0kxA-KgpzgyVqIg0FrUm4sp5Ugz1y22LD4bcJHL7zJ25AnUAAuLwKuF2IxyJ1dWXTaUWNDQmzmq0F499ekDe4J4UU_Db6LtAZjdSrihwpMHldZm74F_qHUazm-YwOclLlE8P7Byu9jhqHx2ujqp29JSba5Qu60iOggdyBGWFvnuwmQNBjYU-8-w5yH9HZV2_kNKI5qzpNGo0LHtEhQ-ez5CKXGSKAMIFEnGLUX30Fp_0I7JnZOAIuya5GNQPfS\"/>\n</div>\n<div class=\"flex items-center gap-sm mb-md\">\n<span class=\"ribbon-status bg-tertiary-fixed text-on-tertiary-fixed text-[10px] px-2 py-0.5 font-bold uppercase\">Pending Response</span>\n</div>\n<div class=\"flex justify-between items-center pt-md border-t border-outline-variant\">\n<span class=\"text-[10px] text-outline italic\">Exp. Nov 24, 2024</span>\n<span class=\"material-symbols-outlined text-tertiary text-lg\">check_circle</span>\n</div>\n</div>\n</div>\n</div>\n<!-- Rejected/Hold Column -->\n<div class=\"flex-1 min-w-[280px]\">\n<div class=\"flex items-center justify-between mb-md px-2\">\n<h3 class=\"font-label-md text-label-md text-primary flex items-center gap-2\">\n<span class=\"w-2 h-2 rounded-full bg-outline\"></span>\n                                REJECTED\n                                <span class=\"text-on-surface-variant font-normal\">(83)</span>\n</h3>\n<button class=\"material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors\">more_horiz</button>\n</div>\n<div class=\"kanban-column bg-surface-container-low/50 rounded-lg border-2 border-dashed border-outline-variant/30 flex flex-col p-4 items-center justify-center text-on-surface-variant gap-2\">\n<span class=\"material-symbols-outlined text-4xl opacity-10\">archive</span>\n<p class=\"font-label-sm\">Archive Drop Zone</p>\n</div>\n</div>\n</div>\n</div>\n<!-- Recent Job Postings List -->\n<section class=\"bg-white border border-outline-variant rounded-lg shadow-sm overflow-hidden\">\n<div class=\"px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low\">\n<h3 class=\"font-headline-md text-headline-md text-primary\">Active Job Postings</h3>\n<button class=\"text-primary font-label-md hover:underline\">View All Postings</button>\n</div>\n<div class=\"overflow-x-auto\">\n<table class=\"w-full text-left border-collapse\">\n<thead class=\"bg-primary text-white font-label-sm\">\n<tr>\n<th class=\"px-lg py-3 font-medium uppercase tracking-wider\">Position Title</th>\n<th class=\"px-lg py-3 font-medium uppercase tracking-wider\">Department</th>\n<th class=\"px-lg py-3 font-medium uppercase tracking-wider\">Applicants</th>\n<th class=\"px-lg py-3 font-medium uppercase tracking-wider\">Status</th>\n<th class=\"px-lg py-3 font-medium uppercase tracking-wider\">Posted Date</th>\n<th class=\"px-lg py-3 font-medium uppercase tracking-wider\">Actions</th>\n</tr>\n</thead>\n<tbody class=\"font-body-md text-on-surface-variant divide-y divide-outline-variant\">\n<tr class=\"hover:bg-surface-container transition-colors\">\n<td class=\"px-lg py-4\">\n<div class=\"font-bold text-primary\">Lead Physics Teacher</div>\n<div class=\"text-[12px]\">Full-Time • On-Campus</div>\n</td>\n<td class=\"px-lg py-4\">Science Department</td>\n<td class=\"px-lg py-4\">\n<div class=\"flex items-center gap-2\">\n<span class=\"font-bold\">24</span>\n<span class=\"text-tertiary text-xs font-bold\">(3 New)</span>\n</div>\n</td>\n<td class=\"px-lg py-4\">\n<span class=\"px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[11px] font-bold uppercase tracking-tight\">Active</span>\n</td>\n<td class=\"px-lg py-4\">Oct 12, 2024</td>\n<td class=\"px-lg py-4\">\n<button class=\"p-1 hover:text-primary transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n<button class=\"p-1 hover:text-error transition-colors\"><span class=\"material-symbols-outlined\">delete</span></button>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container transition-colors\">\n<td class=\"px-lg py-4\">\n<div class=\"font-bold text-primary\">Head of Mathematics</div>\n<div class=\"text-[12px]\">Executive • Full-Time</div>\n</td>\n<td class=\"px-lg py-4\">Administration</td>\n<td class=\"px-lg py-4\">\n<div class=\"flex items-center gap-2\">\n<span class=\"font-bold\">12</span>\n<span class=\"text-on-surface-variant text-xs\">(0 New)</span>\n</div>\n</td>\n<td class=\"px-lg py-4\">\n<span class=\"px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[11px] font-bold uppercase tracking-tight\">Active</span>\n</td>\n<td class=\"px-lg py-4\">Oct 05, 2024</td>\n<td class=\"px-lg py-4\">\n<button class=\"p-1 hover:text-primary transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n<button class=\"p-1 hover:text-error transition-colors\"><span class=\"material-symbols-outlined\">delete</span></button>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container transition-colors\">\n<td class=\"px-lg py-4\">\n<div class=\"font-bold text-primary\">School Counselor</div>\n<div class=\"text-[12px]\">Full-Time • Student Welfare</div>\n</td>\n<td class=\"px-lg py-4\">Wellness Dept.</td>\n<td class=\"px-lg py-4\">\n<div class=\"flex items-center gap-2\">\n<span class=\"font-bold\">48</span>\n<span class=\"text-tertiary text-xs font-bold\">(12 New)</span>\n</div>\n</td>\n<td class=\"px-lg py-4\">\n<span class=\"px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-[11px] font-bold uppercase tracking-tight\">Offer Sent</span>\n</td>\n<td class=\"px-lg py-4\">Sept 28, 2024</td>\n<td class=\"px-lg py-4\">\n<button class=\"p-1 hover:text-primary transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n<button class=\"p-1 hover:text-error transition-colors\"><span class=\"material-symbols-outlined\">delete</span></button>\n</td>\n</tr>\n</tbody>\n</table>\n</div>\n</section>\n</div>\n<!-- Footer (Authority Source: JSON) -->\n<footer class=\"mt-auto w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary text-on-secondary\">\n<div>\n<p class=\"font-body-md text-body-md opacity-80\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap gap-lg justify-end mt-md md:mt-0\">\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</footer>\n</main>";
+import { useState } from 'react';
+import AppShell from '../../../components/layout/AppShell.jsx';
+import PageHeader from '../../../components/ui/PageHeader.jsx';
+import Card from '../../../components/ui/Card.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
+import Avatar from '../../../components/ui/Avatar.jsx';
+import Button from '../../../components/ui/Button.jsx';
+import { stats, columns, jobPostings, jobStatusTone } from './recruitmentData.js';
 
 export default function AdminRecruitmentDashboard() {
-  return <StitchScreen title="Recruitment Admin" bodyClassName="bg-background text-on-background font-body-md min-h-screen flex" html={html} />;
+  const [view, setView] = useState('kanban');
+
+  return (
+    <AppShell portalId="admin" pageTitle="Recruitment Admin" user={{ name: 'HR Office' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <div className="flex justify-between items-end flex-wrap gap-lg">
+          <PageHeader title="Applicant Tracking System" subtitle="HR & Staff · Recruitment" className="flex-1" />
+          <div className="flex items-center bg-surface-container-lowest border border-outline/20 rounded-lg p-1">
+            <button
+              onClick={() => setView('kanban')}
+              className={`px-md py-2 rounded font-label-md text-label-md transition-all ${view === 'kanban' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
+            >
+              Kanban View
+            </button>
+            <button
+              onClick={() => setView('table')}
+              className={`px-md py-2 rounded font-label-md text-label-md transition-all ${view === 'table' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
+            >
+              Table View
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
+          {stats.map((stat) => (
+            <Card key={stat.label} padding="lg" className="hover:border-primary/30 transition-all">
+              <p className="text-on-surface-variant font-label-md text-label-md mb-xs">{stat.label}</p>
+              <div className="flex items-center justify-between">
+                <span className="font-headline-xl text-headline-xl text-primary leading-none">{stat.value}</span>
+                <span className="material-symbols-outlined text-primary/20 text-4xl">{stat.icon}</span>
+              </div>
+              <div className="mt-md text-label-sm text-secondary flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">trending_up</span>
+                <span>{stat.note}</span>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <div className="overflow-x-auto pb-lg">
+          <div className="flex gap-lg min-w-300">
+            {columns.map((column) => (
+              <div key={column.key} className="flex-1 min-w-70">
+                <div className="flex items-center justify-between mb-md px-1">
+                  <h3 className="font-label-md text-label-md text-primary flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${column.dotTone}`} />
+                    {column.label.toUpperCase()}
+                    <span className="text-on-surface-variant font-normal">({column.count})</span>
+                  </h3>
+                  <button className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_horiz</button>
+                </div>
+
+                {column.archive ? (
+                  <div className="bg-surface-container-low/50 rounded-lg border-2 border-dashed border-outline/20 flex flex-col p-lg items-center justify-center text-on-surface-variant gap-2 min-h-40">
+                    <span className="material-symbols-outlined text-4xl opacity-20">archive</span>
+                    <p className="font-label-sm text-label-sm">Archive Drop Zone</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-md">
+                    {column.cards.map((candidate) => (
+                      <Card key={candidate.name} padding="sm" className={candidate.urgent ? 'border-l-4 border-l-primary' : ''}>
+                        <div className="flex justify-between items-start mb-sm">
+                          <div className="flex flex-col">
+                            <span className="font-label-md text-primary">{candidate.name}</span>
+                            <span className="text-label-sm text-on-surface-variant">{candidate.role}</span>
+                          </div>
+                          {candidate.initials && <Avatar size="sm" fallbackInitials={candidate.initials} alt={candidate.name} />}
+                        </div>
+
+                        {candidate.tag && (
+                          <div className="flex items-center gap-sm mb-md">
+                            <span className="bg-secondary-container text-on-secondary-container text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">
+                              {candidate.tag}
+                            </span>
+                            <span className="text-[10px] text-outline">{candidate.meta}</span>
+                          </div>
+                        )}
+
+                        {candidate.note && (
+                          <div className="bg-primary-container/10 text-primary text-[11px] p-2 rounded-md mb-md border border-primary/10">
+                            <div className="flex items-center gap-2 font-bold mb-1">
+                              <span className="material-symbols-outlined text-sm">calendar_today</span>
+                              Interview Scheduled
+                            </div>
+                            <span className="opacity-80">{candidate.note}</span>
+                          </div>
+                        )}
+
+                        {candidate.status && (
+                          <div className="mb-md">
+                            <Badge tone="tertiary">{candidate.status}</Badge>
+                          </div>
+                        )}
+
+                        <div className="flex justify-between items-center pt-md border-t border-outline/10">
+                          {candidate.expires ? (
+                            <span className="text-[10px] text-outline italic">{candidate.expires}</span>
+                          ) : (
+                            <span className="text-[10px] text-outline">&nbsp;</span>
+                          )}
+                          {candidate.urgent ? (
+                            <span className="text-[10px] font-bold text-primary uppercase">Urgent</span>
+                          ) : (
+                            <span className="material-symbols-outlined text-on-surface-variant text-lg">
+                              {candidate.status ? 'check_circle' : 'attachment'}
+                            </span>
+                          )}
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Card padding="none" className="overflow-hidden">
+          <div className="px-lg py-md border-b border-outline/10 flex justify-between items-center bg-surface-container-low">
+            <h3 className="font-headline-md text-headline-md text-primary">Active Job Postings</h3>
+            <Button variant="ghost" size="sm">
+              View All Postings
+            </Button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-175 text-left border-collapse">
+              <thead className="bg-primary text-on-primary font-label-sm">
+                <tr>
+                  <th className="px-lg py-3 font-medium uppercase tracking-wider">Position Title</th>
+                  <th className="px-lg py-3 font-medium uppercase tracking-wider">Department</th>
+                  <th className="px-lg py-3 font-medium uppercase tracking-wider">Applicants</th>
+                  <th className="px-lg py-3 font-medium uppercase tracking-wider">Status</th>
+                  <th className="px-lg py-3 font-medium uppercase tracking-wider">Posted Date</th>
+                  <th className="px-lg py-3 font-medium uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="font-body-md text-on-surface-variant divide-y divide-outline/10">
+                {jobPostings.map((job) => (
+                  <tr key={job.title} className="hover:bg-surface-container transition-colors">
+                    <td className="px-lg py-4">
+                      <div className="font-bold text-primary">{job.title}</div>
+                      <div className="text-[12px]">{job.meta}</div>
+                    </td>
+                    <td className="px-lg py-4">{job.department}</td>
+                    <td className="px-lg py-4">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{job.applicants}</span>
+                        {job.newApplicants > 0 && <span className="text-tertiary-container text-xs font-bold">({job.newApplicants} New)</span>}
+                      </div>
+                    </td>
+                    <td className="px-lg py-4">
+                      <Badge tone={jobStatusTone[job.status]}>{job.status}</Badge>
+                    </td>
+                    <td className="px-lg py-4">{job.posted}</td>
+                    <td className="px-lg py-4">
+                      <button className="p-1 hover:text-primary transition-colors">
+                        <span className="material-symbols-outlined">edit</span>
+                      </button>
+                      <button className="p-1 hover:text-error transition-colors">
+                        <span className="material-symbols-outlined">delete</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+    </AppShell>
+  );
 }

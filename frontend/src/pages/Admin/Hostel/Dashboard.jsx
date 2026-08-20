@@ -1,7 +1,166 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
+import AppShell from '../../../components/layout/AppShell.jsx';
+import PageHeader from '../../../components/ui/PageHeader.jsx';
+import Card from '../../../components/ui/Card.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
+import Button from '../../../components/ui/Button.jsx';
+import Avatar from '../../../components/ui/Avatar.jsx';
+import { stats, blocks, allocations, statusTone, waitlist } from './hostelData.js';
 
-const html = "<!-- SideNavBar Anchor -->\n<aside class=\"fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary w-64 shadow-sm\">\n<div class=\"px-gutter mb-xl\">\n<div class=\"flex items-center gap-sm\">\n<div class=\"w-10 h-10 bg-white rounded-lg flex items-center justify-center overflow-hidden\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A high-resolution, professional digital crest for Mount Carmel Secondary School, featuring a stylized purple shield with a golden flame and a book, rendered in a modern institutional style with clean lines and premium vector finish. The aesthetic is prestigious and academic, set against a crisp white background.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuBxDiDHbXzLjUANT1k1ff5ZEh48LlBu5rlMDRHBcRnXwsUh0byeVWligdYfcYW_s2O1n4JV0gfhyP0KqslN-D9wqisV6_3FDzhg2ZMiHDkEUScMy81IfRJ4b6oi9YNDFVdNhfHBq3ITAnfeFKNXghu32FQpuZ4U_41LNaxCtIYUYw3tkNEM85QVFrJfkmDl3b7VSwJnr-wohfWmPGcMFfd5J2_BW-SYCtwa-8v6pvisyZW68lBG7JPXu6Eljh-qrFdxkgUWATQqhIOk\"/>\n</div>\n<div>\n<h1 class=\"font-headline-md text-headline-md text-on-primary leading-tight\">Mount Carmel</h1>\n<p class=\"font-label-sm text-label-sm text-on-primary/70 uppercase tracking-widest\">Admin Portal</p>\n</div>\n</div>\n</div>\n<nav class=\"flex-1 flex flex-col gap-xs\">\n<!-- Navigation Items Mapping -->\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">school</span>\n<span class=\"font-label-md text-label-md\">Students</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">auto_stories</span>\n<span class=\"font-label-md text-label-md\">Academics</span>\n</a>\n<!-- Active State Logic: 'Hostel' is inferred from prompt intent -->\n<a class=\"border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">hotel</span>\n<span class=\"font-label-md text-label-md\">Hostel</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">payments</span>\n<span class=\"font-label-md text-label-md\">Finance</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">event_available</span>\n<span class=\"font-label-md text-label-md\">Attendance</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">description</span>\n<span class=\"font-label-md text-label-md\">Reports</span>\n</a>\n</nav>\n<div class=\"mt-auto px-xs flex flex-col gap-xs\">\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">settings</span>\n<span class=\"font-label-md text-label-md\">Settings</span>\n</a>\n<a class=\"text-on-primary/70 hover:bg-primary-container/10 transition-all duration-200 py-3 px-6 flex items-center gap-md\" href=\"#\">\n<span class=\"material-symbols-outlined\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Main Content Canvas -->\n<main class=\"ml-64 flex-1 flex flex-col\">\n<!-- TopNavBar Anchor -->\n<header class=\"sticky top-0 z-30 bg-surface border-b border-outline-variant h-16 flex items-center\">\n<div class=\"flex justify-between items-center w-full px-gutter max-w-container-max mx-auto\">\n<div class=\"flex items-center gap-xl\">\n<h2 class=\"font-headline-md text-headline-md font-bold text-primary\">Hostel Management</h2>\n<div class=\"hidden md:flex gap-lg items-center\">\n<a class=\"text-primary border-b-2 border-primary pb-1 font-label-md\" href=\"#\">Occupancy</a>\n<a class=\"text-on-surface-variant hover:text-primary transition-colors font-label-md\" href=\"#\">Allocations</a>\n<a class=\"text-on-surface-variant hover:text-primary transition-colors font-label-md\" href=\"#\">Blocks</a>\n<a class=\"text-on-surface-variant hover:text-primary transition-colors font-label-md\" href=\"#\">Maintenance</a>\n</div>\n</div>\n<div class=\"flex items-center gap-md\">\n<div class=\"relative group\">\n<span class=\"material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container rounded-full cursor-pointer\">search</span>\n</div>\n<span class=\"material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container rounded-full cursor-pointer\">notifications</span>\n<button class=\"bg-primary text-on-primary px-lg py-2 rounded-lg font-label-md hover:opacity-90 transition-all flex items-center gap-sm\">\n<span class=\"material-symbols-outlined text-[20px]\">add</span>\n                        Assign Bed\n                    </button>\n<div class=\"w-10 h-10 rounded-full border border-outline-variant overflow-hidden cursor-pointer ml-sm\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A professional headshot of a female school administrator with a warm, confident expression. She is dressed in corporate academic attire. The background is a soft-focus office setting with institutional bookshelves, emphasizing authority and professionalism in a modern light-mode palette.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDAafIJW0ZweE2DKdpBdri_c2-zzu3ruQcKS4W5VkYzpYrpqxYIZp8VmmLSwHIv9C8zIzyA4_dDI7klJUyGmkG36KQ7YGH4pH08odQj5xCYZ3oCBFfDwYeUjj6FZMxZJQTtlsAadOZDb74RteJIj2LZrjDKrIh0mukceIMRINIX8sfQ7_UN2ehfaCIYV5y14xG0GhGhIeY2Qq4nFrdTcvvRtfJtcILcx0NWDSp5UOOgds0CCFeNaHz2-zZtCJ9xZuhFSUFVNXZ6W6Ue\"/>\n</div>\n</div>\n</div>\n</header>\n<!-- Page Content -->\n<div class=\"p-gutter max-w-container-max mx-auto w-full space-y-xl\">\n<!-- Quick Stats Bento -->\n<section class=\"grid grid-cols-1 md:grid-cols-4 gap-lg\">\n<div class=\"bg-white p-lg rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between h-32\">\n<span class=\"text-on-surface-variant font-label-sm uppercase tracking-wider\">Total Capacity</span>\n<div class=\"flex items-baseline gap-xs\">\n<span class=\"font-headline-xl text-headline-xl text-primary\">840</span>\n<span class=\"text-on-surface-variant font-label-md\">Beds</span>\n</div>\n</div>\n<div class=\"bg-white p-lg rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between h-32\">\n<span class=\"text-on-surface-variant font-label-sm uppercase tracking-wider\">Occupied</span>\n<div class=\"flex items-baseline gap-xs\">\n<span class=\"font-headline-xl text-headline-xl text-secondary\">792</span>\n<span class=\"text-on-surface-variant font-label-md\">Beds</span>\n</div>\n</div>\n<div class=\"bg-white p-lg rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between h-32\">\n<span class=\"text-on-surface-variant font-label-sm uppercase tracking-wider\">Available</span>\n<div class=\"flex items-baseline gap-xs\">\n<span class=\"font-headline-xl text-headline-xl text-on-tertiary-container\">48</span>\n<span class=\"text-on-surface-variant font-label-md\">Beds</span>\n</div>\n</div>\n<div class=\"bg-primary text-on-primary p-lg rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between h-32\">\n<span class=\"opacity-70 font-label-sm uppercase tracking-wider\">Occupancy Rate</span>\n<div class=\"flex items-baseline gap-xs\">\n<span class=\"font-headline-xl text-headline-xl\">94.2</span>\n<span class=\"opacity-70 font-label-md\">%</span>\n</div>\n</div>\n</section>\n<div class=\"grid grid-cols-1 lg:grid-cols-12 gap-xl\">\n<!-- Main Room Allocation Table Section -->\n<section class=\"lg:col-span-8 space-y-lg\">\n<div class=\"flex justify-between items-end\">\n<div>\n<h3 class=\"font-headline-md text-headline-md text-primary\">Room & Bed Allocations</h3>\n<p class=\"text-on-surface-variant\">Live status of hostel blocks and current residents.</p>\n</div>\n<div class=\"flex gap-sm\">\n<select class=\"rounded-lg border-outline-variant bg-white text-label-md px-md py-2 focus:ring-primary\">\n<option>Block A (St. Jude's)</option>\n<option>Block B (St. Mary's)</option>\n<option>Block C (St. Benedict's)</option>\n</select>\n</div>\n</div>\n<div class=\"bg-white rounded-[32px] border border-outline-variant overflow-hidden shadow-sm\">\n<div class=\"overflow-x-auto\">\n<table class=\"w-full text-left border-collapse\">\n<thead class=\"bg-primary text-white font-label-md\">\n<tr>\n<th class=\"p-lg font-label-md\">Hostel Block</th>\n<th class=\"p-lg font-label-md\">Room No.</th>\n<th class=\"p-lg font-label-md\">Bed No.</th>\n<th class=\"p-lg font-label-md\">Occupant Name</th>\n<th class=\"p-lg font-label-md\">Status</th>\n<th class=\"p-lg font-label-md\">Actions</th>\n</tr>\n</thead>\n<tbody class=\"font-body-md divide-y divide-outline-variant\">\n<tr class=\"hover:bg-surface-container-low transition-colors group\">\n<td class=\"p-lg font-medium text-primary\">St. Jude's (A)</td>\n<td class=\"p-lg\">A-102</td>\n<td class=\"p-lg\">Bed 01</td>\n<td class=\"p-lg flex items-center gap-sm\">\n<div class=\"w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-[10px] font-bold\">JD</div>\n                                            James Dominic (Gr. 10)\n                                        </td>\n<td class=\"p-lg\">\n<span class=\"ribbon-tag bg-secondary-container text-on-secondary-container px-md py-1 text-label-sm inline-block\">OCCUPIED</span>\n</td>\n<td class=\"p-lg\">\n<button class=\"p-1 hover:text-primary transition-colors\">\n<span class=\"material-symbols-outlined\">edit_note</span>\n</button>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"p-lg font-medium text-primary\">St. Jude's (A)</td>\n<td class=\"p-lg\">A-102</td>\n<td class=\"p-lg\">Bed 02</td>\n<td class=\"p-lg text-on-surface-variant italic\">Unassigned</td>\n<td class=\"p-lg\">\n<span class=\"ribbon-tag bg-surface-container-highest text-on-surface-variant px-md py-1 text-label-sm inline-block\">VACANT</span>\n</td>\n<td class=\"p-lg\">\n<button class=\"text-primary font-label-sm hover:underline\">Assign Now</button>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"p-lg font-medium text-primary\">St. Jude's (A)</td>\n<td class=\"p-lg\">A-103</td>\n<td class=\"p-lg\">Bed 01</td>\n<td class=\"p-lg flex items-center gap-sm\">\n<div class=\"w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-[10px] font-bold\">SM</div>\n                                            Samuel Mbatha (Gr. 11)\n                                        </td>\n<td class=\"p-lg\">\n<span class=\"ribbon-tag bg-secondary-container text-on-secondary-container px-md py-1 text-label-sm inline-block\">OCCUPIED</span>\n</td>\n<td class=\"p-lg\">\n<button class=\"p-1 hover:text-primary transition-colors\">\n<span class=\"material-symbols-outlined\">edit_note</span>\n</button>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"p-lg font-medium text-primary\">St. Mary's (B)</td>\n<td class=\"p-lg\">B-205</td>\n<td class=\"p-lg\">Bed 04</td>\n<td class=\"p-lg flex items-center gap-sm\">\n<div class=\"w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-[10px] font-bold\">LW</div>\n                                            Liam Walters (Gr. 09)\n                                        </td>\n<td class=\"p-lg\">\n<span class=\"ribbon-tag bg-tertiary-container text-white px-md py-1 text-label-sm inline-block\">LEAVE</span>\n</td>\n<td class=\"p-lg\">\n<button class=\"p-1 hover:text-primary transition-colors\">\n<span class=\"material-symbols-outlined\">edit_note</span>\n</button>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"p-lg font-medium text-primary\">St. Mary's (B)</td>\n<td class=\"p-lg\">B-205</td>\n<td class=\"p-lg\">Bed 05</td>\n<td class=\"p-lg flex items-center gap-sm\">\n<div class=\"w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-[10px] font-bold\">EK</div>\n                                            Ethan Kim (Gr. 10)\n                                        </td>\n<td class=\"p-lg\">\n<span class=\"ribbon-tag bg-secondary-container text-on-secondary-container px-md py-1 text-label-sm inline-block\">OCCUPIED</span>\n</td>\n<td class=\"p-lg\">\n<button class=\"p-1 hover:text-primary transition-colors\">\n<span class=\"material-symbols-outlined\">edit_note</span>\n</button>\n</td>\n</tr>\n</tbody>\n</table>\n</div>\n</div>\n</section>\n<!-- Boarding Student List (Sidebar Style within Canvas) -->\n<aside class=\"lg:col-span-4 space-y-lg\">\n<div class=\"flex items-end justify-between h-10\">\n<h3 class=\"font-headline-md text-headline-md text-primary\">Boarding Waitlist</h3>\n<a class=\"text-primary font-label-sm hover:underline\" href=\"#\">View All</a>\n</div>\n<div class=\"bg-surface-container-low border border-outline-variant rounded-[32px] p-lg flex flex-col gap-md h-[calc(100vh-280px)] overflow-y-auto\">\n<div class=\"sticky top-0 bg-surface-container-low pb-md\">\n<div class=\"relative\">\n<span class=\"material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-[20px]\">search</span>\n<input class=\"w-full pl-10 pr-md py-2 border border-outline-variant rounded-lg font-body-md text-sm focus:ring-primary focus:border-primary\" placeholder=\"Search unassigned students...\" type=\"text\"/>\n</div>\n</div>\n<!-- Student Items -->\n<div class=\"space-y-sm\">\n<div class=\"bg-white p-md rounded-xl border border-outline-variant hover:shadow-md transition-shadow group cursor-pointer\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-12 h-12 rounded-lg bg-surface-container overflow-hidden\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A detailed, professional profile photo of a young male student in a sharp purple school blazer. He has a focused and polite expression. The lighting is bright and clear, reflecting a modern, high-quality institutional photography style for an elite secondary school portal.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDtJpS5jJ0qr5gXHOPgi5IKGbaiYtu2swvLhBd34e4CzTieLu0Li4cj4oBk5mmhfb1u3eA4R8ob3uERKoJH2XXhFASf-Nre6FyZoYNCp2fYJnHLVszqWZz-XEwleNPs0bsApUuzjDmY6Q1FKoitOnsOjr_t5skdkqmKnhVrWlVpdUE-vAI2QpVZxnYV6jmOWBS-pW14e4LnakM53T_Oj7Z5mvvASjNY-FOYw5v6ZY6xdlIhXcZ0LXhajXzVBHMA36A0ot3DJoMX-3Oo\"/>\n</div>\n<div class=\"flex-1\">\n<h4 class=\"font-headline-md text-[16px] text-primary\">Marcus Thorne</h4>\n<p class=\"text-on-surface-variant text-sm\">Grade 11-C • New Student</p>\n</div>\n<button class=\"bg-secondary-container/20 text-on-secondary-container p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity\">\n<span class=\"material-symbols-outlined\">chevron_right</span>\n</button>\n</div>\n<div class=\"mt-md flex gap-sm\">\n<span class=\"bg-surface-container px-sm py-1 rounded text-[10px] font-bold text-on-surface-variant uppercase\">Local</span>\n<span class=\"bg-surface-container px-sm py-1 rounded text-[10px] font-bold text-on-surface-variant uppercase\">Medical: None</span>\n</div>\n</div>\n<div class=\"bg-white p-md rounded-xl border border-outline-variant hover:shadow-md transition-shadow group cursor-pointer\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-12 h-12 rounded-lg bg-surface-container overflow-hidden\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A portrait of a male teenager in a school uniform, looking slightly aside with a thoughtful look. The image is captured in high definition with a soft background gradient of school colors, maintaining the professional academic aesthetic of Mount Carmel Secondary's management system.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAVjduoA7JjxevcUB7SRSArBjyCoMooF8WmIca9599jcLzf_MhI-Jp1V4vxH0DskwjL9KNM_rQVExqFCpK8n2XVxW4FpF7Z_6l-jDfCka7bS3CqTg2I9wx_TowSvcjyyuP5xrirt44FiQZJ6P366SzZGXkqcS5PO7_6avsg3Ppm6OvRmAfBhLRpEYaSw-wboEpRu9x1BLP7LF_ClRMkqqjH7J_5xPTU1XC-BIY6Scn1qtfKFHF4K_KM0hp1t1iXnEvTk4yYR1lNCpvM\"/>\n</div>\n<div class=\"flex-1\">\n<h4 class=\"font-headline-md text-[16px] text-primary\">Adrian Vance</h4>\n<p class=\"text-on-surface-variant text-sm\">Grade 9-A • Waitlisted</p>\n</div>\n<button class=\"bg-secondary-container/20 text-on-secondary-container p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity\">\n<span class=\"material-symbols-outlined\">chevron_right</span>\n</button>\n</div>\n<div class=\"mt-md flex gap-sm\">\n<span class=\"bg-surface-container px-sm py-1 rounded text-[10px] font-bold text-on-surface-variant uppercase\">International</span>\n<span class=\"bg-tertiary-fixed text-on-tertiary-fixed-variant px-sm py-1 rounded text-[10px] font-bold uppercase\">Allergy Alert</span>\n</div>\n</div>\n<div class=\"bg-white p-md rounded-xl border border-outline-variant hover:shadow-md transition-shadow group cursor-pointer\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-12 h-12 rounded-lg bg-surface-container overflow-hidden\">\n<img class=\"w-full h-full object-cover\" data-alt=\"Clear studio portrait of a student for a school ID. High-end lighting, neutral expression, dressed in school uniform. Royal navy and purple tones subtle in the environment. High trust, academic feel.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDRGl4memWBd6iMBAaZ3GokVLFFWll42I-xtgu8pNyvSpmqPRKlOemLI1CF75YjNT4ojn5PqHCIGlUES1-5Gb1X8et8YX7HLurnGuCZUyUlcZ-EcFgRBic78uYRcdYZG07HHqOiMy4vlx-ns4SzlaJ8fcV11sccZhPI-D7CKJEqz4fGm-zLs0zzsN5uSMwMbwsH6z7EKBGn6exsOCuYdra99_iV2rJU46JXXzzmS1l_x818BLzXifnuXBBGVIvg8aD-hqMnltla_fPs\"/>\n</div>\n<div class=\"flex-1\">\n<h4 class=\"font-headline-md text-[16px] text-primary\">Nathaniel Cole</h4>\n<p class=\"text-on-surface-variant text-sm\">Grade 12-D • Transfer</p>\n</div>\n<button class=\"bg-secondary-container/20 text-on-secondary-container p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity\">\n<span class=\"material-symbols-outlined\">chevron_right</span>\n</button>\n</div>\n</div>\n<div class=\"bg-white p-md rounded-xl border border-outline-variant hover:shadow-md transition-shadow group cursor-pointer\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-12 h-12 rounded-lg bg-surface-container overflow-hidden\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A portrait of a male teenager in a school uniform, looking slightly aside with a thoughtful look. The image is captured in high definition with a soft background gradient of school colors, maintaining the professional academic aesthetic of Mount Carmel Secondary's management system.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuBBlYnxaDpWi1ewXjkxRvT79mtdgxYhWmWbjTBMLdSxIR760E8z3xrdqkc4Wj-qRwJj66W4_HT6Gl3QQXOja_m6gK5qMWp1s0Tr0YNhLkwBNEPh6MC4bPy08gq2rmZ3ngeCAhoe6SEErp-5Y1OBtVgkGI9DS7zbgf5iWuDuOkmhIXHvNTWfKB0DUSzIypucUfcJzGRGsdP848GUxhj0Hr89SAf-OK2KjvyJiSHyud5e2WEUlVYROSvXIsH55TxKzXDYPB12JHkDCMfA\"/>\n</div>\n<div class=\"flex-1\">\n<h4 class=\"font-headline-md text-[16px] text-primary\">Julian S.</h4>\n<p class=\"text-on-surface-variant text-sm\">Grade 10-B • New student</p>\n</div>\n<button class=\"bg-secondary-container/20 text-on-secondary-container p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity\">\n<span class=\"material-symbols-outlined\">chevron_right</span>\n</button>\n</div>\n</div>\n</div>\n<div class=\"mt-auto pt-md border-t border-outline-variant\">\n<button class=\"w-full py-3 bg-secondary text-on-secondary rounded-lg font-label-md hover:opacity-90 transition-all flex items-center justify-center gap-sm\">\n<span class=\"material-symbols-outlined\">group_add</span>\n                                Add New Boarder\n                            </button>\n</div>\n</div>\n</aside>\n</div>\n<!-- Footer Anchor -->\n<footer class=\"w-full py-xl px-0 grid grid-cols-1 md:grid-cols-2 items-center bg-transparent border-t border-outline-variant mt-xl\">\n<div>\n<p class=\"font-body-md text-on-surface-variant\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex md:justify-end gap-lg\">\n<a class=\"font-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100\" href=\"#\">Contact Us</a>\n</div>\n</footer>\n</div>\n</main>\n<!-- Visual Polish: Floating Atmospheric Effect -->\n<div class=\"fixed inset-0 pointer-events-none z-[-1] overflow-hidden\">\n<div class=\"absolute -top-24 -right-24 w-96 h-96 bg-primary-container/5 rounded-full blur-3xl\"></div>\n<div class=\"absolute bottom-48 -left-24 w-64 h-64 bg-secondary-container/10 rounded-full blur-3xl\"></div>\n</div>";
+function initialsFor(name) {
+  return name.match(/\b\w/g)?.slice(0, 2).join('').toUpperCase();
+}
 
 export default function AdminHostelDashboard() {
-  return <StitchScreen title="Hostel Admin" bodyClassName="bg-background text-on-surface font-body-md min-h-screen flex" html={html} />;
+  return (
+    <AppShell portalId="admin" pageTitle="Hostel Admin" user={{ name: 'Hostel Manager' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader
+          title="Hostel Management"
+          subtitle="Occupancy, room allocations, and the boarding waitlist."
+          actions={
+            <Button variant="primary" iconLeft="add">
+              Assign Bed
+            </Button>
+          }
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-md sm:gap-lg">
+          {stats.map((stat) => (
+            <Card
+              key={stat.label}
+              padding="lg"
+              className={`flex flex-col justify-between h-32 ${stat.invert ? 'bg-primary text-on-primary border-none' : ''}`}
+            >
+              <span className={`font-label-sm text-label-sm uppercase tracking-wider ${stat.invert ? 'opacity-70' : 'text-on-surface-variant'}`}>
+                {stat.label}
+              </span>
+              <div className="flex items-baseline gap-xs">
+                <span className={`font-headline-xl text-headline-xl ${stat.invert ? '' : stat.tone === 'secondary' ? 'text-secondary' : stat.tone === 'tertiary' ? 'text-on-tertiary-container' : 'text-primary'}`}>
+                  {stat.value}
+                </span>
+                <span className={`font-label-md text-label-md ${stat.invert ? 'opacity-70' : 'text-on-surface-variant'}`}>{stat.unit}</span>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+          <section className="lg:col-span-8 space-y-lg">
+            <div className="flex justify-between items-end flex-wrap gap-md">
+              <div>
+                <h3 className="font-headline-md text-headline-md text-primary">Room &amp; Bed Allocations</h3>
+                <p className="text-on-surface-variant">Live status of hostel blocks and current residents.</p>
+              </div>
+              <select className="rounded-lg border border-outline-variant bg-surface-container-lowest text-label-md px-md py-2 focus:ring-2 focus:ring-primary/20">
+                {blocks.map((block) => (
+                  <option key={block}>{block}</option>
+                ))}
+              </select>
+            </div>
+
+            <Card padding="none" className="overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-175 text-left border-collapse">
+                  <thead className="bg-primary text-on-primary">
+                    <tr>
+                      <th className="p-lg font-label-md text-label-md">Hostel Block</th>
+                      <th className="p-lg font-label-md text-label-md">Room No.</th>
+                      <th className="p-lg font-label-md text-label-md">Bed No.</th>
+                      <th className="p-lg font-label-md text-label-md">Occupant Name</th>
+                      <th className="p-lg font-label-md text-label-md">Status</th>
+                      <th className="p-lg font-label-md text-label-md">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="font-body-md divide-y divide-outline/10">
+                    {allocations.map((row, i) => (
+                      <tr key={i} className="hover:bg-surface-container-low transition-colors group">
+                        <td className="p-lg font-medium text-primary">{row.block}</td>
+                        <td className="p-lg">{row.room}</td>
+                        <td className="p-lg">{row.bed}</td>
+                        <td className="p-lg">
+                          {row.occupant ? (
+                            <div className="flex items-center gap-sm">
+                              <Avatar size="sm" fallbackInitials={row.initials} alt={row.occupant} />
+                              <span>{row.occupant}</span>
+                            </div>
+                          ) : (
+                            <span className="text-on-surface-variant italic">Unassigned</span>
+                          )}
+                        </td>
+                        <td className="p-lg">
+                          <Badge tone={statusTone[row.status]}>{row.status}</Badge>
+                        </td>
+                        <td className="p-lg">
+                          {row.status === 'Vacant' ? (
+                            <button className="text-primary font-label-sm hover:underline">Assign Now</button>
+                          ) : (
+                            <button className="p-1 hover:text-primary transition-colors">
+                              <span className="material-symbols-outlined">edit_note</span>
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </section>
+
+          <aside className="lg:col-span-4 space-y-lg">
+            <div className="flex items-end justify-between">
+              <h3 className="font-headline-md text-headline-md text-primary">Boarding Waitlist</h3>
+              <a className="text-primary font-label-sm hover:underline" href="#">
+                View All
+              </a>
+            </div>
+            <Card padding="lg" className="bg-surface-container-low flex flex-col gap-md">
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-body-md">search</span>
+                <input
+                  className="w-full pl-xl pr-md py-2 border border-outline-variant rounded-lg font-body-md text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  placeholder="Search unassigned students..."
+                  type="text"
+                />
+              </div>
+              <div className="space-y-sm">
+                {waitlist.map((student) => (
+                  <div
+                    key={student.name}
+                    className="bg-surface-container-lowest p-md rounded-xl border border-outline/10 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-md">
+                      <Avatar fallbackInitials={initialsFor(student.name)} alt={student.name} />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-headline-md text-body-md text-primary truncate">{student.name}</h4>
+                        <p className="text-on-surface-variant text-sm truncate">{student.meta}</p>
+                      </div>
+                      <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+                    </div>
+                    {(student.tags.length > 0 || student.alert) && (
+                      <div className="mt-md flex gap-sm flex-wrap">
+                        {student.tags.map((tag) => (
+                          <span key={tag} className="bg-surface-container px-sm py-1 rounded text-[10px] font-bold text-on-surface-variant uppercase">
+                            {tag}
+                          </span>
+                        ))}
+                        {student.alert && (
+                          <span className="bg-tertiary-container text-on-tertiary-container px-sm py-1 rounded text-[10px] font-bold uppercase">
+                            {student.alert}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <Button variant="secondary" className="w-full justify-center mt-xs" iconLeft="group_add">
+                Add New Boarder
+              </Button>
+            </Card>
+          </aside>
+        </div>
+      </div>
+    </AppShell>
+  );
 }

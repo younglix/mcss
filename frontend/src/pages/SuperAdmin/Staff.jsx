@@ -1,7 +1,194 @@
-import StitchScreen from '../../components/StitchScreen.jsx';
+import { useState } from 'react';
+import AppShell from '../../components/layout/AppShell.jsx';
+import PageHeader from '../../components/ui/PageHeader.jsx';
+import Card from '../../components/ui/Card.jsx';
+import Badge from '../../components/ui/Badge.jsx';
+import Button from '../../components/ui/Button.jsx';
+import Avatar from '../../components/ui/Avatar.jsx';
+import Drawer from '../../components/ui/Drawer.jsx';
+import { roles, schools, staff, staffStatusTone, totalStaff, rolePermissions } from './staffData.js';
 
-const html = "<!-- Sidebar Navigation (Mandatory Shared Component) -->\n<aside class=\"fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary dark:bg-surface-container-lowest docked left-0 h-full w-64 shadow-sm\">\n<div class=\"px-gutter mb-xl\">\n<h1 class=\"font-headline-md text-headline-md text-on-primary dark:text-primary font-bold\">Mount Carmel</h1>\n<p class=\"font-label-md text-label-md text-on-primary/70 uppercase tracking-widest\">Admin Portal</p>\n</div>\n<nav class=\"flex-1 space-y-1\">\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">dashboard</span>\n<span class=\"font-label-md\">Dashboard</span>\n</a>\n<a class=\"flex items-center border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary dark:text-primary-fixed-dim py-3 px-4 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">school</span>\n<span class=\"font-label-md\">Students</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">auto_stories</span>\n<span class=\"font-label-md\">Academics</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">payments</span>\n<span class=\"font-label-md\">Finance</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">event_available</span>\n<span class=\"font-label-md\">Attendance</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">description</span>\n<span class=\"font-label-md\">Reports</span>\n</a>\n</nav>\n<div class=\"mt-auto space-y-1\">\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">settings</span>\n<span class=\"font-label-md\">Settings</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 dark:text-on-surface-variant py-3 px-4 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-3\">logout</span>\n<span class=\"font-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Main Content Area -->\n<main class=\"ml-64 min-h-screen flex flex-col\">\n<!-- Top Navigation Bar -->\n<header class=\"sticky top-0 z-30 bg-surface dark:bg-surface-container-high border-b border-outline-variant dark:border-outline h-16 flex items-center px-gutter\">\n<div class=\"flex justify-between items-center w-full max-w-container-max mx-auto\">\n<div class=\"flex items-center gap-lg\">\n<h2 class=\"font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed\">Staff Account Management</h2>\n<div class=\"hidden md:flex gap-md\">\n<a class=\"font-label-md text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed pb-1\" href=\"#\">All Staff</a>\n<a class=\"font-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors\" href=\"#\">Permissions</a>\n<a class=\"font-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors\" href=\"#\">Logs</a>\n</div>\n</div>\n<div class=\"flex items-center gap-md\">\n<button class=\"material-symbols-outlined text-on-surface-variant p-sm hover:bg-surface-container rounded-full transition-all\">notifications</button>\n<button class=\"material-symbols-outlined text-on-surface-variant p-sm hover:bg-surface-container rounded-full transition-all\">apps</button>\n<div class=\"h-10 w-10 rounded-full overflow-hidden border border-outline-variant\">\n<img class=\"h-full w-full object-cover\" data-alt=\"A professional close-up portrait of a senior school administrator in professional business attire, set against a blurred institutional background of an academic office with bookshelves. The lighting is soft and flattering, emphasizing a mood of authority and trust. The overall aesthetic is clean, modern, and perfectly aligned with a high-end educational management platform.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuC9_SWKk_-38XtxAhaJIaVvL2LHsAgMRembWuHaP5cZK4SU72UYlanfbX54b2uGs73d6Lf1NIbV21nRICKB3kKBhwLgzla0Vsz_MlgJk0yFuxcVbzNFJ0pJul6o8O9wlYDxhLWvz2UM0NcoGhDZ7djY9-awA6AutO70j9Ij8hLyrDEScfbUZ-5W_-FU95DMjf0n0BtUNQQlhd-kfmmpOBR_CmGLsT-NYx_Ct5zEOUAf6FF1YNU4NeUt-qZcsY-pQd8l2g60MHwRxQT2\"/>\n</div>\n</div>\n</div>\n</header>\n<!-- Content Canvas -->\n<section class=\"p-xl max-w-container-max mx-auto w-full flex-1\">\n<!-- Dashboard Controls / Filters -->\n<div class=\"flex flex-col md:flex-row justify-between items-end md:items-center gap-md mb-xl\">\n<div class=\"flex flex-wrap gap-md w-full md:w-auto\">\n<!-- Search -->\n<div class=\"relative w-full md:w-72\">\n<span class=\"material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline\">search</span>\n<input class=\"w-full pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md\" placeholder=\"Search staff by name, ID or email...\" type=\"text\"/>\n</div>\n<!-- Role Filter -->\n<select class=\"bg-surface-container-lowest border border-outline-variant rounded-md px-4 py-2 font-body-md focus:ring-2 focus:ring-primary outline-none min-w-[140px]\">\n<option>All Roles</option>\n<option>Teacher</option>\n<option>Bursary</option>\n<option>Library</option>\n<option>Admin</option>\n</select>\n<!-- School Filter -->\n<select class=\"bg-surface-container-lowest border border-outline-variant rounded-md px-4 py-2 font-body-md focus:ring-2 focus:ring-primary outline-none min-w-[160px]\">\n<option>All Schools</option>\n<option>MCSS Main Campus</option>\n<option>MCSS Tech Annex</option>\n</select>\n</div>\n<button class=\"flex items-center gap-sm bg-primary text-on-primary px-lg py-3 rounded-lg font-label-md hover:opacity-90 transition-all shadow-sm\" onclick=\"openModal()\">\n<span class=\"material-symbols-outlined\">person_add</span>\n                    Create New Staff\n                </button>\n</div>\n<!-- Staff Grid / Table -->\n<div class=\"bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm\">\n<table class=\"w-full text-left border-collapse\">\n<thead class=\"bg-primary text-on-primary\">\n<tr>\n<th class=\"px-gutter py-md font-label-md uppercase tracking-wider\">Staff Member</th>\n<th class=\"px-gutter py-md font-label-md uppercase tracking-wider\">Staff ID</th>\n<th class=\"px-gutter py-md font-label-md uppercase tracking-wider\">Role & Access</th>\n<th class=\"px-gutter py-md font-label-md uppercase tracking-wider\">School / Dept</th>\n<th class=\"px-gutter py-md font-label-md uppercase tracking-wider\">Status</th>\n<th class=\"px-gutter py-md font-label-md uppercase tracking-wider text-right\">Actions</th>\n</tr>\n</thead>\n<tbody class=\"divide-y divide-outline-variant\">\n<!-- Row 1 -->\n<tr class=\"hover:bg-surface-container-low transition-colors group\">\n<td class=\"px-gutter py-md\">\n<div class=\"flex items-center gap-md\">\n<div class=\"h-10 w-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-label-md\">JD</div>\n<div>\n<div class=\"font-label-md text-on-surface\">James Doherty</div>\n<div class=\"text-on-surface-variant font-label-sm\">j.doherty@mcss.edu</div>\n</div>\n</div>\n</td>\n<td class=\"px-gutter py-md font-body-md text-on-surface-variant\">MC-2024-001</td>\n<td class=\"px-gutter py-md\">\n<span class=\"bg-primary-container/20 text-primary px-3 py-1 rounded-full font-label-sm\">Head Teacher</span>\n</td>\n<td class=\"px-gutter py-md font-body-md text-on-surface-variant\">Main Campus / Science</td>\n<td class=\"px-gutter py-md\">\n<div class=\"ribbon-tag bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-1 inline-flex items-center gap-1\">\n<span class=\"h-1.5 w-1.5 rounded-full bg-emerald-600\"></span>\n                                    ACTIVE\n                                </div>\n</td>\n<td class=\"px-gutter py-md text-right\">\n<div class=\"flex justify-end gap-sm opacity-40 group-hover:opacity-100 transition-opacity\">\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-primary transition-colors\">edit</button>\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-error transition-colors\">person_off</button>\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-on-surface transition-colors\">more_vert</button>\n</div>\n</td>\n</tr>\n<!-- Row 2 -->\n<tr class=\"hover:bg-surface-container-low transition-colors group\">\n<td class=\"px-gutter py-md\">\n<div class=\"flex items-center gap-md\">\n<div class=\"h-10 w-10 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container font-bold text-label-md\">AS</div>\n<div>\n<div class=\"font-label-md text-on-surface\">Alicia Sterling</div>\n<div class=\"text-on-surface-variant font-label-sm\">a.sterling@mcss.edu</div>\n</div>\n</div>\n</td>\n<td class=\"px-gutter py-md font-body-md text-on-surface-variant\">MC-2024-042</td>\n<td class=\"px-gutter py-md\">\n<span class=\"bg-secondary-container/20 text-secondary px-3 py-1 rounded-full font-label-sm\">Bursary</span>\n</td>\n<td class=\"px-gutter py-md font-body-md text-on-surface-variant\">Finance Office</td>\n<td class=\"px-gutter py-md\">\n<div class=\"ribbon-tag bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-1 inline-flex items-center gap-1\">\n<span class=\"h-1.5 w-1.5 rounded-full bg-emerald-600\"></span>\n                                    ACTIVE\n                                </div>\n</td>\n<td class=\"px-gutter py-md text-right\">\n<div class=\"flex justify-end gap-sm opacity-40 group-hover:opacity-100 transition-opacity\">\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-primary transition-colors\">edit</button>\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-error transition-colors\">person_off</button>\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-on-surface transition-colors\">more_vert</button>\n</div>\n</td>\n</tr>\n<!-- Row 3 -->\n<tr class=\"hover:bg-surface-container-low transition-colors group\">\n<td class=\"px-gutter py-md\">\n<div class=\"flex items-center gap-md\">\n<div class=\"h-10 w-10 rounded-full bg-surface-container-high flex items-center justify-center text-outline font-bold text-label-md\">BK</div>\n<div>\n<div class=\"font-label-md text-on-surface\">Benjamin Kalu</div>\n<div class=\"text-on-surface-variant font-label-sm\">b.kalu@mcss.edu</div>\n</div>\n</div>\n</td>\n<td class=\"px-gutter py-md font-body-md text-on-surface-variant\">MC-2023-112</td>\n<td class=\"px-gutter py-md\">\n<span class=\"bg-outline-variant/30 text-outline px-3 py-1 rounded-full font-label-sm\">Librarian</span>\n</td>\n<td class=\"px-gutter py-md font-body-md text-on-surface-variant\">Information Center</td>\n<td class=\"px-gutter py-md\">\n<div class=\"ribbon-tag bg-surface-container-highest text-on-surface-variant text-[10px] font-bold px-2 py-1 inline-flex items-center gap-1\">\n<span class=\"h-1.5 w-1.5 rounded-full bg-outline\"></span>\n                                    INACTIVE\n                                </div>\n</td>\n<td class=\"px-gutter py-md text-right\">\n<div class=\"flex justify-end gap-sm opacity-40 group-hover:opacity-100 transition-opacity\">\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-primary transition-colors\">edit</button>\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-primary transition-colors\">person</button>\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-on-surface transition-colors\">more_vert</button>\n</div>\n</td>\n</tr>\n<!-- Row 4 -->\n<tr class=\"hover:bg-surface-container-low transition-colors group\">\n<td class=\"px-gutter py-md\">\n<div class=\"flex items-center gap-md\">\n<div class=\"h-10 w-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed font-bold text-label-md\">MW</div>\n<div>\n<div class=\"font-label-md text-on-surface\">Marcus Webb</div>\n<div class=\"text-on-surface-variant font-label-sm\">m.webb@mcss.edu</div>\n</div>\n</div>\n</td>\n<td class=\"px-gutter py-md font-body-md text-on-surface-variant\">MC-2024-088</td>\n<td class=\"px-gutter py-md\">\n<span class=\"bg-tertiary-container/10 text-on-tertiary-fixed-variant px-3 py-1 rounded-full font-label-sm\">Teacher</span>\n</td>\n<td class=\"px-gutter py-md font-body-md text-on-surface-variant\">Annex / Arts</td>\n<td class=\"px-gutter py-md\">\n<div class=\"ribbon-tag bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-1 inline-flex items-center gap-1\">\n<span class=\"h-1.5 w-1.5 rounded-full bg-emerald-600\"></span>\n                                    ACTIVE\n                                </div>\n</td>\n<td class=\"px-gutter py-md text-right\">\n<div class=\"flex justify-end gap-sm opacity-40 group-hover:opacity-100 transition-opacity\">\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-primary transition-colors\">edit</button>\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-error transition-colors\">person_off</button>\n<button class=\"material-symbols-outlined p-1 text-on-surface-variant hover:text-on-surface transition-colors\">more_vert</button>\n</div>\n</td>\n</tr>\n</tbody>\n</table>\n<!-- Pagination -->\n<div class=\"px-gutter py-md bg-surface-container flex justify-between items-center\">\n<p class=\"font-label-sm text-on-surface-variant\">Showing 4 of 128 Staff Members</p>\n<div class=\"flex gap-sm\">\n<button class=\"p-2 rounded-md hover:bg-surface-container-high border border-outline-variant\"><span class=\"material-symbols-outlined text-[20px]\">chevron_left</span></button>\n<button class=\"p-2 px-4 rounded-md bg-primary text-on-primary font-label-sm\">1</button>\n<button class=\"p-2 px-4 rounded-md hover:bg-surface-container-high font-label-sm\">2</button>\n<button class=\"p-2 px-4 rounded-md hover:bg-surface-container-high font-label-sm\">3</button>\n<button class=\"p-2 rounded-md hover:bg-surface-container-high border border-outline-variant\"><span class=\"material-symbols-outlined text-[20px]\">chevron_right</span></button>\n</div>\n</div>\n</div>\n</section>\n<!-- Footer (Mandatory Shared Component) -->\n<footer class=\"w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary dark:bg-secondary-fixed-dim text-on-secondary dark:text-on-secondary-fixed\">\n<div>\n<p class=\"font-body-md\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap gap-lg justify-end mt-md md:mt-0\">\n<a class=\"font-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</footer>\n</main>\n<!-- Create Staff Modal -->\n<div class=\"fixed inset-0 z-50 hidden\" id=\"createStaffModal\">\n<div class=\"absolute inset-0 bg-primary/40 modal-overlay\" onclick=\"closeModal()\"></div>\n<div class=\"absolute right-0 top-0 h-full w-full max-w-md bg-surface-container-lowest shadow-xl flex flex-col transform transition-transform duration-300 translate-x-full\" id=\"modalContent\">\n<div class=\"p-lg border-b border-outline-variant flex justify-between items-center bg-primary text-on-primary\">\n<h3 class=\"font-headline-md\">New Staff Member</h3>\n<button class=\"material-symbols-outlined hover:rotate-90 transition-all\" onclick=\"closeModal()\">close</button>\n</div>\n<div class=\"flex-1 overflow-y-auto p-lg custom-scrollbar\">\n<form class=\"space-y-lg\">\n<!-- Personal Info -->\n<div class=\"space-y-md\">\n<h4 class=\"font-label-md text-primary uppercase tracking-widest border-b border-outline-variant pb-xs\">Identity</h4>\n<div class=\"grid grid-cols-2 gap-md\">\n<div class=\"space-y-xs\">\n<label class=\"font-label-sm text-on-surface-variant\">First Name</label>\n<input class=\"w-full border border-outline-variant rounded-md px-4 py-2 font-body-md focus:ring-2 focus:ring-primary outline-none\" type=\"text\"/>\n</div>\n<div class=\"space-y-xs\">\n<label class=\"font-label-sm text-on-surface-variant\">Last Name</label>\n<input class=\"w-full border border-outline-variant rounded-md px-4 py-2 font-body-md focus:ring-2 focus:ring-primary outline-none\" type=\"text\"/>\n</div>\n</div>\n<div class=\"space-y-xs\">\n<label class=\"font-label-sm text-on-surface-variant\">Email Address</label>\n<input class=\"w-full border border-outline-variant rounded-md px-4 py-2 font-body-md focus:ring-2 focus:ring-primary outline-none\" type=\"email\"/>\n</div>\n</div>\n<!-- Role Assignment -->\n<div class=\"space-y-md\">\n<h4 class=\"font-label-md text-primary uppercase tracking-widest border-b border-outline-variant pb-xs\">Role & Access</h4>\n<div class=\"space-y-xs\">\n<label class=\"font-label-sm text-on-surface-variant\">Assign Role</label>\n<select class=\"w-full border border-outline-variant rounded-md px-4 py-2 font-body-md focus:ring-2 focus:ring-primary outline-none\">\n<option>Select a role...</option>\n<option>Teacher</option>\n<option>Bursary</option>\n<option>Librarian</option>\n<option>School Administrator</option>\n<option>Super Admin</option>\n</select>\n</div>\n<div class=\"space-y-xs\">\n<label class=\"font-label-sm text-on-surface-variant\">Primary Campus</label>\n<select class=\"w-full border border-outline-variant rounded-md px-4 py-2 font-body-md focus:ring-2 focus:ring-primary outline-none\">\n<option>Main Campus</option>\n<option>Tech Annex</option>\n<option>Sports Complex</option>\n</select>\n</div>\n</div>\n<!-- Scoped Permissions (Visual feedback) -->\n<div class=\"p-md bg-surface-container-low rounded-lg border border-dashed border-outline\">\n<h5 class=\"font-label-sm text-primary mb-sm flex items-center gap-xs\">\n<span class=\"material-symbols-outlined text-[16px]\">visibility</span>\n                            Role Preview: Teacher\n                        </h5>\n<ul class=\"text-[12px] space-y-1 text-on-surface-variant font-body-md\">\n<li class=\"flex items-center gap-sm\"><span class=\"material-symbols-outlined text-[14px] text-emerald-600\">check_circle</span> Can view student profiles</li>\n<li class=\"flex items-center gap-sm\"><span class=\"material-symbols-outlined text-[14px] text-emerald-600\">check_circle</span> Can input grade results</li>\n<li class=\"flex items-center gap-sm\"><span class=\"material-symbols-outlined text-[14px] text-error\">cancel</span> Cannot access financial records</li>\n</ul>\n</div>\n</form>\n</div>\n<div class=\"p-lg bg-surface-container border-t border-outline-variant flex gap-md\">\n<button class=\"flex-1 py-3 font-label-md border border-primary text-primary rounded-lg hover:bg-surface transition-all\" onclick=\"closeModal()\">Cancel</button>\n<button class=\"flex-1 py-3 font-label-md bg-primary text-on-primary rounded-lg hover:opacity-90 transition-all shadow-sm\">Save Account</button>\n</div>\n</div>\n</div>";
+const inputClasses =
+  'w-full border border-outline/20 rounded-md px-4 py-2 font-body-md bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all';
 
 export default function SuperAdminStaff() {
-  return <StitchScreen title="Staff Management" bodyClassName="bg-background text-on-surface font-body-md overflow-x-hidden min-h-screen" html={html} />;
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  return (
+    <AppShell portalId="superAdmin" pageTitle="Staff Management" user={{ name: 'Super Admin' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader
+          title="Staff Account Management"
+          subtitle="Create, scope, and audit staff accounts across every campus."
+          actions={
+            <Button variant="primary" iconLeft="person_add" onClick={() => setDrawerOpen(true)}>
+              Create New Staff
+            </Button>
+          }
+        />
+
+        <div className="flex flex-wrap gap-md">
+          <div className="relative w-full sm:w-72">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+            <input className={`${inputClasses} pl-10`} placeholder="Search staff by name, ID or email..." type="text" />
+          </div>
+          <select className={`${inputClasses} sm:w-auto`}>
+            {roles.map((role) => (
+              <option key={role}>{role}</option>
+            ))}
+          </select>
+          <select className={`${inputClasses} sm:w-auto`}>
+            {schools.map((school) => (
+              <option key={school}>{school}</option>
+            ))}
+          </select>
+        </div>
+
+        <Card padding="none" className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-200 text-left border-collapse">
+              <thead className="bg-primary text-on-primary">
+                <tr>
+                  <th className="px-gutter py-md font-label-md uppercase tracking-wider">Staff Member</th>
+                  <th className="px-gutter py-md font-label-md uppercase tracking-wider">Staff ID</th>
+                  <th className="px-gutter py-md font-label-md uppercase tracking-wider">Role &amp; Access</th>
+                  <th className="px-gutter py-md font-label-md uppercase tracking-wider">School / Dept</th>
+                  <th className="px-gutter py-md font-label-md uppercase tracking-wider">Status</th>
+                  <th className="px-gutter py-md font-label-md uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-outline/10">
+                {staff.map((member) => (
+                  <tr key={member.id} className="hover:bg-surface-container-low transition-colors group">
+                    <td className="px-gutter py-md">
+                      <div className="flex items-center gap-md">
+                        <Avatar fallbackInitials={member.initials} alt={member.name} />
+                        <div>
+                          <div className="font-label-md text-on-surface">{member.name}</div>
+                          <div className="text-on-surface-variant font-label-sm">{member.email}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-gutter py-md font-body-md text-on-surface-variant">{member.id}</td>
+                    <td className="px-gutter py-md">
+                      <span className={`px-3 py-1 rounded-full font-label-sm ${member.tone}`}>{member.role}</span>
+                    </td>
+                    <td className="px-gutter py-md font-body-md text-on-surface-variant">{member.dept}</td>
+                    <td className="px-gutter py-md">
+                      <Badge tone={staffStatusTone[member.status]}>{member.status}</Badge>
+                    </td>
+                    <td className="px-gutter py-md text-right">
+                      <div className="flex justify-end gap-sm opacity-40 group-hover:opacity-100 transition-opacity">
+                        <button className="p-1 text-on-surface-variant hover:text-primary transition-colors">
+                          <span className="material-symbols-outlined">edit</span>
+                        </button>
+                        <button className="p-1 text-on-surface-variant hover:text-error transition-colors">
+                          <span className="material-symbols-outlined">{member.status === 'Active' ? 'person_off' : 'person'}</span>
+                        </button>
+                        <button className="p-1 text-on-surface-variant hover:text-on-surface transition-colors">
+                          <span className="material-symbols-outlined">more_vert</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-gutter py-md bg-surface-container flex justify-between items-center">
+            <p className="font-label-sm text-on-surface-variant">
+              Showing {staff.length} of {totalStaff} Staff Members
+            </p>
+            <div className="flex gap-sm">
+              <button className="p-2 rounded-md hover:bg-surface-container-high border border-outline/20">
+                <span className="material-symbols-outlined text-sm">chevron_left</span>
+              </button>
+              <button className="p-2 px-4 rounded-md bg-primary text-on-primary font-label-sm">1</button>
+              <button className="p-2 px-4 rounded-md hover:bg-surface-container-high font-label-sm">2</button>
+              <button className="p-2 px-4 rounded-md hover:bg-surface-container-high font-label-sm">3</button>
+              <button className="p-2 rounded-md hover:bg-surface-container-high border border-outline/20">
+                <span className="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <Drawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        title="New Staff Member"
+        footer={
+          <>
+            <Button variant="secondary" className="flex-1 justify-center" onClick={() => setDrawerOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" className="flex-1 justify-center" onClick={() => setDrawerOpen(false)}>
+              Save Account
+            </Button>
+          </>
+        }
+      >
+        <form className="space-y-lg" onSubmit={(e) => e.preventDefault()}>
+          <div className="space-y-md">
+            <h4 className="font-label-md text-primary uppercase tracking-widest border-b border-outline/10 pb-xs">Identity</h4>
+            <div className="grid grid-cols-2 gap-md">
+              <div className="space-y-xs">
+                <label className="font-label-sm text-on-surface-variant">First Name</label>
+                <input className={inputClasses} type="text" />
+              </div>
+              <div className="space-y-xs">
+                <label className="font-label-sm text-on-surface-variant">Last Name</label>
+                <input className={inputClasses} type="text" />
+              </div>
+            </div>
+            <div className="space-y-xs">
+              <label className="font-label-sm text-on-surface-variant">Email Address</label>
+              <input className={inputClasses} type="email" />
+            </div>
+          </div>
+
+          <div className="space-y-md">
+            <h4 className="font-label-md text-primary uppercase tracking-widest border-b border-outline/10 pb-xs">Role &amp; Access</h4>
+            <div className="space-y-xs">
+              <label className="font-label-sm text-on-surface-variant">Assign Role</label>
+              <select className={inputClasses}>
+                <option>Select a role...</option>
+                <option>Teacher</option>
+                <option>Bursary</option>
+                <option>Librarian</option>
+                <option>School Administrator</option>
+                <option>Super Admin</option>
+              </select>
+            </div>
+            <div className="space-y-xs">
+              <label className="font-label-sm text-on-surface-variant">Primary Campus</label>
+              <select className={inputClasses}>
+                {schools.slice(1).map((school) => (
+                  <option key={school}>{school}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="p-md bg-surface-container-low rounded-lg border border-dashed border-outline/30">
+            <h5 className="font-label-sm text-primary mb-sm flex items-center gap-xs">
+              <span className="material-symbols-outlined text-sm">visibility</span>
+              Role Preview: Teacher
+            </h5>
+            <ul className="text-xs space-y-1 text-on-surface-variant font-body-md">
+              {rolePermissions.map((perm) => (
+                <li key={perm.text} className="flex items-center gap-sm">
+                  <span className={`material-symbols-outlined text-sm ${perm.allowed ? 'text-secondary' : 'text-error'}`}>
+                    {perm.allowed ? 'check_circle' : 'cancel'}
+                  </span>
+                  {perm.text}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </form>
+      </Drawer>
+    </AppShell>
+  );
 }

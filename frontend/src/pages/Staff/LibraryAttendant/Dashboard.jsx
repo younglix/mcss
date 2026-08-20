@@ -1,7 +1,174 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
+import AppShell from '../../../components/layout/AppShell.jsx';
+import PageHeader from '../../../components/ui/PageHeader.jsx';
+import Card from '../../../components/ui/Card.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
+import Button from '../../../components/ui/Button.jsx';
+import { circulation, shift, genres, catalog, shortcuts } from './catalogData.js';
 
-const html = "<!-- SideNavBar Shell -->\n<aside class=\"fixed left-0 top-0 h-full w-64 bg-primary flex flex-col py-md z-40 shadow-sm\">\n<div class=\"px-md mb-xl\">\n<h1 class=\"font-headline-md text-headline-md text-on-primary font-bold\">Mount Carmel</h1>\n<p class=\"font-label-sm text-label-sm text-on-primary/60\">Library Portal</p>\n</div>\n<nav class=\"flex-1 space-y-2\"><!-- Dashboard Tab (Inactive) -->\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out group\" href=\"#\">\n<span class=\"material-symbols-outlined\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<!-- Catalog Tab (Active) -->\n<a class=\"flex items-center gap-md border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary py-3 px-6 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">book</span>\n<span class=\"font-label-md text-label-md\">Catalog</span>\n</a>\n<!-- Borrow/Return Tab (Inactive) -->\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">swap_horiz</span>\n<span class=\"font-label-md text-label-md\">Borrow/Return</span>\n</a>\n<!-- Overdue Tracker Tab (Inactive) -->\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">history_toggle_off</span>\n<span class=\"font-label-md text-label-md\">Overdue Tracker</span>\n</a>\n<!-- Profile Tab (Inactive) -->\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">person</span>\n<span class=\"font-label-md text-label-md\">Profile</span>\n</a></nav>\n<div class=\"mt-auto border-t border-on-primary/10 pt-md\">\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">settings</span>\n<span class=\"font-label-md text-label-md\">Settings</span>\n</a>\n<a class=\"flex items-center gap-md text-on-primary/70 py-3 px-6 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Main Content Canvas -->\n<main class=\"ml-64 p-xl max-w-container-max mx-auto\">\n<!-- Header -->\n<header class=\"flex justify-between items-end mb-xl\">\n<div>\n<h2 class=\"font-headline-lg text-headline-lg text-primary\">Library Catalog</h2>\n<p class=\"font-body-md text-body-md text-on-surface-variant\">Manage collection items, circulation status, and resource categorization.</p>\n</div>\n<div class=\"flex gap-md\">\n<button class=\"bg-surface-container-lowest border border-outline px-md py-sm rounded-DEFAULT flex items-center gap-xs hover:bg-surface-container transition-colors\">\n<span class=\"material-symbols-outlined text-[20px]\">filter_list</span>\n<span class=\"font-label-md text-label-md\">Filters</span>\n</button>\n<button class=\"bg-primary text-on-primary px-lg py-sm rounded-DEFAULT font-label-md text-label-md hover:opacity-90 transition-all shadow-sm\">\n                    + Add New Book\n                </button>\n</div>\n</header>\n<!-- Stats Overview (Asymmetric Bento) -->\n<section class=\"bento-grid mb-xl\">\n<div class=\"col-span-8 bg-surface-container-lowest border border-outline-variant p-lg rounded-lg flex justify-between items-center relative overflow-hidden\">\n<div class=\"relative z-10\">\n<p class=\"font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs\">Live Circulation</p>\n<h3 class=\"font-headline-xl text-headline-xl text-primary\">2,481</h3>\n<p class=\"font-body-md text-body-md text-on-surface-variant mt-sm\">Total items currently in active collection.</p>\n</div>\n<div class=\"h-24 w-48 bg-primary-container/10 rounded-full blur-3xl absolute -right-10 -top-10\"></div>\n<div class=\"flex gap-lg z-10\">\n<div class=\"text-center\">\n<span class=\"block font-headline-md text-headline-md text-secondary\">156</span>\n<span class=\"font-label-sm text-label-sm text-on-surface-variant\">Borrowed</span>\n</div>\n<div class=\"text-center\">\n<span class=\"block font-headline-md text-headline-md text-error\">24</span>\n<span class=\"font-label-sm text-label-sm text-on-surface-variant\">Overdue</span>\n</div>\n</div>\n</div>\n<div class=\"col-span-4 bg-secondary text-on-secondary p-lg rounded-lg flex flex-col justify-between\">\n<div class=\"flex justify-between items-start\">\n<span class=\"material-symbols-outlined text-[32px]\">auto_stories</span>\n<span class=\"bg-on-secondary/20 px-sm py-xs rounded-full font-label-sm text-label-sm\">Active Now</span>\n</div>\n<div>\n<h4 class=\"font-headline-md text-headline-md mb-xs\">Attendant Shift</h4>\n<p class=\"font-body-md text-body-md opacity-80\">Logged in as: Sister Mary Grace<br>Shift ends in 2h 15m</p>\n</div>\n</div>\n</section>\n<!-- Search & Catalog Table -->\n<section class=\"bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm overflow-x-auto\">\n<div class=\"p-lg border-b border-outline-variant bg-surface-container-low flex items-center gap-lg\">\n<div class=\"relative flex-1\">\n<span class=\"material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant\">search</span>\n<input class=\"w-full pl-xl pr-md py-sm bg-white border border-outline rounded-DEFAULT focus:ring-2 focus:ring-primary focus:border-primary outline-none font-body-md text-body-md transition-all\" placeholder=\"Search by Title, Author, or ISBN...\" type=\"text\">\n</div>\n<select class=\"bg-white border border-outline rounded-DEFAULT px-md py-sm font-label-md text-label-md outline-none cursor-pointer\">\n<option>All Genres</option>\n<option>Theology</option>\n<option>Sciences</option>\n<option>Literature</option>\n<option>History</option>\n</select>\n</div>\n<table class=\"w-full text-left border-collapse\">\n<thead>\n<tr class=\"bg-primary text-on-primary\">\n<th class=\"px-lg py-md font-label-md text-label-md\">RESOURCE</th>\n<th class=\"px-lg py-md font-label-md text-label-md\">AUTHOR / ISBN</th>\n<th class=\"px-lg py-md font-label-md text-label-md\">GENRE</th>\n<th class=\"px-lg py-md font-label-md text-label-md\">STATUS</th>\n<th class=\"px-lg py-md font-label-md text-label-md\">ACTIONS</th>\n</tr>\n</thead>\n<tbody class=\"font-body-md text-body-md\">\n<!-- Row 1 -->\n<tr class=\"border-b border-outline-variant hover:bg-surface-container-low transition-colors\">\n<td class=\"px-lg py-md\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-12 h-16 bg-surface-container-high rounded shadow-sm overflow-hidden flex-shrink-0\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A classic book cover with gold-embossed title and ornate borders, sitting on a dark wood surface. The lighting is dramatic and academic, emphasizing the rich purple texture of the cover. High-contrast and professional aesthetic.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuB_t5PcALD_CizRC8PseX5ZHmMk4gCrIO_Dt7S0p1GAjyLyldf9O-WdNdIEDXfyzkBKwFo9oUcOKvGSyuQGMfu4pNVtVvFHv0wXbhnxR3gO4nMOTCIsdXWv_fCmyinoTq_nO1YvXnnDnxuef1KQPfkzi3wJUZ1NM_vY1dzEFuGB6rQ-BKiTGTNx4NtSm-9eWM7LYgDvIYGOQ3S46HUMaOFtEd-5KBtYfeiv7sxTuC4vNZmHLMWtr6Yc19vwaxw3ZbzCQl_cZDhESBJ3\">\n</div>\n<div>\n<span class=\"block font-bold text-primary\">Confessions of St. Augustine</span>\n<span class=\"font-label-sm text-label-sm text-on-surface-variant\">Shelf 4A-22</span>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-md text-on-surface-variant\">\n<span class=\"block\">St. Augustine</span>\n<span class=\"text-xs font-mono\">978-0140441147</span>\n</td>\n<td class=\"px-lg py-md\">\n<span class=\"bg-tertiary-fixed text-on-tertiary-fixed-variant px-sm py-xs rounded-full font-label-sm text-label-sm\">Theology</span>\n</td>\n<td class=\"px-lg py-md\">\n<div class=\"inline-block bg-secondary-container/30 text-on-secondary-container px-md py-xs ribbon-tag font-label-sm text-label-md\">\n                                AVAILABLE\n                            </div>\n</td>\n<td class=\"px-lg py-md\">\n<button class=\"text-primary hover:bg-primary/10 p-xs rounded transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n<button class=\"text-primary hover:bg-primary/10 p-xs rounded transition-colors ml-xs\"><span class=\"material-symbols-outlined\">more_vert</span></button>\n</td>\n</tr>\n<!-- Row 2 -->\n<tr class=\"border-b border-outline-variant hover:bg-surface-container-low transition-colors\">\n<td class=\"px-lg py-md\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-12 h-16 bg-surface-container-high rounded shadow-sm overflow-hidden flex-shrink-0\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A modern science textbook cover with a stylized DNA helix and molecular structures in vibrant blue and magenta. The design is clean, technical, and academic, fitting a high-end school portal. Studio lighting with soft shadows.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAEVF-ltP_oQTMYUppslI0X9oqGnXgE2Eq4L9krrdfj0-EI9SsEMSg1y3D0ov8q3jKc4Rx8-V3Ee2D4otWAnA3EOi740L-50pSrClxIu8jW5KBNTbttuiwpBvVG4F7hzchVfnY602-UmtYjKf908_CtzJIPW-hjbgGUAVLY7w0iSTyV-_pq8zaeq_Cev6SgaEVNhSZuvfE92sgV3WazuMMNU2z699srLhJdSi7EF-LbR1YfoagFB5Pfb1S0b6nMX9_-Hw_FGS4m7-45\">\n</div>\n<div>\n<span class=\"block font-bold text-primary\">Principles of Biology v2</span>\n<span class=\"font-label-sm text-label-sm text-on-surface-variant\">Shelf 12C-04</span>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-md text-on-surface-variant\">\n<span class=\"block\">Dr. Robert Chen</span>\n<span class=\"text-xs font-mono\">978-0131404467</span>\n</td>\n<td class=\"px-lg py-md\">\n<span class=\"bg-secondary-fixed text-on-secondary-fixed-variant px-sm py-xs rounded-full font-label-sm text-label-sm\">Sciences</span>\n</td>\n<td class=\"px-lg py-md\">\n<div class=\"inline-block bg-error-container text-on-error-container px-md py-xs ribbon-tag font-label-sm text-label-md\">\n                                BORROWED\n                            </div>\n</td>\n<td class=\"px-lg py-md\">\n<button class=\"text-primary hover:bg-primary/10 p-xs rounded transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n<button class=\"text-primary hover:bg-primary/10 p-xs rounded transition-colors ml-xs\"><span class=\"material-symbols-outlined\">more_vert</span></button>\n</td>\n</tr>\n<!-- Row 3 -->\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"px-lg py-md\">\n<div class=\"flex items-center gap-md\">\n<div class=\"w-12 h-16 bg-surface-container-high rounded shadow-sm overflow-hidden flex-shrink-0\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A literary classic book cover featuring an elegant minimalist quill sketch on ivory paper texture. Sophisticated purple and gold accents reflect the prestige of Mount Carmel Secondary. High-resolution textures and artistic depth.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAVjzLFudwDomx_oZAaY-zr9ND-5ROx-ld18YLxVFNwL7XoaeWXjZNGZAjQZ2tvoDv5t93EAw11L1L-U9Qw0HMWhaD3Z8rdZQ3zDxs6cZ3A37g270cMmnBqr-b91IeXeg--OQAQI2D-tXxB8pnZwjr0cBboUIL3-w3fkaCusolvtMyNwAMX2yYDYhl4E4j43Cjs8M6z09aj9-lfl-YNeQM0hk44PNUtgKTgn2Hdmeqq3jB932WvuWUd98DEYdZjSJcROyyiMz9O-g5A\">\n</div>\n<div>\n<span class=\"block font-bold text-primary\">Great Expectations</span>\n<span class=\"font-label-sm text-label-sm text-on-surface-variant\">Shelf 7B-11</span>\n</div>\n</div>\n</td>\n<td class=\"px-lg py-md text-on-surface-variant\">\n<span class=\"block\">Charles Dickens</span>\n<span class=\"text-xs font-mono\">978-0141439563</span>\n</td>\n<td class=\"px-lg py-md\">\n<span class=\"bg-primary-fixed text-on-primary-fixed-variant px-sm py-xs rounded-full font-label-sm text-label-sm\">Literature</span>\n</td>\n<td class=\"px-lg py-md\">\n<div class=\"inline-block bg-secondary-container/30 text-on-secondary-container px-md py-xs ribbon-tag font-label-sm text-label-md\">\n                                AVAILABLE\n                            </div>\n</td>\n<td class=\"px-lg py-md\">\n<button class=\"text-primary hover:bg-primary/10 p-xs rounded transition-colors\"><span class=\"material-symbols-outlined\">edit</span></button>\n<button class=\"text-primary hover:bg-primary/10 p-xs rounded transition-colors ml-xs\"><span class=\"material-symbols-outlined\">more_vert</span></button>\n</td>\n</tr>\n</tbody>\n</table>\n<div class=\"p-lg border-t border-outline-variant bg-surface-container-low flex justify-between items-center\">\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Showing 1-10 of 2,481 entries</p>\n<div class=\"flex gap-xs\">\n<button class=\"px-sm py-xs bg-white border border-outline rounded hover:bg-surface-container transition-colors min-h-[44px]\"><span class=\"material-symbols-outlined text-[18px]\">chevron_left</span></button>\n<button class=\"px-md py-xs bg-primary text-on-primary rounded font-label-sm min-h-[44px]\">1</button>\n<button class=\"px-md py-xs bg-white border border-outline rounded hover:bg-surface-container transition-colors font-label-sm min-h-[44px]\">2</button>\n<button class=\"px-md py-xs bg-white border border-outline rounded hover:bg-surface-container transition-colors font-label-sm min-h-[44px]\">3</button>\n<button class=\"px-sm py-xs bg-white border border-outline rounded hover:bg-surface-container transition-colors min-h-[44px]\"><span class=\"material-symbols-outlined text-[18px]\">chevron_right</span></button>\n</div>\n</div>\n</section>\n<!-- Contextual Help / Shortcuts -->\n<section class=\"mt-xl grid grid-cols-1 md:grid-cols-3 gap-lg\">\n<div class=\"bg-white border border-outline-variant p-md rounded-lg flex gap-md items-center shadow-sm\">\n<div class=\"bg-primary-container/20 p-sm rounded-full\">\n<span class=\"material-symbols-outlined text-primary\" style=\"font-variation-settings: 'FILL' 1;\">qr_code_scanner</span>\n</div>\n<div>\n<h5 class=\"font-label-md text-label-md text-primary\">Bulk Check-out</h5>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Rapid scanner mode for classes.</p>\n</div>\n</div>\n<div class=\"bg-white border border-outline-variant p-md rounded-lg flex gap-md items-center shadow-sm\">\n<div class=\"bg-tertiary-container/20 p-sm rounded-full\">\n<span class=\"material-symbols-outlined text-on-tertiary-fixed-variant\" style=\"font-variation-settings: 'FILL' 1;\">assignment_late</span>\n</div>\n<div>\n<h5 class=\"font-label-md text-label-md text-primary\">Report Damage</h5>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Flag items for preservation.</p>\n</div>\n</div>\n<div class=\"bg-white border border-outline-variant p-md rounded-lg flex gap-md items-center shadow-sm\">\n<div class=\"bg-secondary-container/20 p-sm rounded-full\">\n<span class=\"material-symbols-outlined text-secondary\" style=\"font-variation-settings: 'FILL' 1;\">local_library</span>\n</div>\n<div>\n<h5 class=\"font-label-md text-label-md text-primary\">Inter-Library Loan</h5>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Request from partner schools.</p>\n</div>\n</div>\n</section>\n</main>\n<!-- Footer Shell -->\n<footer class=\"ml-64 w-auto py-xl px-xl grid grid-cols-1 md:grid-cols-2 items-center bg-secondary text-on-secondary mt-xl\">\n<div>\n<p class=\"font-headline-md text-headline-md text-on-secondary font-bold\">Mount Carmel Secondary</p>\n<p class=\"font-body-md text-body-md opacity-80 mt-xs\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap gap-lg justify-end mt-lg md:mt-0\">\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</footer>\n<!-- Micro-interaction Script -->";
+const shortcutTone = {
+  primary: 'bg-primary/10 text-primary',
+  tertiary: 'bg-tertiary-container text-on-tertiary-container',
+  secondary: 'bg-secondary-container text-on-secondary-container',
+};
 
 export default function LibraryAttendantDashboard() {
-  return <StitchScreen title="Library Attendant" bodyClassName="bg-background text-on-background min-h-screen overflow-x-hidden" html={html} />;
+  return (
+    <AppShell portalId="libraryAttendant" pageTitle="Library Attendant" user={{ name: shift.attendant }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader
+          title="Library Catalog"
+          subtitle="Manage collection items, circulation status, and resource categorization."
+          actions={
+            <>
+              <Button variant="secondary" iconLeft="filter_list">
+                Filters
+              </Button>
+              <Button variant="primary" iconLeft="add">
+                Add New Book
+              </Button>
+            </>
+          }
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-lg">
+          <Card padding="lg" className="md:col-span-8 flex flex-wrap justify-between items-center gap-lg">
+            <div>
+              <p className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Live Circulation</p>
+              <h3 className="font-headline-xl text-headline-xl text-primary">{circulation.total.toLocaleString()}</h3>
+              <p className="font-body-md text-body-md text-on-surface-variant mt-sm">Total items currently in active collection.</p>
+            </div>
+            <div className="flex gap-lg">
+              <div className="text-center">
+                <span className="block font-headline-md text-headline-md text-secondary">{circulation.borrowed}</span>
+                <span className="font-label-sm text-label-sm text-on-surface-variant">Borrowed</span>
+              </div>
+              <div className="text-center">
+                <span className="block font-headline-md text-headline-md text-error">{circulation.overdue}</span>
+                <span className="font-label-sm text-label-sm text-on-surface-variant">Overdue</span>
+              </div>
+            </div>
+          </Card>
+
+          <Card padding="lg" className="md:col-span-4 bg-secondary text-on-secondary border-none flex flex-col justify-between">
+            <div className="flex justify-between items-start">
+              <span className="material-symbols-outlined text-headline-lg">auto_stories</span>
+              <span className="bg-on-secondary/20 px-sm py-xs rounded-full font-label-sm text-label-sm">Active Now</span>
+            </div>
+            <div>
+              <h4 className="font-headline-md text-headline-md mb-xs">Attendant Shift</h4>
+              <p className="font-body-md text-body-md opacity-80">
+                Logged in as: {shift.attendant}
+                <br />
+                Shift ends in {shift.endsIn}
+              </p>
+            </div>
+          </Card>
+        </div>
+
+        <Card padding="none" className="overflow-hidden">
+          <div className="p-lg border-b border-outline/10 bg-surface-container-low flex flex-col md:flex-row items-stretch md:items-center gap-lg">
+            <div className="relative flex-1">
+              <span className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+              <input
+                className="w-full pl-xl pr-md py-sm bg-surface-container-lowest border border-outline rounded focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-body-md text-body-md"
+                placeholder="Search by Title, Author, or ISBN..."
+                type="text"
+              />
+            </div>
+            <select className="bg-surface-container-lowest border border-outline rounded px-md py-sm font-label-md text-label-md">
+              {genres.map((genre) => (
+                <option key={genre}>{genre}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-175 text-left border-collapse">
+              <thead>
+                <tr className="bg-primary text-on-primary">
+                  <th className="px-lg py-md font-label-md text-label-md">Resource</th>
+                  <th className="px-lg py-md font-label-md text-label-md">Author / ISBN</th>
+                  <th className="px-lg py-md font-label-md text-label-md">Genre</th>
+                  <th className="px-lg py-md font-label-md text-label-md">Status</th>
+                  <th className="px-lg py-md font-label-md text-label-md">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="font-body-md text-body-md divide-y divide-outline/10">
+                {catalog.map((book) => (
+                  <tr key={book.title} className="hover:bg-surface-container-low transition-colors">
+                    <td className="px-lg py-md">
+                      <div className="flex items-center gap-md">
+                        <div className="w-12 h-16 rounded shadow-sm overflow-hidden shrink-0 bg-surface-container-high">
+                          <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                          <span className="block font-bold text-primary">{book.title}</span>
+                          <span className="font-label-sm text-label-sm text-on-surface-variant">{book.shelf}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-lg py-md text-on-surface-variant">
+                      <span className="block">{book.author}</span>
+                      <span className="text-xs font-mono">{book.isbn}</span>
+                    </td>
+                    <td className="px-lg py-md">
+                      <Badge tone="secondary">{book.genre}</Badge>
+                    </td>
+                    <td className="px-lg py-md">
+                      <Badge tone={book.status === 'Available' ? 'success' : 'error'} variant="ribbon">
+                        {book.status}
+                      </Badge>
+                    </td>
+                    <td className="px-lg py-md">
+                      <button className="text-primary hover:bg-primary/10 p-xs rounded transition-colors">
+                        <span className="material-symbols-outlined">edit</span>
+                      </button>
+                      <button className="text-primary hover:bg-primary/10 p-xs rounded transition-colors ml-xs">
+                        <span className="material-symbols-outlined">more_vert</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="p-lg border-t border-outline/10 bg-surface-container-low flex flex-col sm:flex-row justify-between items-center gap-md">
+            <p className="font-label-sm text-label-sm text-on-surface-variant">
+              Showing 1-10 of {circulation.total.toLocaleString()} entries
+            </p>
+            <div className="flex gap-xs">
+              <button className="px-sm py-xs bg-surface-container-lowest border border-outline rounded hover:bg-surface-container transition-colors min-h-11">
+                <span className="material-symbols-outlined text-body-md">chevron_left</span>
+              </button>
+              <button className="px-md py-xs bg-primary text-on-primary rounded font-label-sm min-h-11">1</button>
+              <button className="px-md py-xs bg-surface-container-lowest border border-outline rounded hover:bg-surface-container transition-colors font-label-sm min-h-11">
+                2
+              </button>
+              <button className="px-md py-xs bg-surface-container-lowest border border-outline rounded hover:bg-surface-container transition-colors font-label-sm min-h-11">
+                3
+              </button>
+              <button className="px-sm py-xs bg-surface-container-lowest border border-outline rounded hover:bg-surface-container transition-colors min-h-11">
+                <span className="material-symbols-outlined text-body-md">chevron_right</span>
+              </button>
+            </div>
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
+          {shortcuts.map((shortcut) => (
+            <Card key={shortcut.title} padding="sm" className="flex gap-md items-center">
+              <div className={`p-sm rounded-full ${shortcutTone[shortcut.tone]}`}>
+                <span className="material-symbols-outlined">{shortcut.icon}</span>
+              </div>
+              <div>
+                <h5 className="font-label-md text-label-md text-primary">{shortcut.title}</h5>
+                <p className="font-label-sm text-label-sm text-on-surface-variant">{shortcut.description}</p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </AppShell>
+  );
 }

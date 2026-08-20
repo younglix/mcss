@@ -1,7 +1,190 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
+import AppShell from '../../../components/layout/AppShell.jsx';
+import PageHeader from '../../../components/ui/PageHeader.jsx';
+import Card from '../../../components/ui/Card.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
+import Button from '../../../components/ui/Button.jsx';
+import { stats, clubs, totalClubs, featuredEvent, events, houses, grades, participationLog, totalEntries } from './activityData.js';
 
-const html = "<!-- SideNavBar Shell -->\n<aside class=\"fixed left-0 top-0 h-full w-64 bg-primary flex flex-col py-md z-40 shadow-sm transition-all duration-200 ease-in-out\">\n<div class=\"px-lg mb-xl\">\n<h1 class=\"font-headline-md text-headline-md text-on-primary\">Mount Carmel</h1>\n<p class=\"font-label-sm text-label-sm text-on-primary opacity-80 uppercase tracking-widest\">Admin Portal</p>\n</div>\n<nav class=\"flex-grow space-y-1\">\n<!-- Active Tab: Dashboard -->\n<a class=\"flex items-center border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary py-3 px-4 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-md\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-md\">calendar_today</span>\n<span class=\"font-label-md text-label-md\">Events Calendar</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-md\">assignment_ind</span>\n<span class=\"font-label-md text-label-md\">Participation Log</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-md\">groups</span>\n<span class=\"font-label-md text-label-md\">Clubs &amp; Houses</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-md\">payments</span>\n<span class=\"font-label-md text-label-md\">Budgeting</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-md\">description</span>\n<span class=\"font-label-md text-label-md\">Reports</span>\n</a>\n</nav>\n<div class=\"mt-auto px-1 space-y-1\">\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-md\">settings</span>\n<span class=\"font-label-md text-label-md\">Settings</span>\n</a>\n<a class=\"flex items-center text-on-primary/70 py-3 px-4 hover:bg-primary-container/10 transition-all duration-200 ease-in-out\" href=\"#\">\n<span class=\"material-symbols-outlined mr-md\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Main Content Canvas -->\n<main class=\"ml-64 min-h-screen p-lg max-w-container-max mx-auto\">\n<!-- Header / Top Bar Area -->\n<header class=\"flex justify-between items-center mb-xl\">\n<div>\n<h2 class=\"font-headline-lg text-headline-lg text-primary\">Extracurricular Participation</h2>\n<p class=\"font-body-md text-body-md text-on-surface-variant\">Activity Coordinator Dashboard · Term 2, 2024</p>\n</div>\n<div class=\"flex items-center space-x-md\">\n<div class=\"relative\">\n<span class=\"material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline\">search</span>\n<input class=\"pl-10 pr-4 py-2 border border-outline-variant rounded-full font-body-md focus:outline-none focus:ring-2 focus:ring-primary w-64 bg-white transition-all\" placeholder=\"Search student or activity...\" type=\"text\"/>\n</div>\n<button class=\"bg-primary text-white px-lg py-2 rounded-full font-headline-md text-sm hover:opacity-90 transition-all flex items-center\">\n<span class=\"material-symbols-outlined mr-2\">add</span>\n                    New Entry\n                </button>\n</div>\n</header>\n<!-- Bento Layout -->\n<div class=\"bento-grid\">\n<!-- Quick Stats Row -->\n<div class=\"col-span-12 grid grid-cols-1 md:grid-cols-4 gap-lg\">\n<div class=\"bento-item p-lg flex flex-col justify-center border-l-4 border-primary\">\n<span class=\"text-label-sm font-label-sm uppercase text-outline\">Total Clubs</span>\n<span class=\"text-headline-lg font-headline-lg text-primary\">24</span>\n</div>\n<div class=\"bento-item p-lg flex flex-col justify-center border-l-4 border-secondary\">\n<span class=\"text-label-sm font-label-sm uppercase text-outline\">Active Students</span>\n<span class=\"text-headline-lg font-headline-lg text-secondary\">842</span>\n</div>\n<div class=\"bento-item p-lg flex flex-col justify-center border-l-4 border-on-tertiary-container\">\n<span class=\"text-label-sm font-label-sm uppercase text-outline\">Pending Points</span>\n<span class=\"text-headline-lg font-headline-lg text-on-tertiary-container\">128</span>\n</div>\n<div class=\"bento-item p-lg flex flex-col justify-center border-l-4 border-error\">\n<span class=\"text-label-sm font-label-sm uppercase text-outline\">Urgent Tasks</span>\n<span class=\"text-headline-lg font-headline-lg text-error\">3</span>\n</div>\n</div>\n<!-- Active Clubs (Left Stack) -->\n<div class=\"col-span-12 md:col-span-4 flex flex-col gap-lg\">\n<div class=\"bento-item flex flex-col h-full\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant\">\n<h3 class=\"font-label-md text-label-md text-primary flex items-center\">\n<span class=\"material-symbols-outlined mr-2 text-sm\">groups_2</span> Active Clubs\n                        </h3>\n</div>\n<div class=\"p-lg space-y-md\">\n<!-- Club Card -->\n<div class=\"flex items-center p-md bg-surface-bright border border-outline-variant rounded-xl hover:shadow-sm transition-all group\">\n<div class=\"w-12 h-12 bg-primary-fixed text-primary flex items-center justify-center rounded-lg mr-md\">\n<span class=\"material-symbols-outlined\">forum</span>\n</div>\n<div class=\"flex-grow\">\n<h4 class=\"font-headline-md text-sm\">Debate Society</h4>\n<p class=\"font-body-md text-xs text-outline\">42 Members · Room 302</p>\n</div>\n<span class=\"material-symbols-outlined text-outline group-hover:text-primary transition-colors cursor-pointer\">chevron_right</span>\n</div>\n<!-- Club Card -->\n<div class=\"flex items-center p-md bg-surface-bright border border-outline-variant rounded-xl hover:shadow-sm transition-all group\">\n<div class=\"w-12 h-12 bg-secondary-fixed text-secondary flex items-center justify-center rounded-lg mr-md\">\n<span class=\"material-symbols-outlined\">sports_soccer</span>\n</div>\n<div class=\"flex-grow\">\n<h4 class=\"font-headline-md text-sm\">Varsity Sports</h4>\n<p class=\"font-body-md text-xs text-outline\">156 Members · Main Field</p>\n</div>\n<span class=\"material-symbols-outlined text-outline group-hover:text-primary transition-colors cursor-pointer\">chevron_right</span>\n</div>\n<!-- Club Card -->\n<div class=\"flex items-center p-md bg-surface-bright border border-outline-variant rounded-xl hover:shadow-sm transition-all group\">\n<div class=\"w-12 h-12 bg-tertiary-fixed text-on-tertiary-fixed-variant flex items-center justify-center rounded-lg mr-md\">\n<span class=\"material-symbols-outlined\">music_note</span>\n</div>\n<div class=\"flex-grow\">\n<h4 class=\"font-headline-md text-sm\">Senior Choir</h4>\n<p class=\"font-body-md text-xs text-outline\">38 Members · Chapel Hall</p>\n</div>\n<span class=\"material-symbols-outlined text-outline group-hover:text-primary transition-colors cursor-pointer\">chevron_right</span>\n</div>\n</div>\n<div class=\"mt-auto p-lg pt-0\">\n<button class=\"w-full text-center py-2 text-label-sm font-label-sm text-primary hover:underline\">View All 24 Clubs</button>\n</div>\n</div>\n</div>\n<!-- Inter-House Calendar (Middle) -->\n<div class=\"col-span-12 md:col-span-8 bento-item flex flex-col\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant flex justify-between items-center\">\n<h3 class=\"font-label-md text-label-md text-primary flex items-center\">\n<span class=\"material-symbols-outlined mr-2 text-sm\">calendar_month</span> Inter-House Events\n                    </h3>\n<div class=\"flex space-x-2\">\n<button class=\"p-1 hover:bg-outline-variant rounded\"><span class=\"material-symbols-outlined text-sm\">chevron_left</span></button>\n<span class=\"font-label-sm text-label-sm py-1\">October 2024</span>\n<button class=\"p-1 hover:bg-outline-variant rounded\"><span class=\"material-symbols-outlined text-sm\">chevron_right</span></button>\n</div>\n</div>\n<div class=\"p-lg grid grid-cols-1 md:grid-cols-2 gap-lg flex-grow\">\n<!-- High Priority Event -->\n<div class=\"relative bg-white border border-outline-variant rounded-2xl overflow-hidden group\">\n<div class=\"h-24 bg-cover bg-center\" data-alt=\"A dynamic action shot of high school students in colorful athletic jerseys competing on a lush green track field during a bright sunny afternoon. The atmosphere is energetic and professional, capturing a prestigious academic sports tradition with vibrant purple and white accents. Deep focus photography style.\" style=\"background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC50faO1XuwM6-Y8gC5-6QJi9DbSnRWtwVL6InwjE2tFiFVGo-9AYJeOx1upRKdqgvjpD-MspVb0E7LXxQleN-I0Z9teNYwW3yYHt6LMPECw-XNp0CXICyb6Xa1EuOVUXQ8Vhx8ct52yLhgIiiWeDQn-GoHM9rcdZR88ENWcB7WwExS8RBtB9IVNDEK39N4Tyn-E7IBQoW0qayI6lU3X9VyaGIIOXtt5mEEAk7VJMhEwPxtFujRzi084Ovb5n9W_0wKOShawNHlZceU')\"></div>\n<div class=\"p-md\">\n<div class=\"flex justify-between items-start mb-2\">\n<span class=\"bg-on-tertiary-container text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter flex items-center\">\n<span class=\"material-symbols-outlined text-[12px] mr-1\" style=\"font-variation-settings: 'FILL' 1;\">priority_high</span>\n                                    High Priority\n                                </span>\n<span class=\"text-label-sm font-label-sm text-outline\">Oct 14</span>\n</div>\n<h4 class=\"font-headline-md text-md mb-1\">Annual Sports Gala</h4>\n<p class=\"font-body-md text-xs text-on-surface-variant line-clamp-2\">Inter-house track and field championships. Mandatory attendance for all students and house masters.</p>\n</div>\n<div class=\"px-md pb-md flex justify-between items-center mt-auto\">\n<div class=\"flex -space-x-2\">\n<div class=\"w-6 h-6 rounded-full border border-white bg-slate-200\"></div>\n<div class=\"w-6 h-6 rounded-full border border-white bg-slate-300\"></div>\n<div class=\"w-6 h-6 rounded-full border border-white bg-slate-400\"></div>\n</div>\n<button class=\"text-primary font-label-sm text-xs hover:underline\">Manage Staff</button>\n</div>\n</div>\n<div class=\"space-y-md custom-scrollbar overflow-y-auto max-h-[350px] pr-2\">\n<!-- Standard Event -->\n<div class=\"flex gap-md items-start p-md hover:bg-surface-container-low rounded-xl transition-all cursor-pointer\">\n<div class=\"flex-shrink-0 w-12 text-center\">\n<span class=\"block font-headline-lg text-primary text-xl leading-none\">18</span>\n<span class=\"block font-label-sm text-[10px] uppercase text-outline\">Oct</span>\n</div>\n<div class=\"flex-grow\">\n<h5 class=\"font-label-md text-on-surface leading-tight\">Inter-House Quiz Finals</h5>\n<p class=\"text-xs text-outline font-body-md\">St. Peter's Hall · 2:30 PM</p>\n</div>\n<span class=\"material-symbols-outlined text-outline\">event</span>\n</div>\n<div class=\"flex gap-md items-start p-md hover:bg-surface-container-low rounded-xl transition-all cursor-pointer\">\n<div class=\"flex-shrink-0 w-12 text-center\">\n<span class=\"block font-headline-lg text-primary text-xl leading-none\">21</span>\n<span class=\"block font-label-sm text-[10px] uppercase text-outline\">Oct</span>\n</div>\n<div class=\"flex-grow\">\n<h5 class=\"font-label-md text-on-surface leading-tight\">House Drama Auditions</h5>\n<p class=\"text-xs text-outline font-body-md\">Main Theater · 4:00 PM</p>\n</div>\n<span class=\"material-symbols-outlined text-outline\">event</span>\n</div>\n<!-- Urgent Event -->\n<div class=\"flex gap-md items-start p-md bg-on-tertiary-container/5 border border-on-tertiary-container/20 rounded-xl transition-all cursor-pointer\">\n<div class=\"flex-shrink-0 w-12 text-center\">\n<span class=\"block font-headline-lg text-on-tertiary-container text-xl leading-none\">25</span>\n<span class=\"block font-label-sm text-[10px] uppercase text-on-tertiary-container\">Oct</span>\n</div>\n<div class=\"flex-grow\">\n<h5 class=\"font-label-md text-on-surface leading-tight\">Founder's Day Parade</h5>\n<p class=\"text-xs text-on-tertiary-container font-bold font-body-md\">Grand Court · 8:00 AM</p>\n</div>\n<span class=\"material-symbols-outlined text-on-tertiary-container\" style=\"font-variation-settings: 'FILL' 1;\">warning</span>\n</div>\n</div>\n</div>\n</div>\n<!-- Student Participation Log (Wide Bottom Section) -->\n<div class=\"col-span-12 bento-item flex flex-col\">\n<div class=\"bg-surface-container-low px-lg py-md border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-md\">\n<h3 class=\"font-label-md text-label-md text-primary flex items-center\">\n<span class=\"material-symbols-outlined mr-2 text-sm\">history_edu</span> Participation Log\n                    </h3>\n<div class=\"flex flex-wrap gap-sm\">\n<select class=\"text-xs font-body-md border-outline-variant rounded-full bg-white px-md py-1 focus:ring-primary\">\n<option>All Houses</option>\n<option>St. Gabriel</option>\n<option>St. Michael</option>\n<option>St. Raphael</option>\n</select>\n<select class=\"text-xs font-body-md border-outline-variant rounded-full bg-white px-md py-1 focus:ring-primary\">\n<option>All Grades</option>\n<option>Grade 9</option>\n<option>Grade 10</option>\n<option>Grade 11</option>\n<option>Grade 12</option>\n</select>\n<button class=\"bg-surface-bright border border-outline-variant px-md py-1 rounded-full text-xs font-label-sm hover:bg-outline-variant transition-colors\">Export CSV</button>\n</div>\n</div>\n<!-- Data Table -->\n<div class=\"overflow-x-auto\">\n<table class=\"w-full text-left border-collapse\">\n<thead class=\"bg-secondary-container/10 border-b border-outline-variant\">\n<tr>\n<th class=\"px-lg py-4 font-label-md text-sm text-secondary\">Student Name</th>\n<th class=\"px-lg py-4 font-label-md text-sm text-secondary\">ID Number</th>\n<th class=\"px-lg py-4 font-label-md text-sm text-secondary\">Activity</th>\n<th class=\"px-lg py-4 font-label-md text-sm text-secondary\">Role</th>\n<th class=\"px-lg py-4 font-label-md text-sm text-secondary\">Points Earned</th>\n<th class=\"px-lg py-4 font-label-md text-sm text-secondary text-right\">Action</th>\n</tr>\n</thead>\n<tbody class=\"divide-y divide-outline-variant\">\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"px-lg py-4 font-headline-md text-sm\">Elena Rodriguez</td>\n<td class=\"px-lg py-4 font-body-md text-sm text-outline\">MC-2024-0012</td>\n<td class=\"px-lg py-4\">\n<span class=\"bg-primary-fixed text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase\">Debate Society</span>\n</td>\n<td class=\"px-lg py-4 font-body-md text-sm\">Captain</td>\n<td class=\"px-lg py-4\">\n<div class=\"flex items-center text-on-tertiary-container font-bold\">\n<span class=\"material-symbols-outlined text-sm mr-1\">star</span> 25\n                                    </div>\n</td>\n<td class=\"px-lg py-4 text-right\">\n<button class=\"text-primary hover:bg-primary-container/10 p-2 rounded-full transition-all\">\n<span class=\"material-symbols-outlined\">edit_note</span>\n</button>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"px-lg py-4 font-headline-md text-sm\">Marcus Chen</td>\n<td class=\"px-lg py-4 font-body-md text-sm text-outline\">MC-2024-0451</td>\n<td class=\"px-lg py-4\">\n<span class=\"bg-secondary-fixed text-secondary px-3 py-1 rounded-full text-[10px] font-bold uppercase\">Varsity Soccer</span>\n</td>\n<td class=\"px-lg py-4 font-body-md text-sm\">Striker</td>\n<td class=\"px-lg py-4\">\n<div class=\"flex items-center text-secondary font-bold\">\n<span class=\"material-symbols-outlined text-sm mr-1\">star</span> 15\n                                    </div>\n</td>\n<td class=\"px-lg py-4 text-right\">\n<button class=\"text-primary hover:bg-primary-container/10 p-2 rounded-full transition-all\">\n<span class=\"material-symbols-outlined\">edit_note</span>\n</button>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors\">\n<td class=\"px-lg py-4 font-headline-md text-sm\">Sarah Jenkins</td>\n<td class=\"px-lg py-4 font-body-md text-sm text-outline\">MC-2023-0192</td>\n<td class=\"px-lg py-4\">\n<span class=\"bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase\">Senior Choir</span>\n</td>\n<td class=\"px-lg py-4 font-body-md text-sm\">Soprano</td>\n<td class=\"px-lg py-4\">\n<div class=\"flex items-center text-on-tertiary-fixed-variant font-bold\">\n<span class=\"material-symbols-outlined text-sm mr-1\">star</span> 10\n                                    </div>\n</td>\n<td class=\"px-lg py-4 text-right\">\n<button class=\"text-primary hover:bg-primary-container/10 p-2 rounded-full transition-all\">\n<span class=\"material-symbols-outlined\">edit_note</span>\n</button>\n</td>\n</tr>\n</tbody>\n</table>\n</div>\n<div class=\"p-lg flex items-center justify-between border-t border-outline-variant bg-surface-container-low\">\n<span class=\"font-body-md text-xs text-outline\">Showing 1-10 of 1,240 entries</span>\n<div class=\"flex space-x-2\">\n<button class=\"px-4 py-1 border border-outline-variant rounded-lg text-xs font-label-md hover:bg-white\">Previous</button>\n<button class=\"px-4 py-1 bg-primary text-white rounded-lg text-xs font-label-md\">Next</button>\n</div>\n</div>\n</div>\n</div>\n</main>\n<!-- Footer -->\n<footer class=\"ml-64 w-[calc(100%-16rem)] py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary text-on-secondary\">\n<div>\n<h4 class=\"font-headline-md text-headline-md text-on-secondary mb-2\">Mount Carmel Secondary</h4>\n<p class=\"font-label-sm text-label-sm opacity-80\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex justify-start md:justify-end space-x-lg mt-md md:mt-0\">\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</footer>\n<!-- Floating Action Button for Points Logging -->\n<button class=\"fixed bottom-lg right-lg w-16 h-16 bg-on-tertiary-container text-white rounded-full shadow-lg hover:scale-105 transition-all flex items-center justify-center z-50 group\">\n<span class=\"material-symbols-outlined text-2xl\" style=\"font-variation-settings: 'FILL' 1;\">add_circle</span>\n<span class=\"absolute right-full mr-4 bg-primary text-white px-3 py-1 rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none\">Record Points</span>\n</button>";
+const activityTone = {
+  primary: 'bg-primary-container text-on-primary-container',
+  secondary: 'bg-secondary-container text-on-secondary-container',
+  tertiary: 'bg-tertiary-container text-on-tertiary-container',
+};
 
 export default function AdminActivityDashboard() {
-  return <StitchScreen title="Activity Admin" bodyClassName="bg-surface font-body-md text-on-surface" html={html} />;
+  return (
+    <AppShell portalId="admin" pageTitle="Activity Admin" user={{ name: 'Activity Coordinator' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader
+          title="Extracurricular Participation"
+          subtitle="Activity Coordinator Dashboard · Term 2, 2024"
+          actions={
+            <Button variant="primary" iconLeft="add">
+              New Entry
+            </Button>
+          }
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
+          {stats.map((stat) => (
+            <Card key={stat.label} padding="lg" className={`flex flex-col justify-center border-l-4 ${stat.tone.split(' ')[0]}`}>
+              <span className="text-label-sm font-label-sm uppercase text-outline">{stat.label}</span>
+              <span className={`text-headline-lg font-headline-lg ${stat.tone.split(' ')[1]}`}>{stat.value}</span>
+            </Card>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+          <Card padding="none" className="lg:col-span-4 flex flex-col overflow-hidden">
+            <div className="bg-surface-container-low px-lg py-md border-b border-outline/10">
+              <h3 className="font-label-md text-label-md text-primary flex items-center">
+                <span className="material-symbols-outlined mr-2 text-sm">groups_2</span> Active Clubs
+              </h3>
+            </div>
+            <div className="p-lg space-y-md flex-1">
+              {clubs.map((club) => (
+                <div key={club.name} className="flex items-center p-md bg-surface-container-lowest border border-outline/10 rounded-xl hover:shadow-sm transition-all group">
+                  <div className={`w-12 h-12 flex items-center justify-center rounded-lg mr-md shrink-0 ${club.tone}`}>
+                    <span className="material-symbols-outlined">{club.icon}</span>
+                  </div>
+                  <div className="flex-grow min-w-0">
+                    <h4 className="font-headline-md text-sm truncate">{club.name}</h4>
+                    <p className="font-body-md text-xs text-outline">{club.meta}</p>
+                  </div>
+                  <span className="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+                </div>
+              ))}
+            </div>
+            <div className="p-lg pt-0">
+              <button className="w-full text-center py-2 text-label-sm font-label-sm text-primary hover:underline">View All {totalClubs} Clubs</button>
+            </div>
+          </Card>
+
+          <Card padding="none" className="lg:col-span-8 flex flex-col overflow-hidden">
+            <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex justify-between items-center">
+              <h3 className="font-label-md text-label-md text-primary flex items-center">
+                <span className="material-symbols-outlined mr-2 text-sm">calendar_month</span> Inter-House Events
+              </h3>
+              <div className="flex items-center gap-sm">
+                <button className="p-1 hover:bg-surface-container rounded">
+                  <span className="material-symbols-outlined text-sm">chevron_left</span>
+                </button>
+                <span className="font-label-sm text-label-sm">October 2024</span>
+                <button className="p-1 hover:bg-surface-container rounded">
+                  <span className="material-symbols-outlined text-sm">chevron_right</span>
+                </button>
+              </div>
+            </div>
+            <div className="p-lg grid grid-cols-1 md:grid-cols-2 gap-lg flex-grow">
+              <div className="bg-primary text-on-primary rounded-2xl overflow-hidden flex flex-col justify-between p-md">
+                <div>
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="bg-tertiary-container text-on-tertiary-container text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tight flex items-center">
+                      <span className="material-symbols-outlined text-[12px] mr-1">priority_high</span>
+                      {featuredEvent.priority}
+                    </span>
+                    <span className="text-label-sm font-label-sm opacity-70">{featuredEvent.date}</span>
+                  </div>
+                  <h4 className="font-headline-md text-md mb-1">{featuredEvent.title}</h4>
+                  <p className="font-body-md text-xs opacity-80 line-clamp-2">{featuredEvent.description}</p>
+                </div>
+                <div className="flex justify-between items-center mt-md">
+                  <span className="material-symbols-outlined text-3xl opacity-30">sports</span>
+                  <button className="text-on-primary font-label-sm text-xs hover:underline">Manage Staff</button>
+                </div>
+              </div>
+              <div className="space-y-md overflow-y-auto max-h-90 pr-2">
+                {events.map((event) => (
+                  <div
+                    key={event.title}
+                    className={`flex gap-md items-start p-md rounded-xl transition-all cursor-pointer ${
+                      event.urgent ? 'bg-tertiary-container/10 border border-tertiary-container/30' : 'hover:bg-surface-container-low'
+                    }`}
+                  >
+                    <div className="flex-shrink-0 w-12 text-center">
+                      <span className={`block font-headline-lg text-xl leading-none ${event.urgent ? 'text-on-tertiary-container' : 'text-primary'}`}>{event.day}</span>
+                      <span className={`block font-label-sm text-[10px] uppercase ${event.urgent ? 'text-on-tertiary-container' : 'text-outline'}`}>{event.month}</span>
+                    </div>
+                    <div className="flex-grow">
+                      <h5 className="font-label-md text-on-surface leading-tight">{event.title}</h5>
+                      <p className={`text-xs font-body-md ${event.urgent ? 'text-on-tertiary-container font-bold' : 'text-outline'}`}>{event.meta}</p>
+                    </div>
+                    <span className={`material-symbols-outlined ${event.urgent ? 'text-on-tertiary-container' : 'text-outline'}`}>
+                      {event.urgent ? 'warning' : 'event'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <Card padding="none" className="overflow-hidden">
+          <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex flex-col md:flex-row md:items-center justify-between gap-md">
+            <h3 className="font-label-md text-label-md text-primary flex items-center">
+              <span className="material-symbols-outlined mr-2 text-sm">history_edu</span> Participation Log
+            </h3>
+            <div className="flex flex-wrap gap-sm">
+              <select className="text-xs font-body-md border border-outline/20 rounded-full bg-surface-container-lowest px-md py-1 focus:ring-2 focus:ring-primary/20">
+                {houses.map((house) => (
+                  <option key={house}>{house}</option>
+                ))}
+              </select>
+              <select className="text-xs font-body-md border border-outline/20 rounded-full bg-surface-container-lowest px-md py-1 focus:ring-2 focus:ring-primary/20">
+                {grades.map((grade) => (
+                  <option key={grade}>{grade}</option>
+                ))}
+              </select>
+              <Button variant="secondary" size="sm">
+                Export CSV
+              </Button>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-175 text-left border-collapse">
+              <thead className="bg-secondary-container/10 border-b border-outline/10">
+                <tr>
+                  <th className="px-lg py-4 font-label-md text-sm text-secondary">Student Name</th>
+                  <th className="px-lg py-4 font-label-md text-sm text-secondary">ID Number</th>
+                  <th className="px-lg py-4 font-label-md text-sm text-secondary">Activity</th>
+                  <th className="px-lg py-4 font-label-md text-sm text-secondary">Role</th>
+                  <th className="px-lg py-4 font-label-md text-sm text-secondary">Points Earned</th>
+                  <th className="px-lg py-4 font-label-md text-sm text-secondary text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-outline/10">
+                {participationLog.map((entry) => (
+                  <tr key={entry.id} className="hover:bg-surface-container-low transition-colors">
+                    <td className="px-lg py-4 font-headline-md text-sm">{entry.name}</td>
+                    <td className="px-lg py-4 font-body-md text-sm text-outline">{entry.id}</td>
+                    <td className="px-lg py-4">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${activityTone[entry.tone]}`}>{entry.activity}</span>
+                    </td>
+                    <td className="px-lg py-4 font-body-md text-sm">{entry.role}</td>
+                    <td className="px-lg py-4">
+                      <div className="flex items-center text-on-tertiary-container font-bold">
+                        <span className="material-symbols-outlined text-sm mr-1">star</span> {entry.points}
+                      </div>
+                    </td>
+                    <td className="px-lg py-4 text-right">
+                      <button className="text-primary hover:bg-primary/10 p-2 rounded-full transition-all">
+                        <span className="material-symbols-outlined">edit_note</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="p-lg flex items-center justify-between border-t border-outline/10 bg-surface-container-low">
+            <span className="font-body-md text-xs text-outline">Showing 1-{participationLog.length} of {totalEntries.toLocaleString()} entries</span>
+            <div className="flex gap-sm">
+              <button className="px-4 py-1 border border-outline/20 rounded-lg text-xs font-label-md hover:bg-surface-container-lowest">Previous</button>
+              <button className="px-4 py-1 bg-primary text-on-primary rounded-lg text-xs font-label-md">Next</button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </AppShell>
+  );
 }

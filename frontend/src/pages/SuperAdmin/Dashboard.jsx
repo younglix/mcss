@@ -1,7 +1,195 @@
-import StitchScreen from '../../components/StitchScreen.jsx';
+import AppShell from '../../components/layout/AppShell.jsx';
+import PageHeader from '../../components/ui/PageHeader.jsx';
+import Card from '../../components/ui/Card.jsx';
+import Badge from '../../components/ui/Badge.jsx';
+import Button from '../../components/ui/Button.jsx';
+import { stats, topSchools, schoolStatusTone, totalInstitutions, activityFeed, growth } from './dashboardData.js';
 
-const html = "<!-- Sidebar Navigation Shell -->\n<aside class=\"fixed left-0 top-0 h-full flex flex-col py-md z-40 bg-primary dark:bg-surface-container-lowest docked left-0 h-full w-64 shadow-sm transition-all duration-200 ease-in-out\">\n<!-- Logo/Header -->\n<div class=\"px-6 mb-10 flex items-center gap-3\">\n<div class=\"w-10 h-10 bg-on-primary-fixed-variant rounded-lg flex items-center justify-center\">\n<span class=\"material-symbols-outlined text-white\" style=\"font-variation-settings: 'FILL' 1;\">account_balance</span>\n</div>\n<div>\n<h1 class=\"font-headline-md text-headline-md font-bold text-on-primary dark:text-primary leading-none\">Mount Carmel</h1>\n<p class=\"text-[10px] uppercase tracking-widest text-on-primary/60 font-bold mt-1\">Super Admin Portal</p>\n</div>\n</div>\n<!-- Navigation Tabs -->\n<nav class=\"flex-1 space-y-1\">\n<a class=\"flex items-center gap-3 border-l-4 border-tertiary-container bg-primary-container/20 text-on-primary dark:text-primary-fixed-dim py-3 px-6 transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined\" style=\"font-variation-settings: 'FILL' 1;\">dashboard</span>\n<span class=\"font-label-md text-label-md\">Dashboard</span>\n</a>\n\n<a class=\"flex items-center gap-3 text-on-primary/70 dark:text-on-surface-variant py-3 px-6 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined\">badge</span>\n<span class=\"font-label-md text-label-md\">Staff Management</span>\n</a>\n<a class=\"flex items-center gap-3 text-on-primary/70 dark:text-on-surface-variant py-3 px-6 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined\">group</span>\n<span class=\"font-label-md text-label-md\">Student Management</span>\n</a>\n<a class=\"flex items-center gap-3 text-on-primary/70 dark:text-on-surface-variant py-3 px-6 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined\">domain</span>\n<span class=\"font-label-md text-label-md\">School Management</span>\n</a>\n<a class=\"flex items-center gap-3 text-on-primary/70 dark:text-on-surface-variant py-3 px-6 hover:bg-primary-container/10 dark:hover:bg-surface-container-high transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined\">settings</span>\n<span class=\"font-label-md text-label-md\">Platform Settings</span>\n</a>\n</nav>\n<!-- Footer Actions -->\n<div class=\"px-6 pt-6 border-t border-on-primary/10\">\n<a class=\"flex items-center gap-3 text-on-primary/70 dark:text-on-surface-variant py-3 hover:text-on-primary transition-all\" href=\"#\">\n<span class=\"material-symbols-outlined\">logout</span>\n<span class=\"font-label-md text-label-md\">Logout</span>\n</a>\n</div>\n</aside>\n<!-- Main Content Canvas -->\n<main class=\"ml-64 min-h-screen\">\n<!-- Top Navigation Bar -->\n<header class=\"sticky top-0 z-30 bg-surface dark:bg-surface-container-high border-b border-outline-variant dark:border-outline h-16 flex items-center px-gutter\">\n<div class=\"flex justify-between items-center w-full max-w-container-max mx-auto\">\n<div class=\"flex items-center gap-4\">\n<span class=\"font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed\">Platform Overview</span>\n<!-- Multi-school selector -->\n<div class=\"ml-8 relative group\">\n<button class=\"flex items-center gap-2 px-4 py-1.5 bg-surface-container-low dark:bg-surface-container rounded-full border border-outline-variant hover:border-primary transition-all\">\n<span class=\"material-symbols-outlined text-primary text-[18px]\">hub</span>\n<span class=\"font-label-md text-label-md text-on-surface-variant\">All Institutions</span>\n<span class=\"material-symbols-outlined text-[18px]\">expand_more</span>\n</button>\n</div>\n</div>\n<div class=\"flex items-center gap-6\">\n<div class=\"flex items-center bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant\">\n<span class=\"material-symbols-outlined text-outline\">search</span>\n<input class=\"bg-transparent border-none focus:ring-0 text-body-md font-body-md placeholder:text-outline-variant w-48\" placeholder=\"Search systems...\" type=\"text\">\n</div>\n<div class=\"flex items-center gap-4\">\n<button class=\"text-on-surface-variant hover:text-primary transition-all relative\">\n<span class=\"material-symbols-outlined\">notifications</span>\n<span class=\"absolute top-0 right-0 w-2 h-2 bg-error rounded-full\"></span>\n</button>\n<button class=\"text-on-surface-variant hover:text-primary transition-all\">\n<span class=\"material-symbols-outlined\">apps</span>\n</button>\n<div class=\"h-8 w-8 rounded-full border-2 border-primary-container overflow-hidden\">\n<img class=\"w-full h-full object-cover\" data-alt=\"A professional headshot of a senior administrator in a navy blue suit, set against a blurred institutional background with warm, soft-key lighting, emphasizing professional authority and modern leadership within the Mount Carmel Secondary education system.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAx4CJ9Z4QaK0_k7d5vqO9aqVDR46BuPF-vjcQMzvC_dDfNLQImsITsvwJHtfikAbv6dlnFZ9Q9shhdJl1MJFsK4IhvhHgY5rl5lzt2F3rAxDqDNlIZHVHf-Jk9Th5qnjiTyM86FdqgJhDVAFvYUTbmKYWh3hre_RfqtBHv8OBzeLw7D-oj6h4lAIta5TaPTo9FPk8RcJ9lQa2JGJBPDIfRfgqQWppigKhFJg4YAADFWg4G8dUU-jUTQYcIyHw1TGvVIfesVn_d5G68\">\n</div>\n</div>\n</div>\n</div>\n</header>\n<div class=\"p-gutter max-w-container-max mx-auto space-y-xl\">\n<!-- Statistics Bento Grid -->\n<section class=\"grid grid-cols-1 md:grid-cols-4 gap-gutter\">\n<!-- Total Schools -->\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm hover:shadow-md transition-all group\" style=\"opacity: 1; transform: translateY(0px); transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);\">\n<div class=\"flex justify-between items-start mb-4\">\n<div class=\"p-3 bg-primary/10 rounded-xl group-hover:bg-primary transition-colors\">\n<span class=\"material-symbols-outlined text-primary group-hover:text-white\">domain</span>\n</div>\n<span class=\"text-on-surface-variant font-label-md text-label-md\">+2 this month</span>\n</div>\n<h3 class=\"font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1\">Total Schools</h3>\n<p class=\"font-headline-lg text-headline-lg text-primary\">48</p>\n<div class=\"mt-4 w-full bg-surface-container h-1 rounded-full overflow-hidden\">\n<div class=\"bg-primary w-[75%] h-full\"></div>\n</div>\n</div>\n<!-- Total Students -->\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm hover:shadow-md transition-all group\" style=\"opacity: 1; transform: translateY(0px); transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);\">\n<div class=\"flex justify-between items-start mb-4\">\n<div class=\"p-3 bg-secondary/10 rounded-xl group-hover:bg-secondary transition-colors\">\n<span class=\"material-symbols-outlined text-secondary group-hover:text-white\">school</span>\n</div>\n<span class=\"text-on-surface-variant font-label-md text-label-md\">+1.4k increase</span>\n</div>\n<h3 class=\"font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1\">Global Students</h3>\n<p class=\"font-headline-lg text-headline-lg text-secondary\">32,490</p>\n<div class=\"mt-4 w-full bg-surface-container h-1 rounded-full overflow-hidden\">\n<div class=\"bg-secondary w-[85%] h-full\"></div>\n</div>\n</div>\n<!-- Pending Approvals (Magenta Highlight) -->\n<div class=\"bg-tertiary-container text-white p-lg rounded-lg border border-tertiary shadow-sm relative overflow-hidden group\">\n<div class=\"relative z-10\">\n<div class=\"flex justify-between items-start mb-4\">\n<div class=\"p-3 bg-white/20 rounded-xl\">\n<span class=\"material-symbols-outlined text-white\" style=\"font-variation-settings: 'FILL' 1;\">pending_actions</span>\n</div>\n<span class=\"bg-white/20 text-white font-label-sm text-label-sm px-2 py-0.5 rounded uppercase font-bold\">Action Required</span>\n</div>\n<h3 class=\"font-label-md text-label-md text-white/80 uppercase tracking-wider mb-1\">Pending Admissions</h3>\n<p class=\"font-headline-lg text-headline-lg text-white\">124</p>\n<p class=\"mt-4 font-body-md text-body-md text-white/70 italic underline cursor-pointer\">View applicant queue →</p>\n</div>\n<!-- Decorative element -->\n<div class=\"absolute -right-4 -bottom-4 opacity-10\">\n<span class=\"material-symbols-outlined text-[120px]\">verified_user</span>\n</div>\n</div>\n<!-- System Health -->\n<div class=\"bg-surface-container-lowest p-lg rounded-lg border border-outline-variant shadow-sm hover:shadow-md transition-all group\" style=\"opacity: 1; transform: translateY(0px); transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);\">\n<div class=\"flex justify-between items-start mb-4\">\n<div class=\"p-3 bg-error-container rounded-xl\">\n<span class=\"material-symbols-outlined text-error\" style=\"font-variation-settings: 'FILL' 1;\">dns</span>\n</div>\n<span class=\"flex items-center gap-1 text-on-error-container font-label-md text-label-md\">\n<span class=\"w-2 h-2 rounded-full bg-emerald-500 animate-pulse\"></span> Stable\n                        </span>\n</div>\n<h3 class=\"font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1\">Server Latency</h3>\n<p class=\"font-headline-lg text-headline-lg text-on-surface\">14ms</p>\n<div class=\"mt-4 flex gap-1 items-end h-8\">\n<div class=\"bg-outline-variant w-full h-[40%] rounded-t-sm\"></div>\n<div class=\"bg-outline-variant w-full h-[60%] rounded-t-sm\"></div>\n<div class=\"bg-outline-variant w-full h-[55%] rounded-t-sm\"></div>\n<div class=\"bg-primary w-full h-[80%] rounded-t-sm\"></div>\n<div class=\"bg-primary w-full h-[30%] rounded-t-sm\"></div>\n<div class=\"bg-primary w-full h-[50%] rounded-t-sm\"></div>\n</div>\n</div>\n</section>\n<!-- Main Layout: Active Institutions & Activity Feed -->\n<div class=\"grid grid-cols-1 xl:grid-cols-3 gap-xl\">\n<!-- School Management Column -->\n<div class=\"xl:col-span-2 space-y-lg\">\n<div class=\"flex items-center justify-between\">\n<h2 class=\"font-headline-lg text-headline-lg text-primary\">Top Performing Schools</h2>\n<button class=\"bg-primary text-white px-6 py-2.5 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-all flex items-center gap-2\">\n<span class=\"material-symbols-outlined text-[20px]\">add</span>\n                            Provision New School\n                        </button>\n</div>\n<div class=\"bg-white border border-outline-variant rounded-lg overflow-hidden shadow-sm overflow-x-auto\">\n<table class=\"w-full text-left font-body-md min-w-[800px]\">\n<thead class=\"bg-primary text-on-primary\">\n<tr>\n<th class=\"px-6 py-4 font-label-md text-label-md uppercase tracking-wider\">Institution Name</th>\n<th class=\"px-6 py-4 font-label-md text-label-md uppercase tracking-wider\">Students</th>\n<th class=\"px-6 py-4 font-label-md text-label-md uppercase tracking-wider\">Staff</th>\n<th class=\"px-6 py-4 font-label-md text-label-md uppercase tracking-wider\">Status</th>\n<th class=\"px-6 py-4 font-label-md text-label-md uppercase tracking-wider text-right\">Actions</th>\n</tr>\n</thead>\n<tbody class=\"divide-y divide-outline-variant\">\n<tr class=\"hover:bg-surface-container-low transition-colors group\">\n<td class=\"px-6 py-5\">\n<div class=\"flex items-center gap-3\">\n<div class=\"w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold\">SJ</div>\n<div>\n<p class=\"font-bold text-on-surface\">St. Jude Academy</p>\n<p class=\"text-xs text-on-surface-variant\">Lagos Main Campus</p>\n</div>\n</div>\n</td>\n<td class=\"px-6 py-5 font-body-lg text-body-lg\">1,240</td>\n<td class=\"px-6 py-5 font-body-lg text-body-lg\">82</td>\n<td class=\"px-6 py-5\">\n<span class=\"ribbon-status bg-emerald-100 text-emerald-800 text-[11px] font-bold uppercase py-1\">Active</span>\n</td>\n<td class=\"px-6 py-5 text-right\">\n<button class=\"p-2 text-outline hover:text-primary transition-all\">\n<span class=\"material-symbols-outlined\">settings_suggest</span>\n</button>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors group\">\n<td class=\"px-6 py-5\">\n<div class=\"flex items-center gap-3\">\n<div class=\"w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center text-white font-bold\">HM</div>\n<div>\n<p class=\"font-bold text-on-surface\">Holy Mary Institute</p>\n<p class=\"text-xs text-on-surface-variant\">Central Abuja</p>\n</div>\n</div>\n</td>\n<td class=\"px-6 py-5 font-body-lg text-body-lg\">890</td>\n<td class=\"px-6 py-5 font-body-lg text-body-lg\">45</td>\n<td class=\"px-6 py-5\">\n<span class=\"ribbon-status bg-emerald-100 text-emerald-800 text-[11px] font-bold uppercase py-1\">Active</span>\n</td>\n<td class=\"px-6 py-5 text-right\">\n<button class=\"p-2 text-outline hover:text-primary transition-all\">\n<span class=\"material-symbols-outlined\">settings_suggest</span>\n</button>\n</td>\n</tr>\n<tr class=\"hover:bg-surface-container-low transition-colors group\">\n<td class=\"px-6 py-5\">\n<div class=\"flex items-center gap-3\">\n<div class=\"w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold\">MC</div>\n<div>\n<p class=\"font-bold text-on-surface\">Mount Carmel North</p>\n<p class=\"text-xs text-on-surface-variant\">Port Harcourt</p>\n</div>\n</div>\n</td>\n<td class=\"px-6 py-5 font-body-lg text-body-lg\">2,100</td>\n<td class=\"px-6 py-5 font-body-lg text-body-lg\">114</td>\n<td class=\"px-6 py-5\">\n<span class=\"ribbon-status bg-amber-100 text-amber-800 text-[11px] font-bold uppercase py-1\">Maintenance</span>\n</td>\n<td class=\"px-6 py-5 text-right\">\n<button class=\"p-2 text-outline hover:text-primary transition-all\">\n<span class=\"material-symbols-outlined\">settings_suggest</span>\n</button>\n</td>\n</tr>\n</tbody>\n</table>\n<div class=\"p-4 bg-surface-container-low text-center\">\n<button class=\"text-primary font-label-md text-label-md hover:underline\">View All 48 Institutions</button>\n</div>\n</div>\n</div>\n<!-- System Activity Feed -->\n<div class=\"space-y-lg\">\n<h2 class=\"font-headline-lg text-headline-lg text-primary\">System Activity</h2>\n<div class=\"bg-white border border-outline-variant rounded-lg p-lg shadow-sm h-[500px] overflow-y-auto relative\">\n<div class=\"space-y-6\">\n<!-- Activity Item 1 -->\n<div class=\"flex gap-4 relative\">\n<div class=\"absolute left-4 top-10 bottom-0 w-0.5 bg-outline-variant\"></div>\n<div class=\"relative z-10 w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center border-2 border-white\">\n<span class=\"material-symbols-outlined text-[18px] text-primary\" style=\"font-variation-settings: 'FILL' 1;\">security</span>\n</div>\n<div class=\"flex-1\">\n<p class=\"font-label-md text-label-md text-on-surface\"><span class=\"font-bold\">System Root</span> updated platform-wide security protocol.</p>\n<p class=\"text-xs text-on-surface-variant mt-1\">2 minutes ago</p>\n<div class=\"mt-2 p-3 bg-surface-container-low rounded-lg text-body-md italic border-l-4 border-primary\">\n                                        TLS 1.3 enforced for all child school domains.\n                                    </div>\n</div>\n</div>\n<!-- Activity Item 2 -->\n<div class=\"flex gap-4 relative\">\n<div class=\"absolute left-4 top-10 bottom-0 w-0.5 bg-outline-variant\"></div>\n<div class=\"relative z-10 w-9 h-9 rounded-full bg-secondary-fixed flex items-center justify-center border-2 border-white\">\n<span class=\"material-symbols-outlined text-[18px] text-secondary\">person_add</span>\n</div>\n<div class=\"flex-1\">\n<p class=\"font-label-md text-label-md text-on-surface\"><span class=\"font-bold\">St. Jude Academy</span> added 45 new student enrollments.</p>\n<p class=\"text-xs text-on-surface-variant mt-1\">1 hour ago</p>\n</div>\n</div>\n<!-- Activity Item 3 -->\n<div class=\"flex gap-4 relative\">\n<div class=\"absolute left-4 top-10 bottom-0 w-0.5 bg-outline-variant\"></div>\n<div class=\"relative z-10 w-9 h-9 rounded-full bg-tertiary-fixed flex items-center justify-center border-2 border-white\">\n<span class=\"material-symbols-outlined text-[18px] text-tertiary\">warning</span>\n</div>\n<div class=\"flex-1\">\n<p class=\"font-label-md text-label-md text-on-surface\"><span class=\"font-bold\">System Alert</span>: High traffic detected at Admissions Portal.</p>\n<p class=\"text-xs text-on-surface-variant mt-1\">3 hours ago</p>\n</div>\n</div>\n<!-- Activity Item 4 -->\n<div class=\"flex gap-4 relative\">\n<div class=\"relative z-10 w-9 h-9 rounded-full bg-surface-container-highest flex items-center justify-center border-2 border-white\">\n<span class=\"material-symbols-outlined text-[18px] text-outline\">dns</span>\n</div>\n<div class=\"flex-1\">\n<p class=\"font-label-md text-label-md text-on-surface\"><span class=\"font-bold\">Cloud Backup</span> completed successfully for all 48 nodes.</p>\n<p class=\"text-xs text-on-surface-variant mt-1\">6 hours ago</p>\n</div>\n</div>\n</div>\n</div>\n</div>\n</div>\n<!-- Visualization / Graphic Section -->\n<section class=\"grid grid-cols-1 md:grid-cols-2 gap-xl items-center py-xl border-t border-outline-variant\">\n<div class=\"space-y-lg\">\n<h3 class=\"font-headline-xl text-headline-xl text-primary leading-tight\">Institutional Growth Analysis</h3>\n<p class=\"font-body-lg text-body-lg text-on-surface-variant\">Our platform's predictive modeling suggests a 22% increase in cross-campus student mobility for the upcoming academic session. Manage resources effectively with real-time data sync across all regional centers.</p>\n<div class=\"flex gap-4\">\n<button class=\"bg-secondary text-white px-8 py-3 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all\">Download Annual Report</button>\n<button class=\"border border-secondary text-secondary px-8 py-3 rounded-lg font-label-md text-label-md hover:bg-secondary/5 transition-all\">Growth Strategy</button>\n</div>\n</div>\n<div class=\"relative h-64 md:h-96 rounded-lg overflow-hidden border border-outline-variant group\">\n\n<div class=\"absolute inset-0 flex items-center justify-center bg-primary/20 backdrop-blur-sm group-hover:backdrop-blur-none transition-all\">\n<div class=\"text-center p-lg glass-panel rounded-lg max-w-xs shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500\">\n<span class=\"material-symbols-outlined text-primary text-[48px] mb-2\">auto_graph</span>\n<p class=\"font-headline-md text-headline-md text-primary\">+15.8%</p>\n<p class=\"font-label-md text-label-md text-on-surface-variant\">Global Academic Performance Uplift</p>\n</div>\n</div>\n</div>\n</section>\n</div>\n<!-- Footer -->\n<footer class=\"w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center bg-secondary dark:bg-secondary-fixed-dim text-on-secondary dark:text-on-secondary-fixed mt-xl\">\n<div>\n<h2 class=\"font-headline-md text-headline-md font-bold mb-2\">Mount Carmel Secondary</h2>\n<p class=\"font-label-sm text-label-sm opacity-80\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap gap-x-8 gap-y-2 justify-start md:justify-end mt-6 md:mt-0\">\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</footer>\n</main>\n<!-- Micro-interaction Script -->";
+const activityIconTone = {
+  primary: 'bg-primary-container text-on-primary-container',
+  secondary: 'bg-secondary-container text-on-secondary-container',
+  tertiary: 'bg-tertiary-container text-on-tertiary-container',
+  neutral: 'bg-surface-container-high text-on-surface-variant',
+};
+
+function InstitutionSelector() {
+  return (
+    <button className="flex items-center gap-sm px-md py-1.5 bg-surface-container-low rounded-full border border-outline/20 hover:border-primary transition-all">
+      <span className="material-symbols-outlined text-primary text-body-md">hub</span>
+      <span className="font-label-md text-label-md text-on-surface-variant">All Institutions</span>
+      <span className="material-symbols-outlined text-body-md">expand_more</span>
+    </button>
+  );
+}
 
 export default function SuperAdminDashboard() {
-  return <StitchScreen title="Super Admin Dashboard" bodyClassName="bg-surface font-body-md text-on-surface transition-colors duration-300" html={html} />;
+  return (
+    <AppShell portalId="superAdmin" pageTitle="Super Admin Dashboard" user={{ name: 'System Root' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader title="Platform Overview" actions={<InstitutionSelector />} />
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
+          <Card padding="lg" className="hover:shadow-md transition-all group">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary transition-colors">
+                <span className="material-symbols-outlined text-primary group-hover:text-on-primary">domain</span>
+              </div>
+              <span className="text-on-surface-variant font-label-md text-label-md">{stats.schools.note}</span>
+            </div>
+            <h3 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Total Schools</h3>
+            <p className="font-headline-lg text-headline-lg text-primary">{stats.schools.value}</p>
+            <div className="mt-4 w-full bg-surface-container h-1 rounded-full overflow-hidden">
+              <div className="bg-primary h-full" style={{ width: `${stats.schools.progress}%` }} />
+            </div>
+          </Card>
+
+          <Card padding="lg" className="hover:shadow-md transition-all group">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-3 bg-secondary/10 rounded-xl group-hover:bg-secondary transition-colors">
+                <span className="material-symbols-outlined text-secondary group-hover:text-on-secondary">school</span>
+              </div>
+              <span className="text-on-surface-variant font-label-md text-label-md">{stats.students.note}</span>
+            </div>
+            <h3 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Global Students</h3>
+            <p className="font-headline-lg text-headline-lg text-secondary">{stats.students.value}</p>
+            <div className="mt-4 w-full bg-surface-container h-1 rounded-full overflow-hidden">
+              <div className="bg-secondary h-full" style={{ width: `${stats.students.progress}%` }} />
+            </div>
+          </Card>
+
+          <Card padding="lg" className="bg-tertiary-container text-on-tertiary-container border-none relative overflow-hidden">
+            <div className="relative z-10">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-3 bg-on-tertiary-container/15 rounded-xl">
+                  <span className="material-symbols-outlined">pending_actions</span>
+                </div>
+                <span className="bg-on-tertiary-container/15 font-label-sm text-label-sm px-2 py-0.5 rounded uppercase font-bold">Action Required</span>
+              </div>
+              <h3 className="font-label-md text-label-md opacity-80 uppercase tracking-wider mb-1">Pending Admissions</h3>
+              <p className="font-headline-lg text-headline-lg">{stats.admissions.value}</p>
+              <p className="mt-4 font-body-md text-body-md opacity-80 underline cursor-pointer">{stats.admissions.note} →</p>
+            </div>
+            <span className="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] opacity-10">verified_user</span>
+          </Card>
+
+          <Card padding="lg" className="hover:shadow-md transition-all group">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-3 bg-error-container rounded-xl">
+                <span className="material-symbols-outlined text-on-error-container">dns</span>
+              </div>
+              <span className="flex items-center gap-1 text-secondary font-label-md text-label-md">
+                <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" /> {stats.latency.note}
+              </span>
+            </div>
+            <h3 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Server Latency</h3>
+            <p className="font-headline-lg text-headline-lg text-on-surface">{stats.latency.value}</p>
+            <div className="mt-4 flex gap-1 items-end h-8">
+              {stats.latency.bars.map((h, i) => (
+                <div key={i} className={`w-full rounded-t-sm ${h >= 70 ? 'bg-primary' : 'bg-outline/20'}`} style={{ height: `${h}%` }} />
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-xl">
+          <div className="xl:col-span-2 space-y-lg">
+            <div className="flex items-center justify-between flex-wrap gap-md">
+              <h2 className="font-headline-lg text-headline-lg text-primary">Top Performing Schools</h2>
+              <Button variant="primary" iconLeft="add">
+                Provision New School
+              </Button>
+            </div>
+            <Card padding="none" className="overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left font-body-md min-w-200">
+                  <thead className="bg-primary text-on-primary">
+                    <tr>
+                      <th className="px-6 py-4 font-label-md text-label-md uppercase tracking-wider">Institution Name</th>
+                      <th className="px-6 py-4 font-label-md text-label-md uppercase tracking-wider">Students</th>
+                      <th className="px-6 py-4 font-label-md text-label-md uppercase tracking-wider">Staff</th>
+                      <th className="px-6 py-4 font-label-md text-label-md uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 font-label-md text-label-md uppercase tracking-wider text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline/10">
+                    {topSchools.map((school) => (
+                      <tr key={school.name} className="hover:bg-surface-container-low transition-colors group">
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 ${school.tone}`}>{school.initials}</div>
+                            <div>
+                              <p className="font-bold text-on-surface">{school.name}</p>
+                              <p className="text-xs text-on-surface-variant">{school.location}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 font-body-lg text-body-lg">{school.students.toLocaleString()}</td>
+                        <td className="px-6 py-5 font-body-lg text-body-lg">{school.staff}</td>
+                        <td className="px-6 py-5">
+                          <Badge tone={schoolStatusTone[school.status]}>{school.status}</Badge>
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <button className="p-2 text-outline hover:text-primary transition-all">
+                            <span className="material-symbols-outlined">settings_suggest</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="p-4 bg-surface-container-low text-center">
+                <button className="text-primary font-label-md text-label-md hover:underline">View All {totalInstitutions} Institutions</button>
+              </div>
+            </Card>
+          </div>
+
+          <div className="space-y-lg">
+            <h2 className="font-headline-lg text-headline-lg text-primary">System Activity</h2>
+            <Card padding="lg" className="max-h-125 overflow-y-auto">
+              <div className="space-y-6">
+                {activityFeed.map((item, i) => (
+                  <div key={i} className="flex gap-4 relative">
+                    {i < activityFeed.length - 1 && <div className="absolute left-4 top-10 bottom-0 w-0.5 bg-outline/10" />}
+                    <div className={`relative z-10 w-9 h-9 rounded-full flex items-center justify-center border-2 border-surface-container-lowest shrink-0 ${activityIconTone[item.tone]}`}>
+                      <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-label-md text-label-md text-on-surface">
+                        <span className="font-bold">{item.actor}</span> {item.text}
+                      </p>
+                      <p className="text-xs text-on-surface-variant mt-1">{item.time}</p>
+                      {item.quote && (
+                        <div className="mt-2 p-3 bg-surface-container-low rounded-lg text-body-md italic border-l-4 border-primary">{item.quote}</div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-xl items-center py-xl border-t border-outline/10">
+          <div className="space-y-lg">
+            <h3 className="font-headline-xl text-headline-xl text-primary leading-tight">{growth.heading}</h3>
+            <p className="font-body-lg text-body-lg text-on-surface-variant">{growth.body}</p>
+            <div className="flex flex-wrap gap-md">
+              <Button variant="primary" className="bg-secondary">
+                Download Annual Report
+              </Button>
+              <Button variant="secondary">Growth Strategy</Button>
+            </div>
+          </div>
+          <div className="relative h-64 md:h-96 rounded-lg overflow-hidden border border-outline/10 bg-primary/5 flex items-center justify-center">
+            <div className="text-center p-lg bg-surface-container-lowest/90 rounded-lg max-w-72 shadow-xl">
+              <span className="material-symbols-outlined text-primary text-[48px] mb-2">auto_graph</span>
+              <p className="font-headline-md text-headline-md text-primary">{growth.statValue}</p>
+              <p className="font-label-md text-label-md text-on-surface-variant">{growth.statLabel}</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </AppShell>
+  );
 }

@@ -1,7 +1,145 @@
-import StitchScreen from '../../../components/StitchScreen.jsx';
-
-const html = "<!-- Top Navigation Bar -->\n<header class=\"bg-surface sticky top-0 z-50 border-b border-outline-variant\">\n<nav class=\"flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16\">\n<div class=\"flex items-center gap-md\">\n<span class=\"font-headline-md text-headline-md font-bold text-primary\">Mount Carmel Secondary</span>\n</div>\n<div class=\"hidden md:flex items-center space-x-lg\">\n<a class=\"font-label-md text-label-md text-primary border-b-2 border-primary pb-1 transition-all\" href=\"#\">Admissions</a>\n<a class=\"font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors\" href=\"#\">Academics</a>\n<a class=\"font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors\" href=\"#\">Portal</a>\n<a class=\"font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors\" href=\"#\">Support</a>\n</div>\n<div class=\"flex items-center gap-sm\">\n<button class=\"px-md py-sm bg-primary text-on-primary rounded-lg font-label-md hover:opacity-90 transition-all\">Staff Login</button>\n<span class=\"material-symbols-outlined text-on-surface-variant p-sm cursor-pointer\">notifications</span>\n<span class=\"material-symbols-outlined text-on-surface-variant p-sm cursor-pointer\">apps</span>\n</div>\n</nav>\n</header>\n<main class=\"flex-grow\">\n<!-- Hero Section with Background Illustration -->\n<section class=\"relative w-full h-[400px] flex items-center justify-center overflow-hidden\">\n<div class=\"absolute inset-0 z-0\">\n<div class=\"absolute inset-0 bg-primary/80 mix-blend-multiply z-10\"></div>\n<div class=\"w-full h-full\" data-alt=\"A grand, architectural view of a historic stone secondary school building with Gothic arches and ivy-covered walls. The scene is set during a golden hour sunset, casting warm amber light across the prestigious campus. The photography style is sharp, clean, and highlights the institutional heritage and elite academic atmosphere of the institution.\" style=\"background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhqAw9U6WjniFSSp3tjq7wxdGnNk9d6wOUi6uq-oCQMaxMtkOgZqdnvHN9Zt2nVpPbf_p5Vh7Mnh3JFc7Sh_auKbClHMHMB1SeG0298vXMqBohMVex3V98UOFvdR0Cp3ZeyomZ4z0it_99Ahad-2ETcnUfzUQaGNpeHuH_6X6y9IrlwpwNsuetjpP16vLjfAppvTVtupqnQkvQsQyDVJlauMX5zZucmCaHhSzPqyLuOlKMy_XXq_18uMbMjKDwvawxKVFP_H-fUBxu')\"></div>\n</div>\n<div class=\"relative z-20 text-center max-w-3xl px-gutter\">\n<h1 class=\"font-headline-xl text-headline-xl text-white mb-md\">Forge Your Future at Mount Carmel</h1>\n<p class=\"font-body-lg text-body-lg text-white/90\">Join a legacy of excellence, integrity, and academic mastery. Your journey to leadership begins with a single application.</p>\n</div>\n</section>\n<!-- Main Application Container -->\n<section class=\"max-w-container-max mx-auto px-gutter -mt-24 relative z-30 pb-xl\">\n<div class=\"tonal-layer rounded-lg p-xl md:p-[64px] flex flex-col items-center\">\n<!-- Progress Indicator -->\n<div class=\"w-full max-w-2xl mb-xl\">\n<div class=\"flex justify-between items-center relative\">\n<div class=\"absolute top-1/2 left-0 w-full h-0.5 bg-surface-container -z-10 -translate-y-1/2\"></div>\n<div class=\"absolute top-1/2 left-0 w-1/4 h-0.5 bg-secondary -z-10 -translate-y-1/2\"></div>\n<div class=\"flex flex-col items-center gap-xs\">\n<div class=\"w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold shadow-md\">1</div>\n<span class=\"font-label-sm text-label-sm text-secondary\">Introduction</span>\n</div>\n<div class=\"flex flex-col items-center gap-xs\">\n<div class=\"w-10 h-10 rounded-full bg-surface-container text-outline flex items-center justify-center font-bold\">2</div>\n<span class=\"font-label-sm text-label-sm text-outline\">Personal Info</span>\n</div>\n<div class=\"flex flex-col items-center gap-xs\">\n<div class=\"w-10 h-10 rounded-full bg-surface-container text-outline flex items-center justify-center font-bold\">3</div>\n<span class=\"font-label-sm text-label-sm text-outline\">Academic Record</span>\n</div>\n<div class=\"flex flex-col items-center gap-xs\">\n<div class=\"w-10 h-10 rounded-full bg-surface-container text-outline flex items-center justify-center font-bold\">4</div>\n<span class=\"font-label-sm text-label-sm text-outline\">Submission</span>\n</div>\n</div>\n</div>\n<div class=\"max-w-4xl w-full\">\n<header class=\"text-center mb-xl\">\n<h2 class=\"font-label-md text-label-md text-secondary tracking-widest uppercase mb-xs\">Step 01: Getting Started</h2>\n<h3 class=\"font-headline-lg text-headline-lg text-primary\">Admission Application Process</h3>\n<p class=\"mt-md font-body-md text-on-surface-variant max-w-2xl mx-auto\">\n                            Welcome to the Mount Carmel Secondary School online application portal. Please read the following instructions carefully before commencing your application for the upcoming academic session.\n                        </p>\n</header>\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl\">\n<!-- Step Details -->\n<div class=\"p-lg bg-surface-container-low rounded-lg border border-outline-variant/30 text-center\">\n<span class=\"material-symbols-outlined text-primary text-3xl mb-sm\" style=\"font-variation-settings: 'FILL' 1;\">description</span>\n<h4 class=\"font-label-md text-label-md text-primary mb-xs\">1. Complete Form</h4>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Provide accurate personal and academic information.</p>\n</div>\n<div class=\"p-lg bg-surface-container-low rounded-lg border border-outline-variant/30 text-center\">\n<span class=\"material-symbols-outlined text-primary text-3xl mb-sm\" style=\"font-variation-settings: 'FILL' 1;\">upload_file</span>\n<h4 class=\"font-label-md text-label-md text-primary mb-xs\">2. Upload Documents</h4>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Attach birth certificate and previous school reports.</p>\n</div>\n<div class=\"p-lg bg-surface-container-low rounded-lg border border-outline-variant/30 text-center\">\n<span class=\"material-symbols-outlined text-primary text-3xl mb-sm\" style=\"font-variation-settings: 'FILL' 1;\">payments</span>\n<h4 class=\"font-label-md text-label-md text-primary mb-xs\">3. Pay Fee</h4>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Securely process the non-refundable application fee.</p>\n</div>\n</div>\n<!-- Input Block -->\n<div class=\"bg-surface-bright p-xl rounded-lg border border-outline-variant max-w-2xl mx-auto\">\n<div class=\"space-y-lg\">\n<div>\n<label class=\"font-label-md text-label-md text-primary block mb-sm\">Select Intended Academic Session</label>\n<div class=\"grid grid-cols-1 md:grid-cols-2 gap-md\">\n<button class=\"relative p-md border-2 border-primary bg-primary-fixed/20 rounded-lg text-left transition-all ring-offset-2 ring-primary\">\n<div class=\"flex justify-between items-start\">\n<div>\n<p class=\"font-label-md text-label-md text-primary\">2024/2025 Session</p>\n<p class=\"font-label-sm text-label-sm text-on-surface-variant\">Regular Admission</p>\n</div>\n<span class=\"material-symbols-outlined text-primary\">check_circle</span>\n</div>\n</button>\n<button class=\"p-md border border-outline-variant hover:border-primary rounded-lg text-left transition-all\">\n<div>\n<p class=\"font-label-md text-label-md text-on-surface\">2025/2026 Session</p>\n<p class=\"font-label-sm text-label-sm text-outline\">Advance Registration</p>\n</div>\n</button>\n</div>\n</div>\n<div class=\"pt-md\">\n<label class=\"flex items-start gap-md cursor-pointer group\">\n<input class=\"mt-1 w-5 h-5 rounded border-outline text-primary focus:ring-primary\" type=\"checkbox\"/>\n<span class=\"font-label-sm text-label-sm text-on-surface-variant leading-relaxed\">\n                                        I certify that I am the legal guardian or applicant and I have read the <a class=\"text-secondary font-bold hover:underline\" href=\"#\">Admission Guidelines</a> and <a class=\"text-secondary font-bold hover:underline\" href=\"#\">Privacy Policy</a> of Mount Carmel Secondary School.\n                                    </span>\n</label>\n</div>\n</div>\n</div>\n<div class=\"mt-xl flex flex-col items-center gap-md\">\n<button class=\"px-xl py-lg bg-primary text-on-primary rounded-lg font-headline-md text-headline-md hover:opacity-90 shadow-lg transform hover:-translate-y-1 transition-all flex items-center gap-sm\">\n                            Start Application\n                            <span class=\"material-symbols-outlined\">arrow_forward</span>\n</button>\n<p class=\"font-label-sm text-label-sm text-outline\">Average completion time: 15-20 minutes</p>\n</div>\n</div>\n</div>\n</section>\n<!-- Institutional Trust Section -->\n<section class=\"max-w-container-max mx-auto px-gutter pb-xl\">\n<div class=\"grid grid-cols-1 md:grid-cols-2 gap-xl items-center\">\n<div class=\"tonal-layer p-xl rounded-lg h-full\">\n<h4 class=\"font-headline-md text-headline-md text-primary mb-md\">Required Documentation</h4>\n<ul class=\"space-y-md\">\n<li class=\"flex items-start gap-sm\">\n<span class=\"material-symbols-outlined text-secondary\">verified</span>\n<span class=\"font-body-md text-body-md\">Certified copy of Birth Certificate or Passport.</span>\n</li>\n<li class=\"flex items-start gap-sm\">\n<span class=\"material-symbols-outlined text-secondary\">verified</span>\n<span class=\"font-body-md text-body-md\">Previous two years of academic transcripts or report cards.</span>\n</li>\n<li class=\"flex items-start gap-sm\">\n<span class=\"material-symbols-outlined text-secondary\">verified</span>\n<span class=\"font-body-md text-body-md\">Two recent passport-sized photographs (Digital).</span>\n</li>\n<li class=\"flex items-start gap-sm\">\n<span class=\"material-symbols-outlined text-secondary\">verified</span>\n<span class=\"font-body-md text-body-md\">Letter of recommendation from the previous School Principal.</span>\n</li>\n</ul>\n</div>\n<div class=\"relative rounded-lg overflow-hidden h-[340px] group\">\n<div class=\"absolute inset-0 bg-primary/20 group-hover:bg-primary/10 transition-colors z-10\"></div>\n<div class=\"w-full h-full transform group-hover:scale-105 transition-transform duration-700\" data-alt=\"A focused, modern student sitting in a bright, clean library environment, using a digital tablet to review academic material. The aesthetic is clean, professional, and reflects technical precision within an academic setting. Soft natural light filters through large library windows in the background.\" style=\"background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCypn8xUHFTduHE78GtjvnYe4IVFrybVQ9BdF0fQycK-lQPZOdcicYpHrw1wL5IjE6SA6EUCoUawhzu9iVR5nrWUKQMCEcGO4Xvsidn86ZjfsNQfCxF8xF2tEXGsHiXkhGRCE-tJptQ8rm1QGFAlgt8deoVHd8F3MvNDxzrf-Rryki88VF274G5stkApWJLvmB52NHGyVLn55IfY1pG9tis6JgR8BWxaf4QlZ9AxLyPnmEVDzfSZZt3EqFb7QsgXXZ_2eD0f0kffpc8')\"></div>\n<div class=\"absolute bottom-md left-md z-20\">\n<div class=\"bg-secondary text-on-secondary px-md py-xs rounded-sm font-label-md flex items-center gap-xs shadow-md\">\n<span class=\"material-symbols-outlined text-sm\" style=\"font-variation-settings: 'FILL' 1;\">info</span>\n                            Technical Assistance Available 24/7\n                        </div>\n</div>\n</div>\n</div>\n</section>\n</main>\n<!-- Footer -->\n<footer class=\"bg-secondary text-on-secondary w-full py-xl px-gutter grid grid-cols-1 md:grid-cols-2 items-center\">\n<div>\n<span class=\"font-headline-md text-headline-md font-bold mb-md block\">Mount Carmel Secondary</span>\n<p class=\"font-label-sm text-label-sm opacity-80\">© 2024 Mount Carmel Secondary School. All Rights Reserved.</p>\n</div>\n<div class=\"flex flex-wrap gap-lg md:justify-end mt-xl md:mt-0\">\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Privacy Policy</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Terms of Service</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Campus Safety</a>\n<a class=\"font-label-sm text-label-sm opacity-80 hover:opacity-100 transition-opacity\" href=\"#\">Contact Us</a>\n</div>\n</footer>";
+import { useEffect, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import PublicHeader from '../../../components/public/PublicHeader.jsx';
+import PublicFooter from '../../../components/public/PublicFooter.jsx';
+import ApplyStepper from '../../../components/public/ApplyStepper.jsx';
+import { sessions, processSteps, requiredDocs } from './applyData.js';
 
 export default function ApplyIntro() {
-  return <StitchScreen title="Apply Intro" bodyClassName="bg-background text-on-surface font-body-md min-h-screen flex flex-col" html={html} />;
+  const navigate = useNavigate();
+  const [session, setSession] = useState(sessions[0].key);
+  const [agreed, setAgreed] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Apply | MCSS Portal';
+  }, []);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-surface-container-lowest">
+      <PublicHeader />
+      <main className="grow">
+        <section className="relative w-full h-100 flex items-center justify-center overflow-hidden bg-primary">
+          <div className="absolute inset-0 bg-primary/70" />
+          <div className="relative z-10 text-center max-w-3xl px-gutter">
+            <h1 className="font-headline-xl text-headline-lg text-on-primary mb-md">Forge Your Future at Mount Carmel</h1>
+            <p className="font-body-lg text-body-lg text-on-primary/90">
+              Join a legacy of excellence, integrity, and academic mastery. Your journey to leadership begins with a single application.
+            </p>
+          </div>
+        </section>
+
+        <section className="max-w-container-max mx-auto px-gutter -mt-16 relative z-30 pb-xl">
+          <div className="bg-surface-container-lowest shadow-lg rounded-lg p-lg md:p-16 flex flex-col items-center border border-outline/10">
+            <div className="w-full mb-xl">
+              <ApplyStepper current={1} />
+            </div>
+
+            <div className="max-w-4xl w-full">
+              <header className="text-center mb-xl">
+                <h2 className="font-label-md text-label-md text-secondary tracking-widest uppercase mb-xs">Step 01: Getting Started</h2>
+                <h3 className="font-headline-lg text-headline-md text-primary">Admission Application Process</h3>
+                <p className="mt-md font-body-md text-on-surface-variant max-w-2xl mx-auto">
+                  Welcome to the Mount Carmel Secondary School online application portal. Please read the following instructions carefully before commencing your
+                  application for the upcoming academic session.
+                </p>
+              </header>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+                {processSteps.map((step) => (
+                  <div key={step.title} className="p-lg bg-surface-container-low rounded-lg border border-outline/10 text-center">
+                    <span className="material-symbols-outlined text-primary text-3xl mb-sm">{step.icon}</span>
+                    <h4 className="font-label-md text-label-md text-primary mb-xs">{step.title}</h4>
+                    <p className="font-label-sm text-label-sm text-on-surface-variant">{step.body}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-surface-container-lowest p-xl rounded-lg border border-outline/10 max-w-2xl mx-auto">
+                <div className="space-y-lg">
+                  <div>
+                    <label className="font-label-md text-label-md text-primary block mb-sm">Select Intended Academic Session</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                      {sessions.map((option) => (
+                        <button
+                          key={option.key}
+                          type="button"
+                          onClick={() => setSession(option.key)}
+                          className={`relative p-md rounded-lg text-left transition-all border-2 ${
+                            session === option.key ? 'border-primary bg-primary/5' : 'border-outline/20 hover:border-primary'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-label-md text-label-md text-on-surface">{option.label}</p>
+                              <p className="font-label-sm text-label-sm text-on-surface-variant">{option.note}</p>
+                            </div>
+                            {session === option.key && <span className="material-symbols-outlined text-primary">check_circle</span>}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="pt-md">
+                    <label className="flex items-start gap-md cursor-pointer group">
+                      <input checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1 w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox" />
+                      <span className="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">
+                        I certify that I am the legal guardian or applicant and I have read the{' '}
+                        <a className="text-secondary font-bold hover:underline" href="#">
+                          Admission Guidelines
+                        </a>{' '}
+                        and{' '}
+                        <a className="text-secondary font-bold hover:underline" href="#">
+                          Privacy Policy
+                        </a>{' '}
+                        of Mount Carmel Secondary School.
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-xl flex flex-col items-center gap-md">
+                <button
+                  type="button"
+                  disabled={!agreed}
+                  onClick={() => navigate('/apply/bio-data')}
+                  className="px-xl py-lg bg-primary text-on-primary rounded-lg font-headline-md text-headline-sm hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none shadow-lg hover:-translate-y-1 transition-all flex items-center gap-sm"
+                >
+                  Start Application
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
+                <p className="font-label-sm text-label-sm text-outline">Average completion time: 15-20 minutes</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="max-w-container-max mx-auto px-gutter pb-xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-xl items-center">
+            <div className="bg-surface-container-low p-xl rounded-lg h-full border border-outline/10">
+              <h4 className="font-headline-md text-headline-md text-primary mb-md">Required Documentation</h4>
+              <ul className="space-y-md">
+                {requiredDocs.map((doc) => (
+                  <li key={doc} className="flex items-start gap-sm">
+                    <span className="material-symbols-outlined text-secondary">verified</span>
+                    <span className="font-body-md text-body-md">{doc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-surface-container-low rounded-lg h-85 flex items-center justify-center border border-outline/10">
+              <div className="text-center px-lg">
+                <span className="material-symbols-outlined text-primary text-5xl">support_agent</span>
+                <p className="font-label-md text-label-md text-primary mt-md">Technical Assistance Available 24/7</p>
+                <Link to="/login" className="text-secondary font-label-sm hover:underline mt-xs inline-block">
+                  Portal access issues? Contact support
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <PublicFooter />
+    </div>
+  );
 }
