@@ -114,7 +114,7 @@ export default function TeacherScoreEntry() {
                   return (
                     <tr key={student.id} className="border-b border-outline-variant transition-colors hover:bg-primary/5">
                       <td className="px-lg py-4 font-label-md text-label-md text-secondary">{student.id}</td>
-                      <td className="px-lg py-4 font-body-md text-body-md font-medium">{student.name}</td>
+                      <td className="px-lg py-4 font-body-md text-body-md font-medium text-on-surface">{student.name}</td>
                       <td className="px-lg py-4 text-center">
                         <ScoreInput
                           value={scores[student.id].ca1}

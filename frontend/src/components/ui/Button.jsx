@@ -24,7 +24,7 @@ export default function Button({
   ...rest
 }) {
   const classes = cn(
-    'inline-flex items-center justify-center gap-xs font-label-md text-label-md font-bold rounded transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none',
+    'mcss-btn inline-flex items-center justify-center gap-xs font-label-md text-label-md font-bold rounded transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none',
     variantClasses[variant],
     sizeClasses[size],
     className,

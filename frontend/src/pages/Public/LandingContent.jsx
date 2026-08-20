@@ -164,8 +164,8 @@ export default function LandingContent() {
         </div>
       </section>
 
-      <section className="py-xl lg:py-20 bg-primary text-on-primary relative overflow-hidden">
-        <span className="material-symbols-outlined absolute top-10 right-10 text-on-primary/10 text-6xl hidden md:block">flare</span>
+      <section className="py-xl lg:py-20 bg-nav text-on-nav relative overflow-hidden">
+        <span className="material-symbols-outlined absolute top-10 right-10 text-on-nav/10 text-6xl hidden md:block">flare</span>
         <div className="max-w-container-max mx-auto px-gutter grid grid-cols-1 lg:grid-cols-12 gap-xl relative z-10">
           <div className="lg:col-span-4">
             <h3 className="font-headline-lg text-headline-md lg:text-headline-lg leading-tight mb-md">
@@ -183,7 +183,7 @@ export default function LandingContent() {
             </div>
           </div>
           <div className="lg:col-span-8">
-            <div className="bg-on-primary/5 border border-on-primary/10 p-lg lg:p-xl rounded-lg">
+            <div className="bg-on-nav/5 border border-on-nav/10 p-lg lg:p-xl rounded-lg">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-lg items-center">
                 {fees.rows.map((row) => (
                   <div key={row.label} className="text-center md:text-left">

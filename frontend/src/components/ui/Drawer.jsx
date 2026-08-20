@@ -2,7 +2,7 @@ export default function Drawer({ open, onClose, title, children, footer }) {
   return (
     <div className={`fixed inset-0 z-50 ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
       <div
-        className={`absolute inset-0 bg-primary/40 transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 bg-nav/40 transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0'}`}
         onClick={onClose}
       />
       <div
@@ -10,7 +10,7 @@ export default function Drawer({ open, onClose, title, children, footer }) {
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="p-lg border-b border-outline/10 flex justify-between items-center bg-primary text-on-primary shrink-0">
+        <div className="p-lg border-b border-outline/10 flex justify-between items-center bg-nav text-on-nav shrink-0">
           <h3 className="font-headline-md text-headline-md">{title}</h3>
           <button className="hover:rotate-90 transition-transform" onClick={onClose} aria-label="Close">
             <span className="material-symbols-outlined">close</span>

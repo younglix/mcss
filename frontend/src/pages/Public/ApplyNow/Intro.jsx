@@ -18,11 +18,11 @@ export default function ApplyIntro() {
     <div className="min-h-screen flex flex-col bg-surface-container-lowest">
       <PublicHeader />
       <main className="grow">
-        <section className="relative w-full h-100 flex items-center justify-center overflow-hidden bg-primary">
-          <div className="absolute inset-0 bg-primary/70" />
+        <section className="relative w-full h-100 flex items-center justify-center overflow-hidden bg-nav">
+          <div className="absolute inset-0 bg-nav/70" />
           <div className="relative z-10 text-center max-w-3xl px-gutter">
-            <h1 className="font-headline-xl text-headline-lg text-on-primary mb-md">Forge Your Future at Mount Carmel</h1>
-            <p className="font-body-lg text-body-lg text-on-primary/90">
+            <h1 className="font-headline-xl text-headline-lg text-on-nav mb-md">Forge Your Future at Mount Carmel</h1>
+            <p className="font-body-lg text-body-lg text-on-nav/90">
               Join a legacy of excellence, integrity, and academic mastery. Your journey to leadership begins with a single application.
             </p>
           </div>

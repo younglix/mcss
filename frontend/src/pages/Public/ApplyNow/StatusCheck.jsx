@@ -20,7 +20,7 @@ export default function ApplyStatusCheck() {
     <div className="min-h-screen flex flex-col bg-surface-container-lowest">
       <PublicHeader />
       <main className="grow">
-        <section className="relative py-xl px-gutter overflow-hidden bg-primary text-on-primary">
+        <section className="relative py-xl px-gutter overflow-hidden bg-nav text-on-nav">
           <div className="max-w-container-max mx-auto relative z-10 flex flex-col items-center text-center">
             <h1 className="font-headline-xl text-headline-lg mb-md">Application Status</h1>
             <p className="font-body-lg text-body-lg max-w-2xl opacity-90 mb-xl">

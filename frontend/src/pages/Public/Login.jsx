@@ -54,7 +54,7 @@ export default function Login() {
 
   return (
     <main className="flex min-h-screen w-full bg-surface-container-lowest">
-      <section className="hidden lg:flex flex-col justify-between w-[45%] bg-primary p-xl relative overflow-hidden">
+      <section className="hidden lg:flex flex-col justify-between w-[45%] bg-nav p-xl relative overflow-hidden">
         <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-primary-container rounded-full blur-[100px] opacity-30" />
         <div className="relative z-10 flex flex-col h-full">
           <Link to="/" className="flex items-center gap-md">
@@ -62,24 +62,24 @@ export default function Login() {
               <span className="material-symbols-outlined text-primary text-3xl">school</span>
             </div>
             <div>
-              <h1 className="font-headline-md text-headline-md text-on-primary leading-tight">Mount Carmel</h1>
-              <p className="font-label-md text-on-primary/70 tracking-[0.1em] uppercase">Secondary School</p>
+              <h1 className="font-headline-md text-headline-md text-on-nav leading-tight">Mount Carmel</h1>
+              <p className="font-label-md text-on-nav/70 tracking-[0.1em] uppercase">Secondary School</p>
             </div>
           </Link>
 
           <div className="mt-auto mb-12">
-            <h2 className="font-headline-xl text-headline-lg text-on-primary max-w-md">Cultivating Excellence through Faith and Knowledge.</h2>
+            <h2 className="font-headline-xl text-headline-lg text-on-nav max-w-md">Cultivating Excellence through Faith and Knowledge.</h2>
             <div className="mt-lg h-1 w-24 bg-tertiary-container" />
           </div>
 
-          <div className="flex gap-lg mt-auto text-on-primary/70 font-label-md">
-            <Link to="/" className="hover:text-on-primary transition-colors">
+          <div className="flex gap-lg mt-auto text-on-nav/70 font-label-md">
+            <Link to="/" className="hover:text-on-nav transition-colors">
               Back to Site
             </Link>
-            <a className="hover:text-on-primary transition-colors" href="#">
+            <a className="hover:text-on-nav transition-colors" href="#">
               IT Support
             </a>
-            <a className="hover:text-on-primary transition-colors" href="#">
+            <a className="hover:text-on-nav transition-colors" href="#">
               Campus Safety
             </a>
           </div>

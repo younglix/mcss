@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { navLinks } from '../../pages/Public/landingData.js';
+import PreferenceControls from '../ui/PreferenceControls.jsx';
 
 export default function PublicHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,6 +29,7 @@ export default function PublicHeader() {
           </nav>
 
           <div className="flex items-center gap-md">
+            <PreferenceControls className="hidden sm:flex" />
             <Link to="/login" className="hidden sm:inline-flex bg-primary text-on-primary px-lg py-2 font-label-md rounded-sm hover:opacity-90 transition-all">
               Staff Login
             </Link>
@@ -39,11 +41,12 @@ export default function PublicHeader() {
       </header>
 
       <div
-        className={`fixed inset-0 z-[70] bg-primary text-on-primary flex flex-col p-10 transition-transform duration-300 md:hidden ${
+        className={`fixed inset-0 z-[70] bg-nav text-on-nav flex flex-col p-10 transition-transform duration-300 md:hidden ${
           menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
         }`}
       >
-        <div className="flex justify-end mb-12">
+        <div className="flex justify-between items-center mb-12">
+          <PreferenceControls tone="inverse" />
           <button onClick={() => setMenuOpen(false)} aria-label="Close menu">
             <span className="material-symbols-outlined text-4xl">close</span>
           </button>
@@ -55,7 +58,7 @@ export default function PublicHeader() {
             </Link>
           ))}
         </nav>
-        <div className="mt-auto pt-10 border-t border-on-primary/10">
+        <div className="mt-auto pt-10 border-t border-on-nav/10">
           <Link
             to="/login"
             onClick={() => setMenuOpen(false)}

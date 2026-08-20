@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import Avatar from '../ui/Avatar.jsx';
 import IconButton from '../ui/IconButton.jsx';
+import PreferenceControls from '../ui/PreferenceControls.jsx';
 
 const logoUrl = '/mcss-logo.png';
 
@@ -28,6 +29,7 @@ export default function TopHeader({
         <div className="flex items-center gap-xs shrink-0">
           <IconButton icon="search" label="Search" onClick={onSearchClick} />
           <IconButton icon="notifications" label="Notifications" badge={notificationCount > 0} />
+          <PreferenceControls />
           <Avatar src={avatarUrl} alt={avatarAlt} fallbackInitials={avatarFallback} size="sm" className="ml-xs" />
         </div>
       </div>

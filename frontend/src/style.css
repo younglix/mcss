@@ -71,6 +71,8 @@
   --color-secondary-container: #a6b1fe;
   --color-tertiary-container: #62003a;
   --color-surface-container-lowest: #ffffff;
+  --color-nav: #2e004a;
+  --color-on-nav: #ffffff;
   --spacing-base: 4px;
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -108,6 +110,138 @@
   --radius-xl: 3rem;
 }
 
+/*
+ * RGB triplets of the current primary color, for effects that need to mix
+ * it into an rgba() (glow shadows, cursor spotlight). Kept in sync with
+ * --color-primary in each theme below.
+ */
+:root {
+  --color-primary-rgb: 46, 0, 74;
+}
+
+/*
+ * Dark theme. Every page already reads colors exclusively through the
+ * semantic tokens below (bg-primary, text-on-surface, border-outline/10,
+ * etc.), so overriding the tokens here re-themes the entire app with no
+ * per-component changes needed. Values follow the Material 3 convention of
+ * deriving dark roles from the light theme's "fixed" tone stops, so the
+ * brand hues (deep purple / navy / magenta) stay recognizable, just
+ * rebalanced for a dark surface.
+ */
+:root.dark {
+  --color-primary: #e4b5ff;
+  --color-on-primary: #2f004c;
+  --color-primary-container: #632c87;
+  --color-on-primary-container: #f4d9ff;
+  --color-primary-fixed: #f4d9ff;
+  --color-primary-fixed-dim: #e4b5ff;
+  --color-on-primary-fixed: #2f004c;
+  --color-on-primary-fixed-variant: #632c87;
+  --color-inverse-primary: #2e004a;
+
+  --color-secondary: #bbc3ff;
+  --color-on-secondary: #031159;
+  --color-secondary-container: #354185;
+  --color-on-secondary-container: #dee0ff;
+  --color-secondary-fixed: #dee0ff;
+  --color-secondary-fixed-dim: #bbc3ff;
+  --color-on-secondary-fixed: #031159;
+  --color-on-secondary-fixed-variant: #354185;
+
+  --color-tertiary: #ffb0ce;
+  --color-on-tertiary: #3e0022;
+  --color-tertiary-container: #8c0055;
+  --color-on-tertiary-container: #ffd9e5;
+  --color-tertiary-fixed: #ffd9e5;
+  --color-tertiary-fixed-dim: #ffb0ce;
+  --color-on-tertiary-fixed: #3e0022;
+  --color-on-tertiary-fixed-variant: #8c0055;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+
+  --color-background: #14101a;
+  --color-on-background: #e6e0e6;
+  --color-surface: #14101a;
+  --color-on-surface: #e6e0e6;
+  --color-surface-dim: #14101a;
+  --color-surface-bright: #3a333f;
+  --color-surface-variant: #4a424c;
+  --color-surface-container-lowest: #0e0b12;
+  --color-surface-container-low: #1c1720;
+  --color-surface-container: #201b26;
+  --color-surface-container-high: #2a2430;
+  --color-surface-container-highest: #352e3b;
+  --color-on-surface-variant: #cbc0cc;
+  --color-outline: #948e97;
+  --color-outline-variant: #4a424c;
+  --color-inverse-surface: #e6e0e6;
+  --color-inverse-on-surface: #1a1c1c;
+  --color-surface-tint: #e4b5ff;
+
+  --color-primary-rgb: 228, 181, 255;
+
+  color-scheme: dark;
+}
+
+/*
+ * Focus Mode: a cursor-trailing ambient spotlight plus elevated hover
+ * feedback on the shared Card/Button primitives. Purely additive (no
+ * dimming or blurring of content) and opt-in via the header toggle, so it
+ * never affects default usability. Position is driven by --cursor-x/-y,
+ * written directly to the DOM by CursorGlow.jsx (never through React
+ * state) so it stays smooth regardless of app render load.
+ */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 560px;
+  height: 560px;
+  margin-left: -280px;
+  margin-top: -280px;
+  border-radius: 9999px;
+  z-index: 40;
+  pointer-events: none;
+  opacity: var(--cursor-opacity, 0);
+  transform: translate3d(var(--cursor-x, -9999px), var(--cursor-y, -9999px), 0);
+  background: radial-gradient(circle, rgba(var(--color-primary-rgb), 0.16) 0%, rgba(var(--color-primary-rgb), 0.06) 42%, transparent 72%);
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), opacity 300ms ease;
+  will-change: transform, opacity;
+  filter: blur(4px);
+}
+
+@media (max-width: 767px), (hover: none) {
+  .cursor-glow {
+    display: none;
+  }
+}
+
+.focus-mode :is(.mcss-card, .mcss-btn):hover {
+  transform: translateY(-2px);
+}
+
+.focus-mode .mcss-card:hover {
+  box-shadow:
+    0 0 0 1px rgba(var(--color-primary-rgb), 0.28),
+    0 20px 44px -16px rgba(var(--color-primary-rgb), 0.4),
+    0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.focus-mode .mcss-btn:hover {
+  box-shadow: 0 0 22px rgba(var(--color-primary-rgb), 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-glow,
+  .mcss-card,
+  .mcss-btn {
+    transition: none !important;
+  }
+}
+
 @keyframes fade-slide-in {
   from {
     opacity: 0;
@@ -131,8 +265,9 @@ body,
 
 body {
   margin: 0;
-  background: #f9f9f9;
-  color: #1a1c1c;
+  background: var(--color-background);
+  color: var(--color-on-background);
+  transition: background-color 400ms ease, color 400ms ease;
 }
 
 button,
@@ -141,6 +276,20 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+/*
+ * Low-specificity fallback so a form control left without explicit
+ * background or text color utilities still follows the app's theme
+ * instead of the browser's native (and, under color-scheme: dark,
+ * low-contrast) styling. Any Tailwind utility class on the element
+ * itself still wins.
+ */
+input,
+select,
+textarea {
+  background-color: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
 }
 
 .stitch-screen {
