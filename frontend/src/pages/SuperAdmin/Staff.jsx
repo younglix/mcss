@@ -8,8 +8,7 @@ import Avatar from '../../components/ui/Avatar.jsx';
 import Drawer from '../../components/ui/Drawer.jsx';
 import { roles, schools, staff, staffStatusTone, totalStaff, rolePermissions } from './staffData.js';
 
-const inputClasses =
-  'w-full border border-outline/20 rounded-md px-4 py-2 font-body-md bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all';
+const inputClasses = 'mcss-field w-full px-md';
 
 export default function SuperAdminStaff() {
   const [drawerOpen, setDrawerOpen] = useState(false);

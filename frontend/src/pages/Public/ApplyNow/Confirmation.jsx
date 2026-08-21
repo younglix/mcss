@@ -60,7 +60,7 @@ export default function ApplyConfirmation() {
                         {i + 1}
                       </span>
                       {step.status === 'current' && (
-                        <span className="bg-secondary-container text-on-secondary-container px-sm py-0.5 rounded-full font-label-sm text-[10px] uppercase font-bold">Current</span>
+                        <span className="bg-secondary-container text-on-secondary-container px-sm py-0.5 rounded-full font-label-sm text-label-xs uppercase font-bold">Current</span>
                       )}
                     </div>
                     <h4 className="font-label-md text-label-md text-primary mb-xs">{step.title}</h4>

@@ -5,7 +5,7 @@ export default function Sidebar({ items, brand, onSignOut }) {
     <aside className="hidden lg:flex flex-col fixed left-0 top-16 bottom-0 z-20 w-64 bg-nav text-on-nav py-lg shadow-[4px_0_24px_rgba(0,0,0,0.15)]">
       <div className="px-lg mb-lg">
         <p className="font-label-md text-label-md font-bold">{brand?.wordmark}</p>
-        <p className="text-[10px] uppercase tracking-widest opacity-70 mt-1">{brand?.tagline || 'Academic Excellence'}</p>
+        <p className="text-label-xs uppercase tracking-widest opacity-70 mt-1">{brand?.tagline || 'Academic Excellence'}</p>
       </div>
 
       <nav className="flex-1 flex flex-col gap-xs px-sm">
@@ -20,7 +20,7 @@ export default function Sidebar({ items, brand, onSignOut }) {
                 <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                 <span className="font-label-md text-label-md">{item.label}</span>
               </span>
-              <span className="text-[9px] uppercase tracking-wide border border-on-nav/20 rounded-full px-1.5 py-0.5">Soon</span>
+              <span className="text-label-xs uppercase tracking-wide border border-on-nav/20 rounded-full px-1.5 py-0.5">Soon</span>
             </span>
           ) : (
             <NavLink

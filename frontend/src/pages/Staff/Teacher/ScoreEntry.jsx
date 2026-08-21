@@ -14,7 +14,7 @@ function ScoreInput({ value, max, onChange }) {
       value={value ?? ''}
       placeholder="0"
       onChange={(event) => onChange(event.target.value === '' ? null : Number(event.target.value))}
-      className="w-full md:w-16 text-center border border-outline-variant rounded font-body-lg text-body-lg min-h-11 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+      className="mcss-field w-full md:w-16 px-xs text-center font-body-lg text-body-lg"
     />
   );
 }
@@ -52,7 +52,7 @@ export default function TeacherScoreEntry() {
           <div className="grid grid-cols-2 lg:flex gap-md w-full lg:w-auto items-end">
             <div className="col-span-2 md:col-span-1 lg:w-48">
               <label className="block font-label-sm text-label-sm text-outline mb-1 uppercase tracking-tighter">Subject</label>
-              <select className="w-full border border-outline-variant rounded font-body-md text-body-md py-2.5 px-3 min-h-11 focus:border-primary outline-none">
+              <select className="mcss-field w-full px-md">
                 {subjects.map((subject) => (
                   <option key={subject}>{subject}</option>
                 ))}
@@ -60,7 +60,7 @@ export default function TeacherScoreEntry() {
             </div>
             <div className="col-span-1 lg:w-32">
               <label className="block font-label-sm text-label-sm text-outline mb-1 uppercase tracking-tighter">Class</label>
-              <select className="w-full border border-outline-variant rounded font-body-md text-body-md py-2.5 px-3 min-h-11 focus:border-primary outline-none">
+              <select className="mcss-field w-full px-md">
                 {classes.map((klass) => (
                   <option key={klass}>{klass}</option>
                 ))}

@@ -4,7 +4,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App.jsx';
 import './style.css';
-import './stitch-exported.css';
 
 registerSW({ immediate: true });
 

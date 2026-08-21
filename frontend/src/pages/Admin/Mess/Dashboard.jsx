@@ -91,8 +91,8 @@ export default function AdminMessDashboard() {
                       <div
                         className={
                           entry.status === 'Current'
-                            ? 'bg-tertiary-container text-on-tertiary-container text-[10px] px-2 py-1 rounded font-bold uppercase'
-                            : 'text-[10px] text-on-surface-variant font-bold uppercase'
+                            ? 'bg-tertiary-container text-on-tertiary-container text-label-xs px-2 py-1 rounded font-bold uppercase'
+                            : 'text-label-xs text-on-surface-variant font-bold uppercase'
                         }
                       >
                         {entry.status}

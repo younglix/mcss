@@ -8,7 +8,7 @@ import { summaryCards, roles, permissionMatrix, auditLog } from './settingsData.
 
 const accessIcon = {
   full: { icon: 'check_circle', tone: 'text-secondary' },
-  view: { icon: 'visibility', tone: 'text-tertiary-container' },
+  view: { icon: 'visibility', tone: 'text-tertiary' },
   none: { icon: 'radio_button_unchecked', tone: 'text-outline' },
 };
 
@@ -17,10 +17,10 @@ const logTone = {
   primary: { border: 'border-primary', text: 'text-primary' },
   error: { border: 'border-error', text: 'text-error' },
   secondary: { border: 'border-secondary', text: 'text-secondary' },
-  tertiary: { border: 'border-tertiary-container', text: 'text-tertiary-container' },
+  tertiary: { border: 'border-tertiary-container', text: 'text-tertiary' },
 };
 
-const inputClasses = 'w-full px-md py-2 border border-outline/20 rounded text-body-md bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all';
+const inputClasses = 'mcss-field w-full px-md';
 
 export default function SuperAdminSettings() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
@@ -137,7 +137,7 @@ export default function SuperAdminSettings() {
                   <div className="border-2 border-dashed border-outline/20 rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
                     <span className="material-symbols-outlined text-primary text-[48px] mb-sm group-hover:scale-110 transition-transform">cloud_upload</span>
                     <p className="font-label-md text-label-md text-on-surface-variant">Click to upload SVG or PNG</p>
-                    <p className="text-[10px] text-outline mt-xs uppercase">Max size: 2MB</p>
+                    <p className="text-label-xs text-outline mt-xs uppercase">Max size: 2MB</p>
                   </div>
                 </div>
                 <div className="pt-md border-t border-outline/10 flex justify-end gap-md">

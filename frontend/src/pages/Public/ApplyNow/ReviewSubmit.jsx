@@ -131,7 +131,7 @@ export default function ApplyReviewSubmit() {
         <section className="max-w-4xl mx-auto space-y-lg">
           <div className="bg-surface-container-high p-lg rounded-xl border border-primary/20">
             <div className="flex items-start gap-md">
-              <input checked={declared} onChange={(e) => setDeclared(e.target.checked)} className="mt-1 w-6 h-6 rounded border-outline text-primary focus:ring-primary" id="declaration" type="checkbox" />
+              <input checked={declared} onChange={(e) => setDeclared(e.target.checked)} className="mt-1 w-5 h-5 rounded border-outline text-primary focus:ring-primary" id="declaration" type="checkbox" />
               <label className="font-body-md text-body-md text-on-surface" htmlFor="declaration">
                 <strong>Declaration:</strong> I hereby certify that the information provided in this application is true and correct to the best of my
                 knowledge. I understand that any false statements or omission of facts may be grounds for rejection of this application or subsequent

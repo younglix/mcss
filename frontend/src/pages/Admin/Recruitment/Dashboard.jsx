@@ -79,10 +79,10 @@ export default function AdminRecruitmentDashboard() {
 
                         {candidate.tag && (
                           <div className="flex items-center gap-sm mb-md">
-                            <span className="bg-secondary-container text-on-secondary-container text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">
+                            <span className="bg-secondary-container text-on-secondary-container text-label-xs px-2 py-0.5 rounded-full font-bold uppercase">
                               {candidate.tag}
                             </span>
-                            <span className="text-[10px] text-outline">{candidate.meta}</span>
+                            <span className="text-label-xs text-outline">{candidate.meta}</span>
                           </div>
                         )}
 
@@ -104,12 +104,12 @@ export default function AdminRecruitmentDashboard() {
 
                         <div className="flex justify-between items-center pt-md border-t border-outline/10">
                           {candidate.expires ? (
-                            <span className="text-[10px] text-outline italic">{candidate.expires}</span>
+                            <span className="text-label-xs text-outline italic">{candidate.expires}</span>
                           ) : (
-                            <span className="text-[10px] text-outline">&nbsp;</span>
+                            <span className="text-label-xs text-outline">&nbsp;</span>
                           )}
                           {candidate.urgent ? (
-                            <span className="text-[10px] font-bold text-primary uppercase">Urgent</span>
+                            <span className="text-label-xs font-bold text-primary uppercase">Urgent</span>
                           ) : (
                             <span className="material-symbols-outlined text-on-surface-variant text-lg">
                               {candidate.status ? 'check_circle' : 'attachment'}
@@ -149,13 +149,13 @@ export default function AdminRecruitmentDashboard() {
                   <tr key={job.title} className="hover:bg-surface-container transition-colors">
                     <td className="px-lg py-4">
                       <div className="font-bold text-primary">{job.title}</div>
-                      <div className="text-[12px]">{job.meta}</div>
+                      <div className="text-label-sm">{job.meta}</div>
                     </td>
                     <td className="px-lg py-4">{job.department}</td>
                     <td className="px-lg py-4">
                       <div className="flex items-center gap-2">
                         <span className="font-bold">{job.applicants}</span>
-                        {job.newApplicants > 0 && <span className="text-tertiary-container text-xs font-bold">({job.newApplicants} New)</span>}
+                        {job.newApplicants > 0 && <span className="text-tertiary text-xs font-bold">({job.newApplicants} New)</span>}
                       </div>
                     </td>
                     <td className="px-lg py-4">

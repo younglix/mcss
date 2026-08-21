@@ -5,7 +5,7 @@ import PublicFooter from '../../../components/public/PublicFooter.jsx';
 import ApplyStepper from '../../../components/public/ApplyStepper.jsx';
 import { entryLevels } from './applyData.js';
 
-const inputClasses = 'w-full bg-surface-container-lowest border border-outline/30 rounded-md p-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all';
+const inputClasses = 'mcss-field w-full px-md';
 
 export default function ApplyBioData() {
   const navigate = useNavigate();

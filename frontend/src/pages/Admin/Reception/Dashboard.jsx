@@ -52,7 +52,7 @@ export default function AdminReceptionDashboard() {
                 <div className="relative">
                   <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-body-md">search</span>
                   <input
-                    className="pl-10 pr-4 py-2 border border-outline-variant rounded-full text-label-md focus:outline-none focus:border-primary bg-surface-container-lowest"
+                    className="mcss-field pl-10 pr-md"
                     placeholder="Search visitors..."
                     type="text"
                   />

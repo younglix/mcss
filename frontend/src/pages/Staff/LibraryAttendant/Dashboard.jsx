@@ -70,12 +70,12 @@ export default function LibraryAttendantDashboard() {
             <div className="relative flex-1">
               <span className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
               <input
-                className="w-full pl-xl pr-md py-sm bg-surface-container-lowest border border-outline rounded focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-body-md text-body-md"
+                className="mcss-field w-full pl-xl pr-md"
                 placeholder="Search by Title, Author, or ISBN..."
                 type="text"
               />
             </div>
-            <select className="bg-surface-container-lowest border border-outline rounded px-md py-sm font-label-md text-label-md">
+            <select className="mcss-field mcss-field-compact px-md">
               {genres.map((genre) => (
                 <option key={genre}>{genre}</option>
               ))}

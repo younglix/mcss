@@ -79,7 +79,7 @@ export default function AdminActivityDashboard() {
               <div className="bg-primary text-on-primary rounded-2xl overflow-hidden flex flex-col justify-between p-md">
                 <div>
                   <div className="flex justify-between items-start mb-2">
-                    <span className="bg-tertiary-container text-on-tertiary-container text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tight flex items-center">
+                    <span className="bg-tertiary-container text-on-tertiary-container text-label-xs font-bold px-3 py-1 rounded-full uppercase tracking-tight flex items-center">
                       <span className="material-symbols-outlined text-[12px] mr-1">priority_high</span>
                       {featuredEvent.priority}
                     </span>
@@ -102,14 +102,14 @@ export default function AdminActivityDashboard() {
                     }`}
                   >
                     <div className="flex-shrink-0 w-12 text-center">
-                      <span className={`block font-headline-lg text-xl leading-none ${event.urgent ? 'text-on-tertiary-container' : 'text-primary'}`}>{event.day}</span>
-                      <span className={`block font-label-sm text-[10px] uppercase ${event.urgent ? 'text-on-tertiary-container' : 'text-outline'}`}>{event.month}</span>
+                      <span className={`block font-headline-lg text-xl leading-none ${event.urgent ? 'text-tertiary' : 'text-primary'}`}>{event.day}</span>
+                      <span className={`block font-label-sm text-label-xs uppercase ${event.urgent ? 'text-tertiary' : 'text-outline'}`}>{event.month}</span>
                     </div>
                     <div className="flex-grow">
                       <h5 className="font-label-md text-on-surface leading-tight">{event.title}</h5>
-                      <p className={`text-xs font-body-md ${event.urgent ? 'text-on-tertiary-container font-bold' : 'text-outline'}`}>{event.meta}</p>
+                      <p className={`text-xs font-body-md ${event.urgent ? 'text-tertiary font-bold' : 'text-outline'}`}>{event.meta}</p>
                     </div>
-                    <span className={`material-symbols-outlined ${event.urgent ? 'text-on-tertiary-container' : 'text-outline'}`}>
+                    <span className={`material-symbols-outlined ${event.urgent ? 'text-tertiary' : 'text-outline'}`}>
                       {event.urgent ? 'warning' : 'event'}
                     </span>
                   </div>
@@ -125,12 +125,12 @@ export default function AdminActivityDashboard() {
               <span className="material-symbols-outlined mr-2 text-sm">history_edu</span> Participation Log
             </h3>
             <div className="flex flex-wrap gap-sm">
-              <select className="text-xs font-body-md border border-outline/20 rounded-full bg-surface-container-lowest px-md py-1 focus:ring-2 focus:ring-primary/20">
+              <select className="mcss-field mcss-field-compact px-md">
                 {houses.map((house) => (
                   <option key={house}>{house}</option>
                 ))}
               </select>
-              <select className="text-xs font-body-md border border-outline/20 rounded-full bg-surface-container-lowest px-md py-1 focus:ring-2 focus:ring-primary/20">
+              <select className="mcss-field mcss-field-compact px-md">
                 {grades.map((grade) => (
                   <option key={grade}>{grade}</option>
                 ))}
@@ -158,11 +158,11 @@ export default function AdminActivityDashboard() {
                     <td className="px-lg py-4 font-headline-md text-sm">{entry.name}</td>
                     <td className="px-lg py-4 font-body-md text-sm text-outline">{entry.id}</td>
                     <td className="px-lg py-4">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${activityTone[entry.tone]}`}>{entry.activity}</span>
+                      <span className={`px-3 py-1 rounded-full text-label-xs font-bold uppercase ${activityTone[entry.tone]}`}>{entry.activity}</span>
                     </td>
                     <td className="px-lg py-4 font-body-md text-sm">{entry.role}</td>
                     <td className="px-lg py-4">
-                      <div className="flex items-center text-on-tertiary-container font-bold">
+                      <div className="flex items-center text-tertiary font-bold">
                         <span className="material-symbols-outlined text-sm mr-1">star</span> {entry.points}
                       </div>
                     </td>

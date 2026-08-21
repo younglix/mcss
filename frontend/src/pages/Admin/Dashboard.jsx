@@ -63,7 +63,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="relative h-64 pl-8 pb-8">
-              <div className="absolute left-0 inset-y-0 flex flex-col justify-between text-[10px] text-outline py-2">
+              <div className="absolute left-0 inset-y-0 flex flex-col justify-between text-label-xs text-outline py-2">
                 <span>100</span>
                 <span>50</span>
                 <span>0</span>
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
                   strokeWidth="3"
                 />
               </svg>
-              <div className="absolute -bottom-2 inset-x-8 flex justify-between text-[10px] text-outline font-bold">
+              <div className="absolute -bottom-2 inset-x-8 flex justify-between text-label-xs text-outline font-bold">
                 {performanceTrend.weeks.map((week) => (
                   <span key={week}>{week}</span>
                 ))}
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
             </div>
             <div className="grid grid-cols-7 gap-1.5 sm:gap-2 flex-1">
               {weekdays.map((day) => (
-                <div key={day} className="text-[9px] text-center font-bold text-outline">
+                <div key={day} className="text-label-xs text-center font-bold text-outline">
                   {day}
                 </div>
               ))}
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
               ))}
             </div>
             <div className="mt-lg flex items-center justify-between">
-              <p className="text-[10px] text-outline font-bold uppercase tracking-widest">Intensity</p>
+              <p className="text-label-xs text-outline font-bold uppercase tracking-widest">Intensity</p>
               <div className="flex items-center gap-1">
                 {heatmapTone.slice(1).map((tone) => (
                   <div key={tone} className={`w-2 h-2 rounded-sm ${tone}`} />
@@ -124,9 +124,9 @@ export default function AdminDashboard() {
               <table className="w-full min-w-100 text-left">
                 <thead>
                   <tr className="bg-primary text-on-primary">
-                    <th className="px-lg py-3 text-[10px] font-bold uppercase tracking-widest">Student Name</th>
-                    <th className="px-lg py-3 text-[10px] font-bold uppercase tracking-widest">Class</th>
-                    <th className="px-lg py-3 text-[10px] font-bold uppercase tracking-widest">Status</th>
+                    <th className="px-lg py-3 text-label-xs font-bold uppercase tracking-widest">Student Name</th>
+                    <th className="px-lg py-3 text-label-xs font-bold uppercase tracking-widest">Class</th>
+                    <th className="px-lg py-3 text-label-xs font-bold uppercase tracking-widest">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline/10 font-body-md text-[13px]">
@@ -160,7 +160,7 @@ export default function AdminDashboard() {
                   <img src={person.photoUrl} alt={person.name} className="w-12 h-12 rounded-lg object-cover" />
                   <div className="flex-1 min-w-0">
                     <p className="font-label-md text-label-md text-on-surface truncate">{person.name}</p>
-                    <p className="text-[10px] text-outline truncate uppercase">{person.role}</p>
+                    <p className="text-label-xs text-outline truncate uppercase">{person.role}</p>
                   </div>
                   <Badge tone={person.badge === 'Top' ? 'primary' : 'secondary'} variant="ribbon" className="shrink-0">
                     {person.badge}

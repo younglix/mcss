@@ -30,7 +30,7 @@ export default function ProgressRing({ percent, size = 200, strokeWidth = 12, la
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="font-headline-md text-headline-md text-primary">{label}</span>
-        {sublabel && <span className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant">{sublabel}</span>}
+        {sublabel && <span className="text-label-xs uppercase font-bold tracking-widest text-on-surface-variant">{sublabel}</span>}
       </div>
     </div>
   );

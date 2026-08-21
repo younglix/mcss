@@ -128,7 +128,7 @@ export default function AdminLibraryDashboard() {
                     </div>
                   </div>
                 ))}
-                <a className="text-center font-label-md text-label-md text-tertiary-container hover:underline pt-xs" href="#">
+                <a className="text-center font-label-md text-label-md text-tertiary hover:underline pt-xs" href="#">
                   View All {totalOverdue} Overdue Items
                 </a>
               </div>

@@ -110,7 +110,7 @@ export default function ParentDashboard() {
               {upcomingEvents.map((event) => (
                 <div key={event.title} className="flex gap-md items-start">
                   <div className="flex flex-col items-center bg-surface-container px-sm py-xs rounded min-w-12.5">
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase">{event.month}</span>
+                    <span className="text-label-xs font-bold text-on-surface-variant uppercase">{event.month}</span>
                     <span className="font-headline-sm text-headline-sm text-primary leading-none">{event.day}</span>
                   </div>
                   <div>

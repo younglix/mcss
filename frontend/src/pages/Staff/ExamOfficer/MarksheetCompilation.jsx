@@ -39,7 +39,7 @@ export default function ExamOfficerMarksheet() {
           <Card padding="lg" className="relative overflow-hidden">
             <div className="relative z-10">
               <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Missing Scores</p>
-              <p className="font-headline-md text-headline-md text-on-tertiary-container">{stats.missingScores} Entries</p>
+              <p className="font-headline-md text-headline-md text-tertiary">{stats.missingScores} Entries</p>
             </div>
             <span className="material-symbols-outlined absolute right-0 bottom-0 text-[64px] opacity-10">warning</span>
           </Card>
@@ -53,7 +53,7 @@ export default function ExamOfficerMarksheet() {
           <div className="bg-surface-container-low p-md border-b border-outline/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-md">
             <div className="flex items-center gap-md">
               <span className="font-label-md text-label-md text-on-surface-variant">Filter by:</span>
-              <select className="bg-surface-container-lowest border border-outline-variant rounded-md text-body-md py-1 px-2">
+              <select className="mcss-field mcss-field-compact px-md">
                 <option>All Students</option>
                 <option>Missing Data Only</option>
                 <option>Borderline Passes</option>
@@ -62,7 +62,7 @@ export default function ExamOfficerMarksheet() {
             <div className="flex-1 relative">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
               <input
-                className="w-full pl-10 pr-md py-2 bg-surface-container-lowest border border-outline-variant rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-body-md"
+                className="mcss-field w-full pl-10 pr-md"
                 placeholder="Search by name or admission number..."
                 type="text"
               />
@@ -92,14 +92,14 @@ export default function ExamOfficerMarksheet() {
                       <td className="px-4 py-3 border-r border-outline-variant sticky left-0 bg-surface-container-lowest z-10">
                         <div className="flex flex-col">
                           <span className="font-bold text-primary">{student.name}</span>
-                          <span className="text-[10px] text-on-surface-variant">{student.id}</span>
+                          <span className="text-label-xs text-on-surface-variant">{student.id}</span>
                         </div>
                       </td>
                       {student.scores.map((score, i) => (
                         <td
                           key={i}
                           className={`px-4 py-3 text-center ${
-                            score === null ? 'bg-tertiary-container/10 text-on-tertiary-container font-bold italic' : ''
+                            score === null ? 'bg-tertiary-container/10 text-tertiary font-bold italic' : ''
                           }`}
                         >
                           {score === null ? 'Missing' : score}

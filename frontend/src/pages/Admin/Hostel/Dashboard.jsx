@@ -35,7 +35,7 @@ export default function AdminHostelDashboard() {
                 {stat.label}
               </span>
               <div className="flex items-baseline gap-xs">
-                <span className={`font-headline-xl text-headline-xl ${stat.invert ? '' : stat.tone === 'secondary' ? 'text-secondary' : stat.tone === 'tertiary' ? 'text-on-tertiary-container' : 'text-primary'}`}>
+                <span className={`font-headline-xl text-headline-xl ${stat.invert ? '' : stat.tone === 'secondary' ? 'text-secondary' : stat.tone === 'tertiary' ? 'text-tertiary' : 'text-primary'}`}>
                   {stat.value}
                 </span>
                 <span className={`font-label-md text-label-md ${stat.invert ? 'opacity-70' : 'text-on-surface-variant'}`}>{stat.unit}</span>
@@ -51,7 +51,7 @@ export default function AdminHostelDashboard() {
                 <h3 className="font-headline-md text-headline-md text-primary">Room &amp; Bed Allocations</h3>
                 <p className="text-on-surface-variant">Live status of hostel blocks and current residents.</p>
               </div>
-              <select className="rounded-lg border border-outline-variant bg-surface-container-lowest text-label-md px-md py-2 focus:ring-2 focus:ring-primary/20">
+              <select className="mcss-field mcss-field-compact px-md">
                 {blocks.map((block) => (
                   <option key={block}>{block}</option>
                 ))}
@@ -118,7 +118,7 @@ export default function AdminHostelDashboard() {
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-body-md">search</span>
                 <input
-                  className="w-full pl-xl pr-md py-2 border border-outline-variant rounded-lg font-body-md text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  className="mcss-field w-full pl-xl pr-md"
                   placeholder="Search unassigned students..."
                   type="text"
                 />
@@ -140,12 +140,12 @@ export default function AdminHostelDashboard() {
                     {(student.tags.length > 0 || student.alert) && (
                       <div className="mt-md flex gap-sm flex-wrap">
                         {student.tags.map((tag) => (
-                          <span key={tag} className="bg-surface-container px-sm py-1 rounded text-[10px] font-bold text-on-surface-variant uppercase">
+                          <span key={tag} className="bg-surface-container px-sm py-1 rounded text-label-xs font-bold text-on-surface-variant uppercase">
                             {tag}
                           </span>
                         ))}
                         {student.alert && (
-                          <span className="bg-tertiary-container text-on-tertiary-container px-sm py-1 rounded text-[10px] font-bold uppercase">
+                          <span className="bg-tertiary-container text-on-tertiary-container px-sm py-1 rounded text-label-xs font-bold uppercase">
                             {student.alert}
                           </span>
                         )}

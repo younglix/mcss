@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { categories, familyRoles, staffRoles, superAdmin, detectFamilyRole } from './loginData.js';
 
-const inputClasses =
-  'w-full bg-surface-container-lowest border border-outline/30 pl-11 pr-4 py-3 font-body-md text-on-surface rounded transition-all hover:border-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none';
+const inputClasses = 'mcss-field w-full pl-11 pr-md hover:border-primary';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -137,7 +136,7 @@ export default function Login() {
                       }`}
                     >
                       <span className="material-symbols-outlined text-lg">{role.icon}</span>
-                      <span className="font-label-sm text-[10px] font-bold text-center leading-tight">{role.label}</span>
+                      <span className="font-label-sm text-label-xs font-bold text-center leading-tight">{role.label}</span>
                     </button>
                   ))}
                 </div>
@@ -197,7 +196,7 @@ export default function Login() {
             </div>
 
             <div className="flex items-center gap-sm">
-              <input className="w-4 h-4 rounded border-outline text-primary focus:ring-primary" id="remember" type="checkbox" />
+              <input className="w-5 h-5 rounded border-outline text-primary focus:ring-primary" id="remember" type="checkbox" />
               <label className="font-label-md text-on-surface-variant cursor-pointer select-none" htmlFor="remember">
                 Remember this device for 30 days
               </label>

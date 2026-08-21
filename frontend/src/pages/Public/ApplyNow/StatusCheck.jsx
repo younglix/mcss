@@ -40,7 +40,7 @@ export default function ApplyStatusCheck() {
                 <div className="relative">
                   <span className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">search</span>
                   <input
-                    className="w-full pl-xl pr-md py-md rounded-md border border-outline/30 focus:border-primary focus:ring-1 focus:ring-primary outline-none font-body-md"
+                    className="mcss-field w-full pl-xl pr-md"
                     id="ref-input"
                     placeholder="MCSS-2024-XXXX"
                     type="text"

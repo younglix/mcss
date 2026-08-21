@@ -54,7 +54,7 @@
   --color-surface-container: #eeeeee;
   --color-on-error: #ffffff;
   --color-surface-bright: #f9f9f9;
-  --color-outline: #7e7481;
+  --color-outline: #716874;
   --color-on-error-container: #93000a;
   --color-primary: #2e004a;
   --color-on-background: #1a1c1c;
@@ -99,6 +99,7 @@
   --text-headline-sm: 18px;
   --text-body-lg: 18px;
   --text-headline-lg-mobile: 28px;
+  --text-label-xs: 10px;
   --text-label-sm: 12px;
   --text-headline-xl: 48px;
   --text-label-md: 14px;
@@ -408,6 +409,10 @@ textarea {
   direction: ltr;
   -webkit-font-feature-settings: "liga";
   -webkit-font-smoothing: antialiased;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 /* Shared component layer (src/components/ui, src/components/layout).
@@ -415,6 +420,29 @@ textarea {
    last-one-wins duplicate selectors in stitch-exported.css. */
 .mcss-badge-ribbon {
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+}
+
+/* Canonical text input / select treatment, replacing per-page ad-hoc
+   border/radius/padding combinations that had drifted inconsistent
+   (mismatched radii, missing touch-target height, mixed font tokens). */
+.mcss-field {
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius);
+  min-height: 44px;
+  background-color: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.mcss-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
+}
+.mcss-field.mcss-field-compact {
+  min-height: 38px;
+  font-size: var(--text-label-md);
 }
 
 @media (max-width: 1023px) {

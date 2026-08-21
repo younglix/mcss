@@ -80,7 +80,7 @@ export default function AdminInventoryDashboard() {
         <Card padding="none" className="overflow-hidden">
           <div className="bg-primary px-lg py-md flex items-center gap-md">
             <h2 className="font-label-md text-label-md text-on-primary">Master Stock Registry</h2>
-            <span className="px-2 py-0.5 bg-on-primary/15 text-on-primary text-[10px] font-bold rounded uppercase tracking-tighter">
+            <span className="px-2 py-0.5 bg-on-primary/15 text-on-primary text-label-xs font-bold rounded uppercase tracking-tighter">
               Updated 2m ago
             </span>
           </div>
@@ -103,7 +103,7 @@ export default function AdminInventoryDashboard() {
                     <td className="px-lg py-4 text-outline font-body-md">{item.id}</td>
                     <td className="px-lg py-4 font-bold text-primary">{item.name}</td>
                     <td className="px-lg py-4">{item.category}</td>
-                    <td className={`px-lg py-4 ${item.status !== 'In Stock' ? 'font-bold text-on-tertiary-container' : ''}`}>{item.qty}</td>
+                    <td className={`px-lg py-4 ${item.status !== 'In Stock' ? 'font-bold text-tertiary' : ''}`}>{item.qty}</td>
                     <td className="px-lg py-4">{item.location}</td>
                     <td className="px-lg py-4">
                       <Badge tone={statusTone[item.status]} variant="ribbon">
@@ -111,7 +111,7 @@ export default function AdminInventoryDashboard() {
                       </Badge>
                     </td>
                     <td className="px-lg py-4 text-center">
-                      <button className="text-primary hover:text-tertiary-container transition-colors">
+                      <button className="text-primary hover:text-tertiary transition-colors">
                         <span className="material-symbols-outlined">edit</span>
                       </button>
                     </td>
@@ -152,7 +152,7 @@ export default function AdminInventoryDashboard() {
                   </div>
                   <div>
                     <p className="font-label-md text-label-md">{entry.text}</p>
-                    <p className="text-[10px] text-outline">{entry.meta}</p>
+                    <p className="text-label-xs text-outline">{entry.meta}</p>
                   </div>
                 </div>
               ))}

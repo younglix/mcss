@@ -16,7 +16,7 @@ export default function BottomNav({ items }) {
             title="Coming soon"
           >
             <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-            <span className="font-label-sm text-[10px]">{item.label}</span>
+            <span className="font-label-sm text-label-xs">{item.label}</span>
           </span>
         ) : (
           <NavLink
@@ -34,7 +34,7 @@ export default function BottomNav({ items }) {
                 >
                   <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                 </span>
-                <span className={`font-label-sm text-[10px] ${isActive ? 'text-primary font-bold' : ''}`}>{item.label}</span>
+                <span className={`font-label-sm text-label-xs ${isActive ? 'text-primary font-bold' : ''}`}>{item.label}</span>
               </>
             )}
           </NavLink>

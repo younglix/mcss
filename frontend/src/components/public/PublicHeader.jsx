@@ -16,7 +16,7 @@ export default function PublicHeader() {
             </div>
             <div className="flex flex-col leading-none">
               <span className="font-headline-md text-body-lg font-bold text-primary">Mount Carmel</span>
-              <span className="text-[9px] tracking-[0.2em] uppercase text-secondary font-bold">Secondary School</span>
+              <span className="text-label-xs tracking-[0.2em] uppercase text-secondary font-bold">Secondary School</span>
             </div>
           </Link>
 
@@ -53,7 +53,7 @@ export default function PublicHeader() {
         </div>
         <nav className="flex flex-col gap-8">
           {navLinks.map((link) => (
-            <Link key={link.label} to={link.path} onClick={() => setMenuOpen(false)} className="font-headline-md text-4xl hover:text-tertiary-container transition-colors">
+            <Link key={link.label} to={link.path} onClick={() => setMenuOpen(false)} className="font-headline-md text-4xl hover:text-tertiary-fixed transition-colors">
               {link.label}
             </Link>
           ))}

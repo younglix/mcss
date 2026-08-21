@@ -125,7 +125,7 @@ export default function StudentDashboard() {
                   {item.highlighted && <div className="absolute -left-1.25 top-1 w-2 h-2 rounded-full bg-tertiary" />}
                   <p
                     className={`text-xs font-bold uppercase mb-1 ${
-                      item.highlighted ? 'text-tertiary-fixed-dim' : 'text-on-surface-variant'
+                      item.highlighted ? 'text-tertiary' : 'text-on-surface-variant'
                     }`}
                   >
                     {item.timestamp}

@@ -50,7 +50,7 @@ export default function LandingContent() {
           <div className="lg:col-span-6">
             <div className="flex items-center gap-sm mb-sm">
               <div className="h-px w-8 bg-tertiary-container lg:hidden" />
-              <span className="text-tertiary-container font-label-md text-[10px] lg:text-xs tracking-[0.3em] font-bold uppercase">{hero.eyebrow}</span>
+              <span className="text-tertiary font-label-md text-label-xs lg:text-xs tracking-[0.3em] font-bold uppercase">{hero.eyebrow}</span>
             </div>
             <h2 className="font-headline-xl text-headline-lg lg:text-headline-xl text-primary leading-[1.1] mb-md">
               {hero.title} <br />
@@ -78,7 +78,7 @@ export default function LandingContent() {
               </div>
               <div className="absolute -bottom-6 -right-2 lg:right-0 lg:translate-x-1/4 z-20 bg-secondary p-lg shadow-xl text-on-secondary max-w-40">
                 <p className="text-3xl font-headline-lg font-bold">{hero.stat.value}</p>
-                <p className="text-[9px] uppercase tracking-widest leading-tight mt-1 opacity-80">{hero.stat.label}</p>
+                <p className="text-label-xs uppercase tracking-widest leading-tight mt-1 opacity-80">{hero.stat.label}</p>
               </div>
               <div className="absolute -top-10 -left-10 w-40 h-40 border-[20px] border-tertiary-container/10 rounded-full z-0 hidden lg:block" />
             </div>
@@ -99,7 +99,7 @@ export default function LandingContent() {
             </div>
             <div className="space-y-md">
               <div className="aspect-square bg-primary flex flex-col justify-center p-lg text-on-primary rounded-lg">
-                <span className="material-symbols-outlined text-tertiary-container mb-sm text-3xl">flare</span>
+                <span className="material-symbols-outlined mb-sm text-3xl">flare</span>
                 <p className="font-headline-md text-lg italic">Our Vision</p>
                 <p className="text-xs opacity-80 leading-relaxed mt-xs">Beacon of integral education in Africa.</p>
               </div>
@@ -110,7 +110,7 @@ export default function LandingContent() {
           </div>
 
           <div className="order-1 lg:order-2">
-            <span className="text-tertiary-container font-label-md text-xs tracking-[0.2em] font-bold uppercase mb-sm block">{about.eyebrow}</span>
+            <span className="text-tertiary font-label-md text-xs tracking-[0.2em] font-bold uppercase mb-sm block">{about.eyebrow}</span>
             <h3 className="font-headline-lg text-headline-md lg:text-headline-lg text-primary leading-tight mb-md">
               {about.title} <br />
               <span className="italic">{about.titleAccent}</span>
@@ -136,7 +136,7 @@ export default function LandingContent() {
       <section className="py-xl lg:py-20 bg-surface-container-low" id="academics">
         <div className="max-w-container-max mx-auto px-gutter">
           <div className="text-center mb-xl">
-            <span className="text-tertiary-container font-label-md text-xs tracking-[0.2em] font-bold uppercase mb-sm block">{academics.eyebrow}</span>
+            <span className="text-tertiary font-label-md text-xs tracking-[0.2em] font-bold uppercase mb-sm block">{academics.eyebrow}</span>
             <h3 className="font-headline-lg text-headline-md lg:text-headline-lg text-primary leading-tight">{academics.title}</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
@@ -146,7 +146,7 @@ export default function LandingContent() {
                   <div className={`w-14 h-14 rounded flex items-center justify-center ${toneClasses[program.tone].icon}`}>
                     <span className="material-symbols-outlined text-2xl">{program.icon}</span>
                   </div>
-                  <span className="text-[10px] font-bold text-outline uppercase tracking-widest">{program.grades}</span>
+                  <span className="text-label-xs font-bold text-outline uppercase tracking-widest">{program.grades}</span>
                 </div>
                 <h4 className="font-headline-md text-headline-sm text-primary mb-sm italic">{program.name}</h4>
                 <p className="font-body-md text-on-surface-variant leading-relaxed mb-lg">{program.body}</p>
@@ -170,13 +170,13 @@ export default function LandingContent() {
           <div className="lg:col-span-4">
             <h3 className="font-headline-lg text-headline-md lg:text-headline-lg leading-tight mb-md">
               {fees.title} <br />
-              <span className="italic text-tertiary-container">{fees.titleAccent}</span>
+              <span className="italic text-tertiary-fixed">{fees.titleAccent}</span>
             </h3>
             <p className="opacity-80 font-body-md mb-lg leading-relaxed">{fees.body}</p>
             <div className="flex flex-col gap-md">
               {fees.perks.map((perk) => (
                 <div key={perk.label} className="flex items-center gap-sm">
-                  <span className="material-symbols-outlined text-tertiary-container">{perk.icon}</span>
+                  <span className="material-symbols-outlined text-tertiary-fixed">{perk.icon}</span>
                   <span className="font-label-md">{perk.label}</span>
                 </div>
               ))}

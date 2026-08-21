@@ -1,7 +1,7 @@
 export const stats = [
   { label: 'Total Clubs', value: '24', tone: 'border-primary text-primary' },
   { label: 'Active Students', value: '842', tone: 'border-secondary text-secondary' },
-  { label: 'Pending Points', value: '128', tone: 'border-tertiary-container text-on-tertiary-container' },
+  { label: 'Pending Points', value: '128', tone: 'border-tertiary text-tertiary' },
   { label: 'Urgent Tasks', value: '3', tone: 'border-error text-error' },
 ];
 
