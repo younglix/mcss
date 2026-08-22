@@ -1,0 +1,13 @@
+from django.contrib import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("api/v1/auth/", include("apps.accounts.urls")),
+    path("api/v1/rbac/", include("apps.rbac.urls")),
+    path("api/v1/config/", include("apps.configuration.urls")),
+    path("api/v1/settings/", include("apps.settings_app.urls")),
+    path("api/v1/audit/", include("apps.audit.urls")),
+    path("api/v1/notifications/", include("apps.notifications.urls")),
+    path("api/v1/dashboard/", include("apps.dashboard.urls")),
+]

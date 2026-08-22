@@ -26,6 +26,7 @@ export default function Sidebar({ items, brand, onSignOut }) {
             <NavLink
               key={item.key}
               to={item.path}
+              end
               className={({ isActive }) =>
                 `flex items-center gap-sm px-md py-sm rounded border-l-4 transition-all ${
                   isActive

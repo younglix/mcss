@@ -30,17 +30,22 @@ export const portals = {
     label: 'Super Admin Portal',
     homePath: '/super-admin',
     brand: { wordmark: 'Mount Carmel', tagline: 'Super Admin Portal' },
+    // Mirrors the Phase 1 backend modules 1:1 (see backend/apps/*): rbac,
+    // configuration, settings_app, and audit are all live endpoints now —
+    // students/admissions have no backend yet, so they stay 'planned'.
     sidebarNav: [
       { key: 'dashboard', label: 'Dashboard', icon: 'dashboard', path: '/super-admin', status: 'active' },
-      { key: 'schools', label: 'School Management', icon: 'domain', path: '/super-admin/schools', status: 'active' },
-      { key: 'staff', label: 'Staff Management', icon: 'badge', path: '/super-admin/staff', status: 'active' },
-      { key: 'applicants', label: 'Applicant Approvals', icon: 'pending_actions', path: '/super-admin/applicants', status: 'active' },
+      { key: 'roles', label: 'Roles & Permissions', icon: 'admin_panel_settings', path: '/super-admin/roles', status: 'active' },
+      { key: 'staff', label: 'Staff & Users', icon: 'badge', path: '/super-admin/staff', status: 'active' },
+      { key: 'configuration', label: 'School Configuration', icon: 'domain', path: '/super-admin/configuration', status: 'active' },
+      { key: 'settings', label: 'System Settings', icon: 'settings', path: '/super-admin/settings', status: 'active' },
+      { key: 'audit', label: 'Audit Log', icon: 'history', path: '/super-admin/audit', status: 'active' },
+      { key: 'applicants', label: 'Applicant Approvals', icon: 'pending_actions', path: '/super-admin/applicants', status: 'planned' },
       { key: 'students', label: 'Student Management', icon: 'group', path: '/super-admin/students', status: 'planned' },
-      { key: 'settings', label: 'Platform Settings', icon: 'settings', path: '/super-admin/settings', status: 'active' },
     ],
     bottomNav: [
       { key: 'dashboard', label: 'Home', icon: 'dashboard', path: '/super-admin', status: 'active' },
-      { key: 'schools', label: 'Schools', icon: 'domain', path: '/super-admin/schools', status: 'active' },
+      { key: 'roles', label: 'Roles', icon: 'admin_panel_settings', path: '/super-admin/roles', status: 'active' },
       { key: 'staff', label: 'Staff', icon: 'badge', path: '/super-admin/staff', status: 'active' },
       { key: 'more', label: 'More', icon: 'more_horiz', path: '/super-admin/more', status: 'planned' },
     ],

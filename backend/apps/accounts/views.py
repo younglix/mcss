@@ -1,0 +1,287 @@
+from datetime import timedelta
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db.models import Q
+from django.utils import timezone
+from django.utils.crypto import get_random_string
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.throttling import ScopedRateThrottle
+from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from apps.audit.models import LoginHistory
+from apps.audit.services import client_ip, log, user_agent
+from apps.rbac.permissions import get_effective_permissions
+from common.responses import failure, success
+
+from .authentication import issue_tokens_for_user
+from .models import OTPChallenge, UserSession
+from .serializers import (
+    Enable2FASerializer,
+    LoginSerializer,
+    PasswordChangeSerializer,
+    PasswordForgotSerializer,
+    PasswordResetSerializer,
+    RefreshSerializer,
+    UserSerializer,
+    VerifyOTPSerializer,
+)
+from .tasks import send_otp_email, send_otp_sms
+
+User = get_user_model()
+
+
+def _build_auth_payload(user, request):
+    tokens = issue_tokens_for_user(user)
+    UserSession.objects.create(
+        user=user,
+        refresh_token_jti=tokens["refresh_jti"],
+        ip_address=client_ip(request),
+        user_agent=user_agent(request)[:300],
+    )
+    user.last_login_at = timezone.now()
+    user.save(update_fields=["last_login_at"])
+    LoginHistory.objects.create(
+        user=user, successful=True,
+        ip_address=client_ip(request), user_agent=user_agent(request)[:300],
+    )
+    return {
+        "access": tokens["access"],
+        "refresh": tokens["refresh"],
+        "user": UserSerializer(user).data,
+        "permissions": sorted(get_effective_permissions(user)),
+    }
+
+
+def _generate_otp():
+    return get_random_string(length=settings.OTP_LENGTH, allowed_chars="0123456789")
+
+
+def _create_challenge(user, purpose):
+    code = _generate_otp()
+    challenge = OTPChallenge.objects.create(
+        user=user,
+        purpose=purpose,
+        expires_at=timezone.now() + timedelta(minutes=settings.OTP_EXPIRY_MINUTES),
+    )
+    challenge.set_code(code)
+    challenge.save(update_fields=["code_hash"])
+    if user.email:
+        send_otp_email.delay(user.email, code)
+    elif user.phone:
+        send_otp_sms.delay(user.phone, code)
+    return challenge
+
+
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
+
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if not serializer.is_valid():
+            LoginHistory.objects.create(
+                user=None, successful=False,
+                ip_address=client_ip(request), user_agent=user_agent(request)[:300],
+            )
+            return failure(message="Invalid credentials.", errors=serializer.errors, status=401)
+
+        user = serializer.validated_data["user"]
+
+        if user.two_factor_enabled:
+            challenge = _create_challenge(user, OTPChallenge.Purpose.LOGIN_2FA)
+            return success(
+                message="Verification code sent.",
+                data={"requires_2fa": True, "challenge_id": str(challenge.id)},
+            )
+
+        return success(message="Login successful.", data=_build_auth_payload(user, request))
+
+
+class VerifyOTPView(APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "otp"
+
+    def post(self, request):
+        serializer = VerifyOTPSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        challenge = OTPChallenge.objects.filter(
+            id=serializer.validated_data["challenge_id"],
+            purpose=OTPChallenge.Purpose.LOGIN_2FA,
+        ).select_related("user").first()
+
+        if challenge is None or not challenge.is_valid:
+            return failure(message="This code has expired or is invalid.", status=400)
+
+        if not challenge.check_code(serializer.validated_data["code"]):
+            challenge.attempts += 1
+            challenge.save(update_fields=["attempts"])
+            return failure(message="Incorrect code.", status=400)
+
+        challenge.consume()
+        return success(message="Login successful.", data=_build_auth_payload(challenge.user, request))
+
+
+class RefreshView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = RefreshSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            refresh = RefreshToken(serializer.validated_data["refresh"])
+            old_jti = refresh["jti"]
+            if settings.SIMPLE_JWT["ROTATE_REFRESH_TOKENS"]:
+                refresh.set_jti()
+                refresh.set_exp()
+                refresh.set_iat()
+                UserSession.objects.filter(refresh_token_jti=old_jti).update(refresh_token_jti=refresh["jti"])
+
+            access = refresh.access_token
+            for claim in ("user_type", "is_superadmin", "roles", "perms_version"):
+                if claim in refresh:
+                    access[claim] = refresh[claim]
+            access["refresh_jti"] = refresh["jti"]
+        except TokenError as exc:
+            return failure(message="Invalid or expired refresh token.", errors=str(exc), status=401)
+
+        return success(data={"access": str(access), "refresh": str(refresh)})
+
+
+class LogoutView(APIView):
+    def post(self, request):
+        refresh_str = request.data.get("refresh")
+        if refresh_str:
+            try:
+                token = RefreshToken(refresh_str)
+                token.blacklist()
+                UserSession.objects.filter(refresh_token_jti=token["jti"]).update(revoked_at=timezone.now())
+            except TokenError:
+                pass
+        return success(message="Logged out.")
+
+
+class MeView(APIView):
+    def get(self, request):
+        return success(data={
+            "user": UserSerializer(request.user).data,
+            "roles": [] if request.user.is_superadmin else list(
+                request.user.user_roles.select_related("role").values_list("role__slug", flat=True)
+            ),
+            "permissions": sorted(get_effective_permissions(request.user)),
+        })
+
+
+class PasswordForgotView(APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
+
+    def post(self, request):
+        serializer = PasswordForgotSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        login = serializer.validated_data["login"].strip()
+        user = User.objects.filter(
+            Q(email__iexact=login) | Q(identifier__iexact=login) | Q(phone=login)
+        ).first()
+
+        # Always return success shape regardless of whether the account exists,
+        # so this endpoint can't be used to enumerate registered logins.
+        if user is not None:
+            challenge = _create_challenge(user, OTPChallenge.Purpose.PASSWORD_RESET)
+            return success(message="If that account exists, a reset code was sent.",
+                            data={"challenge_id": str(challenge.id)})
+        return success(message="If that account exists, a reset code was sent.")
+
+
+class PasswordResetView(APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "otp"
+
+    def post(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        challenge = OTPChallenge.objects.filter(
+            id=serializer.validated_data["challenge_id"],
+            purpose=OTPChallenge.Purpose.PASSWORD_RESET,
+        ).select_related("user").first()
+
+        if challenge is None or not challenge.is_valid:
+            return failure(message="This code has expired or is invalid.", status=400)
+
+        if not challenge.check_code(serializer.validated_data["code"]):
+            challenge.attempts += 1
+            challenge.save(update_fields=["attempts"])
+            return failure(message="Incorrect code.", status=400)
+
+        challenge.consume()
+        user = challenge.user
+        user.set_password(serializer.validated_data["new_password"])
+        user.save(update_fields=["password"])
+        log(actor=user, action="user.password_reset", target=user, request=request)
+        return success(message="Password has been reset.")
+
+
+class PasswordChangeView(APIView):
+    def post(self, request):
+        serializer = PasswordChangeSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        request.user.set_password(serializer.validated_data["new_password"])
+        request.user.save(update_fields=["password"])
+        log(actor=request.user, action="user.password_change", target=request.user, request=request)
+        return success(message="Password changed.")
+
+
+class Enable2FAView(APIView):
+    def post(self, request):
+        serializer = Enable2FASerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        request.user.two_factor_enabled = serializer.validated_data["enabled"]
+        request.user.save(update_fields=["two_factor_enabled"])
+        return success(message="Two-factor preference updated.", data={"two_factor_enabled": request.user.two_factor_enabled})
+
+
+class SessionsView(APIView):
+    def get(self, request):
+        active_jtis = set(
+            OutstandingToken.objects.filter(user=request.user)
+            .exclude(id__in=BlacklistedToken.objects.values_list("token_id", flat=True))
+            .values_list("jti", flat=True)
+        )
+        sessions = UserSession.objects.filter(user=request.user, revoked_at__isnull=True, refresh_token_jti__in=active_jtis)
+        current_jti = request.auth.get("refresh_jti") if request.auth else None
+
+        data = [
+            {
+                "id": str(s.id),
+                "ip_address": s.ip_address,
+                "user_agent": s.user_agent,
+                "created_at": s.created_at,
+                "last_used_at": s.last_used_at,
+                "is_current": s.refresh_token_jti == current_jti,
+            }
+            for s in sessions
+        ]
+        return success(data=data)
+
+
+class SessionRevokeView(APIView):
+    def delete(self, request, session_id):
+        session = UserSession.objects.filter(id=session_id, user=request.user, revoked_at__isnull=True).first()
+        if session is None:
+            return failure(message="Session not found.", status=404)
+
+        for outstanding in OutstandingToken.objects.filter(jti=session.refresh_token_jti):
+            BlacklistedToken.objects.get_or_create(token=outstanding)
+
+        session.revoked_at = timezone.now()
+        session.save(update_fields=["revoked_at"])
+        return success(message="Session revoked.")

@@ -1,0 +1,742 @@
+# Mount Carmel ERP — Backend Phase 1: Foundation
+
+**Scope of this document:** the foundational backend that everything else plugs into — the auth engine, granular RBAC, school configuration, system settings, and the Super Admin dashboard — plus the real-time and background-job infrastructure the rest of the ERP will build on.
+
+**Stack (locked):** Django + Django REST Framework · PostgreSQL · Django Channels + Redis (WebSockets) · Celery + Redis (background jobs) · JWT auth · S3/R2 storage · Paystack/Flutterwave (later phases).
+
+**Frontend:** React PWA + Tailwind (already built). This backend serves it over REST + WebSockets.
+
+---
+
+## 1. Why "foundation first"
+
+The spec describes ~17 roles and dozens of modules, but they all share four things: **who you are** (auth), **what you're allowed to do** (RBAC), **what the school is** (configuration), and **how the system behaves** (settings). Build these once, correctly, and every later module (students, finance, exams, hostel…) becomes a matter of adding models + endpoints + permission strings — not re-solving auth or access control each time.
+
+The build order for Phase 1:
+
+```
+1. Project skeleton + settings + Postgres + Redis
+2. Custom User model + JWT auth engine (+ OTP/2FA)
+3. RBAC: permissions, roles, role_permissions, user_roles
+4. DRF permission classes that read RBAC
+5. School configuration + system settings
+6. Real-time layer (Channels) + background jobs (Celery)
+7. Audit logging (cross-cutting)
+8. Super Admin dashboard (aggregation endpoints + live widgets)
+```
+
+---
+
+## 2. Project & folder structure
+
+Django "apps" map to bounded contexts. Phase 1 creates the ones below; later phases add `students`, `academics`, `finance`, `hostel`, etc. as sibling apps.
+
+```
+mountcarmel/
+├── manage.py
+├── requirements.txt
+├── .env.example
+├── config/                     # project package (not an app)
+│   ├── __init__.py
+│   ├── settings/
+│   │   ├── __init__.py
+│   │   ├── base.py             # shared settings
+│   │   ├── dev.py
+│   │   └── prod.py
+│   ├── urls.py                 # root URL router
+│   ├── asgi.py                 # Channels entrypoint (WebSockets)
+│   ├── wsgi.py                 # HTTP entrypoint
+│   └── celery.py               # Celery app
+│
+├── apps/
+│   ├── accounts/               # custom User, auth, OTP/2FA, sessions
+│   │   ├── models.py
+│   │   ├── managers.py
+│   │   ├── serializers.py
+│   │   ├── views.py
+│   │   ├── permissions.py      # base DRF permission classes
+│   │   ├── authentication.py   # JWT auth backend
+│   │   ├── urls.py
+│   │   └── tasks.py            # send OTP email/SMS, etc.
+│   │
+│   ├── rbac/                   # roles, permissions, assignments
+│   │   ├── models.py
+│   │   ├── serializers.py
+│   │   ├── views.py
+│   │   ├── permissions.py      # HasPermission("students.view") etc.
+│   │   ├── constants.py        # the master permission registry
+│   │   ├── seed.py             # seeds default roles + permissions
+│   │   └── urls.py
+│   │
+│   ├── configuration/         # school profile, sessions, classes, grading, fee categories
+│   │   ├── models.py
+│   │   ├── serializers.py
+│   │   ├── views.py
+│   │   └── urls.py
+│   │
+│   ├── settings_app/          # key/value system settings (SMS, email, gateways, numbering)
+│   │   ├── models.py
+│   │   ├── serializers.py
+│   │   ├── views.py
+│   │   └── urls.py
+│   │
+│   ├── audit/                 # audit_logs, login history
+│   │   ├── models.py
+│   │   ├── middleware.py
+│   │   ├── signals.py
+│   │   └── services.py
+│   │
+│   ├── realtime/             # Channels consumers, routing, groups
+│   │   ├── consumers.py
+│   │   ├── routing.py
+│   │   └── services.py        # broadcast helpers
+│   │
+│   ├── notifications/        # notification model + fan-out (email/SMS/push/ws)
+│   │   ├── models.py
+│   │   ├── services.py
+│   │   ├── tasks.py
+│   │   └── channels/          # email.py, sms.py, whatsapp.py, push.py
+│   │
+│   └── dashboard/            # super admin aggregation endpoints
+│       ├── views.py
+│       ├── services.py
+│       └── urls.py
+│
+└── common/                    # shared, non-app code
+    ├── models.py              # BaseModel (uuid pk, timestamps, soft delete)
+    ├── pagination.py
+    ├── responses.py           # standard API envelope
+    ├── exceptions.py          # custom exception handler
+    └── validators.py
+```
+
+**Convention:** every app follows `models → serializers → views → urls`, and business logic that touches more than one model lives in a `services.py`, not in the view. Views stay thin.
+
+---
+
+## 3. Base model & API conventions
+
+Every table inherits a common base so we get UUID primary keys, timestamps, and soft-delete everywhere for free.
+
+```python
+# common/models.py
+import uuid
+from django.db import models
+
+class BaseModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_deleted = models.BooleanField(default=False)   # soft delete
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+        ordering = ["-created_at"]
+```
+
+**Standard response envelope** (so the React app parses one shape everywhere):
+
+```json
+{
+  "success": true,
+  "message": "Students fetched",
+  "data": { ... },
+  "errors": null,
+  "meta": { "page": 1, "page_size": 20, "total": 134 }
+}
+```
+
+**Conventions:**
+- All endpoints are versioned under `/api/v1/`.
+- Auth via `Authorization: Bearer <access_token>` (JWT).
+- List endpoints are paginated, filterable (`django-filter`), and searchable.
+- Timestamps are UTC ISO-8601; the frontend localizes.
+- Soft delete is the default; hard delete is a separate, permission-gated action.
+
+---
+
+## 4. The auth engine
+
+One authentication engine for all roles — the login path differs per role (`/admin/login`, `/teacher/login`, `/student/login`, `/parent/login`), but they all hit the **same** backend auth, which then resolves the user's roles and permissions. The database decides what each user can see, not the URL.
+
+### 4.1 Custom User model
+
+Do **not** use Django's default username-based user. Login is by email (staff/admin) or a school-issued identifier (students by admission number, parents by phone/email). A single `User` table with a `user_type` discriminator keeps auth unified while profile tables hold role-specific data.
+
+```python
+# apps/accounts/models.py
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.db import models
+from common.models import BaseModel
+
+class User(AbstractBaseUser, PermissionsMixin, BaseModel):
+    class UserType(models.TextChoices):
+        STAFF = "staff"       # admin, principal, teacher, accountant, HR, etc.
+        STUDENT = "student"
+        PARENT = "parent"
+        APPLICANT = "applicant"
+
+    email = models.EmailField(unique=True, null=True, blank=True)
+    phone = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    # identifier is the login handle when not email — e.g. admission number
+    identifier = models.CharField(max_length=50, unique=True, null=True, blank=True)
+
+    user_type = models.CharField(max_length=20, choices=UserType.choices)
+    full_name = models.CharField(max_length=150)
+    avatar = models.URLField(null=True, blank=True)
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)   # Django admin access only
+    is_superadmin = models.BooleanField(default=False)  # bypasses RBAC checks
+
+    two_factor_enabled = models.BooleanField(default=False)
+    last_login_at = models.DateTimeField(null=True, blank=True)
+
+    USERNAME_FIELD = "email"          # primary; managers handle alt logins
+    REQUIRED_FIELDS = ["full_name"]
+
+    objects = UserManager()
+```
+
+> **Note on `is_superadmin`:** the Super Administrator bypasses granular permission checks entirely — it is the one role that always returns `True` from `has_permission`. Every other role, including Principal, is governed by explicit permission strings.
+
+### 4.2 Login flow (with optional 2FA)
+
+```
+POST /api/v1/auth/login
+    { "login": "principal@mountcarmel.edu", "password": "..." }
+        │
+        ├── validate credentials (constant-time, hashed compare)
+        ├── if user.two_factor_enabled:
+        │       → generate 6-digit OTP, store hashed w/ 5-min expiry
+        │       → dispatch OTP via Celery (email/SMS)
+        │       → return { "requires_2fa": true, "challenge_id": "..." }
+        │
+        └── else:
+                → issue access + refresh JWT
+                → write LoginHistory row (ip, user-agent, success)
+                → return tokens + user profile + resolved permissions[]
+
+POST /api/v1/auth/verify-otp
+    { "challenge_id": "...", "code": "123456" }
+        → on success issue JWT (same as above)
+```
+
+**JWT contents (access token claims):**
+
+```json
+{
+  "sub": "<user_uuid>",
+  "user_type": "staff",
+  "is_superadmin": false,
+  "roles": ["principal"],
+  "perms_version": 42,        // bumped when a role's perms change → forces re-fetch
+  "exp": 1735689600
+}
+```
+
+> Don't stuff the full permission list into the JWT (it can be large and goes stale). Put a `perms_version` in the token and resolve the actual permission set server-side per request (cached in Redis). When an admin edits a role's permissions, bump the version so clients re-authenticate their permission view.
+
+### 4.3 Auth endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/v1/auth/login` | Credential login, may return a 2FA challenge |
+| POST | `/api/v1/auth/verify-otp` | Complete 2FA, issue tokens |
+| POST | `/api/v1/auth/refresh` | Exchange refresh token for a new access token |
+| POST | `/api/v1/auth/logout` | Blacklist refresh token, close session |
+| GET  | `/api/v1/auth/me` | Current user + roles + resolved permissions |
+| POST | `/api/v1/auth/password/forgot` | Send reset link/OTP |
+| POST | `/api/v1/auth/password/reset` | Set new password with token |
+| POST | `/api/v1/auth/password/change` | Change while authenticated |
+| POST | `/api/v1/auth/2fa/enable` | Turn on 2FA for the account |
+| GET  | `/api/v1/auth/sessions` | List active sessions/devices |
+| DELETE | `/api/v1/auth/sessions/{id}` | Revoke a session |
+
+---
+
+## 5. RBAC — the access-control core
+
+The spec is explicit: **don't gate on role names, gate on permission strings.** A role is just a named bundle of permissions. A user has one or more roles; their effective permission set is the union.
+
+### 5.1 Data model
+
+```python
+# apps/rbac/models.py
+from django.db import models
+from common.models import BaseModel
+
+class Permission(BaseModel):
+    # e.g. "results.approve", "fees.collect", "students.delete"
+    code = models.CharField(max_length=100, unique=True)
+    module = models.CharField(max_length=50)     # "results", "fees", "students"
+    action = models.CharField(max_length=50)     # "approve", "collect", "delete"
+    description = models.CharField(max_length=255, blank=True)
+
+class Role(BaseModel):
+    name = models.CharField(max_length=100, unique=True)   # "Principal", "Teacher"
+    slug = models.SlugField(unique=True)                   # "principal"
+    description = models.CharField(max_length=255, blank=True)
+    is_system = models.BooleanField(default=False)  # system roles can't be deleted
+
+class RolePermission(BaseModel):
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="role_permissions")
+    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("role", "permission")
+
+class UserRole(BaseModel):
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="user_roles")
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("user", "role")
+```
+
+This gives the exact tables the spec calls for: `users`, `roles`, `permissions`, `role_permissions` (plus `user_roles` for many-roles-per-user).
+
+### 5.2 The permission registry
+
+Keep the master list of permission strings in code so it's version-controlled and seed-able. Grouped by module:
+
+```python
+# apps/rbac/constants.py
+PERMISSIONS = {
+    "students":   ["view", "create", "edit", "delete", "export"],
+    "attendance": ["view", "create", "edit"],
+    "results":    ["view", "enter", "edit", "approve", "publish"],
+    "fees":       ["view", "create", "collect", "refund", "waive"],
+    "staff":      ["view", "create", "edit", "delete"],
+    "payroll":    ["view", "run", "approve"],
+    "config":     ["view", "edit"],          # school configuration
+    "settings":   ["view", "edit"],          # system settings
+    "roles":      ["view", "create", "edit", "delete", "assign"],
+    "users":      ["view", "create", "edit", "delete", "reset_password"],
+    "audit":      ["view"],
+    "dashboard":  ["view"],
+    # ...expands per module as later phases land
+}
+# flattened → "students.view", "results.approve", etc.
+```
+
+A management command (`seed_rbac`) turns this into `Permission` rows and wires up the default roles from the spec's Section 33 table.
+
+### 5.3 Enforcement in DRF
+
+One reusable permission class reads the effective set:
+
+```python
+# apps/rbac/permissions.py
+from rest_framework.permissions import BasePermission
+
+def get_effective_permissions(user) -> set[str]:
+    if user.is_superadmin:
+        return {"*"}   # wildcard: everything
+    # cached in Redis, keyed by (user_id, perms_version)
+    return set(
+        RolePermission.objects
+        .filter(role__userrole__user=user)
+        .values_list("permission__code", flat=True)
+    )
+
+class HasPermission(BasePermission):
+    """Usage: permission_classes = [HasPermission("students.view")]"""
+    def __init__(self, code):
+        self.code = code
+
+    def has_permission(self, request, view):
+        perms = get_effective_permissions(request.user)
+        return "*" in perms or self.code in perms
+```
+
+```python
+# example usage in a viewset
+class StudentViewSet(ModelViewSet):
+    def get_permissions(self):
+        mapping = {
+            "list": "students.view", "retrieve": "students.view",
+            "create": "students.create", "update": "students.edit",
+            "destroy": "students.delete",
+        }
+        return [HasPermission(mapping[self.action])]
+```
+
+### 5.4 RBAC endpoints (Super Admin managed)
+
+| Method | Endpoint | Permission |
+|---|---|---|
+| GET | `/api/v1/rbac/permissions` | `roles.view` |
+| GET/POST | `/api/v1/rbac/roles` | `roles.view` / `roles.create` |
+| GET/PATCH/DELETE | `/api/v1/rbac/roles/{id}` | `roles.view` / `roles.edit` / `roles.delete` |
+| PUT | `/api/v1/rbac/roles/{id}/permissions` | `roles.edit` — set the role's permission list (bumps `perms_version`) |
+| POST | `/api/v1/rbac/users/{id}/roles` | `roles.assign` — assign/unassign roles to a user |
+
+---
+
+## 6. School configuration
+
+The "what the school is" tables. These are the objects the rest of the ERP references (a student belongs to a class arm within a session, etc.). Managed by Super Admin under `config.*`.
+
+```python
+# apps/configuration/models.py
+from common.models import BaseModel
+from django.db import models
+
+class SchoolProfile(BaseModel):        # singleton row
+    name = models.CharField(max_length=200)
+    logo = models.URLField(blank=True)
+    address = models.TextField(blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
+    motto = models.CharField(max_length=200, blank=True)
+
+class AcademicSession(BaseModel):      # e.g. 2026/2027
+    name = models.CharField(max_length=20, unique=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_current = models.BooleanField(default=False)
+
+class Term(BaseModel):                 # First/Second/Third within a session
+    session = models.ForeignKey(AcademicSession, on_delete=models.CASCADE, related_name="terms")
+    name = models.CharField(max_length=30)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_current = models.BooleanField(default=False)
+
+class Department(BaseModel):
+    name = models.CharField(max_length=100, unique=True)
+
+class SchoolClass(BaseModel):          # JSS 1, Primary 5, SS 2 ...
+    name = models.CharField(max_length=50, unique=True)
+    level_order = models.PositiveIntegerField()   # drives promotion ordering
+
+class ClassArm(BaseModel):             # JSS 1A, JSS 1B ...
+    school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, related_name="arms")
+    name = models.CharField(max_length=10)         # "A", "B"
+
+    class Meta:
+        unique_together = ("school_class", "name")
+
+class GradeScale(BaseModel):           # grading system config
+    name = models.CharField(max_length=50)         # "A1", "B2"...
+    min_score = models.PositiveIntegerField()
+    max_score = models.PositiveIntegerField()
+    remark = models.CharField(max_length=50)       # "Excellent"
+    grade_point = models.DecimalField(max_digits=3, decimal_places=1, null=True)
+
+class FeeCategory(BaseModel):          # Tuition, ICT, Development...
+    name = models.CharField(max_length=100, unique=True)
+    is_recurring = models.BooleanField(default=True)
+```
+
+**Key rule:** exactly one `AcademicSession` and one `Term` can be `is_current=True` at a time — enforce with a `services.set_current_session()` that flips the others in a transaction. Almost every later module reads "current session/term," so this must be reliable.
+
+### Configuration endpoints (all gated `config.view` / `config.edit`)
+
+```
+GET/PATCH   /api/v1/config/school-profile        (singleton)
+GET/POST    /api/v1/config/sessions
+POST        /api/v1/config/sessions/{id}/set-current
+GET/POST    /api/v1/config/sessions/{id}/terms
+GET/POST    /api/v1/config/classes
+GET/POST    /api/v1/config/classes/{id}/arms
+GET/POST    /api/v1/config/departments
+GET/POST    /api/v1/config/grade-scales
+GET/POST    /api/v1/config/fee-categories
+```
+
+---
+
+## 7. System settings
+
+Configuration is *academic structure*; settings are *how the software behaves* — SMS/email credentials, payment-gateway keys, notification toggles, numbering formats. A flexible key/value store beats a rigid table here.
+
+```python
+# apps/settings_app/models.py
+class SystemSetting(BaseModel):
+    key = models.CharField(max_length=100, unique=True)  # "sms.provider", "payments.paystack.public_key"
+    value = models.JSONField()                            # string, number, bool, or object
+    group = models.CharField(max_length=50)              # "sms", "email", "payments", "numbering"
+    is_secret = models.BooleanField(default=False)       # masked in API responses, encrypted at rest
+```
+
+**Groups & example keys**
+
+| Group | Keys |
+|---|---|
+| `sms` | `sms.provider`, `sms.sender_id`, `sms.api_key`* |
+| `email` | `email.host`, `email.from`, `email.password`* |
+| `payments` | `payments.paystack.public_key`, `payments.paystack.secret_key`*, `payments.flutterwave.*` |
+| `notifications` | `notifications.absentee_alert_enabled`, `notifications.channels` |
+| `numbering` | `numbering.admission_format` (e.g. `MC/{year}/{seq:04}`), `numbering.receipt_format`, `numbering.invoice_format` |
+| `result` | `result.pass_mark`, `result.show_position`, `result.lock_after_publish` |
+
+`*` = `is_secret`: encrypted at rest, never returned in plaintext (write-only fields; responses show `••••`).
+
+### Settings endpoints (gated `settings.view` / `settings.edit`)
+
+```
+GET    /api/v1/settings                      # optionally ?group=payments
+GET    /api/v1/settings/{key}
+PATCH  /api/v1/settings/{key}
+PUT    /api/v1/settings/bulk                 # update several at once
+```
+
+---
+
+## 8. Real-time layer (Django Channels)
+
+Django's HTTP path can't push. Channels adds an ASGI WebSocket layer, with **Redis as the channel layer** so multiple server processes share the same broadcast bus.
+
+### What's actually real-time in this ERP
+
+- **Notifications** — new admission, payment received, low stock, pending approvals land in the bell instantly.
+- **Absentee alerts** — parent gets pushed the moment a teacher submits attendance marking their child absent.
+- **Live dashboard** — Super Admin's counters (present today, fees collected) update without refresh.
+- **Bus status / presence** — later phases; the same group-broadcast mechanism.
+
+### Design: per-user + per-role groups
+
+Each connected client joins:
+- a **personal group** `user.<uuid>` (targeted messages), and
+- a **role group** per role, e.g. `role.super_admin`, `role.accountant` (broadcast to everyone in a role).
+
+```python
+# apps/realtime/consumers.py
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+
+class NotificationConsumer(AsyncJsonWebsocketConsumer):
+    async def connect(self):
+        user = self.scope["user"]          # resolved by JWT middleware
+        if user.is_anonymous:
+            await self.close(); return
+        self.groups_joined = [f"user.{user.id}"] + [f"role.{r}" for r in user_role_slugs(user)]
+        for g in self.groups_joined:
+            await self.channel_layer.group_add(g, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, code):
+        for g in getattr(self, "groups_joined", []):
+            await self.channel_layer.group_discard(g, self.channel_name)
+
+    # server → client
+    async def notify(self, event):
+        await self.send_json(event["payload"])
+```
+
+```python
+# apps/realtime/services.py — call this from anywhere in the app
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+def push_to_user(user_id, payload):
+    async_to_sync(get_channel_layer().group_send)(
+        f"user.{user_id}", {"type": "notify", "payload": payload}
+    )
+
+def push_to_role(role_slug, payload):
+    async_to_sync(get_channel_layer().group_send)(
+        f"role.{role_slug}", {"type": "notify", "payload": payload}
+    )
+```
+
+**WebSocket endpoint:** `wss://<host>/ws/notifications/?token=<jwt>` (token authenticated by a Channels middleware that validates the JWT and sets `scope["user"]`).
+
+> **Golden rule:** WebSockets are for *pushing* live updates only. Never make them the source of truth. The client still fetches state over REST; the socket just tells it "something changed, here's the new item."
+
+---
+
+## 9. Notifications & background jobs (Celery)
+
+Sending SMS/email/WhatsApp/push, running the daily absentee sweep, generating overdue reminders — none of these should block an HTTP request. They run as **Celery tasks** on a Redis broker.
+
+```python
+# apps/notifications/models.py
+class Notification(BaseModel):
+    recipient = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="notifications")
+    title = models.CharField(max_length=200)
+    body = models.TextField()
+    category = models.CharField(max_length=50)      # "payment", "attendance", "approval"...
+    data = models.JSONField(default=dict)           # deep-link payload
+    is_read = models.BooleanField(default=False)
+    read_at = models.DateTimeField(null=True, blank=True)
+```
+
+```python
+# apps/notifications/services.py
+def dispatch(recipient, title, body, category, channels=("in_app",), data=None):
+    n = Notification.objects.create(recipient=recipient, title=title, body=body,
+                                    category=category, data=data or {})
+    # 1) live push to the bell
+    push_to_user(recipient.id, NotificationSerializer(n).data)
+    # 2) external channels, async
+    if "email" in channels: send_email.delay(recipient.id, title, body)
+    if "sms"   in channels: send_sms.delay(recipient.id, body)
+    if "push"  in channels: send_push.delay(recipient.id, title, body)
+    return n
+```
+
+**Notification endpoints**
+
+```
+GET    /api/v1/notifications                 # ?unread=true
+GET    /api/v1/notifications/unread-count
+POST   /api/v1/notifications/{id}/read
+POST   /api/v1/notifications/read-all
+```
+
+**Scheduled tasks (Celery Beat)** — foundation-level ones:
+- nightly cleanup of expired OTP challenges and blacklisted tokens
+- (hooks reserved for later phases: absentee sweep, overdue-fee reminders, payroll runs)
+
+---
+
+## 10. Audit logging (cross-cutting)
+
+The spec is firm: sensitive actions (result edits after publish, fee refunds, permission changes) must be traceable. Audit logging is not a module you visit — it's a service every other module calls.
+
+```python
+# apps/audit/models.py
+class AuditLog(BaseModel):
+    actor = models.ForeignKey("accounts.User", null=True, on_delete=models.SET_NULL)
+    action = models.CharField(max_length=100)     # "result.published", "role.permissions_changed"
+    target_type = models.CharField(max_length=100, blank=True)  # "Student", "Role"
+    target_id = models.CharField(max_length=64, blank=True)
+    changes = models.JSONField(default=dict)       # {"before": {...}, "after": {...}}
+    ip_address = models.GenericIPAddressField(null=True)
+    user_agent = models.CharField(max_length=300, blank=True)
+
+class LoginHistory(BaseModel):
+    user = models.ForeignKey("accounts.User", null=True, on_delete=models.SET_NULL)
+    successful = models.BooleanField()
+    ip_address = models.GenericIPAddressField(null=True)
+    user_agent = models.CharField(max_length=300, blank=True)
+```
+
+```python
+# apps/audit/services.py
+def log(actor, action, target=None, changes=None, request=None):
+    AuditLog.objects.create(
+        actor=actor, action=action,
+        target_type=target.__class__.__name__ if target else "",
+        target_id=str(getattr(target, "id", "")),
+        changes=changes or {},
+        ip_address=_ip(request), user_agent=_ua(request),
+    )
+```
+
+**Audit endpoints** (gated `audit.view`, Super Admin/Principal):
+
+```
+GET /api/v1/audit/logs           # filter by actor, action, date range, target
+GET /api/v1/audit/login-history
+```
+
+Audit logs are **append-only** — no update/delete endpoints exist, by design.
+
+---
+
+## 11. Super Admin dashboard
+
+The dashboard is an **aggregation layer**, not new data — it reads across modules and returns summary numbers, then keeps the volatile ones live over the WebSocket.
+
+Because most Phase-1 modules (students, fees, exams) don't exist yet, the dashboard is built so each widget degrades gracefully: a service function per widget that returns `0`/empty until its module lands, then starts returning real figures. This lets you ship the Super Admin shell now and have the numbers "wake up" as later phases arrive.
+
+### Widgets (from spec Sections 2 & 36)
+
+```
+Statistics:   students, teachers, staff, parents, classes
+Financial:    fees_collected, outstanding_fees, todays_payments
+Academic:     present_today, absent_today, upcoming_exams, pending_results
+Operations:   inventory_alerts, library_activity, hostel_occupancy, transport_status
+Feed:         recent_activities (from audit log), announcements
+```
+
+### Endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/v1/dashboard/summary` | All top-line counters in one call |
+| GET | `/api/v1/dashboard/financial` | Fees collected / outstanding / today |
+| GET | `/api/v1/dashboard/academic` | Attendance today, upcoming exams, pending results |
+| GET | `/api/v1/dashboard/recent-activity` | Latest audit-log entries (paginated) |
+
+```python
+# apps/dashboard/services.py  (illustrative)
+def build_summary():
+    return {
+        "students": Student.objects.filter(is_deleted=False).count() if _has("students") else 0,
+        "teachers": Teacher.objects.count() if _has("teachers") else 0,
+        "staff":    Employee.objects.count() if _has("hr") else 0,
+        "parents":  User.objects.filter(user_type="parent").count(),
+        "classes":  SchoolClass.objects.count(),
+        # ...volatile ones (present_today, fees_collected) also pushed live via WS
+    }
+```
+
+**Live behavior:** when a payment is recorded or attendance is submitted (later phases), the responsible service calls `push_to_role("super_admin", {...})`, and the dashboard widget updates in place. Phase 1 wires the plumbing; the events attach as modules land.
+
+Dashboard access is gated by `dashboard.view`; Super Admin sees the full board, and later roles (Principal, Accountant) get filtered variants of the same endpoints via their permission set.
+
+---
+
+## 12. Security checklist (Phase 1)
+
+The foundation is where security is won or lost — every later module inherits it.
+
+- **Passwords** hashed with Argon2 (Django's `PASSWORD_HASHERS`).
+- **JWT** short-lived access (~15 min) + rotating refresh, refresh blacklist on logout.
+- **2FA/OTP** hashed, single-use, 5-minute expiry, rate-limited.
+- **RBAC** enforced at the DRF permission layer on every endpoint — no endpoint ships without an explicit permission mapping.
+- **Secrets** (`is_secret` settings) encrypted at rest, never returned in plaintext.
+- **Rate limiting** on auth endpoints (login, OTP, password reset) via DRF throttling.
+- **CORS** locked to the PWA origin; **CSRF** enforced on any cookie-based paths.
+- **SQL injection / XSS** — ORM + DRF serializers by default; never raw string SQL.
+- **Audit trail** on every sensitive mutation; login history on every attempt.
+- **Session management** — list/revoke device sessions from `/auth/sessions`.
+- **Input validation** centralized in serializers; standard exception handler so errors never leak stack traces.
+
+---
+
+## 13. Phase 1 build checklist
+
+```
+[ ] Project skeleton, split settings, Postgres + Redis wired
+[ ] common/BaseModel, response envelope, exception handler, pagination
+[ ] accounts: custom User + manager + migrations
+[ ] auth: JWT login, refresh, logout, /me
+[ ] auth: OTP/2FA, password forgot/reset/change, sessions
+[ ] rbac: models + permission registry + seed command
+[ ] rbac: HasPermission class + Redis-cached effective perms
+[ ] rbac: role/permission/assignment endpoints
+[ ] configuration: models + set-current-session service + endpoints
+[ ] settings_app: key/value store + secret encryption + endpoints
+[ ] audit: models + service + middleware + login history
+[ ] realtime: ASGI + Channels + Redis layer + JWT ws-auth + consumer
+[ ] notifications: model + dispatch service + Celery channel tasks
+[ ] celery + beat: broker wired, cleanup tasks scheduled
+[ ] dashboard: aggregation services + endpoints + live-push hooks
+[ ] seed default roles (spec §33) with their permission bundles
+[ ] security pass: throttling, CORS, Argon2, secret masking
+```
+
+Once this foundation is in, every later module (students → academics → finance → hostel → transport → …) is: add app → models → serializers → viewset with a permission mapping → register any new permission strings → optionally emit notifications/audit/live-push. No auth or access-control rework required.
+
+---
+
+## 14. What comes after Phase 1 (roadmap)
+
+Rough dependency-ordered sequence, each building on the foundation above:
+
+1. **Students** (central DB) + **Parents** + student↔parent links → unlocks admission workflow.
+2. **Academics** — subjects, teacher assignments, timetable.
+3. **Attendance** — first real live-notification consumer (absentee alerts).
+4. **Exams & Results** — the multi-stage approval workflow (Teacher → HOD → Principal → publish) with post-publish lock + audit.
+5. **Finance** — fee structures, invoices, payments, Paystack/Flutterwave, receipts.
+6. **HR & Payroll**, then **Library / Hostel / Transport / Inventory / Assets / Mess**.
+7. **Communication / CMS / Gallery / Custom forms**.
+8. **Admission & Promotion** workflows tie the academic + student + account-creation pieces together.
+
+Each slots into the same skeleton, reuses the same auth/RBAC/audit/realtime spine, and registers its own permission strings — which is exactly why the foundation is built first.

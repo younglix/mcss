@@ -22,7 +22,7 @@ export default function BottomNav({ items }) {
           <NavLink
             key={item.key}
             to={item.path}
-            end={item.path === '/'}
+            end
             className="flex-1 flex flex-col items-center justify-center gap-0.5 py-sm text-on-surface-variant"
           >
             {({ isActive }) => (

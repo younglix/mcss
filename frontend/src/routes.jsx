@@ -8,9 +8,11 @@ import ApplyReviewSubmit from './pages/Public/ApplyNow/ReviewSubmit.jsx';
 import ApplyConfirmation from './pages/Public/ApplyNow/Confirmation.jsx';
 import ApplyStatusCheck from './pages/Public/ApplyNow/StatusCheck.jsx';
 import SuperAdminDashboard from './pages/SuperAdmin/Dashboard.jsx';
-import SuperAdminSchools from './pages/SuperAdmin/Schools.jsx';
+import SuperAdminRolesPermissions from './pages/SuperAdmin/RolesPermissions.jsx';
+import SuperAdminConfiguration from './pages/SuperAdmin/Configuration.jsx';
 import SuperAdminStaff from './pages/SuperAdmin/Staff.jsx';
 import SuperAdminSettings from './pages/SuperAdmin/Settings.jsx';
+import SuperAdminAuditLog from './pages/SuperAdmin/AuditLog.jsx';
 import SuperAdminApplicantApprovals from './pages/SuperAdmin/ApplicantApprovals.jsx';
 import AdminDashboard from './pages/Admin/Dashboard.jsx';
 import AdminStudentDirectory from './pages/Admin/Students/StudentDirectory.jsx';
@@ -42,9 +44,11 @@ export const routes = [
   { path: "/apply/confirmation", label: "Apply Confirmation", source: "admission_application_confirmation", element: <ApplyConfirmation /> },
   { path: "/apply/status", label: "Apply Status", source: "admission_application_status_check", element: <ApplyStatusCheck /> },
   { path: "/super-admin", label: "Super Admin Dashboard", source: "super_admin_dashboard_platform_overview", element: <SuperAdminDashboard /> },
-  { path: "/super-admin/schools", label: "School Management", source: "school_management_super_admin_portal", element: <SuperAdminSchools /> },
+  { path: "/super-admin/roles", label: "Roles & Permissions", source: "roles_permissions_super_admin_portal", element: <SuperAdminRolesPermissions /> },
   { path: "/super-admin/staff", label: "Staff Management", source: "staff_management_super_admin_portal", element: <SuperAdminStaff /> },
-  { path: "/super-admin/settings", label: "Platform Settings", source: "platform_settings_super_admin", element: <SuperAdminSettings /> },
+  { path: "/super-admin/configuration", label: "School Configuration", source: "school_configuration_super_admin_portal", element: <SuperAdminConfiguration /> },
+  { path: "/super-admin/settings", label: "System Settings", source: "platform_settings_super_admin", element: <SuperAdminSettings /> },
+  { path: "/super-admin/audit", label: "Audit Log", source: "audit_log_super_admin_portal", element: <SuperAdminAuditLog /> },
   { path: "/super-admin/applicants", label: "Applicant Approvals", source: "applicant_approval_queue_super_admin", element: <SuperAdminApplicantApprovals /> },
   { path: "/admin", label: "Admin Dashboard", source: "admin_dashboard_responsive_mcss", element: <AdminDashboard /> },
   { path: "/admin/students", label: "Student Directory", source: "student_directory_admin_portal", element: <AdminStudentDirectory /> },
