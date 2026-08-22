@@ -1,0 +1,24 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 10m
+          # The key's authorized_keys entry on the server has a forced
+          # command (command="/srv/mcss/deploy.sh") — whatever is sent here
+          # is ignored server-side and deploy.sh runs instead. This is just
+          # a label for the Actions log; the real deploy output streams
+          # back over the same SSH session regardless.
+          script: echo "invoking forced deploy command on the server"
