@@ -28,11 +28,11 @@ export default function AppShell({ portalId, pageTitle, user, children }) {
         />
         <Sidebar items={portal.sidebarNav} brand={portal.brand} onSignOut={() => navigate('/login')} />
       </div>
-      <main className="lg:ml-64 pb-24 lg:pb-xl px-md sm:px-gutter xl:px-xl pt-lg max-w-container-max mx-auto print:ml-0 print:p-0 print:max-w-none">
+      <main className="lg:ml-72 pb-24 lg:pb-xl px-md sm:px-gutter xl:px-xl pt-lg max-w-container-max mx-auto print:ml-0 print:p-0 print:max-w-none">
         {children}
       </main>
       <div className="no-print">
-        <BottomNav items={portal.bottomNav} />
+        <BottomNav items={portal.bottomNav} fullNav={portal.sidebarNav} />
       </div>
     </div>
   );
