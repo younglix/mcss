@@ -1,15 +1,35 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { categories, familyRoles, staffRoles, superAdmin, detectFamilyRole } from './loginData.js';
 
 const inputClasses = 'mcss-field w-full pl-11 pr-md hover:border-primary';
 
+// The backend is the source of truth for what a user actually is — this
+// only decides WHERE to land them, based on what /auth/login just
+// returned, never on which category tab the user happened to click.
+function resolveHomePath({ permissions, user, requestedFrom }) {
+  if (requestedFrom && requestedFrom !== '/login') return requestedFrom;
+  if (permissions?.includes('*')) return '/super-admin';
+  if (user?.user_type === 'parent') return '/parent';
+  if (user?.user_type === 'student') return '/student';
+  if (user?.user_type === 'staff') return '/admin';
+  return '/';
+}
+
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, verifyOtp } = useAuth();
   const [activeCategory, setActiveCategory] = useState(categories[0].key);
   const [showPassword, setShowPassword] = useState(false);
   const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [selectedStaffRole, setSelectedStaffRole] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [otpChallenge, setOtpChallenge] = useState(null); // { challengeId } once 2FA is required
+  const [otpCode, setOtpCode] = useState('');
 
   useEffect(() => {
     document.title = 'Portal Login | MCSS Portal';
@@ -17,7 +37,11 @@ export default function Login() {
 
   useEffect(() => {
     setIdentifier('');
+    setPassword('');
     setSelectedStaffRole(null);
+    setFormError('');
+    setOtpChallenge(null);
+    setOtpCode('');
   }, [activeCategory]);
 
   const detectedFamily = activeCategory === 'family' ? detectFamilyRole(identifier) : null;
@@ -30,7 +54,9 @@ export default function Login() {
         : { label: superAdmin.idLabel, placeholder: superAdmin.placeholder };
 
   const canSubmit =
-    identifier.trim().length > 0 && (activeCategory === 'family' ? !!detectedFamily : activeCategory === 'staff' ? !!selectedStaffRole : true);
+    identifier.trim().length > 0 &&
+    password.length > 0 &&
+    (activeCategory === 'family' ? !!detectedFamily : activeCategory === 'staff' ? !!selectedStaffRole : true);
 
   const submitLabel =
     activeCategory === 'family'
@@ -43,12 +69,40 @@ export default function Login() {
           : 'Select a role to continue'
         : 'Authenticate as Super Admin';
 
-  const handleSubmit = (e) => {
+  const requestedFrom = location.state?.from?.pathname;
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!canSubmit) return;
-    if (activeCategory === 'family') navigate(familyRoles[detectedFamily].homePath);
-    else if (activeCategory === 'staff') navigate(selectedStaffRole.homePath);
-    else navigate(superAdmin.homePath);
+    if (!canSubmit || submitting) return;
+    setFormError('');
+    setSubmitting(true);
+    try {
+      const result = await login(identifier.trim(), password);
+      if (result.requiresOtp) {
+        setOtpChallenge({ challengeId: result.challengeId });
+      } else {
+        navigate(resolveHomePath({ permissions: result.permissions, user: result.user, requestedFrom }));
+      }
+    } catch (err) {
+      setFormError(err.message || 'Unable to sign in. Please check your credentials.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (otpCode.length !== 6 || submitting) return;
+    setFormError('');
+    setSubmitting(true);
+    try {
+      const result = await verifyOtp(otpChallenge.challengeId, otpCode);
+      navigate(resolveHomePath({ permissions: result.permissions, user: result.user, requestedFrom }));
+    } catch (err) {
+      setFormError(err.message || 'Invalid or expired code.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -102,6 +156,8 @@ export default function Login() {
             <p className="font-body-md text-on-surface-variant">Choose your portal category to authenticate.</p>
           </header>
 
+          {!otpChallenge && (
+          <>
           <div className="grid grid-cols-3 gap-sm">
             {categories.map((cat) => (
               <button
@@ -184,7 +240,14 @@ export default function Login() {
               </div>
               <div className="relative">
                 <span className="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">lock</span>
-                <input className={inputClasses} id="password" placeholder="••••••••" type={showPassword ? 'text' : 'password'} />
+                <input
+                  className={inputClasses}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  type={showPassword ? 'text' : 'password'}
+                />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
@@ -202,15 +265,61 @@ export default function Login() {
               </label>
             </div>
 
+            {formError && (
+              <p className="font-label-md text-label-md text-error bg-error-container/20 border border-error/20 rounded-lg px-md py-sm" role="alert">
+                {formError}
+              </p>
+            )}
+
             <button
               type="submit"
-              disabled={!canSubmit}
+              disabled={!canSubmit || submitting}
               className="bg-secondary text-on-secondary font-label-md font-bold py-md rounded shadow-sm hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none transition-all active:scale-[0.98] flex items-center justify-center gap-sm mt-xs"
             >
-              {submitLabel}
-              <span className="material-symbols-outlined text-body-md">login</span>
+              {submitting ? 'Signing in…' : submitLabel}
+              {!submitting && <span className="material-symbols-outlined text-body-md">login</span>}
             </button>
           </form>
+          </>
+          )}
+
+          {otpChallenge && (
+            <form className="flex flex-col gap-lg animate-fade-slide-in border-t border-outline/10 pt-lg" onSubmit={handleVerifyOtp}>
+              <div>
+                <h3 className="font-headline-md text-headline-sm text-on-surface">Enter Verification Code</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
+                  A 6-digit code was sent to your registered contact. It expires in 5 minutes.
+                </p>
+              </div>
+              <input
+                className={`${inputClasses} pl-md text-center tracking-[0.5em] font-headline-md text-headline-sm`}
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                inputMode="numeric"
+                maxLength={6}
+                autoFocus
+              />
+              <button
+                type="submit"
+                disabled={otpCode.length !== 6 || submitting}
+                className="bg-primary text-on-primary font-label-md font-bold py-md rounded shadow-sm hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none transition-all active:scale-[0.98]"
+              >
+                {submitting ? 'Verifying…' : 'Verify & Continue'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOtpChallenge(null);
+                  setOtpCode('');
+                  setFormError('');
+                }}
+                className="font-label-md text-label-md text-on-surface-variant hover:text-primary self-center"
+              >
+                Use a different account
+              </button>
+            </form>
+          )}
 
           <footer className="flex flex-col gap-md pt-lg border-t border-outline/10">
             <div className="flex justify-between items-center text-on-surface-variant font-label-sm">

@@ -3,6 +3,16 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  server: {
+    proxy: {
+      // Mirrors nginx's production routing (see backend/README.md) so the
+      // app can always call relative /api/v1 and /ws paths regardless of
+      // environment. Point this at wherever `manage.py runserver` is
+      // listening locally.
+      '/api': { target: 'http://localhost:8000', changeOrigin: true },
+      '/ws': { target: 'ws://localhost:8000', ws: true },
+    },
+  },
   plugins: [
     tailwindcss(),
     VitePWA({

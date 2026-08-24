@@ -27,6 +27,13 @@ class DashboardAcademicView(APIView):
         return success(data=services.build_academic())
 
 
+class DashboardOperationsView(APIView):
+    permission_classes = [HasPermission("dashboard.view")]
+
+    def get(self, request):
+        return success(data=services.build_operations())
+
+
 class DashboardRecentActivityView(APIView):
     permission_classes = [HasPermission("dashboard.view")]
 
