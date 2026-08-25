@@ -11,6 +11,8 @@ import SuperAdminOverview from './pages/SuperAdmin/dashboard/Overview.jsx';
 import SuperAdminFinancialSummary from './pages/SuperAdmin/dashboard/FinancialSummary.jsx';
 import SuperAdminAcademicSummary from './pages/SuperAdmin/dashboard/AcademicSummary.jsx';
 import SuperAdminOperationsSummary from './pages/SuperAdmin/dashboard/OperationsSummary.jsx';
+import SuperAdminRecentActivities from './pages/SuperAdmin/dashboard/RecentActivities.jsx';
+import SuperAdminNotifications from './pages/SuperAdmin/dashboard/Notifications.jsx';
 import SuperAdminRolesPermissions from './pages/SuperAdmin/RolesPermissions.jsx';
 import SuperAdminConfiguration from './pages/SuperAdmin/Configuration.jsx';
 import SuperAdminStaff from './pages/SuperAdmin/Staff.jsx';
@@ -50,6 +52,8 @@ export const routes = [
   { path: "/super-admin/financial-summary", label: "Financial Summary", source: "super_admin_dashboard_financial_summary", element: <SuperAdminFinancialSummary /> },
   { path: "/super-admin/academic-summary", label: "Academic Summary", source: "super_admin_dashboard_academic_summary", element: <SuperAdminAcademicSummary /> },
   { path: "/super-admin/operations-summary", label: "Operations Summary", source: "super_admin_dashboard_operations_summary", element: <SuperAdminOperationsSummary /> },
+  { path: "/super-admin/recent-activities", label: "Recent Activities", source: "super_admin_dashboard_recent_activities", element: <SuperAdminRecentActivities /> },
+  { path: "/super-admin/notifications", label: "Notifications", source: "super_admin_dashboard_notifications", element: <SuperAdminNotifications /> },
   { path: "/super-admin/roles", label: "Roles & Permissions", source: "roles_permissions_super_admin_portal", element: <SuperAdminRolesPermissions /> },
   { path: "/super-admin/staff", label: "Staff Management", source: "staff_management_super_admin_portal", element: <SuperAdminStaff /> },
   { path: "/super-admin/configuration", label: "School Configuration", source: "school_configuration_super_admin_portal", element: <SuperAdminConfiguration /> },

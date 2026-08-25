@@ -6,10 +6,10 @@ import { useAuth } from '../../../context/AuthContext.jsx';
 
 /**
  * Shared chrome for every Dashboard sub-page (Overview, Financial Summary,
- * Academic Summary, Operations Summary): AppShell + PageHeader + Refresh
- * button + loading skeleton + error/retry banner. Each page just supplies
- * its own title/subtitle/data-fetch state and renders its own content once
- * loaded.
+ * Academic Summary, Operations Summary, Recent Activities, Notifications):
+ * AppShell + PageHeader + Refresh button + loading skeleton + error/retry
+ * banner. Each page just supplies its own title/subtitle/data-fetch state
+ * and renders its own content once loaded.
  */
 export default function DashboardPageShell({ pageTitle, title, subtitle, loading, error, onReload, skeletonCount = 4, children }) {
   const { user } = useAuth();
