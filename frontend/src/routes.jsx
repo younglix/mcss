@@ -14,8 +14,16 @@ import SuperAdminOperationsSummary from './pages/SuperAdmin/dashboard/Operations
 import SuperAdminRecentActivities from './pages/SuperAdmin/dashboard/RecentActivities.jsx';
 import SuperAdminNotifications from './pages/SuperAdmin/dashboard/Notifications.jsx';
 import SuperAdminRolesPermissions from './pages/SuperAdmin/RolesPermissions.jsx';
-import SuperAdminConfiguration from './pages/SuperAdmin/Configuration.jsx';
-import SuperAdminStaff from './pages/SuperAdmin/Staff.jsx';
+import SuperAdminSchoolConfiguration from './pages/SuperAdmin/administration/SchoolConfiguration.jsx';
+import SuperAdminAcademicSessionTerms from './pages/SuperAdmin/administration/AcademicSessionTerms.jsx';
+import SuperAdminClassesArms from './pages/SuperAdmin/administration/ClassesArms.jsx';
+import SuperAdminDepartments from './pages/SuperAdmin/administration/Departments.jsx';
+import SuperAdminStaffManagement from './pages/SuperAdmin/administration/StaffManagement.jsx';
+import SuperAdminUserManagement from './pages/SuperAdmin/administration/UserManagement.jsx';
+import SuperAdminReception from './pages/SuperAdmin/administration/Reception.jsx';
+import SuperAdminCommunication from './pages/SuperAdmin/administration/Communication.jsx';
+import SuperAdminCalendar from './pages/SuperAdmin/administration/Calendar.jsx';
+import SuperAdminWebsiteCms from './pages/SuperAdmin/administration/WebsiteCms.jsx';
 import SuperAdminSettings from './pages/SuperAdmin/Settings.jsx';
 import SuperAdminAuditLog from './pages/SuperAdmin/AuditLog.jsx';
 import SuperAdminApplicantApprovals from './pages/SuperAdmin/ApplicantApprovals.jsx';
@@ -55,8 +63,16 @@ export const routes = [
   { path: "/super-admin/recent-activities", label: "Recent Activities", source: "super_admin_dashboard_recent_activities", element: <SuperAdminRecentActivities /> },
   { path: "/super-admin/notifications", label: "Notifications", source: "super_admin_dashboard_notifications", element: <SuperAdminNotifications /> },
   { path: "/super-admin/roles", label: "Roles & Permissions", source: "roles_permissions_super_admin_portal", element: <SuperAdminRolesPermissions /> },
-  { path: "/super-admin/staff", label: "Staff Management", source: "staff_management_super_admin_portal", element: <SuperAdminStaff /> },
-  { path: "/super-admin/configuration", label: "School Configuration", source: "school_configuration_super_admin_portal", element: <SuperAdminConfiguration /> },
+  { path: "/super-admin/configuration", label: "School Configuration", source: "school_configuration_super_admin_portal", element: <SuperAdminSchoolConfiguration /> },
+  { path: "/super-admin/administration/academic-session-terms", label: "Academic Session & Terms", source: "super_admin_academic_session_terms", element: <SuperAdminAcademicSessionTerms /> },
+  { path: "/super-admin/administration/classes-arms", label: "Classes & Arms", source: "super_admin_classes_arms", element: <SuperAdminClassesArms /> },
+  { path: "/super-admin/administration/departments", label: "Departments", source: "super_admin_departments", element: <SuperAdminDepartments /> },
+  { path: "/super-admin/staff", label: "Staff Management", source: "staff_management_super_admin_portal", element: <SuperAdminStaffManagement /> },
+  { path: "/super-admin/administration/user-management", label: "User Management", source: "super_admin_user_management", element: <SuperAdminUserManagement /> },
+  { path: "/super-admin/administration/reception", label: "Reception", source: "super_admin_reception", element: <SuperAdminReception /> },
+  { path: "/super-admin/administration/communication", label: "Communication", source: "super_admin_communication", element: <SuperAdminCommunication /> },
+  { path: "/super-admin/administration/calendar", label: "Calendar", source: "super_admin_calendar", element: <SuperAdminCalendar /> },
+  { path: "/super-admin/administration/website-cms", label: "Website / CMS", source: "super_admin_website_cms", element: <SuperAdminWebsiteCms /> },
   { path: "/super-admin/settings", label: "System Settings", source: "platform_settings_super_admin", element: <SuperAdminSettings /> },
   { path: "/super-admin/audit", label: "Audit Log", source: "audit_log_super_admin_portal", element: <SuperAdminAuditLog /> },
   { path: "/super-admin/applicants", label: "Applicant Approvals", source: "applicant_approval_queue_super_admin", element: <SuperAdminApplicantApprovals /> },

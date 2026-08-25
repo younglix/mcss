@@ -1,12 +1,18 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 
+from apps.audit.services import log
+from apps.rbac.permissions import HasPermission
 from common.responses import success
 
+from . import services
 from .models import Notification
-from .serializers import NotificationSerializer
+from .serializers import BroadcastSerializer, NotificationSerializer
+
+User = get_user_model()
 
 
 class NotificationsListView(ListAPIView):
@@ -41,3 +47,33 @@ class MarkAllReadView(APIView):
             is_read=True, read_at=timezone.now()
         )
         return success(message="All notifications marked read.", data={"updated": updated})
+
+
+class BroadcastView(APIView):
+    """Communication (Administration): compose a message and fan it out via
+    the existing Notification/dispatch pipeline — no separate messaging
+    system, this just drives the one that's already there."""
+    permission_classes = [HasPermission("communication.send")]
+
+    def post(self, request):
+        serializer = BroadcastSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        audience = serializer.validated_data["audience"]
+
+        recipients = User.objects.filter(is_active=True, is_deleted=False)
+        if audience != "all":
+            recipients = recipients.filter(user_type=audience)
+
+        count = 0
+        for recipient in recipients:
+            services.dispatch(
+                recipient=recipient,
+                title=serializer.validated_data["title"],
+                body=serializer.validated_data["body"],
+                category="announcement",
+            )
+            count += 1
+
+        log(actor=request.user, action="communication.broadcast_sent",
+            changes={"audience": audience, "recipient_count": count}, request=request)
+        return success(message=f"Sent to {count} recipient(s).", data={"recipient_count": count})

@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
 
 from apps.audit.services import log
@@ -49,6 +50,22 @@ class SessionsView(ConfigPermissionMixin, ListCreateAPIView):
         log(actor=self.request.user, action="config.session_created", target=session, request=self.request)
 
 
+class SessionDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = AcademicSessionSerializer
+    queryset = AcademicSession.objects.all()
+    lookup_url_kwarg = "session_id"
+
+    def perform_update(self, serializer):
+        session = serializer.save()
+        log(actor=self.request.user, action="config.session_updated", target=session, request=self.request)
+
+    def perform_destroy(self, instance):
+        if instance.is_current:
+            raise ValidationError("Cannot delete the current academic session. Set another session as current first.")
+        log(actor=self.request.user, action="config.session_deleted", target=instance, request=self.request)
+        instance.delete()
+
+
 class SessionSetCurrentView(ConfigPermissionMixin, APIView):
     def post(self, request, session_id):
         session = services.set_current_session(session_id)
@@ -67,6 +84,22 @@ class SessionTermsView(ConfigPermissionMixin, ListCreateAPIView):
         log(actor=self.request.user, action="config.term_created", target=term, request=self.request)
 
 
+class TermDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = TermSerializer
+    queryset = Term.objects.all()
+    lookup_url_kwarg = "term_id"
+
+    def perform_update(self, serializer):
+        term = serializer.save()
+        log(actor=self.request.user, action="config.term_updated", target=term, request=self.request)
+
+    def perform_destroy(self, instance):
+        if instance.is_current:
+            raise ValidationError("Cannot delete the current term. Set another term as current first.")
+        log(actor=self.request.user, action="config.term_deleted", target=instance, request=self.request)
+        instance.delete()
+
+
 class TermSetCurrentView(ConfigPermissionMixin, APIView):
     def post(self, request, term_id):
         term = services.set_current_term(term_id)
@@ -78,6 +111,24 @@ class ClassesView(ConfigPermissionMixin, ListCreateAPIView):
     serializer_class = SchoolClassSerializer
     queryset = SchoolClass.objects.prefetch_related("arms").all()
 
+    def perform_create(self, serializer):
+        klass = serializer.save()
+        log(actor=self.request.user, action="config.class_created", target=klass, request=self.request)
+
+
+class ClassDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = SchoolClassSerializer
+    queryset = SchoolClass.objects.prefetch_related("arms").all()
+    lookup_url_kwarg = "class_id"
+
+    def perform_update(self, serializer):
+        klass = serializer.save()
+        log(actor=self.request.user, action="config.class_updated", target=klass, request=self.request)
+
+    def perform_destroy(self, instance):
+        log(actor=self.request.user, action="config.class_deleted", target=instance, request=self.request)
+        instance.delete()
+
 
 class ClassArmsView(ConfigPermissionMixin, ListCreateAPIView):
     serializer_class = ClassArmSerializer
@@ -86,12 +137,45 @@ class ClassArmsView(ConfigPermissionMixin, ListCreateAPIView):
         return ClassArm.objects.filter(school_class_id=self.kwargs["class_id"])
 
     def perform_create(self, serializer):
-        serializer.save(school_class_id=self.kwargs["class_id"])
+        arm = serializer.save(school_class_id=self.kwargs["class_id"])
+        log(actor=self.request.user, action="config.class_arm_created", target=arm, request=self.request)
+
+
+class ClassArmDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = ClassArmSerializer
+    queryset = ClassArm.objects.all()
+    lookup_url_kwarg = "arm_id"
+
+    def perform_update(self, serializer):
+        arm = serializer.save()
+        log(actor=self.request.user, action="config.class_arm_updated", target=arm, request=self.request)
+
+    def perform_destroy(self, instance):
+        log(actor=self.request.user, action="config.class_arm_deleted", target=instance, request=self.request)
+        instance.delete()
 
 
 class DepartmentsView(ConfigPermissionMixin, ListCreateAPIView):
     serializer_class = DepartmentSerializer
     queryset = Department.objects.all()
+
+    def perform_create(self, serializer):
+        department = serializer.save()
+        log(actor=self.request.user, action="config.department_created", target=department, request=self.request)
+
+
+class DepartmentDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = DepartmentSerializer
+    queryset = Department.objects.all()
+    lookup_url_kwarg = "department_id"
+
+    def perform_update(self, serializer):
+        department = serializer.save()
+        log(actor=self.request.user, action="config.department_updated", target=department, request=self.request)
+
+    def perform_destroy(self, instance):
+        log(actor=self.request.user, action="config.department_deleted", target=instance, request=self.request)
+        instance.delete()
 
 
 class GradeScalesView(ConfigPermissionMixin, ListCreateAPIView):

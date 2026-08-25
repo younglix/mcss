@@ -3,8 +3,11 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
@@ -14,7 +17,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.audit.models import LoginHistory
 from apps.audit.services import client_ip, log, user_agent
-from apps.rbac.permissions import get_effective_permissions
+from apps.rbac.permissions import HasPermission, get_effective_permissions
 from common.responses import failure, success
 
 from .authentication import issue_tokens_for_user
@@ -26,6 +29,8 @@ from .serializers import (
     PasswordForgotSerializer,
     PasswordResetSerializer,
     RefreshSerializer,
+    UserAdminSerializer,
+    UserCreateSerializer,
     UserSerializer,
     VerifyOTPSerializer,
 )
@@ -285,3 +290,65 @@ class SessionRevokeView(APIView):
         session.revoked_at = timezone.now()
         session.save(update_fields=["revoked_at"])
         return success(message="Session revoked.")
+
+
+class UsersView(ListCreateAPIView):
+    """
+    Backs both Staff Management (?user_type=staff) and User Management
+    (unfiltered) — one real CRUD surface instead of two parallel systems,
+    since the backend has a single User model regardless of which admin
+    screen is looking at it.
+    """
+    queryset = User.objects.filter(is_deleted=False).order_by("-created_at")
+    search_fields = ["full_name", "email", "identifier", "phone"]
+    filterset_fields = ["user_type", "is_active"]
+
+    def get_permissions(self):
+        code = "users.view" if self.request.method == "GET" else "users.create"
+        return [HasPermission(code)]
+
+    def get_serializer_class(self):
+        return UserCreateSerializer if self.request.method == "POST" else UserAdminSerializer
+
+    def perform_create(self, serializer):
+        user = serializer.save()
+        log(actor=self.request.user, action="user.created", target=user, request=self.request)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return success(message="User created.", data=UserAdminSerializer(serializer.instance).data, status=201)
+
+
+class UserDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.filter(is_deleted=False)
+    serializer_class = UserAdminSerializer
+
+    def get_permissions(self):
+        mapping = {"GET": "users.view", "PATCH": "users.edit", "PUT": "users.edit", "DELETE": "users.delete"}
+        return [HasPermission(mapping[self.request.method])]
+
+    def perform_update(self, serializer):
+        user = serializer.save()
+        log(actor=self.request.user, action="user.updated", target=user, request=self.request)
+
+    def perform_destroy(self, instance):
+        if instance.id == self.request.user.id:
+            raise ValidationError("You cannot delete your own account.")
+        log(actor=self.request.user, action="user.deleted", target=instance, request=self.request)
+        instance.soft_delete()
+        instance.is_active = False
+        instance.save(update_fields=["is_active"])
+
+
+class UserResetPasswordView(APIView):
+    permission_classes = [HasPermission("users.reset_password")]
+
+    def post(self, request, user_id):
+        user = get_object_or_404(User, id=user_id, is_deleted=False)
+        temp_password = get_random_string(length=12)
+        user.set_password(temp_password)
+        user.save(update_fields=["password"])
+        log(actor=request.user, action="user.password_reset_by_admin", target=user, request=request)
+        return success(message="Password reset.", data={"temporary_password": temp_password})

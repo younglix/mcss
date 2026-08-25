@@ -22,7 +22,7 @@ class TermSerializer(serializers.ModelSerializer):
     class Meta:
         model = Term
         fields = ["id", "session", "name", "start_date", "end_date", "is_current"]
-        read_only_fields = ["id", "is_current"]
+        read_only_fields = ["id", "session", "is_current"]
 
 
 class AcademicSessionSerializer(serializers.ModelSerializer):
@@ -44,6 +44,7 @@ class ClassArmSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassArm
         fields = ["id", "school_class", "name"]
+        read_only_fields = ["id", "school_class"]
 
 
 class SchoolClassSerializer(serializers.ModelSerializer):

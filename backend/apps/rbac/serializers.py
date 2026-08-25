@@ -21,6 +21,25 @@ class RoleSerializer(serializers.ModelSerializer):
     def get_permissions(self, obj):
         return list(obj.role_permissions.values_list("permission__code", flat=True))
 
+    def validate(self, attrs):
+        # name/slug are only unique among is_deleted=False roles (see the
+        # model's partial UniqueConstraints) — dropping unique=True there
+        # also dropped DRF's auto-validator, so redo the check here.
+        errors = {}
+        exclude_id = self.instance.id if self.instance else None
+        for field in ("name", "slug"):
+            value = attrs.get(field)
+            if not value:
+                continue
+            qs = Role.objects.filter(is_deleted=False, **{field: value})
+            if exclude_id:
+                qs = qs.exclude(id=exclude_id)
+            if qs.exists():
+                errors[field] = [f"role with this {field} already exists."]
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
 
 class RolePermissionsUpdateSerializer(serializers.Serializer):
     permission_codes = serializers.ListField(child=serializers.CharField(), allow_empty=True)

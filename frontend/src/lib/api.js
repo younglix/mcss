@@ -78,20 +78,22 @@ async function request(path, { method = 'GET', body, auth = true, retry = true }
   }
 
   let payload = null;
-  try {
-    payload = await res.json();
-  } catch {
-    // no/invalid body
+  if (res.status !== 204) {
+    try {
+      payload = await res.json();
+    } catch {
+      // no/invalid body
+    }
   }
 
-  if (!res.ok || !payload || payload.success === false) {
+  if (!res.ok || (payload && payload.success === false)) {
     throw new ApiError(payload?.message || `Request failed (${res.status})`, {
       status: res.status,
       errors: payload?.errors,
     });
   }
 
-  return payload.data;
+  return payload ? payload.data : null;
 }
 
 export const api = {

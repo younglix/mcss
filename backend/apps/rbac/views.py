@@ -29,7 +29,7 @@ class RolesView(APIView):
         return [HasPermission("roles.view")] if self.request.method == "GET" else [HasPermission("roles.create")]
 
     def get(self, request):
-        return success(data=RoleSerializer(Role.objects.all(), many=True).data)
+        return success(data=RoleSerializer(Role.objects.filter(is_deleted=False), many=True).data)
 
     def post(self, request):
         serializer = RoleSerializer(data=request.data)

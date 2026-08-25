@@ -16,10 +16,12 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         PARENT = "parent", "Parent"
         APPLICANT = "applicant", "Applicant"
 
+    # unique=True is a hard Django requirement for USERNAME_FIELD (auth.E003),
+    # so email stays globally unique even across soft-deleted rows.
     email = models.EmailField(unique=True, null=True, blank=True)
-    phone = models.CharField(max_length=20, unique=True, null=True, blank=True, validators=[phone_validator])
+    phone = models.CharField(max_length=20, null=True, blank=True, validators=[phone_validator])
     # login handle when not email — e.g. admission number
-    identifier = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    identifier = models.CharField(max_length=50, null=True, blank=True)
 
     user_type = models.CharField(max_length=20, choices=UserType.choices)
     full_name = models.CharField(max_length=150)
@@ -39,6 +41,15 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            # unique=True on these fields would permanently lock a soft-deleted
+            # user's phone/identifier out of reuse (e.g. an admission number
+            # reassigned after a withdrawal); scope uniqueness to active rows
+            # only, same as every other is_deleted=False query. (email can't
+            # get this treatment — see the field comment above.)
+            models.UniqueConstraint(fields=["phone"], condition=models.Q(is_deleted=False), name="accounts_user_active_phone_uniq"),
+            models.UniqueConstraint(fields=["identifier"], condition=models.Q(is_deleted=False), name="accounts_user_active_identifier_uniq"),
+        ]
 
     def __str__(self):
         return self.email or self.identifier or self.phone or str(self.id)

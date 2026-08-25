@@ -17,13 +17,20 @@ class Permission(BaseModel):
 
 
 class Role(BaseModel):
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=100)
+    slug = models.SlugField()
     description = models.CharField(max_length=255, blank=True)
     is_system = models.BooleanField(default=False)
 
     class Meta(BaseModel.Meta):
         ordering = ["name"]
+        constraints = [
+            # unique=True would permanently block reusing a deleted role's
+            # name/slug (delete here is soft — see RoleDetailView); scope
+            # uniqueness to active rows only, same as the accounts.User fix.
+            models.UniqueConstraint(fields=["name"], condition=models.Q(is_deleted=False), name="rbac_role_active_name_uniq"),
+            models.UniqueConstraint(fields=["slug"], condition=models.Q(is_deleted=False), name="rbac_role_active_slug_uniq"),
+        ]
 
     def __str__(self):
         return self.name

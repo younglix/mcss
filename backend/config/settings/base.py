@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     "apps.realtime",
     "apps.notifications",
     "apps.dashboard",
+    "apps.reception",
+    "apps.calendar_app",
+    "apps.cms",
 ]
 
 MIDDLEWARE = [

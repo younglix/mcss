@@ -9,8 +9,12 @@ PERMISSIONS = {
     "settings":   ["view", "edit"],
     "roles":      ["view", "create", "edit", "delete", "assign"],
     "users":      ["view", "create", "edit", "delete", "reset_password"],
-    "audit":      ["view"],
-    "dashboard":  ["view"],
+    "audit":        ["view"],
+    "dashboard":    ["view"],
+    "reception":    ["view", "create", "edit", "delete"],
+    "calendar":     ["view", "create", "edit", "delete"],
+    "cms":          ["view", "edit"],
+    "communication": ["view", "send"],
     # ...expands per module as later phases land
 }
 
