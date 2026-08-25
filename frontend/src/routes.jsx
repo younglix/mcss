@@ -7,7 +7,10 @@ import ApplyDocumentUpload from './pages/Public/ApplyNow/DocumentUpload.jsx';
 import ApplyReviewSubmit from './pages/Public/ApplyNow/ReviewSubmit.jsx';
 import ApplyConfirmation from './pages/Public/ApplyNow/Confirmation.jsx';
 import ApplyStatusCheck from './pages/Public/ApplyNow/StatusCheck.jsx';
-import SuperAdminDashboard from './pages/SuperAdmin/Dashboard.jsx';
+import SuperAdminOverview from './pages/SuperAdmin/dashboard/Overview.jsx';
+import SuperAdminFinancialSummary from './pages/SuperAdmin/dashboard/FinancialSummary.jsx';
+import SuperAdminAcademicSummary from './pages/SuperAdmin/dashboard/AcademicSummary.jsx';
+import SuperAdminOperationsSummary from './pages/SuperAdmin/dashboard/OperationsSummary.jsx';
 import SuperAdminRolesPermissions from './pages/SuperAdmin/RolesPermissions.jsx';
 import SuperAdminConfiguration from './pages/SuperAdmin/Configuration.jsx';
 import SuperAdminStaff from './pages/SuperAdmin/Staff.jsx';
@@ -43,7 +46,10 @@ export const routes = [
   { path: "/apply/review", label: "Apply Review", source: "admission_application_review_submit", element: <ApplyReviewSubmit /> },
   { path: "/apply/confirmation", label: "Apply Confirmation", source: "admission_application_confirmation", element: <ApplyConfirmation /> },
   { path: "/apply/status", label: "Apply Status", source: "admission_application_status_check", element: <ApplyStatusCheck /> },
-  { path: "/super-admin", label: "Super Admin Dashboard", source: "super_admin_dashboard_platform_overview", element: <SuperAdminDashboard /> },
+  { path: "/super-admin", label: "Super Admin Dashboard", source: "super_admin_dashboard_platform_overview", element: <SuperAdminOverview /> },
+  { path: "/super-admin/financial-summary", label: "Financial Summary", source: "super_admin_dashboard_financial_summary", element: <SuperAdminFinancialSummary /> },
+  { path: "/super-admin/academic-summary", label: "Academic Summary", source: "super_admin_dashboard_academic_summary", element: <SuperAdminAcademicSummary /> },
+  { path: "/super-admin/operations-summary", label: "Operations Summary", source: "super_admin_dashboard_operations_summary", element: <SuperAdminOperationsSummary /> },
   { path: "/super-admin/roles", label: "Roles & Permissions", source: "roles_permissions_super_admin_portal", element: <SuperAdminRolesPermissions /> },
   { path: "/super-admin/staff", label: "Staff Management", source: "staff_management_super_admin_portal", element: <SuperAdminStaff /> },
   { path: "/super-admin/configuration", label: "School Configuration", source: "school_configuration_super_admin_portal", element: <SuperAdminConfiguration /> },

@@ -41,10 +41,10 @@ export const portals = {
       {
         key: 'dashboard', label: 'Dashboard', icon: 'dashboard',
         children: [
-          { key: 'dashboard-overview', label: 'Overview / Statistics', icon: 'query_stats', path: '/super-admin#overview', status: 'active' },
-          { key: 'dashboard-financial', label: 'Financial Summary', icon: 'payments', path: '/super-admin#financial-summary', status: 'active' },
-          { key: 'dashboard-academic', label: 'Academic Summary', icon: 'school', path: '/super-admin#academic-summary', status: 'active' },
-          { key: 'dashboard-operations', label: 'Operations Summary', icon: 'monitoring', path: '/super-admin#operations-summary', status: 'active' },
+          { key: 'dashboard-overview', label: 'Overview / Statistics', icon: 'query_stats', path: '/super-admin', status: 'active' },
+          { key: 'dashboard-financial', label: 'Financial Summary', icon: 'payments', path: '/super-admin/financial-summary', status: 'active' },
+          { key: 'dashboard-academic', label: 'Academic Summary', icon: 'school', path: '/super-admin/academic-summary', status: 'active' },
+          { key: 'dashboard-operations', label: 'Operations Summary', icon: 'monitoring', path: '/super-admin/operations-summary', status: 'active' },
           { key: 'dashboard-activities', label: 'Recent Activities', icon: 'history', path: '/super-admin#recent-activities', status: 'active' },
           { key: 'dashboard-notifications', label: 'Notifications', icon: 'notifications', path: '/super-admin#notifications', status: 'active' },
         ],
@@ -163,15 +163,16 @@ export const portals = {
         ],
       },
     ],
-    // Primary mobile nav is the Dashboard's own 4 summary sections (its
-    // 2 remaining sections — Recent Activities, Notifications — plus the
-    // full Administration/Finance/Operations/etc. hierarchy all live behind
-    // More, which opens the same full-nav drawer as the sidebar's tree).
+    // Primary mobile nav is the Dashboard's own 4 summary pages (its
+    // 2 remaining sections — Recent Activities, Notifications — stay
+    // in-page on Overview; the full Administration/Finance/Operations/etc.
+    // hierarchy lives behind More, which opens the same full-nav drawer as
+    // the sidebar's tree).
     bottomNav: [
-      { key: 'overview', label: 'Overview', icon: 'query_stats', path: '/super-admin#overview', status: 'active' },
-      { key: 'financial', label: 'Financial', icon: 'payments', path: '/super-admin#financial-summary', status: 'active' },
-      { key: 'academic', label: 'Academic', icon: 'school', path: '/super-admin#academic-summary', status: 'active' },
-      { key: 'operations', label: 'Operations', icon: 'monitoring', path: '/super-admin#operations-summary', status: 'active' },
+      { key: 'overview', label: 'Overview', icon: 'query_stats', path: '/super-admin', status: 'active' },
+      { key: 'financial', label: 'Financial', icon: 'payments', path: '/super-admin/financial-summary', status: 'active' },
+      { key: 'academic', label: 'Academic', icon: 'school', path: '/super-admin/academic-summary', status: 'active' },
+      { key: 'operations', label: 'Operations', icon: 'monitoring', path: '/super-admin/operations-summary', status: 'active' },
       { key: 'more', label: 'More', icon: 'more_horiz', status: 'more' },
     ],
   },
