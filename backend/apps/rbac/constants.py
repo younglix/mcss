@@ -31,6 +31,10 @@ PERMISSIONS = {
     "activities":   ["view", "create", "edit", "delete", "enroll"],
     "resources":    ["view", "create", "edit", "delete"],
     "health":       ["view", "create", "edit", "delete"],
+    "hr":           ["view", "create", "edit", "delete", "approve"],
+    "recruitment":  ["view", "create", "edit", "delete"],
+    "inventory":    ["view", "create", "edit", "delete"],
+    "assets":       ["view", "create", "edit", "delete", "assign"],
     # ...expands per module as later phases land
 }
 

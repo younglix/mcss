@@ -50,6 +50,10 @@ import SuperAdminReceipts from './pages/SuperAdmin/finance/Receipts.jsx';
 import SuperAdminExpenses from './pages/SuperAdmin/finance/Expenses.jsx';
 import SuperAdminPayroll from './pages/SuperAdmin/finance/Payroll.jsx';
 import SuperAdminFinancialReports from './pages/SuperAdmin/finance/FinancialReports.jsx';
+import SuperAdminHR from './pages/SuperAdmin/operations/HR.jsx';
+import SuperAdminRecruitment from './pages/SuperAdmin/operations/Recruitment.jsx';
+import SuperAdminInventory from './pages/SuperAdmin/operations/Inventory.jsx';
+import SuperAdminAssets from './pages/SuperAdmin/operations/Assets.jsx';
 import SuperAdminSettings from './pages/SuperAdmin/Settings.jsx';
 import SuperAdminAuditLog from './pages/SuperAdmin/AuditLog.jsx';
 import SuperAdminApplicantApprovals from './pages/SuperAdmin/ApplicantApprovals.jsx';
@@ -125,6 +129,10 @@ export const routes = [
   { path: "/super-admin/finance/expenses", label: "Expenses", source: "super_admin_finance_expenses", element: <SuperAdminExpenses /> },
   { path: "/super-admin/finance/payroll", label: "Payroll", source: "super_admin_finance_payroll", element: <SuperAdminPayroll /> },
   { path: "/super-admin/finance/reports", label: "Financial Reports", source: "super_admin_finance_reports", element: <SuperAdminFinancialReports /> },
+  { path: "/super-admin/operations/hr", label: "HR", source: "super_admin_operations_hr", element: <SuperAdminHR /> },
+  { path: "/super-admin/operations/recruitment", label: "Recruitment", source: "super_admin_operations_recruitment", element: <SuperAdminRecruitment /> },
+  { path: "/super-admin/operations/inventory", label: "Inventory", source: "super_admin_operations_inventory", element: <SuperAdminInventory /> },
+  { path: "/super-admin/operations/assets", label: "Assets", source: "super_admin_operations_assets", element: <SuperAdminAssets /> },
   { path: "/super-admin/settings", label: "System Settings", source: "platform_settings_super_admin", element: <SuperAdminSettings /> },
   { path: "/super-admin/audit", label: "Audit Log", source: "audit_log_super_admin_portal", element: <SuperAdminAuditLog /> },
   { path: "/super-admin/applicants", label: "Applicant Approvals", source: "applicant_approval_queue_super_admin", element: <SuperAdminApplicantApprovals /> },

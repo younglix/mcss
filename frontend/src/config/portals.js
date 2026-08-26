@@ -109,10 +109,10 @@ export const portals = {
       {
         key: 'operations', label: 'Operations', icon: 'engineering',
         children: [
-          { key: 'ops-hr', label: 'HR', icon: 'badge', path: '/super-admin/operations/hr', status: 'planned' },
-          { key: 'ops-recruitment', label: 'Recruitment', icon: 'person_search', path: '/super-admin/operations/recruitment', status: 'planned' },
-          { key: 'ops-inventory', label: 'Inventory', icon: 'inventory_2', path: '/super-admin/operations/inventory', status: 'planned' },
-          { key: 'ops-assets', label: 'Assets', icon: 'warehouse', path: '/super-admin/operations/assets', status: 'planned' },
+          { key: 'ops-hr', label: 'HR', icon: 'badge', path: '/super-admin/operations/hr', status: 'active' },
+          { key: 'ops-recruitment', label: 'Recruitment', icon: 'person_search', path: '/super-admin/operations/recruitment', status: 'active' },
+          { key: 'ops-inventory', label: 'Inventory', icon: 'inventory_2', path: '/super-admin/operations/inventory', status: 'active' },
+          { key: 'ops-assets', label: 'Assets', icon: 'warehouse', path: '/super-admin/operations/assets', status: 'active' },
           { key: 'ops-reception', label: 'Reception', icon: 'support_agent', path: '/super-admin/administration/reception', status: 'active' },
           { key: 'ops-transport', label: 'Transport', icon: 'directions_bus', path: '/super-admin/student-services/transport', status: 'active' },
           { key: 'ops-hostel', label: 'Hostel', icon: 'holiday_village', path: '/super-admin/student-services/hostel', status: 'active' },
