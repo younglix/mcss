@@ -31,3 +31,19 @@ class SystemSetting(BaseModel):
         if not self.is_secret:
             return self.value
         return json.loads(decrypt_value(self.value))
+
+
+class NumberSequence(BaseModel):
+    """Backs the numbering.* format settings (numbering.py) — one running
+    counter per (document key, year), so 'MC/{year}/{seq:04}' etc. produce
+    gapless, collision-free numbers under concurrent requests."""
+
+    key = models.CharField(max_length=50)   # "admission", "application", "receipt", "invoice", "expense", "staff"
+    year = models.IntegerField()
+    last_seq = models.PositiveIntegerField(default=0)
+
+    class Meta(BaseModel.Meta):
+        unique_together = ("key", "year")
+
+    def __str__(self):
+        return f"{self.key}/{self.year} -> {self.last_seq}"

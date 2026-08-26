@@ -1,21 +1,38 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PublicHeader from '../../../components/public/PublicHeader.jsx';
 import PublicFooter from '../../../components/public/PublicFooter.jsx';
 import ApplyStepper from '../../../components/public/ApplyStepper.jsx';
-import { entryLevels } from './applyData.js';
+import { api } from '../../../lib/api.js';
+import { getDraft, saveDraft } from './applyDraft.js';
 
 const inputClasses = 'mcss-field w-full px-md';
 
+const emptyBioData = {
+  full_name: '', date_of_birth: '', gender: '', class_applying_for: '', previous_school: '',
+  guardian_name: '', guardian_phone: '', guardian_email: '', address: '',
+};
+
 export default function ApplyBioData() {
   const navigate = useNavigate();
+  const [values, setValues] = useState({ ...emptyBioData, ...getDraft() });
+  const [classOptions, setClassOptions] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     document.title = 'Apply: Bio-Data | MCSS Portal';
+    api.get('/config/public-classes', { auth: false }).then(setClassOptions).catch(() => {});
   }, []);
+
+  const set = (key) => (e) => setValues((prev) => ({ ...prev, [key]: e.target.value }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!values.full_name || !values.guardian_name || (!values.guardian_phone && !values.guardian_email)) {
+      setError('Full name, guardian name, and a guardian phone or email are required.');
+      return;
+    }
+    saveDraft(values);
     navigate('/apply/documents');
   };
 
@@ -47,38 +64,33 @@ export default function ApplyBioData() {
                   <label className="block font-label-sm text-label-sm text-on-surface-variant mb-xs" htmlFor="full_name">
                     Full Name (As it appears on birth certificate)
                   </label>
-                  <input className={inputClasses} id="full_name" placeholder="Johnathan Doe" type="text" />
+                  <input className={inputClasses} id="full_name" placeholder="Johnathan Doe" type="text" value={values.full_name} onChange={set('full_name')} required />
                 </div>
                 <div>
                   <label className="block font-label-sm text-label-sm text-on-surface-variant mb-xs" htmlFor="dob">
                     Date of Birth
                   </label>
-                  <input className={inputClasses} id="dob" type="date" />
+                  <input className={inputClasses} id="dob" type="date" value={values.date_of_birth} onChange={set('date_of_birth')} />
                 </div>
                 <div>
                   <label className="block font-label-sm text-label-sm text-on-surface-variant mb-xs" htmlFor="gender">
                     Gender
                   </label>
-                  <select className={inputClasses} id="gender" defaultValue="">
-                    <option disabled value="">
-                      Select Gender
-                    </option>
+                  <select className={inputClasses} id="gender" value={values.gender} onChange={set('gender')}>
+                    <option value="">Select Gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
-                    <option value="other">Other</option>
                   </select>
                 </div>
                 <div>
                   <label className="block font-label-sm text-label-sm text-on-surface-variant mb-xs" htmlFor="entry_level">
                     Intended Class/Entry Level
                   </label>
-                  <select className={inputClasses} id="entry_level" defaultValue="">
-                    <option disabled value="">
-                      Select Class
-                    </option>
-                    {entryLevels.map((level) => (
-                      <option key={level.value} value={level.value}>
-                        {level.label}
+                  <select className={inputClasses} id="entry_level" value={values.class_applying_for} onChange={set('class_applying_for')}>
+                    <option value="">Select Class</option>
+                    {classOptions.map((level) => (
+                      <option key={level.id} value={level.id}>
+                        {level.name}
                       </option>
                     ))}
                   </select>
@@ -87,7 +99,7 @@ export default function ApplyBioData() {
                   <label className="block font-label-sm text-label-sm text-on-surface-variant mb-xs" htmlFor="prev_school">
                     Previous School Attended
                   </label>
-                  <input className={inputClasses} id="prev_school" placeholder="International Primary Academy" type="text" />
+                  <input className={inputClasses} id="prev_school" placeholder="International Primary Academy" type="text" value={values.previous_school} onChange={set('previous_school')} />
                 </div>
               </div>
             </div>
@@ -102,28 +114,29 @@ export default function ApplyBioData() {
                   <label className="block font-label-sm text-label-sm text-on-surface-variant mb-xs" htmlFor="guardian_name">
                     Guardian Full Name
                   </label>
-                  <input className={inputClasses} id="guardian_name" placeholder="Sarah Jane Doe" type="text" />
+                  <input className={inputClasses} id="guardian_name" placeholder="Sarah Jane Doe" type="text" value={values.guardian_name} onChange={set('guardian_name')} required />
                 </div>
                 <div>
                   <label className="block font-label-sm text-label-sm text-on-surface-variant mb-xs" htmlFor="guardian_phone">
                     Phone Number
                   </label>
-                  <input className={inputClasses} id="guardian_phone" placeholder="+1 (555) 000-0000" type="tel" />
+                  <input className={inputClasses} id="guardian_phone" placeholder="+1 (555) 000-0000" type="tel" value={values.guardian_phone} onChange={set('guardian_phone')} />
                 </div>
                 <div>
                   <label className="block font-label-sm text-label-sm text-on-surface-variant mb-xs" htmlFor="guardian_email">
                     Email Address
                   </label>
-                  <input className={inputClasses} id="guardian_email" placeholder="sarah.doe@example.com" type="email" />
+                  <input className={inputClasses} id="guardian_email" placeholder="sarah.doe@example.com" type="email" value={values.guardian_email} onChange={set('guardian_email')} />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block font-label-sm text-label-sm text-on-surface-variant mb-xs" htmlFor="address">
                     Residential Address
                   </label>
-                  <textarea className={`${inputClasses} resize-none`} id="address" placeholder="123 Carmel Avenue, Heritage District..." rows={3} />
+                  <textarea className={`${inputClasses} resize-none`} id="address" placeholder="123 Carmel Avenue, Heritage District..." rows={3} value={values.address} onChange={set('address')} />
                 </div>
               </div>
             </div>
+            {error && <p className="font-label-md text-label-md text-error">{error}</p>}
 
             <div className="pt-xl flex flex-col md:flex-row justify-between items-center gap-md border-t border-outline/10">
               <button

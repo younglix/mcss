@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "apps.finance",
     "apps.student_services",
     "apps.operations",
+    "apps.admissions",
 ]
 
 MIDDLEWARE = [

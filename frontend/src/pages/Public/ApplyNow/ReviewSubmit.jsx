@@ -3,22 +3,65 @@ import { useNavigate } from 'react-router-dom';
 import PublicHeader from '../../../components/public/PublicHeader.jsx';
 import PublicFooter from '../../../components/public/PublicFooter.jsx';
 import ApplyStepper from '../../../components/public/ApplyStepper.jsx';
-import { applicantSummary } from './applyData.js';
-
-const bioFields = [
-  ['Full Legal Name', applicantSummary.fullName],
-  ['Date of Birth', applicantSummary.dob],
-  ['Nationality', applicantSummary.nationality],
-  ['Applying For', applicantSummary.applyingFor],
-];
+import { api, ApiError } from '../../../lib/api.js';
+import { clearDraft, getDraft, saveResult } from './applyDraft.js';
+import { uploadSlots } from './applyData.js';
 
 export default function ApplyReviewSubmit() {
   const navigate = useNavigate();
   const [declared, setDeclared] = useState(false);
+  const [draft] = useState(getDraft());
+  const [classOptions, setClassOptions] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     document.title = 'Apply: Review & Submit | MCSS Portal';
-  }, []);
+    if (!draft.full_name) {
+      navigate('/apply/bio-data');
+      return;
+    }
+    api.get('/config/public-classes', { auth: false }).then(setClassOptions).catch(() => {});
+  }, [draft, navigate]);
+
+  const className = classOptions.find((c) => c.id === draft.class_applying_for)?.name;
+
+  const bioFields = [
+    ['Full Legal Name', draft.full_name],
+    ['Date of Birth', draft.date_of_birth || '—'],
+    ['Previous School', draft.previous_school || '—'],
+    ['Applying For', className || '—'],
+  ];
+
+  const readyDocs = Object.entries(draft.documents_ready || {}).filter(([, v]) => v).map(([k]) => k);
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setError('');
+    try {
+      const payload = {
+        full_name: draft.full_name,
+        date_of_birth: draft.date_of_birth || null,
+        gender: draft.gender || '',
+        email: draft.guardian_email || '',
+        phone: draft.guardian_phone || '',
+        address: draft.address || '',
+        guardian_name: draft.guardian_name,
+        guardian_phone: draft.guardian_phone || '',
+        guardian_email: draft.guardian_email || '',
+        class_applying_for: draft.class_applying_for || null,
+        previous_school: draft.previous_school || '',
+      };
+      const result = await api.post('/admissions/apply', payload, { auth: false });
+      saveResult(result);
+      clearDraft();
+      navigate('/apply/confirmation');
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not submit your application. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-container-lowest">
@@ -36,11 +79,15 @@ export default function ApplyReviewSubmit() {
           <ApplyStepper current={4} />
         </header>
 
+        {error && (
+          <p className="font-label-md text-label-md text-error bg-error-container/20 border border-error/20 rounded-lg px-md py-sm mb-lg">{error}</p>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-lg mb-xl">
           <section className="md:col-span-8 bg-surface-container-lowest border border-outline/10 rounded-lg overflow-hidden">
             <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex justify-between items-center">
               <h2 className="font-headline-md text-headline-sm text-primary">Student Bio-Data</h2>
-              <button type="button" className="flex items-center gap-xs text-secondary font-label-md">
+              <button type="button" onClick={() => navigate('/apply/bio-data')} className="flex items-center gap-xs text-secondary font-label-md">
                 <span className="material-symbols-outlined text-sm">edit</span> Edit
               </button>
             </div>
@@ -53,25 +100,15 @@ export default function ApplyReviewSubmit() {
               ))}
               <div className="sm:col-span-2 space-y-xs pt-md border-t border-outline/10">
                 <label className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Residential Address</label>
-                <p className="font-body-lg text-body-lg text-on-surface">{applicantSummary.address}</p>
+                <p className="font-body-lg text-body-lg text-on-surface">{draft.address || '—'}</p>
               </div>
             </div>
-          </section>
-
-          <section className="md:col-span-4 bg-surface-container-lowest border border-outline/10 rounded-lg flex flex-col items-center justify-center p-lg relative overflow-hidden">
-            <div className="w-40 h-40 rounded-full border-4 border-primary p-1 mb-md flex items-center justify-center bg-surface-container-low">
-              <span className="material-symbols-outlined text-outline text-5xl">person</span>
-            </div>
-            <div className="bg-tertiary-container text-on-tertiary-container px-md py-1 rounded-full font-label-sm text-label-sm absolute top-md right-md">
-              CANDIDATE ID: {applicantSummary.candidateId}
-            </div>
-            <p className="font-label-md text-label-md text-primary mt-2">Official Passport Photograph</p>
           </section>
 
           <section className="md:col-span-4 bg-surface-container-lowest border border-outline/10 rounded-lg overflow-hidden">
             <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex justify-between items-center">
               <h2 className="font-headline-md text-headline-sm text-primary">Guardian</h2>
-              <button type="button" className="flex items-center gap-xs text-secondary font-label-md">
+              <button type="button" onClick={() => navigate('/apply/bio-data')} className="flex items-center gap-xs text-secondary font-label-md">
                 <span className="material-symbols-outlined text-sm">edit</span>
               </button>
             </div>
@@ -82,7 +119,7 @@ export default function ApplyReviewSubmit() {
                 </div>
                 <div>
                   <p className="font-label-sm text-label-sm text-on-surface-variant">Primary Guardian</p>
-                  <p className="font-label-md text-label-md">{applicantSummary.guardian.name}</p>
+                  <p className="font-label-md text-label-md">{draft.guardian_name}</p>
                 </div>
               </div>
               <div className="flex items-center gap-md">
@@ -91,7 +128,7 @@ export default function ApplyReviewSubmit() {
                 </div>
                 <div>
                   <p className="font-label-sm text-label-sm text-on-surface-variant">Phone Number</p>
-                  <p className="font-label-md text-label-md">{applicantSummary.guardian.phone}</p>
+                  <p className="font-label-md text-label-md">{draft.guardian_phone || '—'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-md">
@@ -100,30 +137,32 @@ export default function ApplyReviewSubmit() {
                 </div>
                 <div>
                   <p className="font-label-sm text-label-sm text-on-surface-variant">Email Address</p>
-                  <p className="font-label-md text-label-md">{applicantSummary.guardian.email}</p>
+                  <p className="font-label-md text-label-md">{draft.guardian_email || '—'}</p>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="md:col-span-8 bg-surface-container-lowest border border-outline/10 rounded-lg">
+          <section className="md:col-span-12 bg-surface-container-lowest border border-outline/10 rounded-lg">
             <div className="bg-surface-container-low px-lg py-md border-b border-outline/10 flex justify-between items-center">
-              <h2 className="font-headline-md text-headline-sm text-primary">Uploaded Documents</h2>
-              <button type="button" className="flex items-center gap-xs text-secondary font-label-md">
-                <span className="material-symbols-outlined text-sm">add_circle</span> Add More
+              <h2 className="font-headline-md text-headline-sm text-primary">Documents Ready</h2>
+              <button type="button" onClick={() => navigate('/apply/documents')} className="flex items-center gap-xs text-secondary font-label-md">
+                <span className="material-symbols-outlined text-sm">edit</span> Edit
               </button>
             </div>
-            <div className="p-lg grid grid-cols-1 sm:grid-cols-2 gap-md">
-              {applicantSummary.documents.map((doc) => (
-                <div key={doc.name} className="flex items-center p-md border border-outline/10 rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer">
-                  <span className="material-symbols-outlined text-primary mr-md">description</span>
-                  <div className="flex-grow min-w-0">
-                    <p className="font-label-md text-label-md truncate">{doc.name}</p>
-                    <p className="font-label-sm text-label-sm text-on-surface-variant">{doc.meta}</p>
-                  </div>
-                  <span className="material-symbols-outlined text-on-surface-variant shrink-0">visibility</span>
+            <div className="p-lg">
+              {readyDocs.length === 0 ? (
+                <p className="font-label-sm text-label-sm text-on-surface-variant">No documents marked ready yet.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                  {readyDocs.map((key) => (
+                    <div key={key} className="flex items-center p-md border border-outline/10 rounded-xl">
+                      <span className="material-symbols-outlined text-primary mr-md">check_circle</span>
+                      <p className="font-label-md text-label-md truncate">{uploadSlots.find((s) => s.key === key)?.title || key}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           </section>
         </div>
@@ -150,11 +189,11 @@ export default function ApplyReviewSubmit() {
             </button>
             <button
               type="button"
-              disabled={!declared}
-              onClick={() => navigate('/apply/confirmation')}
+              disabled={!declared || submitting}
+              onClick={handleSubmit}
               className="w-full md:w-auto px-xl py-4 bg-primary text-on-primary font-headline-md rounded-lg shadow-lg hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center justify-center gap-md group"
             >
-              Submit Final Application
+              {submitting ? 'Submitting…' : 'Submit Final Application'}
               <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">send</span>
             </button>
           </div>

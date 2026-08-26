@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
 from apps.audit.services import log
@@ -39,6 +40,17 @@ class SchoolProfileView(ConfigPermissionMixin, APIView):
         serializer.save()
         log(actor=request.user, action="config.school_profile_updated", target=profile, request=request)
         return success(message="School profile updated.", data=serializer.data)
+
+
+class PublicClassOptionsView(APIView):
+    """Unauthenticated — just id+name, for the public admission form's
+    'class applying for' picker. Nothing else about a class is exposed here."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        classes = SchoolClass.objects.order_by("level_order").values("id", "name")
+        return success(data=list(classes))
 
 
 class SessionsView(ConfigPermissionMixin, ListCreateAPIView):
@@ -181,6 +193,24 @@ class DepartmentDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
 class GradeScalesView(ConfigPermissionMixin, ListCreateAPIView):
     serializer_class = GradeScaleSerializer
     queryset = GradeScale.objects.all()
+
+    def perform_create(self, serializer):
+        grade = serializer.save()
+        log(actor=self.request.user, action="config.grade_scale_created", target=grade, request=self.request)
+
+
+class GradeScaleDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = GradeScaleSerializer
+    queryset = GradeScale.objects.all()
+    lookup_url_kwarg = "grade_scale_id"
+
+    def perform_update(self, serializer):
+        grade = serializer.save()
+        log(actor=self.request.user, action="config.grade_scale_updated", target=grade, request=self.request)
+
+    def perform_destroy(self, instance):
+        log(actor=self.request.user, action="config.grade_scale_deleted", target=instance, request=self.request)
+        instance.delete()
 
 
 class FeeCategoriesView(ConfigPermissionMixin, ListCreateAPIView):

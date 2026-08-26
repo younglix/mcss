@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
-from django.utils.crypto import get_random_string
 
+from apps.settings_app.numbering import generate_number
 from common.models import BaseModel
 
 
@@ -37,6 +37,7 @@ class Invoice(BaseModel):
         PAID = "paid", "Paid"
         WAIVED = "waived", "Waived"
 
+    invoice_number = models.CharField(max_length=30, unique=True, editable=False)
     student = models.ForeignKey("academics.Student", on_delete=models.CASCADE, related_name="invoices")
     fee_structure = models.ForeignKey(
         FeeStructure, on_delete=models.SET_NULL, null=True, blank=True, related_name="invoices",
@@ -52,7 +53,12 @@ class Invoice(BaseModel):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.description} — {self.student}"
+        return f"{self.invoice_number} — {self.student}"
+
+    def save(self, *args, **kwargs):
+        if not self.invoice_number:
+            self.invoice_number = generate_number("invoice")
+        super().save(*args, **kwargs)
 
     @property
     def amount_paid(self):
@@ -105,11 +111,12 @@ class Payment(BaseModel):
 
     def save(self, *args, **kwargs):
         if not self.receipt_number:
-            self.receipt_number = f"RCT-{get_random_string(8).upper()}"
+            self.receipt_number = generate_number("receipt")
         super().save(*args, **kwargs)
 
 
 class Expense(BaseModel):
+    expense_number = models.CharField(max_length=30, unique=True, editable=False)
     category = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -121,7 +128,12 @@ class Expense(BaseModel):
         ordering = ["-date"]
 
     def __str__(self):
-        return f"{self.category} — {self.amount}"
+        return f"{self.expense_number} — {self.amount}"
+
+    def save(self, *args, **kwargs):
+        if not self.expense_number:
+            self.expense_number = generate_number("expense")
+        super().save(*args, **kwargs)
 
 
 class StaffSalary(BaseModel):

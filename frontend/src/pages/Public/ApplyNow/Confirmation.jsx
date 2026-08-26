@@ -1,12 +1,19 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PublicFooter from '../../../components/public/PublicFooter.jsx';
-import { referenceNumber, nextSteps } from './applyData.js';
+import { nextSteps } from './applyData.js';
+import { getResult } from './applyDraft.js';
 
 export default function ApplyConfirmation() {
+  const navigate = useNavigate();
+  const result = getResult();
+
   useEffect(() => {
     document.title = 'Application Received | MCSS Portal';
-  }, []);
+    if (!result) navigate('/apply');
+  }, [result, navigate]);
+
+  if (!result) return null;
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-container-lowest">
@@ -31,23 +38,15 @@ export default function ApplyConfirmation() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-lg w-full mb-xl">
-            <div className="md:col-span-7 bg-surface-container-lowest border border-outline/10 p-xl rounded-lg shadow-sm flex flex-col justify-center relative overflow-hidden">
+          <div className="grid grid-cols-1 gap-lg w-full mb-xl">
+            <div className="bg-surface-container-lowest border border-outline/10 p-xl rounded-lg shadow-sm flex flex-col justify-center relative overflow-hidden">
               <span className="material-symbols-outlined absolute top-0 right-0 p-md opacity-10 text-8xl">assignment_turned_in</span>
               <span className="font-label-md text-label-md text-secondary mb-xs">REFERENCE NUMBER</span>
-              <h2 className="font-headline-lg text-headline-md text-primary tracking-widest uppercase">{referenceNumber}</h2>
+              <h2 className="font-headline-lg text-headline-md text-primary tracking-widest uppercase">{result.reference_number}</h2>
               <p className="font-label-sm text-label-sm text-on-surface-variant mt-sm">Keep this number for all future correspondence with the Admissions Office.</p>
             </div>
-            <button
-              type="button"
-              className="md:col-span-5 group bg-primary text-on-primary p-xl rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-all hover:bg-primary-container hover:text-on-primary-container active:scale-[0.98]"
-            >
-              <span className="material-symbols-outlined text-4xl mb-sm group-hover:scale-110 transition-transform">picture_as_pdf</span>
-              <span className="font-headline-md text-headline-sm">Download Summary</span>
-              <p className="font-label-sm text-label-sm opacity-80 mt-xs">PDF Document • 2.4 MB</p>
-            </button>
 
-            <div className="md:col-span-12 bg-surface-container-low border border-outline/10 rounded-lg overflow-hidden">
+            <div className="bg-surface-container-low border border-outline/10 rounded-lg overflow-hidden">
               <div className="bg-primary px-lg py-md flex items-center gap-sm">
                 <span className="material-symbols-outlined text-on-primary">info</span>
                 <h3 className="font-headline-md text-headline-sm text-on-primary">What Happens Next</h3>
@@ -90,8 +89,6 @@ export default function ApplyConfirmation() {
 
           <div className="mt-xl text-center">
             <p className="font-body-md text-body-md text-on-surface-variant italic">
-              A confirmation email has been sent to the primary guardian&apos;s address.
-              <br />
               Need assistance? Contact us at <span className="text-primary font-bold not-italic">admissions@mountcarmel.edu</span>
             </p>
           </div>

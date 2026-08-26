@@ -1,133 +1,180 @@
+import { useMemo, useState } from 'react';
 import AppShell from '../../components/layout/AppShell.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
 import Button from '../../components/ui/Button.jsx';
-import { stats, applicants, totalApplicants } from './applicantsData.js';
+import Drawer from '../../components/ui/Drawer.jsx';
+import FormField from '../../components/ui/FormField.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { useDashboardData } from './dashboard/useDashboardData.js';
+import { EmptyState } from './dashboard/dashboardHelpers.jsx';
+import { api } from '../../lib/api.js';
+
+const ENDPOINTS = { applications: '/admissions/applications' };
+
+const STATUS_TONE = { submitted: 'secondary', under_review: 'warning', accepted: 'success', rejected: 'error' };
+const STATUS_LABEL = { submitted: 'Submitted', under_review: 'Under Review', accepted: 'Accepted', rejected: 'Rejected' };
+
+function DetailDrawer({ application, onClose, reload }) {
+  const [notes, setNotes] = useState(application?.review_notes || '');
+  const [saving, setSaving] = useState(false);
+
+  const handleReview = async (status) => {
+    setSaving(true);
+    try {
+      await api.post(`/admissions/applications/${application.id}/review`, { status, review_notes: notes });
+      onClose();
+      reload();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!application) return null;
+
+  return (
+    <Drawer open={!!application} onClose={onClose} title={application.full_name}>
+      <div className="space-y-lg">
+        <div className="flex items-center gap-sm">
+          <Badge tone={STATUS_TONE[application.status]}>{STATUS_LABEL[application.status]}</Badge>
+          <span className="font-label-sm text-label-sm text-on-surface-variant">{application.reference_number}</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-md">
+          <div>
+            <p className="font-label-sm text-label-sm text-on-surface-variant">Date of Birth</p>
+            <p className="font-label-md text-label-md">{application.date_of_birth || '—'}</p>
+          </div>
+          <div>
+            <p className="font-label-sm text-label-sm text-on-surface-variant">Gender</p>
+            <p className="font-label-md text-label-md capitalize">{application.gender || '—'}</p>
+          </div>
+          <div>
+            <p className="font-label-sm text-label-sm text-on-surface-variant">Applying For</p>
+            <p className="font-label-md text-label-md">{application.class_applying_for_name || '—'}</p>
+          </div>
+          <div>
+            <p className="font-label-sm text-label-sm text-on-surface-variant">Previous School</p>
+            <p className="font-label-md text-label-md">{application.previous_school || '—'}</p>
+          </div>
+          <div className="col-span-2">
+            <p className="font-label-sm text-label-sm text-on-surface-variant">Contact</p>
+            <p className="font-label-md text-label-md">{application.email || '—'} · {application.phone || '—'}</p>
+          </div>
+          <div className="col-span-2">
+            <p className="font-label-sm text-label-sm text-on-surface-variant">Address</p>
+            <p className="font-label-md text-label-md">{application.address || '—'}</p>
+          </div>
+        </div>
+
+        <div className="border-t border-outline/10 pt-md">
+          <h4 className="font-label-md text-label-md font-bold text-primary mb-sm">Guardian</h4>
+          <p className="font-label-md text-label-md">{application.guardian_name || '—'}</p>
+          <p className="font-label-sm text-label-sm text-on-surface-variant">{application.guardian_phone || '—'} · {application.guardian_email || '—'}</p>
+        </div>
+
+        <div className="border-t border-outline/10 pt-md">
+          <h4 className="font-label-md text-label-md font-bold text-primary mb-sm">Documents</h4>
+          {application.documents.length === 0 ? (
+            <p className="font-label-sm text-label-sm text-outline">None attached yet.</p>
+          ) : (
+            <ul className="space-y-xs">
+              {application.documents.map((d) => (
+                <li key={d.id}>
+                  <a href={d.file_url} target="_blank" rel="noreferrer" className="font-label-sm text-label-sm text-primary hover:underline">{d.title}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="border-t border-outline/10 pt-md">
+          <FormField field={{ key: 'notes', id: 'review_notes', label: 'Review Notes', type: 'textarea' }} value={notes} onChange={setNotes} />
+        </div>
+
+        <div className="flex flex-wrap gap-sm pt-md border-t border-outline/10">
+          {application.status !== 'under_review' && (
+            <Button variant="secondary" disabled={saving} onClick={() => handleReview('under_review')}>Mark Under Review</Button>
+          )}
+          {application.status !== 'accepted' && (
+            <Button variant="primary" disabled={saving} onClick={() => handleReview('accepted')}>Accept</Button>
+          )}
+          {application.status !== 'rejected' && (
+            <Button variant="ghost" disabled={saving} onClick={() => handleReview('rejected')}>Reject</Button>
+          )}
+        </div>
+      </div>
+    </Drawer>
+  );
+}
 
 export default function SuperAdminApplicantApprovals() {
-  return (
-    <AppShell portalId="superAdmin" pageTitle="Applicant Approvals" user={{ name: 'Super Admin' }}>
-      <div className="space-y-lg sm:space-y-xl">
-        <PageHeader
-          title="Applicant Approval Queue"
-          subtitle="Review and manage pending admission applications for the 2024/2025 academic session."
-          actions={
-            <>
-              <Button variant="secondary" className="bg-secondary-container text-on-secondary-container border-none" iconLeft="check_circle">
-                Bulk Approve
-              </Button>
-              <Button variant="primary" iconLeft="file_download">
-                Export List
-              </Button>
-            </>
-          }
-        />
+  const { user } = useAuth();
+  const endpoints = useMemo(() => ENDPOINTS, []);
+  const { data, loading, error, reload } = useDashboardData(endpoints);
+  const applications = data?.applications || [];
+  const [selected, setSelected] = useState(null);
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
-          {stats.map((stat) => (
-            <Card key={stat.label} padding="sm" className="flex items-center justify-between">
-              <div>
-                <p className="font-label-sm text-label-sm text-outline uppercase tracking-wider">{stat.label}</p>
-                <h3 className="font-headline-md text-headline-md text-primary">{stat.value}</h3>
-              </div>
-              <div className={`p-sm rounded-full shrink-0 ${stat.tone}`}>
-                <span className="material-symbols-outlined">{stat.icon}</span>
-              </div>
+  const counts = useMemo(() => {
+    const c = { submitted: 0, under_review: 0, accepted: 0, rejected: 0 };
+    for (const a of applications) c[a.status] = (c[a.status] || 0) + 1;
+    return c;
+  }, [applications]);
+
+  return (
+    <AppShell portalId="superAdmin" pageTitle="Applicant Approvals" user={{ name: user?.full_name || 'Super Admin' }}>
+      <div className="space-y-lg sm:space-y-xl">
+        <PageHeader title="Applicant Approval Queue" subtitle="Review and manage admission applications submitted through the public apply form." />
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-md">
+          {Object.entries(STATUS_LABEL).map(([key, label]) => (
+            <Card key={key} padding="lg">
+              <p className="font-label-sm text-label-sm text-on-surface-variant">{label}</p>
+              <p className="font-headline-lg text-headline-lg text-primary">{counts[key] || 0}</p>
             </Card>
           ))}
         </div>
 
-        <Card padding="none" className="overflow-hidden flex flex-col">
-          <div className="px-gutter py-md bg-primary flex flex-wrap items-center justify-between gap-md">
-            <h3 className="font-label-md text-label-md text-on-primary">PENDING APPLICATIONS</h3>
-            <div className="flex items-center gap-lg">
-              <div className="flex items-center gap-xs text-on-primary/80 font-label-sm text-label-sm">
-                <span className="material-symbols-outlined text-sm">filter_list</span>
-                <span>Filter by Class</span>
-              </div>
-              <div className="flex items-center gap-xs text-on-primary/80 font-label-sm text-label-sm border-l border-on-primary/20 pl-lg">
-                <span className="material-symbols-outlined text-sm">sort</span>
-                <span>Sort by Date</span>
-              </div>
-            </div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-175 border-collapse">
-              <thead className="bg-surface-container-low border-b border-outline/10">
-                <tr>
-                  <th className="p-md text-left w-12">
-                    <input type="checkbox" />
-                  </th>
-                  <th className="p-md text-left font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Applicant Name</th>
-                  <th className="p-md text-left font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Intended Class</th>
-                  <th className="p-md text-left font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Submission Date</th>
-                  <th className="p-md text-left font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Status</th>
-                  <th className="p-md text-right font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-outline/10">
-                {applicants.map((applicant) => (
-                  <tr key={applicant.ref} className="hover:bg-surface-container-low transition-colors group">
-                    <td className="p-md">
-                      <input type="checkbox" />
-                    </td>
-                    <td className="p-md">
-                      <div className="flex items-center gap-md">
-                        <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold font-headline-md text-sm shrink-0 ${applicant.tone}`}>
-                          {applicant.initials}
-                        </div>
-                        <div>
-                          <p className="font-body-md text-body-md text-primary font-semibold">{applicant.name}</p>
-                          <p className="font-label-sm text-label-sm text-outline">Ref: {applicant.ref}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-md font-body-md text-body-md text-on-surface">{applicant.className}</td>
-                    <td className="p-md font-body-md text-body-md text-on-surface">{applicant.date}</td>
-                    <td className="p-md">
-                      <Badge tone="warning">Pending</Badge>
-                    </td>
-                    <td className="p-md text-right">
-                      <div className="flex items-center justify-end gap-sm">
-                        <button className="p-2 text-outline hover:text-primary transition-colors" title="View Details">
-                          <span className="material-symbols-outlined">visibility</span>
-                        </button>
-                        <button className="p-2 text-outline hover:text-secondary transition-colors" title="Approve">
-                          <span className="material-symbols-outlined">check_circle</span>
-                        </button>
-                        <button className="p-2 text-outline hover:text-error transition-colors" title="Reject">
-                          <span className="material-symbols-outlined">cancel</span>
-                        </button>
-                      </div>
-                    </td>
+        {loading ? (
+          <Card padding="lg"><p className="font-label-sm text-label-sm text-on-surface-variant">Loading…</p></Card>
+        ) : error ? (
+          <Card padding="lg"><p className="font-label-sm text-label-sm text-error">{error}</p></Card>
+        ) : applications.length === 0 ? (
+          <Card padding="lg"><EmptyState icon="how_to_reg" text="No data available yet" /></Card>
+        ) : (
+          <Card padding="none">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-175 text-left border-collapse">
+                <thead>
+                  <tr className="bg-primary text-on-primary">
+                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Applicant</th>
+                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Reference</th>
+                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Applying For</th>
+                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Status</th>
+                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="p-md bg-surface-container-low border-t border-outline/10 flex items-center justify-between">
-            <p className="font-label-sm text-label-sm text-on-surface-variant">
-              Showing 1 to {applicants.length} of {totalApplicants} results
-            </p>
-            <div className="flex items-center gap-sm">
-              <button className="h-8 w-8 rounded flex items-center justify-center border border-outline/20 text-outline hover:bg-surface-container-lowest transition-all disabled:opacity-30" disabled>
-                <span className="material-symbols-outlined text-sm">chevron_left</span>
-              </button>
-              <button className="h-8 w-8 rounded flex items-center justify-center bg-primary text-on-primary font-label-sm text-label-sm">1</button>
-              <button className="h-8 w-8 rounded flex items-center justify-center border border-outline/20 text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-lowest">
-                2
-              </button>
-              <button className="h-8 w-8 rounded flex items-center justify-center border border-outline/20 text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-lowest">
-                3
-              </button>
-              <button className="h-8 w-8 rounded flex items-center justify-center border border-outline/20 text-outline hover:bg-surface-container-lowest transition-all">
-                <span className="material-symbols-outlined text-sm">chevron_right</span>
-              </button>
+                </thead>
+                <tbody className="divide-y divide-outline/10">
+                  {applications.map((a) => (
+                    <tr key={a.id} className="hover:bg-surface-container-low transition-colors">
+                      <td className="px-lg py-4 font-body-md text-body-md font-semibold text-on-surface">{a.full_name}</td>
+                      <td className="px-lg py-4 font-label-sm text-label-sm text-on-surface-variant">{a.reference_number}</td>
+                      <td className="px-lg py-4 font-label-sm text-label-sm text-on-surface-variant">{a.class_applying_for_name || '—'}</td>
+                      <td className="px-lg py-4"><Badge tone={STATUS_TONE[a.status]}>{STATUS_LABEL[a.status]}</Badge></td>
+                      <td className="px-lg py-4 text-right">
+                        <button type="button" onClick={() => setSelected(a)} className="font-label-sm text-label-sm text-primary hover:underline">Review</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
-        </Card>
+          </Card>
+        )}
       </div>
+
+      <DetailDrawer application={selected} onClose={() => setSelected(null)} reload={reload} />
     </AppShell>
   );
 }

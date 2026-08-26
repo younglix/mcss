@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from apps.accounts.serializers import UserCreateSerializer
 from apps.configuration.models import AcademicSession, ClassArm, Term
+from apps.settings_app.numbering import generate_number
 
 from .models import (
     Assignment,
@@ -78,11 +79,12 @@ class StudentCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop("password", "") or get_random_string(length=12)
         auto_generated = "password" not in self.initial_data or not self.initial_data.get("password")
+        identifier = validated_data.pop("identifier", "") or generate_number("admission")
         user_payload = {
             "full_name": validated_data.pop("full_name"),
             "email": validated_data.pop("email", "") or None,
             "phone": validated_data.pop("phone", "") or None,
-            "identifier": validated_data.pop("identifier", "") or None,
+            "identifier": identifier,
             "user_type": User.UserType.STUDENT,
             "password": password,
         }

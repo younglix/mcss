@@ -56,6 +56,10 @@ import SuperAdminInventory from './pages/SuperAdmin/operations/Inventory.jsx';
 import SuperAdminAssets from './pages/SuperAdmin/operations/Assets.jsx';
 import SuperAdminGeneralSettings from './pages/SuperAdmin/system-config/General.jsx';
 import SuperAdminAppearanceSettings from './pages/SuperAdmin/system-config/Appearance.jsx';
+import SuperAdminAcademicSettings from './pages/SuperAdmin/system-config/Academic.jsx';
+import SuperAdminStudentAdmissionSettings from './pages/SuperAdmin/system-config/StudentAdmission.jsx';
+import SuperAdminStaffHRSettings from './pages/SuperAdmin/system-config/StaffHR.jsx';
+import SuperAdminFinanceSettings from './pages/SuperAdmin/system-config/Finance.jsx';
 import SuperAdminSettings from './pages/SuperAdmin/Settings.jsx';
 import SuperAdminAuditLog from './pages/SuperAdmin/AuditLog.jsx';
 import SuperAdminApplicantApprovals from './pages/SuperAdmin/ApplicantApprovals.jsx';
@@ -137,6 +141,10 @@ export const routes = [
   { path: "/super-admin/operations/assets", label: "Assets", source: "super_admin_operations_assets", element: <SuperAdminAssets /> },
   { path: "/super-admin/system-config/general", label: "General Settings", source: "super_admin_system_config_general", element: <SuperAdminGeneralSettings /> },
   { path: "/super-admin/system-config/appearance", label: "Appearance Settings", source: "super_admin_system_config_appearance", element: <SuperAdminAppearanceSettings /> },
+  { path: "/super-admin/system-config/academic", label: "Academic Settings", source: "super_admin_system_config_academic", element: <SuperAdminAcademicSettings /> },
+  { path: "/super-admin/system-config/student-admission", label: "Student & Admission Settings", source: "super_admin_system_config_student_admission", element: <SuperAdminStudentAdmissionSettings /> },
+  { path: "/super-admin/system-config/staff-hr", label: "Staff & HR Settings", source: "super_admin_system_config_staff_hr", element: <SuperAdminStaffHRSettings /> },
+  { path: "/super-admin/system-config/finance", label: "Finance Settings", source: "super_admin_system_config_finance", element: <SuperAdminFinanceSettings /> },
   { path: "/super-admin/settings", label: "System Settings", source: "platform_settings_super_admin", element: <SuperAdminSettings /> },
   { path: "/super-admin/audit", label: "Audit Log", source: "audit_log_super_admin_portal", element: <SuperAdminAuditLog /> },
   { path: "/super-admin/applicants", label: "Applicant Approvals", source: "applicant_approval_queue_super_admin", element: <SuperAdminApplicantApprovals /> },

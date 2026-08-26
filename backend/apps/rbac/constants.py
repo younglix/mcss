@@ -35,6 +35,7 @@ PERMISSIONS = {
     "recruitment":  ["view", "create", "edit", "delete"],
     "inventory":    ["view", "create", "edit", "delete"],
     "assets":       ["view", "create", "edit", "delete", "assign"],
+    "admissions":   ["view", "edit", "review"],
     # ...expands per module as later phases land
 }
 

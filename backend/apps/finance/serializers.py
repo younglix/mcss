@@ -48,10 +48,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
         fields = [
-            "id", "student", "student_name", "class_arm_label", "fee_structure", "description",
+            "id", "invoice_number", "student", "student_name", "class_arm_label", "fee_structure", "description",
             "session", "term", "amount", "amount_paid", "balance", "due_date", "status", "created_at",
         ]
-        read_only_fields = ["id", "amount_paid", "balance", "status", "created_at"]
+        read_only_fields = ["id", "invoice_number", "amount_paid", "balance", "status", "created_at"]
 
     def get_class_arm_label(self, obj):
         return str(obj.student.class_arm) if obj.student.class_arm else None
@@ -89,8 +89,8 @@ class PaymentSerializer(serializers.ModelSerializer):
 class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
-        fields = ["id", "category", "description", "amount", "date", "paid_to", "recorded_by"]
-        read_only_fields = ["id", "recorded_by"]
+        fields = ["id", "expense_number", "category", "description", "amount", "date", "paid_to", "recorded_by"]
+        read_only_fields = ["id", "expense_number", "recorded_by"]
 
 
 class StaffSalarySerializer(serializers.ModelSerializer):

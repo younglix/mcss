@@ -4,10 +4,15 @@ import PublicHeader from '../../../components/public/PublicHeader.jsx';
 import PublicFooter from '../../../components/public/PublicFooter.jsx';
 import ApplyStepper from '../../../components/public/ApplyStepper.jsx';
 import { uploadSlots } from './applyData.js';
+import { getDraft, saveDraft } from './applyDraft.js';
 
-function UploadCard({ slot, uploaded, onUpload }) {
-  const isVerified = slot.status === 'verified' || uploaded;
-
+// No file-storage backend exists yet, so this is an honest readiness
+// checklist rather than a fake upload — the admissions office collects the
+// actual documents separately (in person / by email) once an application
+// reference number exists. See apps.admissions.ApplicationDocument for the
+// (URL-based) document record this will attach to once real file storage
+// lands.
+function ChecklistCard({ slot, ready, onToggle }) {
   return (
     <div className="bg-surface-container-lowest border border-outline/10 p-lg rounded-lg">
       <div className="flex items-start justify-between gap-md mb-lg">
@@ -20,49 +25,37 @@ function UploadCard({ slot, uploaded, onUpload }) {
             <p className="text-on-surface-variant text-sm">{slot.body}</p>
           </div>
         </div>
-        {isVerified && (
+        {ready && (
           <span className="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1 shrink-0">
-            <span className="material-symbols-outlined text-sm">check_circle</span> Verified
+            <span className="material-symbols-outlined text-sm">check_circle</span> Ready
           </span>
         )}
       </div>
 
-      {isVerified ? (
-        <div className="flex flex-wrap items-center justify-between gap-md p-md bg-surface-container-low rounded-lg border border-primary/20">
-          <div className="flex items-center gap-md">
-            <span className="material-symbols-outlined text-primary">description</span>
-            <div>
-              <p className="font-label-md text-label-md text-primary">{slot.fileName || `${slot.key}.pdf`}</p>
-              <p className="text-xs text-outline">{slot.fileMeta || 'Uploaded just now'}</p>
-            </div>
-          </div>
-          <button type="button" className="text-error font-label-md hover:underline">
-            Remove
-          </button>
-        </div>
-      ) : (
-        <label className="w-full border-2 border-dashed border-outline/20 rounded-lg p-xl flex flex-col items-center justify-center gap-md cursor-pointer hover:bg-surface-container-low transition-all">
-          <input className="hidden" type="file" onChange={() => onUpload(slot.key)} />
-          <span className="material-symbols-outlined text-outline text-5xl">cloud_upload</span>
-          <p className="font-label-md text-label-md text-on-surface-variant text-center">
-            Drag and drop file or <span className="text-primary underline">browse local files</span>
-          </p>
-          <p className="text-xs text-outline">Maximum file size: 5MB</p>
-        </label>
-      )}
+      <label className="w-full border-2 border-dashed border-outline/20 rounded-lg p-lg flex items-center justify-center gap-md cursor-pointer hover:bg-surface-container-low transition-all">
+        <input className="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox" checked={!!ready} onChange={() => onToggle(slot.key)} />
+        <p className="font-label-md text-label-md text-on-surface-variant text-center">
+          {ready ? 'I have this document ready to bring in or send to admissions' : 'Mark as ready — you\'ll submit the physical/scanned copy to the admissions office'}
+        </p>
+      </label>
     </div>
   );
 }
 
 export default function ApplyDocumentUpload() {
   const navigate = useNavigate();
-  const [uploaded, setUploaded] = useState({});
+  const [ready, setReady] = useState(getDraft().documents_ready || {});
 
   useEffect(() => {
     document.title = 'Apply: Documents | MCSS Portal';
   }, []);
 
-  const markUploaded = (key) => setUploaded((prev) => ({ ...prev, [key]: true }));
+  const markReady = (key) => setReady((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const handleContinue = () => {
+    saveDraft({ documents_ready: ready });
+    navigate('/apply/review');
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-container-lowest">
@@ -86,7 +79,7 @@ export default function ApplyDocumentUpload() {
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
           <div className="lg:col-span-8 space-y-lg">
             {uploadSlots.map((slot) => (
-              <UploadCard key={slot.key} slot={slot} uploaded={uploaded[slot.key]} onUpload={markUploaded} />
+              <ChecklistCard key={slot.key} slot={slot} ready={ready[slot.key]} onToggle={markReady} />
             ))}
           </div>
 
@@ -143,15 +136,12 @@ export default function ApplyDocumentUpload() {
             Return to Step 2
           </button>
           <div className="flex gap-md">
-            <button type="button" className="px-xl py-3 text-secondary font-label-md hover:bg-secondary/5 rounded-lg transition-colors">
-              Save Draft
-            </button>
             <button
               type="button"
-              onClick={() => navigate('/apply/review')}
+              onClick={handleContinue}
               className="px-xl py-3 bg-primary text-on-primary rounded-lg font-label-md shadow-sm hover:opacity-90 active:scale-95 transition-all"
             >
-              Submit &amp; Continue
+              Continue
             </button>
           </div>
         </footer>

@@ -54,6 +54,40 @@ DEFAULT_SETTINGS = [
     ("appearance.report_branding_enabled", "appearance", True, False),
     ("appearance.invoice_branding_enabled", "appearance", True, False),
     ("appearance.certificate_branding_enabled", "appearance", True, False),
+    # More numbering formats (genuinely consumed — see settings_app/numbering.py
+    # and its call sites in academics.StudentCreateSerializer, the new
+    # apps.admissions app, and apps.finance's Invoice/Payment/Expense .save()).
+    ("numbering.application_format", "numbering", "APP/{year}/{seq:05}", False),
+    ("numbering.staff_format", "numbering", "STF/{year}/{seq:04}", False),
+    ("numbering.expense_format", "numbering", "EXP/{year}/{seq:05}", False),
+    # Academic — rules/defaults, not a duplicate of the real academic records
+    # (grading scale is configuration.GradeScale, current session/term is
+    # configuration.AcademicSession/Term — both linked to from this settings
+    # page, not re-stored here).
+    ("academic.gpa_enabled", "academic", False, False),
+    ("academic.gpa_scale", "academic", "5.0", False),
+    ("academic.score_calculation", "academic", "weighted_average", False),
+    ("academic.attendance_min_percent", "academic", 75, False),
+    ("academic.promotion_min_average", "academic", 40, False),
+    ("academic.graduation_min_average", "academic", 40, False),
+    ("academic.exam_retakes_allowed", "academic", False, False),
+    # Student & Admission
+    ("student_admission.guardian_required", "student_admission", True, False),
+    ("student_admission.required_documents", "student_admission", "Birth Certificate, Passport Photograph, Previous Report Card", False),
+    ("student_admission.admission_requirements", "student_admission", "", False),
+    # Staff & HR
+    ("staff_hr.employment_types", "staff_hr", "Full-time, Part-time, Contract", False),
+    ("staff_hr.working_hours", "staff_hr", "8:00 AM - 4:00 PM", False),
+    ("staff_hr.leave_days_annual", "staff_hr", 21, False),
+    ("staff_hr.leave_days_sick", "staff_hr", 10, False),
+    ("staff_hr.default_tax_rate", "staff_hr", 0, False),
+    # Finance — fee/payment policy defaults. Actual fee amounts live on
+    # finance.FeeStructure; this is global policy, not a second fee table.
+    ("finance.late_fee_percent", "finance", 0, False),
+    ("finance.late_fee_grace_days", "finance", 0, False),
+    ("finance.financial_year_start_month", "finance", 1, False),
+    ("finance.default_discount_percent", "finance", 0, False),
+    ("finance.tax_percent", "finance", 0, False),
 ]
 
 

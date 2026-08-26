@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("school-profile", views.SchoolProfileView.as_view(), name="config-school-profile"),
+    path("public-classes", views.PublicClassOptionsView.as_view(), name="config-public-classes"),
     path("sessions", views.SessionsView.as_view(), name="config-sessions"),
     path("sessions/<uuid:session_id>", views.SessionDetailView.as_view(), name="config-session-detail"),
     path("sessions/<uuid:session_id>/set-current", views.SessionSetCurrentView.as_view(), name="config-session-set-current"),
@@ -17,5 +18,6 @@ urlpatterns = [
     path("departments", views.DepartmentsView.as_view(), name="config-departments"),
     path("departments/<uuid:department_id>", views.DepartmentDetailView.as_view(), name="config-department-detail"),
     path("grade-scales", views.GradeScalesView.as_view(), name="config-grade-scales"),
+    path("grade-scales/<uuid:grade_scale_id>", views.GradeScaleDetailView.as_view(), name="config-grade-scale-detail"),
     path("fee-categories", views.FeeCategoriesView.as_view(), name="config-fee-categories"),
 ]
