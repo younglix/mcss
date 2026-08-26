@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "apps.reception",
     "apps.calendar_app",
     "apps.cms",
+    "apps.academics",
 ]
 
 MIDDLEWARE = [

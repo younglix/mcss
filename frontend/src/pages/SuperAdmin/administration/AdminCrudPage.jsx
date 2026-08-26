@@ -28,9 +28,22 @@ export default function AdminCrudPage({
   initialFormValues = {},
   emptyIcon = 'inbox',
   renderExtraActions,
+  // Optional {key: url} of reference data (e.g. class arms, subjects) a page
+  // needs to build dynamic select options. Must be a stable (memoized)
+  // object — it's a useDashboardData dependency. When present, `formFields`
+  // and `columns` may be functions of that extra data instead of plain
+  // arrays: (extra) => [...].
+  extraEndpoints,
 }) {
-  const endpoints = useMemo(() => ({ items: endpoint }), [endpoint]);
+  const endpoints = useMemo(() => ({ items: endpoint, ...extraEndpoints }), [endpoint, extraEndpoints]);
   const { data, loading, error, reload } = useDashboardData(endpoints);
+  const extra = useMemo(() => {
+    if (!data) return {};
+    const { items: _items, ...rest } = data;
+    return rest;
+  }, [data]);
+  const fields = typeof formFields === 'function' ? formFields(extra) : formFields;
+  const resolvedColumns = typeof columns === 'function' ? columns(extra) : columns;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formValues, setFormValues] = useState(initialFormValues);
@@ -50,7 +63,7 @@ export default function AdminCrudPage({
     setEditingItem(item);
     setFormValues(
       Object.fromEntries(
-        formFields.map((f) => {
+        fields.map((f) => {
           let value = item[f.key];
           // API returns full ISO timestamps; datetime-local inputs need
           // "YYYY-MM-DDTHH:mm" with no seconds/timezone suffix.
@@ -132,7 +145,7 @@ export default function AdminCrudPage({
                 <table className="w-full min-w-150 text-left border-collapse">
                   <thead>
                     <tr className="bg-primary text-on-primary">
-                      {columns.map((col) => (
+                      {resolvedColumns.map((col) => (
                         <th key={col.key} className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">
                           {col.label}
                         </th>
@@ -143,7 +156,7 @@ export default function AdminCrudPage({
                   <tbody className="divide-y divide-outline/10">
                     {items.map((item) => (
                       <tr key={item.id} className="hover:bg-surface-container-low transition-colors">
-                        {columns.map((col) => (
+                        {resolvedColumns.map((col) => (
                           <td key={col.key} className="px-lg py-4 font-body-md text-body-md text-on-surface">
                             {col.render ? col.render(item) : String(item[col.key] ?? '—')}
                           </td>
@@ -174,7 +187,7 @@ export default function AdminCrudPage({
               {formErrors.__all__}
             </p>
           )}
-          {formFields.map((field) => (
+          {fields.map((field) => (
             <FormField
               key={field.key}
               field={field}

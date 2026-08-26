@@ -14,4 +14,5 @@ urlpatterns = [
     path("api/v1/reception/", include("apps.reception.urls")),
     path("api/v1/calendar/", include("apps.calendar_app.urls")),
     path("api/v1/cms/", include("apps.cms.urls")),
+    path("api/v1/academics/", include("apps.academics.urls")),
 ]

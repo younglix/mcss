@@ -24,6 +24,17 @@ import SuperAdminReception from './pages/SuperAdmin/administration/Reception.jsx
 import SuperAdminCommunication from './pages/SuperAdmin/administration/Communication.jsx';
 import SuperAdminCalendar from './pages/SuperAdmin/administration/Calendar.jsx';
 import SuperAdminWebsiteCms from './pages/SuperAdmin/administration/WebsiteCms.jsx';
+import SuperAdminStudents from './pages/SuperAdmin/academic/Students.jsx';
+import SuperAdminTeachers from './pages/SuperAdmin/academic/Teachers.jsx';
+import SuperAdminSubjects from './pages/SuperAdmin/academic/Subjects.jsx';
+import SuperAdminClasses from './pages/SuperAdmin/academic/Classes.jsx';
+import SuperAdminTimetable from './pages/SuperAdmin/academic/Timetable.jsx';
+import SuperAdminAttendance from './pages/SuperAdmin/academic/Attendance.jsx';
+import SuperAdminExams from './pages/SuperAdmin/academic/Exams.jsx';
+import SuperAdminResults from './pages/SuperAdmin/academic/Results.jsx';
+import SuperAdminAssignments from './pages/SuperAdmin/academic/Assignments.jsx';
+import SuperAdminPromotion from './pages/SuperAdmin/academic/Promotion.jsx';
+import SuperAdminAcademicReports from './pages/SuperAdmin/academic/AcademicReports.jsx';
 import SuperAdminSettings from './pages/SuperAdmin/Settings.jsx';
 import SuperAdminAuditLog from './pages/SuperAdmin/AuditLog.jsx';
 import SuperAdminApplicantApprovals from './pages/SuperAdmin/ApplicantApprovals.jsx';
@@ -73,6 +84,17 @@ export const routes = [
   { path: "/super-admin/administration/communication", label: "Communication", source: "super_admin_communication", element: <SuperAdminCommunication /> },
   { path: "/super-admin/administration/calendar", label: "Calendar", source: "super_admin_calendar", element: <SuperAdminCalendar /> },
   { path: "/super-admin/administration/website-cms", label: "Website / CMS", source: "super_admin_website_cms", element: <SuperAdminWebsiteCms /> },
+  { path: "/super-admin/academic/students", label: "Students", source: "super_admin_academic_students", element: <SuperAdminStudents /> },
+  { path: "/super-admin/academic/teachers", label: "Teachers", source: "super_admin_academic_teachers", element: <SuperAdminTeachers /> },
+  { path: "/super-admin/academic/subjects", label: "Subjects", source: "super_admin_academic_subjects", element: <SuperAdminSubjects /> },
+  { path: "/super-admin/academic/classes", label: "Classes", source: "super_admin_academic_classes", element: <SuperAdminClasses /> },
+  { path: "/super-admin/academic/timetable", label: "Timetable", source: "super_admin_academic_timetable", element: <SuperAdminTimetable /> },
+  { path: "/super-admin/academic/attendance", label: "Attendance", source: "super_admin_academic_attendance", element: <SuperAdminAttendance /> },
+  { path: "/super-admin/academic/exams", label: "Exams", source: "super_admin_academic_exams", element: <SuperAdminExams /> },
+  { path: "/super-admin/academic/results", label: "Results / Marksheets", source: "super_admin_academic_results", element: <SuperAdminResults /> },
+  { path: "/super-admin/academic/assignments", label: "Assignments", source: "super_admin_academic_assignments", element: <SuperAdminAssignments /> },
+  { path: "/super-admin/academic/promotion", label: "Promotion", source: "super_admin_academic_promotion", element: <SuperAdminPromotion /> },
+  { path: "/super-admin/academic/reports", label: "Academic Reports", source: "super_admin_academic_reports", element: <SuperAdminAcademicReports /> },
   { path: "/super-admin/settings", label: "System Settings", source: "platform_settings_super_admin", element: <SuperAdminSettings /> },
   { path: "/super-admin/audit", label: "Audit Log", source: "audit_log_super_admin_portal", element: <SuperAdminAuditLog /> },
   { path: "/super-admin/applicants", label: "Applicant Approvals", source: "applicant_approval_queue_super_admin", element: <SuperAdminApplicantApprovals /> },

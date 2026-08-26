@@ -15,6 +15,14 @@ PERMISSIONS = {
     "calendar":     ["view", "create", "edit", "delete"],
     "cms":          ["view", "edit"],
     "communication": ["view", "send"],
+    "subjects":     ["view", "create", "edit", "delete"],
+    "teachers":     ["view", "assign"],
+    "classes":      ["view", "assign"],
+    "timetable":    ["view", "create", "edit", "delete"],
+    "exams":        ["view", "create", "edit", "delete"],
+    "assignments":  ["view", "create", "edit", "delete"],
+    "promotion":    ["view", "action"],
+    "reports":      ["view"],
     # ...expands per module as later phases land
 }
 
@@ -40,6 +48,8 @@ DEFAULT_ROLES = {
         "permissions": [
             "students.view", "attendance.view", "attendance.create", "attendance.edit",
             "results.view", "results.enter", "results.edit",
+            "subjects.view", "classes.view", "timetable.view",
+            "exams.view", "assignments.view", "assignments.create", "assignments.edit", "assignments.delete",
         ],
     },
     "accountant": {

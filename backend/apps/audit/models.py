@@ -1,3 +1,4 @@
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from common.models import BaseModel
@@ -8,7 +9,10 @@ class AuditLog(BaseModel):
     action = models.CharField(max_length=100)                    # "result.published", "role.permissions_changed"
     target_type = models.CharField(max_length=100, blank=True)   # "Student", "Role"
     target_id = models.CharField(max_length=64, blank=True)
-    changes = models.JSONField(default=dict)                     # {"before": {...}, "after": {...}}
+    # DjangoJSONEncoder (not the plain default) so a `changes` dict can carry
+    # a raw UUID/Decimal/date/datetime straight from a model without every
+    # call site having to remember to str()-wrap it first.
+    changes = models.JSONField(default=dict, encoder=DjangoJSONEncoder)  # {"before": {...}, "after": {...}}
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=300, blank=True)
 
