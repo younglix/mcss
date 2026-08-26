@@ -36,6 +36,7 @@ PERMISSIONS = {
     "inventory":    ["view", "create", "edit", "delete"],
     "assets":       ["view", "create", "edit", "delete", "assign"],
     "admissions":   ["view", "edit", "review"],
+    "custom_fields": ["view", "edit"],
     # ...expands per module as later phases land
 }
 

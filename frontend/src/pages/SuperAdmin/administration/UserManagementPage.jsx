@@ -34,16 +34,33 @@ export default function UserManagementPage({ pageTitle, title, subtitle, userTyp
   const [deleting, setDeleting] = useState(false);
   const [resetResult, setResetResult] = useState(null); // { user, tempPassword }
   const [actionError, setActionError] = useState('');
+  const [customFields, setCustomFields] = useState([]);
+  const [customFieldValues, setCustomFieldValues] = useState({});
 
   const users = data?.users || [];
   const roles = data?.roles || [];
 
+  const loadCustomFields = async (userId) => {
+    try {
+      const query = userId ? `&entity_id=${userId}` : '';
+      const result = await api.get(`/custom-fields/values?entity=staff${query}`);
+      setCustomFields(result || []);
+      setCustomFieldValues(Object.fromEntries((result || []).map((f) => [f.field_id, f.value ?? ''])));
+    } catch {
+      setCustomFields([]);
+      setCustomFieldValues({});
+    }
+  };
+
   const openCreate = () => {
     setEditingUser(null);
-    setFormValues({ ...emptyForm, user_type: userTypeFilter || 'staff' });
+    const userType = userTypeFilter || 'staff';
+    setFormValues({ ...emptyForm, user_type: userType });
     setSelectedRoleIds([]);
     setFormErrors({});
     setDrawerOpen(true);
+    if (userType === 'staff') loadCustomFields(null);
+    else { setCustomFields([]); setCustomFieldValues({}); }
   };
 
   const openEdit = (user) => {
@@ -60,6 +77,14 @@ export default function UserManagementPage({ pageTitle, title, subtitle, userTyp
     setSelectedRoleIds(roleIdsForUser);
     setFormErrors({});
     setDrawerOpen(true);
+    if (user.user_type === 'staff') loadCustomFields(user.id);
+    else { setCustomFields([]); setCustomFieldValues({}); }
+  };
+
+  const handleUserTypeChange = (v) => {
+    setFormValues((prev) => ({ ...prev, user_type: v }));
+    if (v === 'staff') loadCustomFields(editingUser ? editingUser.id : null);
+    else { setCustomFields([]); setCustomFieldValues({}); }
   };
 
   const toggleRole = (roleId) => {
@@ -71,6 +96,7 @@ export default function UserManagementPage({ pageTitle, title, subtitle, userTyp
     setSubmitting(true);
     setFormErrors({});
     try {
+      let userId = editingUser?.id;
       if (editingUser) {
         await api.patch(`/users/${editingUser.id}`, {
           full_name: formValues.full_name,
@@ -82,7 +108,15 @@ export default function UserManagementPage({ pageTitle, title, subtitle, userTyp
         if (!payload.email) delete payload.email;
         if (!payload.phone) delete payload.phone;
         if (!payload.identifier) delete payload.identifier;
-        await api.post('/users/', payload);
+        const result = await api.post('/users/', payload);
+        userId = result.id;
+      }
+      if (formValues.user_type === 'staff' && customFields.length > 0) {
+        await api.put('/custom-fields/values/bulk', {
+          entity: 'staff',
+          entity_id: userId,
+          values: customFields.map((f) => ({ field_id: f.field_id, value: customFieldValues[f.field_id] ?? null })),
+        });
       }
       setDrawerOpen(false);
       reload();
@@ -219,7 +253,7 @@ export default function UserManagementPage({ pageTitle, title, subtitle, userTyp
           <FormField
             field={{ key: 'user_type', label: 'User Type', type: 'select', required: true, options: USER_TYPE_OPTIONS }}
             value={formValues.user_type}
-            onChange={(v) => setFormValues((prev) => ({ ...prev, user_type: v }))}
+            onChange={handleUserTypeChange}
             error={formErrors.user_type?.[0]}
           />
           {!editingUser && (
@@ -249,6 +283,21 @@ export default function UserManagementPage({ pageTitle, title, subtitle, userTyp
                 error={formErrors.password?.[0]}
               />
             </>
+          )}
+          {customFields.length > 0 && (
+            <div className="space-y-lg pt-md border-t border-outline/10">
+              {customFields.map((f) => (
+                <FormField
+                  key={f.field_id}
+                  field={{
+                    key: f.field_id, label: f.label, type: f.field_type, required: f.required,
+                    options: (f.options || []).map((o) => ({ value: o, label: o })),
+                  }}
+                  value={customFieldValues[f.field_id] ?? ''}
+                  onChange={(v) => setCustomFieldValues((prev) => ({ ...prev, [f.field_id]: v }))}
+                />
+              ))}
+            </div>
           )}
           <div>
             <p className="font-label-md text-label-md text-on-surface mb-xs">Roles</p>

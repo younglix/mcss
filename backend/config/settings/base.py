@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "apps.student_services",
     "apps.operations",
     "apps.admissions",
+    "apps.custom_fields",
 ]
 
 MIDDLEWARE = [

@@ -62,6 +62,7 @@ import SuperAdminStaffHRSettings from './pages/SuperAdmin/system-config/StaffHR.
 import SuperAdminFinanceSettings from './pages/SuperAdmin/system-config/Finance.jsx';
 import SuperAdminCommunicationSettings from './pages/SuperAdmin/system-config/Communication.jsx';
 import SuperAdminUsersSecuritySettings from './pages/SuperAdmin/system-config/UsersSecurity.jsx';
+import SuperAdminFormsCustomFields from './pages/SuperAdmin/system-config/FormsCustomFields.jsx';
 import SuperAdminSettings from './pages/SuperAdmin/Settings.jsx';
 import SuperAdminAuditLog from './pages/SuperAdmin/AuditLog.jsx';
 import SuperAdminApplicantApprovals from './pages/SuperAdmin/ApplicantApprovals.jsx';
@@ -149,6 +150,7 @@ export const routes = [
   { path: "/super-admin/system-config/finance", label: "Finance Settings", source: "super_admin_system_config_finance", element: <SuperAdminFinanceSettings /> },
   { path: "/super-admin/system-config/communication", label: "Communication Settings", source: "super_admin_system_config_communication", element: <SuperAdminCommunicationSettings /> },
   { path: "/super-admin/system-config/users-security", label: "Users & Security Settings", source: "super_admin_system_config_users_security", element: <SuperAdminUsersSecuritySettings /> },
+  { path: "/super-admin/system-config/forms", label: "Forms & Custom Fields", source: "super_admin_system_config_forms", element: <SuperAdminFormsCustomFields /> },
   { path: "/super-admin/settings", label: "System Settings", source: "platform_settings_super_admin", element: <SuperAdminSettings /> },
   { path: "/super-admin/audit", label: "Audit Log", source: "audit_log_super_admin_portal", element: <SuperAdminAuditLog /> },
   { path: "/super-admin/applicants", label: "Applicant Approvals", source: "applicant_approval_queue_super_admin", element: <SuperAdminApplicantApprovals /> },

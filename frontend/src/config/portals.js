@@ -138,7 +138,7 @@ export const portals = {
           { key: 'sc-finance', label: 'Finance', icon: 'payments', path: '/super-admin/system-config/finance', status: 'active' },
           { key: 'sc-communication', label: 'Communication', icon: 'campaign', path: '/super-admin/system-config/communication', status: 'active' },
           { key: 'sc-users-security', label: 'Users & Security', icon: 'admin_panel_settings', path: '/super-admin/system-config/users-security', status: 'active' },
-          { key: 'sc-forms', label: 'Forms & Custom Fields', icon: 'dynamic_form', path: '/super-admin/system-config/forms', status: 'planned' },
+          { key: 'sc-forms', label: 'Forms & Custom Fields', icon: 'dynamic_form', path: '/super-admin/system-config/forms', status: 'active' },
           { key: 'sc-documents', label: 'Documents & Templates', icon: 'description', path: '/super-admin/system-config/documents', status: 'planned' },
           { key: 'sc-website', label: 'Website', icon: 'public', path: '/super-admin/system-config/website', status: 'planned' },
           { key: 'sc-maintenance', label: 'System & Maintenance', icon: 'build', path: '/super-admin/system-config/maintenance', status: 'planned' },

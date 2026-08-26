@@ -52,6 +52,20 @@ export default function SuperAdminStudents() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [enrollResult, setEnrollResult] = useState(null);
+  const [customFields, setCustomFields] = useState([]);
+  const [customFieldValues, setCustomFieldValues] = useState({});
+
+  const loadCustomFields = async (studentId) => {
+    try {
+      const query = studentId ? `&entity_id=${studentId}` : '';
+      const result = await api.get(`/custom-fields/values?entity=student${query}`);
+      setCustomFields(result || []);
+      setCustomFieldValues(Object.fromEntries((result || []).map((f) => [f.field_id, f.value ?? ''])));
+    } catch {
+      setCustomFields([]);
+      setCustomFieldValues({});
+    }
+  };
 
   const students = data?.students || [];
   const classes = data?.classes || [];
@@ -62,6 +76,7 @@ export default function SuperAdminStudents() {
     setFormValues(emptyForm);
     setFormErrors({});
     setDrawerOpen(true);
+    loadCustomFields(null);
   };
 
   const openEdit = (student) => {
@@ -79,6 +94,7 @@ export default function SuperAdminStudents() {
     });
     setFormErrors({});
     setDrawerOpen(true);
+    loadCustomFields(student.id);
   };
 
   const handleSubmit = async (e) => {
@@ -87,6 +103,7 @@ export default function SuperAdminStudents() {
     setFormErrors({});
     try {
       const payload = Object.fromEntries(Object.entries(formValues).filter(([, v]) => v !== ''));
+      let studentId = editingStudent?.id;
       if (editingStudent) {
         delete payload.email;
         delete payload.phone;
@@ -97,8 +114,16 @@ export default function SuperAdminStudents() {
       } else {
         const enrolledName = formValues.full_name;
         const result = await api.post('/academics/students', payload);
+        studentId = result.id;
         setDrawerOpen(false);
         if (result.temporary_password) setEnrollResult({ ...result, full_name: enrolledName });
+      }
+      if (customFields.length > 0) {
+        await api.put('/custom-fields/values/bulk', {
+          entity: 'student',
+          entity_id: studentId,
+          values: customFields.map((f) => ({ field_id: f.field_id, value: customFieldValues[f.field_id] ?? null })),
+        });
       }
       reload();
     } catch (err) {
@@ -207,6 +232,21 @@ export default function SuperAdminStudents() {
               error={formErrors[field.key]?.[0]}
             />
           ))}
+          {customFields.length > 0 && (
+            <div className="space-y-lg pt-md border-t border-outline/10">
+              {customFields.map((f) => (
+                <FormField
+                  key={f.field_id}
+                  field={{
+                    key: f.field_id, label: f.label, type: f.field_type, required: f.required,
+                    options: (f.options || []).map((o) => ({ value: o, label: o })),
+                  }}
+                  value={customFieldValues[f.field_id] ?? ''}
+                  onChange={(v) => setCustomFieldValues((prev) => ({ ...prev, [f.field_id]: v }))}
+                />
+              ))}
+            </div>
+          )}
           <div className="flex justify-end gap-sm pt-md border-t border-outline/10">
             <Button type="button" variant="ghost" onClick={() => setDrawerOpen(false)} disabled={submitting}>
               Cancel
