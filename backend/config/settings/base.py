@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "apps.calendar_app",
     "apps.cms",
     "apps.academics",
+    "apps.finance",
 ]
 
 MIDDLEWARE = [

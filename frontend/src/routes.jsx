@@ -35,6 +35,14 @@ import SuperAdminResults from './pages/SuperAdmin/academic/Results.jsx';
 import SuperAdminAssignments from './pages/SuperAdmin/academic/Assignments.jsx';
 import SuperAdminPromotion from './pages/SuperAdmin/academic/Promotion.jsx';
 import SuperAdminAcademicReports from './pages/SuperAdmin/academic/AcademicReports.jsx';
+import SuperAdminSchoolFees from './pages/SuperAdmin/finance/SchoolFees.jsx';
+import SuperAdminFeeStructures from './pages/SuperAdmin/finance/FeeStructures.jsx';
+import SuperAdminInvoices from './pages/SuperAdmin/finance/Invoices.jsx';
+import SuperAdminPayments from './pages/SuperAdmin/finance/Payments.jsx';
+import SuperAdminReceipts from './pages/SuperAdmin/finance/Receipts.jsx';
+import SuperAdminExpenses from './pages/SuperAdmin/finance/Expenses.jsx';
+import SuperAdminPayroll from './pages/SuperAdmin/finance/Payroll.jsx';
+import SuperAdminFinancialReports from './pages/SuperAdmin/finance/FinancialReports.jsx';
 import SuperAdminSettings from './pages/SuperAdmin/Settings.jsx';
 import SuperAdminAuditLog from './pages/SuperAdmin/AuditLog.jsx';
 import SuperAdminApplicantApprovals from './pages/SuperAdmin/ApplicantApprovals.jsx';
@@ -95,6 +103,14 @@ export const routes = [
   { path: "/super-admin/academic/assignments", label: "Assignments", source: "super_admin_academic_assignments", element: <SuperAdminAssignments /> },
   { path: "/super-admin/academic/promotion", label: "Promotion", source: "super_admin_academic_promotion", element: <SuperAdminPromotion /> },
   { path: "/super-admin/academic/reports", label: "Academic Reports", source: "super_admin_academic_reports", element: <SuperAdminAcademicReports /> },
+  { path: "/super-admin/finance/school-fees", label: "School Fees", source: "super_admin_finance_school_fees", element: <SuperAdminSchoolFees /> },
+  { path: "/super-admin/finance/fee-structures", label: "Fee Structures", source: "super_admin_finance_fee_structures", element: <SuperAdminFeeStructures /> },
+  { path: "/super-admin/finance/invoices", label: "Invoices", source: "super_admin_finance_invoices", element: <SuperAdminInvoices /> },
+  { path: "/super-admin/finance/payments", label: "Payments", source: "super_admin_finance_payments", element: <SuperAdminPayments /> },
+  { path: "/super-admin/finance/receipts", label: "Receipts", source: "super_admin_finance_receipts", element: <SuperAdminReceipts /> },
+  { path: "/super-admin/finance/expenses", label: "Expenses", source: "super_admin_finance_expenses", element: <SuperAdminExpenses /> },
+  { path: "/super-admin/finance/payroll", label: "Payroll", source: "super_admin_finance_payroll", element: <SuperAdminPayroll /> },
+  { path: "/super-admin/finance/reports", label: "Financial Reports", source: "super_admin_finance_reports", element: <SuperAdminFinancialReports /> },
   { path: "/super-admin/settings", label: "System Settings", source: "platform_settings_super_admin", element: <SuperAdminSettings /> },
   { path: "/super-admin/audit", label: "Audit Log", source: "audit_log_super_admin_portal", element: <SuperAdminAuditLog /> },
   { path: "/super-admin/applicants", label: "Applicant Approvals", source: "applicant_approval_queue_super_admin", element: <SuperAdminApplicantApprovals /> },

@@ -30,15 +30,19 @@ def _metric(value, available=True):
 
 
 def build_summary():
+    # Students/Teachers/Attendance/Exams live inside apps.academics (one app,
+    # not the separate apps.students/apps.hr the spec originally sketched —
+    # Teachers in particular reuses accounts.User rather than a dedicated
+    # model, since Staff Management already owns that account data).
+    academics_available = _has("academics")
+    student_count = 0
+    teacher_count = 0
+    if academics_available:
+        student_count = django_apps.get_model("academics", "Student").objects.filter(user__is_deleted=False).count()
+        teacher_count = User.objects.filter(user_type=User.UserType.STAFF, is_deleted=False, is_active=True).count()
     return {
-        "students": _metric(
-            django_apps.get_model("students", "Student").objects.filter(is_deleted=False).count() if _has("students") else 0,
-            available=_has("students"),
-        ),
-        "teachers": _metric(
-            django_apps.get_model("academics", "Teacher").objects.count() if _has("academics") else 0,
-            available=_has("academics"),
-        ),
+        "students": _metric(student_count, available=academics_available),
+        "teachers": _metric(teacher_count, available=academics_available),
         "staff": _metric(
             django_apps.get_model("hr", "Employee").objects.count() if _has("hr") else 0,
             available=_has("hr"),
@@ -49,28 +53,44 @@ def build_summary():
 
 
 def build_financial():
-    if not _has("finance"):
+    finance_available = _has("finance")
+    if not finance_available:
         return {
             "fees_collected": _metric(0, available=False),
             "outstanding_fees": _metric(0, available=False),
             "todays_payments": _metric(0, available=False),
         }
-    payment_model = django_apps.get_model("finance", "Payment")  # wired when apps.finance lands
+    from django.db.models import Sum
+
+    Payment = django_apps.get_model("finance", "Payment")
+    Invoice = django_apps.get_model("finance", "Invoice")
+    completed = Payment.objects.filter(status="completed")
+    total_invoiced = Invoice.objects.aggregate(total=Sum("amount"))["total"] or 0
+    total_collected = completed.aggregate(total=Sum("amount"))["total"] or 0
     return {
-        "fees_collected": _metric(0, available=False),
-        "outstanding_fees": _metric(0, available=False),
-        "todays_payments": _metric(payment_model.objects.filter(created_at__date=date.today()).count()),
+        "fees_collected": _metric(total_collected),
+        "outstanding_fees": _metric(total_invoiced - total_collected),
+        "todays_payments": _metric(completed.filter(paid_at__date=date.today()).count()),
     }
 
 
 def build_academic():
-    attendance_available = _has("attendance")
-    exams_available = _has("exams")
+    # Attendance/Exams also live in apps.academics — see build_summary().
+    academics_available = _has("academics")
+    present_today = absent_today = upcoming_exams = pending_results = 0
+    if academics_available:
+        AttendanceRecord = django_apps.get_model("academics", "AttendanceRecord")
+        Exam = django_apps.get_model("academics", "Exam")
+        today = date.today()
+        present_today = AttendanceRecord.objects.filter(date=today, status="present").count()
+        absent_today = AttendanceRecord.objects.filter(date=today, status="absent").count()
+        upcoming_exams = Exam.objects.filter(start_date__gte=today).count()
+        pending_results = Exam.objects.filter(status="completed").count()
     return {
-        "present_today": _metric(0, available=attendance_available),
-        "absent_today": _metric(0, available=attendance_available),
-        "upcoming_exams": _metric(0, available=exams_available),
-        "pending_results": _metric(0, available=exams_available),
+        "present_today": _metric(present_today, available=academics_available),
+        "absent_today": _metric(absent_today, available=academics_available),
+        "upcoming_exams": _metric(upcoming_exams, available=academics_available),
+        "pending_results": _metric(pending_results, available=academics_available),
     }
 
 

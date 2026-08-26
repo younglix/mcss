@@ -2,7 +2,7 @@ PERMISSIONS = {
     "students":   ["view", "create", "edit", "delete", "export"],
     "attendance": ["view", "create", "edit"],
     "results":    ["view", "enter", "edit", "approve", "publish"],
-    "fees":       ["view", "create", "collect", "refund", "waive"],
+    "fees":       ["view", "create", "edit", "delete", "collect", "refund", "waive"],
     "staff":      ["view", "create", "edit", "delete"],
     "payroll":    ["view", "run", "approve"],
     "config":     ["view", "edit"],
@@ -23,6 +23,7 @@ PERMISSIONS = {
     "assignments":  ["view", "create", "edit", "delete"],
     "promotion":    ["view", "action"],
     "reports":      ["view"],
+    "expenses":     ["view", "create", "edit", "delete"],
     # ...expands per module as later phases land
 }
 
@@ -56,8 +57,10 @@ DEFAULT_ROLES = {
         "name": "Accountant",
         "description": "Bursary staff: fee collection and financial records.",
         "permissions": [
-            "students.view", "fees.view", "fees.create", "fees.collect",
-            "fees.refund", "fees.waive", "dashboard.view",
+            "students.view", "fees.view", "fees.create", "fees.edit", "fees.delete",
+            "fees.collect", "fees.refund", "fees.waive",
+            "expenses.view", "expenses.create", "expenses.edit", "expenses.delete",
+            "dashboard.view", "reports.view",
         ],
     },
     "hr": {

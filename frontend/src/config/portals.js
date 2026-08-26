@@ -84,14 +84,14 @@ export const portals = {
       {
         key: 'finance', label: 'Finance', icon: 'account_balance_wallet',
         children: [
-          { key: 'finance-school-fees', label: 'School Fees', icon: 'payments', path: '/super-admin/finance/school-fees', status: 'planned' },
-          { key: 'finance-fee-structures', label: 'Fee Structures', icon: 'request_quote', path: '/super-admin/finance/fee-structures', status: 'planned' },
-          { key: 'finance-invoices', label: 'Invoices', icon: 'receipt_long', path: '/super-admin/finance/invoices', status: 'planned' },
-          { key: 'finance-payments', label: 'Payments', icon: 'point_of_sale', path: '/super-admin/finance/payments', status: 'planned' },
-          { key: 'finance-receipts', label: 'Receipts', icon: 'receipt', path: '/super-admin/finance/receipts', status: 'planned' },
-          { key: 'finance-expenses', label: 'Expenses', icon: 'trending_down', path: '/super-admin/finance/expenses', status: 'planned' },
-          { key: 'finance-payroll', label: 'Payroll', icon: 'work', path: '/super-admin/finance/payroll', status: 'planned' },
-          { key: 'finance-reports', label: 'Financial Reports', icon: 'bar_chart', path: '/super-admin/finance/reports', status: 'planned' },
+          { key: 'finance-school-fees', label: 'School Fees', icon: 'payments', path: '/super-admin/finance/school-fees', status: 'active' },
+          { key: 'finance-fee-structures', label: 'Fee Structures', icon: 'request_quote', path: '/super-admin/finance/fee-structures', status: 'active' },
+          { key: 'finance-invoices', label: 'Invoices', icon: 'receipt_long', path: '/super-admin/finance/invoices', status: 'active' },
+          { key: 'finance-payments', label: 'Payments', icon: 'point_of_sale', path: '/super-admin/finance/payments', status: 'active' },
+          { key: 'finance-receipts', label: 'Receipts', icon: 'receipt', path: '/super-admin/finance/receipts', status: 'active' },
+          { key: 'finance-expenses', label: 'Expenses', icon: 'trending_down', path: '/super-admin/finance/expenses', status: 'active' },
+          { key: 'finance-payroll', label: 'Payroll', icon: 'work', path: '/super-admin/finance/payroll', status: 'active' },
+          { key: 'finance-reports', label: 'Financial Reports', icon: 'bar_chart', path: '/super-admin/finance/reports', status: 'active' },
         ],
       },
       {
