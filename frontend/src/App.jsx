@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { BrandingProvider } from './context/BrandingContext.jsx';
 import RequireAuth from './components/auth/RequireAuth.jsx';
 import CursorGlow from './components/ui/CursorGlow.jsx';
+import MaintenanceOverlay from './components/ui/MaintenanceOverlay.jsx';
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
       <AuthProvider>
         <UIPreferencesProvider>
           <CursorGlow />
+          <MaintenanceOverlay />
           <Routes>
             {routes.map((route) => (
               <Route

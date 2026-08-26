@@ -111,6 +111,21 @@ DEFAULT_SETTINGS = [
     ("security.lockout_duration_minutes", "security", 15, False),
     ("security.session_timeout_minutes", "security", "", False),
     ("security.notify_on_failed_login", "security", True, False),
+    # System & Maintenance — maintenance_enabled is read by
+    # apps.settings_app.middleware.MaintenanceModeMiddleware on every
+    # request, so toggling it here genuinely blocks non-superadmin access
+    # rather than just recording a preference.
+    ("system.maintenance_enabled", "system", False, False),
+    ("system.maintenance_message", "system", "The system is currently under maintenance. Please check back soon.", False),
+    # Website — SEO/social metadata for the public site; institutional
+    # identity (name, logo, address) stays on configuration.SchoolProfile,
+    # and page content stays on apps.cms.SiteAnnouncement — this is neither.
+    ("website.meta_title", "website", "", False),
+    ("website.meta_description", "website", "", False),
+    ("website.social_facebook", "website", "", False),
+    ("website.social_twitter", "website", "", False),
+    ("website.social_instagram", "website", "", False),
+    ("website.footer_text", "website", "", False),
 ]
 
 

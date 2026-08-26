@@ -21,9 +21,11 @@ class AuditLogSerializer(serializers.ModelSerializer):
 
 
 class LoginHistorySerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source="user.full_name", default=None, read_only=True)
+
     class Meta:
         model = LoginHistory
-        fields = ["id", "user", "successful", "ip_address", "user_agent", "created_at"]
+        fields = ["id", "user", "user_name", "successful", "ip_address", "user_agent", "created_at"]
         read_only_fields = fields
 
 

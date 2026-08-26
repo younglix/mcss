@@ -87,6 +87,9 @@ async function request(path, { method = 'GET', body, auth = true, retry = true }
   }
 
   if (!res.ok || (payload && payload.success === false)) {
+    if (res.status === 503 && payload?.errors?.code === 'maintenance_mode') {
+      window.dispatchEvent(new CustomEvent('mcss:maintenance', { detail: { message: payload.message } }));
+    }
     throw new ApiError(payload?.message || `Request failed (${res.status})`, {
       status: res.status,
       errors: payload?.errors,
