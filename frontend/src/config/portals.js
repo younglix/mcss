@@ -119,46 +119,30 @@ export const portals = {
         ],
       },
       {
-        key: 'communication', label: 'Communication & Public Website', icon: 'campaign',
+        // Replaces the former separate "Communication & Public Website",
+        // "Configuration", and "System" sections — see portals.js audit
+        // notes (2026-08) for what was merged/removed/kept. Roles &
+        // Permissions and Academic Sessions/Classes & Departments were
+        // duplicated 2-4x across those sections; they're linked once here
+        // (Users & Security) and remain reachable via Administration too,
+        // rather than triplicated. Audit Logs/Login History and System
+        // Settings previously claimed 'active' while rendering static mock
+        // data — status reflects real state until each phase lands.
+        key: 'system-config', label: 'System & Config', icon: 'settings_applications',
         children: [
-          { key: 'comm-notices', label: 'Notices / Announcements', icon: 'campaign', path: '/super-admin/communication/notices', status: 'planned' },
-          { key: 'comm-sms', label: 'SMS', icon: 'sms', path: '/super-admin/communication/sms', status: 'planned' },
-          { key: 'comm-email', label: 'Email', icon: 'mail', path: '/super-admin/communication/email', status: 'planned' },
-          { key: 'comm-push', label: 'Push Notifications', icon: 'notifications_active', path: '/super-admin/communication/push', status: 'planned' },
-          { key: 'comm-parent', label: 'Parent Communication', icon: 'family_restroom', path: '/super-admin/communication/parent', status: 'planned' },
-          { key: 'comm-website', label: 'Website', icon: 'public', path: '/super-admin/communication/website', status: 'planned' },
-          { key: 'comm-gallery', label: 'Gallery', icon: 'photo_library', path: '/super-admin/communication/gallery', status: 'planned' },
-          { key: 'comm-events', label: 'Events', icon: 'event_available', path: '/super-admin/communication/events', status: 'planned' },
-        ],
-      },
-      {
-        key: 'configuration-engine', label: 'Configuration', icon: 'tune',
-        children: [
-          { key: 'config-name-logo', label: 'School Name & Logo', icon: 'domain', path: '/super-admin/configuration', status: 'active' },
-          { key: 'config-address-contact', label: 'Address & Contact', icon: 'contact_mail', path: '/super-admin/configuration', status: 'active' },
-          { key: 'config-sessions', label: 'Academic Sessions', icon: 'calendar_month', path: '/super-admin/administration/academic-session-terms', status: 'active' },
-          { key: 'config-grading', label: 'Grading System', icon: 'grading', path: '/super-admin/configuration/grading', status: 'planned' },
-          { key: 'config-fee-categories', label: 'Fee Categories', icon: 'sell', path: '/super-admin/configuration/fee-categories', status: 'planned' },
-          { key: 'config-classes-departments', label: 'Classes & Departments', icon: 'class', path: '/super-admin/administration/classes-arms', status: 'active' },
-          { key: 'config-user-roles', label: 'User Roles', icon: 'admin_panel_settings', path: '/super-admin/roles', status: 'active' },
-          { key: 'config-permissions', label: 'Permissions', icon: 'verified_user', path: '/super-admin/roles', status: 'active' },
-          { key: 'config-sms-settings', label: 'SMS Settings', icon: 'sms', path: '/super-admin/settings', status: 'active' },
-          { key: 'config-email-settings', label: 'Email Settings', icon: 'mail', path: '/super-admin/settings', status: 'active' },
-          { key: 'config-payment-gateway', label: 'Payment Gateway', icon: 'credit_card', path: '/super-admin/settings', status: 'active' },
-          { key: 'config-notification-settings', label: 'Notification Settings', icon: 'notifications_active', path: '/super-admin/settings', status: 'active' },
-          { key: 'config-result-settings', label: 'Result Settings', icon: 'grading', path: '/super-admin/settings', status: 'active' },
-          { key: 'config-numbering-formats', label: 'Numbering Formats', icon: 'tag', path: '/super-admin/settings', status: 'active' },
-        ],
-      },
-      {
-        key: 'system', label: 'System', icon: 'settings_applications',
-        children: [
-          { key: 'system-roles-permissions', label: 'Roles & Permissions', icon: 'admin_panel_settings', path: '/super-admin/roles', status: 'active' },
-          { key: 'system-custom-forms', label: 'Custom Forms (Form Builder)', icon: 'dynamic_form', path: '/super-admin/system/custom-forms', status: 'planned' },
-          { key: 'system-audit-logs', label: 'Audit Logs', icon: 'history', path: '/super-admin/audit', status: 'active' },
-          { key: 'system-login-history', label: 'Login History', icon: 'login', path: '/super-admin/audit', status: 'active' },
-          { key: 'system-backup-security', label: 'Backup & Security', icon: 'backup', path: '/super-admin/system/backup-security', status: 'planned' },
-          { key: 'system-settings', label: 'System Settings', icon: 'settings', path: '/super-admin/settings', status: 'active' },
+          { key: 'sc-general', label: 'General', icon: 'domain', path: '/super-admin/system-config/general', status: 'active' },
+          { key: 'sc-appearance', label: 'Appearance', icon: 'palette', path: '/super-admin/system-config/appearance', status: 'active' },
+          { key: 'sc-academic', label: 'Academic', icon: 'grading', path: '/super-admin/system-config/academic', status: 'planned' },
+          { key: 'sc-student-admission', label: 'Student & Admission', icon: 'school', path: '/super-admin/system-config/student-admission', status: 'planned' },
+          { key: 'sc-staff-hr', label: 'Staff & HR', icon: 'badge', path: '/super-admin/system-config/staff-hr', status: 'planned' },
+          { key: 'sc-finance', label: 'Finance', icon: 'payments', path: '/super-admin/system-config/finance', status: 'planned' },
+          { key: 'sc-communication', label: 'Communication', icon: 'campaign', path: '/super-admin/system-config/communication', status: 'planned' },
+          { key: 'sc-users-security', label: 'Users & Security', icon: 'admin_panel_settings', path: '/super-admin/roles', status: 'active' },
+          { key: 'sc-forms', label: 'Forms & Custom Fields', icon: 'dynamic_form', path: '/super-admin/system-config/forms', status: 'planned' },
+          { key: 'sc-documents', label: 'Documents & Templates', icon: 'description', path: '/super-admin/system-config/documents', status: 'planned' },
+          { key: 'sc-website', label: 'Website', icon: 'public', path: '/super-admin/system-config/website', status: 'planned' },
+          { key: 'sc-maintenance', label: 'System & Maintenance', icon: 'build', path: '/super-admin/system-config/maintenance', status: 'planned' },
+          { key: 'sc-integrations', label: 'Integrations', icon: 'integration_instructions', path: '/super-admin/system-config/integrations', status: 'planned' },
         ],
       },
     ],

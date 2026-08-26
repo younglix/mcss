@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
 from apps.audit.services import log
+from apps.configuration.models import SchoolProfile
 from apps.rbac.permissions import HasPermission
 from common.responses import failure, success
 
@@ -13,6 +15,27 @@ class SettingsPermissionMixin:
     def get_permissions(self):
         code = "settings.view" if self.request.method in ("GET", "HEAD", "OPTIONS") else "settings.edit"
         return [HasPermission(code)]
+
+
+class PublicBrandingView(APIView):
+    """Unauthenticated — only the handful of fields safe to show before
+    login (wordmark, logo, theme colors). Never route secret-group keys
+    through here; use SettingsListView (auth-gated) for anything else."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        profile = SchoolProfile.objects.first()
+        appearance = {s.key: s.value for s in SystemSetting.objects.filter(group="appearance", is_secret=False)}
+        return success(data={
+            "name": profile.name if profile else "",
+            "short_name": profile.short_name if profile else "",
+            "logo": profile.logo if profile else "",
+            "favicon": profile.favicon if profile else "",
+            "motto": profile.motto if profile else "",
+            "primary_color": appearance.get("appearance.primary_color", ""),
+            "secondary_color": appearance.get("appearance.secondary_color", ""),
+        })
 
 
 class SettingsListView(SettingsPermissionMixin, APIView):

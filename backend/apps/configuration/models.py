@@ -5,10 +5,16 @@ from common.models import BaseModel
 
 class SchoolProfile(BaseModel):
     name = models.CharField(max_length=200)
+    short_name = models.CharField(max_length=50, blank=True)
     logo = models.URLField(blank=True)
+    favicon = models.URLField(blank=True)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)
+    website = models.URLField(blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True)
     motto = models.CharField(max_length=200, blank=True)
 
     class Meta(BaseModel.Meta):

@@ -15,7 +15,10 @@ from .models import (
 class SchoolProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = SchoolProfile
-        fields = ["id", "name", "logo", "address", "phone", "email", "motto"]
+        fields = [
+            "id", "name", "short_name", "logo", "favicon", "address", "phone", "email",
+            "website", "country", "state", "city", "motto",
+        ]
 
 
 class TermSerializer(serializers.ModelSerializer):

@@ -3,7 +3,7 @@ import Avatar from '../ui/Avatar.jsx';
 import IconButton from '../ui/IconButton.jsx';
 import PreferenceControls from '../ui/PreferenceControls.jsx';
 
-const logoUrl = '/mcss-logo.png';
+const DEFAULT_LOGO = '/mcss-logo.png';
 
 /**
  * Minimal top bar per the "Institutional Heritage" reference: wordmark,
@@ -12,6 +12,7 @@ const logoUrl = '/mcss-logo.png';
  */
 export default function TopHeader({
   wordmark,
+  logoUrl,
   homePath = '/',
   onSearchClick,
   notificationCount = 0,
@@ -23,7 +24,7 @@ export default function TopHeader({
     <header className="sticky top-0 z-30 bg-surface border-b border-outline-variant h-16 flex items-center px-md sm:px-gutter">
       <div className="flex items-center justify-between w-full max-w-container-max mx-auto">
         <Link to={homePath} className="flex items-center gap-sm min-w-0">
-          <img src={logoUrl} alt="" className="w-9 h-9 object-contain shrink-0" />
+          <img src={logoUrl || DEFAULT_LOGO} alt="" className="w-9 h-9 object-contain shrink-0" />
           <span className="font-headline-md text-headline-sm sm:text-headline-md text-primary font-bold truncate">{wordmark}</span>
         </Link>
         <div className="flex items-center gap-xs shrink-0">
