@@ -97,13 +97,13 @@ export const portals = {
       {
         key: 'student-services', label: 'Student Services', icon: 'family_restroom',
         children: [
-          { key: 'services-library', label: 'Library', icon: 'menu_book', path: '/super-admin/student-services/library', status: 'planned' },
-          { key: 'services-hostel', label: 'Hostel', icon: 'holiday_village', path: '/super-admin/student-services/hostel', status: 'planned' },
-          { key: 'services-transport', label: 'Transport', icon: 'directions_bus', path: '/super-admin/student-services/transport', status: 'planned' },
-          { key: 'services-mess', label: 'School Meals / Mess', icon: 'restaurant', path: '/super-admin/student-services/mess', status: 'planned' },
-          { key: 'services-activities', label: 'Activities', icon: 'sports_soccer', path: '/super-admin/student-services/activities', status: 'planned' },
-          { key: 'services-resources', label: 'Student Resources', icon: 'folder_shared', path: '/super-admin/student-services/resources', status: 'planned' },
-          { key: 'services-health', label: 'Health / Medical Records', icon: 'medical_services', path: '/super-admin/student-services/health', status: 'planned' },
+          { key: 'services-library', label: 'Library', icon: 'menu_book', path: '/super-admin/student-services/library', status: 'active' },
+          { key: 'services-hostel', label: 'Hostel', icon: 'holiday_village', path: '/super-admin/student-services/hostel', status: 'active' },
+          { key: 'services-transport', label: 'Transport', icon: 'directions_bus', path: '/super-admin/student-services/transport', status: 'active' },
+          { key: 'services-mess', label: 'School Meals / Mess', icon: 'restaurant', path: '/super-admin/student-services/mess', status: 'active' },
+          { key: 'services-activities', label: 'Activities', icon: 'sports_soccer', path: '/super-admin/student-services/activities', status: 'active' },
+          { key: 'services-resources', label: 'Student Resources', icon: 'folder_shared', path: '/super-admin/student-services/resources', status: 'active' },
+          { key: 'services-health', label: 'Health / Medical Records', icon: 'medical_services', path: '/super-admin/student-services/health', status: 'active' },
         ],
       },
       {
@@ -114,9 +114,9 @@ export const portals = {
           { key: 'ops-inventory', label: 'Inventory', icon: 'inventory_2', path: '/super-admin/operations/inventory', status: 'planned' },
           { key: 'ops-assets', label: 'Assets', icon: 'warehouse', path: '/super-admin/operations/assets', status: 'planned' },
           { key: 'ops-reception', label: 'Reception', icon: 'support_agent', path: '/super-admin/administration/reception', status: 'active' },
-          { key: 'ops-transport', label: 'Transport', icon: 'directions_bus', path: '/super-admin/student-services/transport', status: 'planned' },
-          { key: 'ops-hostel', label: 'Hostel', icon: 'holiday_village', path: '/super-admin/student-services/hostel', status: 'planned' },
-          { key: 'ops-mess', label: 'Mess', icon: 'restaurant', path: '/super-admin/student-services/mess', status: 'planned' },
+          { key: 'ops-transport', label: 'Transport', icon: 'directions_bus', path: '/super-admin/student-services/transport', status: 'active' },
+          { key: 'ops-hostel', label: 'Hostel', icon: 'holiday_village', path: '/super-admin/student-services/hostel', status: 'active' },
+          { key: 'ops-mess', label: 'Mess', icon: 'restaurant', path: '/super-admin/student-services/mess', status: 'active' },
         ],
       },
       {

@@ -35,6 +35,13 @@ import SuperAdminResults from './pages/SuperAdmin/academic/Results.jsx';
 import SuperAdminAssignments from './pages/SuperAdmin/academic/Assignments.jsx';
 import SuperAdminPromotion from './pages/SuperAdmin/academic/Promotion.jsx';
 import SuperAdminAcademicReports from './pages/SuperAdmin/academic/AcademicReports.jsx';
+import SuperAdminLibrary from './pages/SuperAdmin/student-services/Library.jsx';
+import SuperAdminHostel from './pages/SuperAdmin/student-services/Hostel.jsx';
+import SuperAdminTransport from './pages/SuperAdmin/student-services/Transport.jsx';
+import SuperAdminMess from './pages/SuperAdmin/student-services/Mess.jsx';
+import SuperAdminActivities from './pages/SuperAdmin/student-services/Activities.jsx';
+import SuperAdminResources from './pages/SuperAdmin/student-services/Resources.jsx';
+import SuperAdminHealth from './pages/SuperAdmin/student-services/Health.jsx';
 import SuperAdminSchoolFees from './pages/SuperAdmin/finance/SchoolFees.jsx';
 import SuperAdminFeeStructures from './pages/SuperAdmin/finance/FeeStructures.jsx';
 import SuperAdminInvoices from './pages/SuperAdmin/finance/Invoices.jsx';
@@ -103,6 +110,13 @@ export const routes = [
   { path: "/super-admin/academic/assignments", label: "Assignments", source: "super_admin_academic_assignments", element: <SuperAdminAssignments /> },
   { path: "/super-admin/academic/promotion", label: "Promotion", source: "super_admin_academic_promotion", element: <SuperAdminPromotion /> },
   { path: "/super-admin/academic/reports", label: "Academic Reports", source: "super_admin_academic_reports", element: <SuperAdminAcademicReports /> },
+  { path: "/super-admin/student-services/library", label: "Library", source: "super_admin_student_services_library", element: <SuperAdminLibrary /> },
+  { path: "/super-admin/student-services/hostel", label: "Hostel", source: "super_admin_student_services_hostel", element: <SuperAdminHostel /> },
+  { path: "/super-admin/student-services/transport", label: "Transport", source: "super_admin_student_services_transport", element: <SuperAdminTransport /> },
+  { path: "/super-admin/student-services/mess", label: "School Meals / Mess", source: "super_admin_student_services_mess", element: <SuperAdminMess /> },
+  { path: "/super-admin/student-services/activities", label: "Activities", source: "super_admin_student_services_activities", element: <SuperAdminActivities /> },
+  { path: "/super-admin/student-services/resources", label: "Student Resources", source: "super_admin_student_services_resources", element: <SuperAdminResources /> },
+  { path: "/super-admin/student-services/health", label: "Health / Medical Records", source: "super_admin_student_services_health", element: <SuperAdminHealth /> },
   { path: "/super-admin/finance/school-fees", label: "School Fees", source: "super_admin_finance_school_fees", element: <SuperAdminSchoolFees /> },
   { path: "/super-admin/finance/fee-structures", label: "Fee Structures", source: "super_admin_finance_fee_structures", element: <SuperAdminFeeStructures /> },
   { path: "/super-admin/finance/invoices", label: "Invoices", source: "super_admin_finance_invoices", element: <SuperAdminInvoices /> },

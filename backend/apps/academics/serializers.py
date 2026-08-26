@@ -264,8 +264,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
 class PromotionRecordSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source="student.user.full_name", read_only=True)
-    from_class_arm_label = serializers.CharField(source="from_class_arm.__str__", read_only=True, default=None)
-    to_class_arm_label = serializers.CharField(source="to_class_arm.__str__", read_only=True, default=None)
+    from_class_arm_label = serializers.SerializerMethodField()
+    to_class_arm_label = serializers.SerializerMethodField()
 
     class Meta:
         model = PromotionRecord
@@ -275,6 +275,12 @@ class PromotionRecordSerializer(serializers.ModelSerializer):
             "outcome", "promoted_by", "promoted_at",
         ]
         read_only_fields = fields
+
+    def get_from_class_arm_label(self, obj):
+        return str(obj.from_class_arm) if obj.from_class_arm else None
+
+    def get_to_class_arm_label(self, obj):
+        return str(obj.to_class_arm) if obj.to_class_arm else None
 
 
 class PromotionActionSerializer(serializers.Serializer):

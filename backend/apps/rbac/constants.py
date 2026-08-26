@@ -24,6 +24,13 @@ PERMISSIONS = {
     "promotion":    ["view", "action"],
     "reports":      ["view"],
     "expenses":     ["view", "create", "edit", "delete"],
+    "library":      ["view", "create", "edit", "delete"],
+    "hostel":       ["view", "create", "edit", "delete", "allocate"],
+    "transport":    ["view", "create", "edit", "delete", "assign"],
+    "mess":         ["view", "create", "edit", "delete"],
+    "activities":   ["view", "create", "edit", "delete", "enroll"],
+    "resources":    ["view", "create", "edit", "delete"],
+    "health":       ["view", "create", "edit", "delete"],
     # ...expands per module as later phases land
 }
 
