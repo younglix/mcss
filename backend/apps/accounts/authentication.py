@@ -1,9 +1,23 @@
+from datetime import timedelta
+
 from rest_framework_simplejwt.authentication import JWTAuthentication as BaseJWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from apps.settings_app.models import SystemSetting
 
 
 class JWTAuthentication(BaseJWTAuthentication):
     """Hook point for auth customization; behaves as simplejwt's default for now."""
+
+
+def _configured_session_timeout_minutes():
+    setting = SystemSetting.objects.filter(key="security.session_timeout_minutes").first()
+    if setting and setting.value:
+        try:
+            return int(setting.value)
+        except (TypeError, ValueError):
+            pass
+    return None
 
 
 def _resolve_role_slugs(user):
@@ -38,6 +52,11 @@ def issue_tokens_for_user(user):
     access = refresh.access_token
     for key, value in claims.items():
         access[key] = value
+    # Users & Security's "session timeout" setting, applied live to each
+    # issued token — no redeploy needed for a policy change to take effect.
+    timeout_minutes = _configured_session_timeout_minutes()
+    if timeout_minutes:
+        access.set_exp(lifetime=timedelta(minutes=timeout_minutes))
     # lets a request identify which UserSession (keyed by refresh jti) issued
     # the access token that authenticated it, e.g. for "current session" flags
     access["refresh_jti"] = refresh["jti"]

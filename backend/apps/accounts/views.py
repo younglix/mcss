@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 
 from django.conf import settings
@@ -17,7 +18,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.audit.models import LoginHistory
 from apps.audit.services import client_ip, log, user_agent
+from apps.notifications.services import dispatch
 from apps.rbac.permissions import HasPermission, get_effective_permissions
+from apps.settings_app.models import SystemSetting
 from common.responses import failure, success
 
 from .authentication import issue_tokens_for_user
@@ -61,6 +64,43 @@ def _build_auth_payload(user, request):
     }
 
 
+def _security_setting(key, default):
+    setting = SystemSetting.objects.filter(key=key).first()
+    if setting is None or setting.value in (None, ""):
+        return default
+    return setting.value
+
+
+def _is_locked_out(user):
+    """Rolling-window lockout: too many failed attempts within the last
+    `lockout_duration_minutes` blocks login, and lifts on its own as old
+    failures age out of the window — no extra "locked_until" field needed,
+    LoginHistory (already recorded on every attempt) is the source of truth."""
+    max_attempts = int(_security_setting("security.max_login_attempts", 5))
+    if max_attempts <= 0:
+        return False
+    window_minutes = int(_security_setting("security.lockout_duration_minutes", 15))
+    since = timezone.now() - timedelta(minutes=window_minutes)
+    recent_failures = LoginHistory.objects.filter(user=user, successful=False, created_at__gte=since).count()
+    return recent_failures >= max_attempts
+
+
+def _maybe_alert_on_lockout(user, request):
+    if not _security_setting("security.notify_on_failed_login", True):
+        return
+    try:
+        dispatch(
+            recipient=user,
+            title="Security alert: account locked",
+            body=f"Your account was temporarily locked after too many failed login attempts from {client_ip(request) or 'an unknown IP'}.",
+            category="security",
+        )
+    except Exception:
+        # Never let a notification-delivery failure break the lockout
+        # response itself — the account is still locked either way.
+        logging.getLogger(__name__).exception("Failed to dispatch lockout security alert for user %s.", user.id)
+
+
 def _generate_otp():
     return get_random_string(length=settings.OTP_LENGTH, allowed_chars="0123456789")
 
@@ -87,12 +127,25 @@ class LoginView(APIView):
     throttle_scope = "auth"
 
     def post(self, request):
+        login_value = str(request.data.get("login", "")).strip()
+        candidate = User.objects.filter(
+            Q(email__iexact=login_value) | Q(identifier__iexact=login_value) | Q(phone=login_value)
+        ).first()
+
+        if candidate and _is_locked_out(candidate):
+            return failure(
+                message="This account is temporarily locked due to too many failed login attempts. Try again later.",
+                status=423,
+            )
+
         serializer = LoginSerializer(data=request.data)
         if not serializer.is_valid():
             LoginHistory.objects.create(
-                user=None, successful=False,
+                user=candidate, successful=False,
                 ip_address=client_ip(request), user_agent=user_agent(request)[:300],
             )
+            if candidate and _is_locked_out(candidate):
+                _maybe_alert_on_lockout(candidate, request)
             return failure(message="Invalid credentials.", errors=serializer.errors, status=401)
 
         user = serializer.validated_data["user"]

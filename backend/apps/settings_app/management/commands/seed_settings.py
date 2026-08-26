@@ -96,6 +96,21 @@ DEFAULT_SETTINGS = [
     ("finance.financial_year_start_month", "finance", 1, False),
     ("finance.default_discount_percent", "finance", 0, False),
     ("finance.tax_percent", "finance", 0, False),
+    # Users & Security — genuinely enforced: password policy feeds
+    # apps.accounts.validators.ConfigurablePasswordValidator (wired into
+    # AUTH_PASSWORD_VALIDATORS, so it applies to every password entry
+    # point), login-attempt limits and the notify flag drive LoginView's
+    # rolling-window lockout, and session timeout controls issued JWT
+    # access-token lifetime (see apps.accounts.authentication). Role
+    # definitions themselves are NOT duplicated here — see Roles & Permissions.
+    ("security.password_min_length", "security", 8, False),
+    ("security.password_require_uppercase", "security", False, False),
+    ("security.password_require_number", "security", False, False),
+    ("security.password_require_symbol", "security", False, False),
+    ("security.max_login_attempts", "security", 5, False),
+    ("security.lockout_duration_minutes", "security", 15, False),
+    ("security.session_timeout_minutes", "security", "", False),
+    ("security.notify_on_failed_login", "security", True, False),
 ]
 
 
