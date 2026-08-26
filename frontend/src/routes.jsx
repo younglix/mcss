@@ -60,6 +60,7 @@ import SuperAdminAcademicSettings from './pages/SuperAdmin/system-config/Academi
 import SuperAdminStudentAdmissionSettings from './pages/SuperAdmin/system-config/StudentAdmission.jsx';
 import SuperAdminStaffHRSettings from './pages/SuperAdmin/system-config/StaffHR.jsx';
 import SuperAdminFinanceSettings from './pages/SuperAdmin/system-config/Finance.jsx';
+import SuperAdminCommunicationSettings from './pages/SuperAdmin/system-config/Communication.jsx';
 import SuperAdminSettings from './pages/SuperAdmin/Settings.jsx';
 import SuperAdminAuditLog from './pages/SuperAdmin/AuditLog.jsx';
 import SuperAdminApplicantApprovals from './pages/SuperAdmin/ApplicantApprovals.jsx';
@@ -145,6 +146,7 @@ export const routes = [
   { path: "/super-admin/system-config/student-admission", label: "Student & Admission Settings", source: "super_admin_system_config_student_admission", element: <SuperAdminStudentAdmissionSettings /> },
   { path: "/super-admin/system-config/staff-hr", label: "Staff & HR Settings", source: "super_admin_system_config_staff_hr", element: <SuperAdminStaffHRSettings /> },
   { path: "/super-admin/system-config/finance", label: "Finance Settings", source: "super_admin_system_config_finance", element: <SuperAdminFinanceSettings /> },
+  { path: "/super-admin/system-config/communication", label: "Communication Settings", source: "super_admin_system_config_communication", element: <SuperAdminCommunicationSettings /> },
   { path: "/super-admin/settings", label: "System Settings", source: "platform_settings_super_admin", element: <SuperAdminSettings /> },
   { path: "/super-admin/audit", label: "Audit Log", source: "audit_log_super_admin_portal", element: <SuperAdminAuditLog /> },
   { path: "/super-admin/applicants", label: "Applicant Approvals", source: "applicant_approval_queue_super_admin", element: <SuperAdminApplicantApprovals /> },

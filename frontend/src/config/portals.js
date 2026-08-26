@@ -136,7 +136,7 @@ export const portals = {
           { key: 'sc-student-admission', label: 'Student & Admission', icon: 'school', path: '/super-admin/system-config/student-admission', status: 'active' },
           { key: 'sc-staff-hr', label: 'Staff & HR', icon: 'badge', path: '/super-admin/system-config/staff-hr', status: 'active' },
           { key: 'sc-finance', label: 'Finance', icon: 'payments', path: '/super-admin/system-config/finance', status: 'active' },
-          { key: 'sc-communication', label: 'Communication', icon: 'campaign', path: '/super-admin/system-config/communication', status: 'planned' },
+          { key: 'sc-communication', label: 'Communication', icon: 'campaign', path: '/super-admin/system-config/communication', status: 'active' },
           { key: 'sc-users-security', label: 'Users & Security', icon: 'admin_panel_settings', path: '/super-admin/roles', status: 'active' },
           { key: 'sc-forms', label: 'Forms & Custom Fields', icon: 'dynamic_form', path: '/super-admin/system-config/forms', status: 'planned' },
           { key: 'sc-documents', label: 'Documents & Templates', icon: 'description', path: '/super-admin/system-config/documents', status: 'planned' },
