@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @page { size: A4; margin: 2cm; }
+  body { font-family: Helvetica, Arial, sans-serif; color: #1a1a1a; font-size: 11pt; }
+  .header { border-bottom: 2px solid {{ primary_color }}; padding-bottom: 12px; margin-bottom: 20px; }
+  .logo { height: 48px; }
+  .school-name { font-size: 18pt; font-weight: bold; color: {{ primary_color }}; margin: 0; }
+  .school-meta { font-size: 9pt; color: #555555; margin: 2px 0 0 0; }
+  .title { text-align: center; font-size: 14pt; font-weight: bold; letter-spacing: 2px; margin: 18px 0; color: {{ primary_color }}; }
+  .meta-table { width: 100%; margin-bottom: 16px; }
+  .meta-table td { padding: 2px 0; font-size: 10pt; }
+  .meta-label { color: #555555; width: 130px; }
+  .items-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .items-table th { background-color: {{ primary_color }}; color: #ffffff; text-align: left; padding: 8px 10px; font-size: 10pt; }
+  .items-table td { padding: 8px 10px; border-bottom: 1px solid #dddddd; font-size: 10pt; }
+  .amount-row td { font-weight: bold; font-size: 12pt; padding-top: 12px; }
+  .footer { margin-top: 40px; font-size: 8.5pt; color: #888888; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="header">
+    {% if show_branding and logo_url %}<img class="logo" src="{{ logo_url }}" /><br/>{% endif %}
+    <p class="school-name">{{ school_name }}</p>
+    {% if school_address %}<p class="school-meta">{{ school_address }}</p>{% endif %}
+    {% if school_contact %}<p class="school-meta">{{ school_contact }}</p>{% endif %}
+  </div>
+
+  <div class="title">PAYMENT RECEIPT</div>
+
+  <table class="meta-table">
+    <tr><td class="meta-label">Receipt No.</td><td>{{ receipt_number }}</td>
+        <td class="meta-label">Date</td><td>{{ paid_at }}</td></tr>
+    <tr><td class="meta-label">Student</td><td>{{ student_name }}</td>
+        <td class="meta-label">Class</td><td>{{ student_class }}</td></tr>
+    <tr><td class="meta-label">Admission No.</td><td>{{ student_identifier }}</td>
+        <td class="meta-label">Invoice No.</td><td>{{ invoice_number }}</td></tr>
+  </table>
+
+  <table class="items-table">
+    <thead>
+      <tr><th>Description</th><th>Method</th><th>Reference</th><th style="text-align:right;">Amount</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ invoice_description }}</td>
+        <td>{{ method }}</td>
+        <td>{{ reference }}</td>
+        <td style="text-align:right;">{{ currency_symbol }}{{ amount }}</td>
+      </tr>
+      <tr class="amount-row">
+        <td colspan="3" style="text-align:right;">Amount Paid</td>
+        <td style="text-align:right;">{{ currency_symbol }}{{ amount }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    This is a system-generated receipt from {{ school_name }}. Generated on {{ generated_at }}.
+  </div>
+</body>
+</html>

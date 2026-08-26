@@ -1,15 +1,19 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q, Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
+from xhtml2pdf import pisa
 
 from apps.academics.models import Student
 from apps.audit.services import log
-from apps.configuration.models import AcademicSession
+from apps.configuration.models import AcademicSession, SchoolProfile
 from apps.rbac.permissions import HasPermission
+from apps.settings_app.models import SystemSetting
 from common.responses import success
 
 from .models import Expense, FeeStructure, Invoice, Payment, PayrollRun, Payslip, StaffSalary
@@ -197,6 +201,71 @@ class PaymentsView(APIView):
         payment.invoice.refresh_status()
         log(actor=request.user, action="finance.payment_recorded", target=payment, request=request)
         return success(message="Payment recorded.", data=PaymentSerializer(payment).data, status=201)
+
+
+class PaymentReceiptPDFView(APIView):
+    """Proves real, server-rendered PDF generation end-to-end (Documents &
+    Templates, Phase 6): renders an HTML letterhead — pulling the school's
+    identity from configuration.SchoolProfile and the brand color + the
+    invoice-branding toggle from Appearance settings, both already real,
+    already-configurable settings — through xhtml2pdf, and streams the
+    result directly rather than writing to MEDIA_ROOT (nothing in this repo
+    serves media files in production yet, so streaming needs no new infra)."""
+
+    permission_classes = [HasPermission("fees.view")]
+
+    def get(self, request, payment_id):
+        payment = get_object_or_404(
+            Payment.objects.select_related("invoice__student__user", "invoice__student__class_arm__school_class"),
+            id=payment_id,
+        )
+        profile = SchoolProfile.objects.first()
+        settings_by_key = {
+            s.key: s.value for s in SystemSetting.objects.filter(key__in=[
+                "appearance.primary_color", "appearance.invoice_branding_enabled",
+                "general.currency_symbol", "general.currency",
+            ])
+        }
+        student = payment.invoice.student
+        contact_parts = [p for p in [profile.phone if profile else "", profile.email if profile else ""] if p]
+
+        # xhtml2pdf's default fonts only cover Latin-1 — a configured symbol
+        # outside that range (e.g. "₦") would otherwise render as a missing-
+        # glyph box, so fall back to a plain 3-letter code rather than
+        # bundling/maintaining a Unicode font just for this one case.
+        currency_symbol = settings_by_key.get("general.currency_symbol") or ""
+        try:
+            currency_symbol.encode("latin-1")
+        except UnicodeEncodeError:
+            currency_symbol = (settings_by_key.get("general.currency") or "") + " "
+
+        html = render_to_string("finance/receipt.html", {
+            "show_branding": bool(settings_by_key.get("appearance.invoice_branding_enabled", True)),
+            "logo_url": profile.logo if profile else "",
+            "school_name": profile.name if profile else "School",
+            "school_address": profile.address if profile else "",
+            "school_contact": " · ".join(contact_parts),
+            "primary_color": settings_by_key.get("appearance.primary_color") or "#2e004a",
+            "currency_symbol": currency_symbol,
+            "receipt_number": payment.receipt_number,
+            "paid_at": payment.paid_at.strftime("%d %b %Y"),
+            "student_name": student.user.full_name,
+            "student_class": str(student.class_arm) if student.class_arm else "—",
+            "student_identifier": student.user.identifier or "—",
+            "invoice_number": payment.invoice.invoice_number,
+            "invoice_description": payment.invoice.description,
+            "method": payment.get_method_display(),
+            "reference": payment.reference or "—",
+            "amount": f"{payment.amount:,.2f}",
+            "generated_at": timezone.now().strftime("%d %b %Y, %I:%M %p"),
+        })
+
+        pdf_buffer = HttpResponse(content_type="application/pdf")
+        pdf_buffer["Content-Disposition"] = f'inline; filename="receipt-{payment.receipt_number}.pdf"'
+        pisa_status = pisa.CreatePDF(html, dest=pdf_buffer)
+        if pisa_status.err:
+            return HttpResponse("Could not generate receipt PDF.", status=500)
+        return pdf_buffer
 
 
 class PaymentRefundView(APIView):

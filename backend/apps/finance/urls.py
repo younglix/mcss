@@ -15,6 +15,7 @@ urlpatterns = [
 
     path("payments", views.PaymentsView.as_view(), name="finance-payments"),
     path("payments/<uuid:payment_id>/refund", views.PaymentRefundView.as_view(), name="finance-payment-refund"),
+    path("payments/<uuid:payment_id>/receipt.pdf", views.PaymentReceiptPDFView.as_view(), name="finance-payment-receipt-pdf"),
 
     path("expenses", views.ExpensesView.as_view(), name="finance-expenses"),
     path("expenses/<uuid:expense_id>", views.ExpenseDetailView.as_view(), name="finance-expense-detail"),
