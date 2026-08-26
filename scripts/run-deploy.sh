@@ -12,6 +12,12 @@ cd backend
 ./.venv/bin/pip install -q -r requirements.txt
 ./.venv/bin/python manage.py migrate --noinput
 ./.venv/bin/python manage.py collectstatic --noinput
+# Both commands only create rows for keys/permissions that don't exist yet
+# (see seed_rbac.py / seed_settings.py) — safe to run on every deploy so a
+# phase that adds new permission or settings keys doesn't need a manual
+# follow-up SSH step to actually seed them.
+./.venv/bin/python manage.py seed_rbac
+./.venv/bin/python manage.py seed_settings
 cd ..
 
 echo "--- frontend ---"
