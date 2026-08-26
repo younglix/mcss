@@ -34,9 +34,12 @@ export const portals = {
     // this order, with these exact labels. Items with a real page behind
     // them are 'active'; everything else is 'planned' (disabled, "Soon")
     // until its own build phase, per the incremental build-one-at-a-time
-    // plan. Intentional duplicates (Reception, Transport, Hostel, Mess,
-    // Roles & Permissions) keep distinct `key`s but the same `path` where
-    // a page already exists, so both entries stay in sync automatically.
+    // plan. Operations deliberately does NOT duplicate Reception (owned by
+    // Administration) or Transport/Hostel/Mess (owned by Student Services)
+    // — each of those lives under exactly one section. The one remaining
+    // intentional duplicate is Roles & Permissions (Administration and
+    // System both link to /super-admin/roles), which stays since it's a
+    // genuinely cross-cutting page, not an ownership overlap.
     sidebarNav: [
       {
         key: 'dashboard', label: 'Dashboard', icon: 'dashboard',
@@ -113,10 +116,6 @@ export const portals = {
           { key: 'ops-recruitment', label: 'Recruitment', icon: 'person_search', path: '/super-admin/operations/recruitment', status: 'active' },
           { key: 'ops-inventory', label: 'Inventory', icon: 'inventory_2', path: '/super-admin/operations/inventory', status: 'active' },
           { key: 'ops-assets', label: 'Assets', icon: 'warehouse', path: '/super-admin/operations/assets', status: 'active' },
-          { key: 'ops-reception', label: 'Reception', icon: 'support_agent', path: '/super-admin/administration/reception', status: 'active' },
-          { key: 'ops-transport', label: 'Transport', icon: 'directions_bus', path: '/super-admin/student-services/transport', status: 'active' },
-          { key: 'ops-hostel', label: 'Hostel', icon: 'holiday_village', path: '/super-admin/student-services/hostel', status: 'active' },
-          { key: 'ops-mess', label: 'Mess', icon: 'restaurant', path: '/super-admin/student-services/mess', status: 'active' },
         ],
       },
       {
