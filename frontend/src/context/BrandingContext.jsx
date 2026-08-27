@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { api } from '../lib/api.js';
-import { applyColorOverrides } from '../lib/colorTokens.js';
 
 const BrandingContext = createContext(null);
 
@@ -11,7 +10,9 @@ const FALLBACK = { name: 'Mount Carmel', short_name: '', logo: '', favicon: '', 
  * unauthenticated /settings/public-branding endpoint — this is what makes
  * "change the primary color in Appearance settings" actually repaint the
  * whole app (including the login screen), not just save a value nobody
- * reads. See lib/colorTokens.js for the actual CSS custom-property writes.
+ * reads. The actual CSS custom-property writes happen in BrandColorSync
+ * (rendered inside UIPreferencesProvider), not here — applying them needs
+ * to know the active light/dark theme too, which this provider doesn't.
  */
 export function BrandingProvider({ children }) {
   const [branding, setBranding] = useState(FALLBACK);
@@ -21,7 +22,6 @@ export function BrandingProvider({ children }) {
     try {
       const data = await api.get('/settings/public-branding', { auth: false });
       setBranding({ ...FALLBACK, ...data });
-      applyColorOverrides({ primary: data.primary_color, secondary: data.secondary_color });
     } catch {
       // Public endpoint down or unseeded — keep the built-in fallback theme
       // rather than leaving the page unstyled.

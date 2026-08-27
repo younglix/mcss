@@ -49,11 +49,27 @@ function isValidHex(hex) {
 }
 
 /** Everything a `primary` (or `secondary`/`tertiary`) role needs: the base
- * color, a light container tint, dark text-on-container, and white/black
- * on-color chosen by contrast against the base. */
-export function deriveColorRole(hex) {
+ * color, a container tint, and on-* text colors chosen by contrast against
+ * each. In dark mode the roles invert per Material 3 convention (the base
+ * tone becomes light so it reads against a dark surface, the container
+ * becomes a muted mid-dark fill instead of a pale tint) — mirroring the
+ * hand-tuned light->dark remap already baked into style.css's :root.dark
+ * block, just derived from whatever hex an admin picked instead of the
+ * built-in brand hue. Without this split, a configured brand color pins
+ * --color-primary etc. to their light-mode values via inline style (higher
+ * specificity than the :root.dark class rule), leaving primary-colored text
+ * dark-on-dark and unreadable whenever dark mode is active. */
+export function deriveColorRole(hex, isDark = false) {
   if (!isValidHex(hex)) return null;
   const { h, s, l } = hexToHsl(hex);
+  if (isDark) {
+    return {
+      base: hslToHex(h, Math.min(s, 55), 82),
+      onBase: hslToHex(h, Math.min(s, 60), 18),
+      container: hslToHex(h, Math.min(s, 45), 34),
+      onContainer: hslToHex(h, Math.min(s, 35), 92),
+    };
+  }
   return {
     base: hex,
     container: hslToHex(h, Math.min(s, 40), 90),
@@ -64,17 +80,19 @@ export function deriveColorRole(hex) {
 
 /** Applies primary/secondary overrides as CSS custom properties on :root —
  * every `bg-primary` / `text-on-primary` / etc. Tailwind utility reads these
- * at paint time, so this is a real, immediate global theme change. */
-export function applyColorOverrides({ primary, secondary } = {}) {
+ * at paint time, so this is a real, immediate global theme change. Must be
+ * re-called whenever the active theme flips (see BrandColorSync), since the
+ * derived values differ between light and dark. */
+export function applyColorOverrides({ primary, secondary, isDark = false } = {}) {
   const root = document.documentElement.style;
-  const primaryRole = deriveColorRole(primary);
+  const primaryRole = deriveColorRole(primary, isDark);
   if (primaryRole) {
     root.setProperty('--color-primary', primaryRole.base);
     root.setProperty('--color-on-primary', primaryRole.onBase);
     root.setProperty('--color-primary-container', primaryRole.container);
     root.setProperty('--color-on-primary-container', primaryRole.onContainer);
   }
-  const secondaryRole = deriveColorRole(secondary);
+  const secondaryRole = deriveColorRole(secondary, isDark);
   if (secondaryRole) {
     root.setProperty('--color-secondary', secondaryRole.base);
     root.setProperty('--color-on-secondary', secondaryRole.onBase);

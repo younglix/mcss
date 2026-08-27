@@ -5,7 +5,7 @@ import FormField from '../../../components/ui/FormField.jsx';
 import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { useBranding } from '../../../context/BrandingContext.jsx';
-import { applyColorOverrides, applyRadiusOverride, applyTypographyOverrides, RADIUS_SCALE_OPTIONS } from '../../../lib/colorTokens.js';
+import { applyRadiusOverride, applyTypographyOverrides, RADIUS_SCALE_OPTIONS } from '../../../lib/colorTokens.js';
 import { api, ApiError } from '../../../lib/api.js';
 
 const ENDPOINTS = { settings: '/settings/?group=appearance' };
@@ -61,7 +61,10 @@ export default function SuperAdminAppearanceSettings() {
     setSaved(false);
     try {
       await api.put('/settings/bulk', Object.entries(values).map(([key, value]) => ({ key, value })));
-      applyColorOverrides({ primary: values['appearance.primary_color'], secondary: values['appearance.secondary_color'] });
+      // Color overrides aren't applied directly here — refreshBranding()
+      // below updates BrandingContext, and BrandColorSync (mounted at the
+      // app root) reactively re-derives them against the current light/dark
+      // theme, which a direct call here has no way to know.
       applyTypographyOverrides({
         headingFont: values['appearance.heading_font'],
         primaryFont: values['appearance.primary_font'],
