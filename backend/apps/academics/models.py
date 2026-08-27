@@ -200,6 +200,12 @@ class ExamScore(BaseModel):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name="exam_scores")
     score = models.DecimalField(max_digits=5, decimal_places=2)
     max_score = models.DecimalField(max_digits=5, decimal_places=2, default=100)
+    # Optional CA/Exam breakdown for the compiled report card. When both are
+    # supplied, `score` is server-computed as their sum (see ExamScoresView)
+    # rather than trusted as independently entered — a subject not split
+    # into components just leaves these null and keeps using `score` as-is.
+    ca_score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    exam_score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     remark = models.CharField(max_length=100, blank=True)
     entered_by = models.ForeignKey(
         "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="scores_entered"
@@ -211,6 +217,45 @@ class ExamScore(BaseModel):
 
     def __str__(self):
         return f"{self.student} — {self.subject.name}: {self.score}/{self.max_score}"
+
+
+class ReportCardRemark(BaseModel):
+    """Class-teacher and principal narrative comments for one student's
+    report card, one row per exam — distinct from ExamScore.remark, which is
+    per-subject."""
+
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name="report_card_remarks")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="report_card_remarks")
+    class_teacher_remark = models.TextField(blank=True, default="")
+    principal_remark = models.TextField(blank=True, default="")
+
+    class Meta(BaseModel.Meta):
+        unique_together = ("exam", "student")
+
+    def __str__(self):
+        return f"Remarks — {self.student} ({self.exam.name})"
+
+
+class SkillRating(BaseModel):
+    """Psychomotor & affective skills block on the report card (punctuality,
+    neatness, etc.), rated 1-5, one row per skill per student per exam."""
+
+    class Skill(models.TextChoices):
+        PUNCTUALITY = "punctuality", "Punctuality"
+        NEATNESS = "neatness", "Neatness"
+        LEADERSHIP = "leadership", "Leadership"
+        HONESTY = "honesty", "Honesty"
+
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name="skill_ratings")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="skill_ratings")
+    skill = models.CharField(max_length=20, choices=Skill.choices)
+    rating = models.PositiveSmallIntegerField(default=3)
+
+    class Meta(BaseModel.Meta):
+        unique_together = ("exam", "student", "skill")
+
+    def __str__(self):
+        return f"{self.student} — {self.get_skill_display()}: {self.rating}"
 
 
 class Assignment(BaseModel):

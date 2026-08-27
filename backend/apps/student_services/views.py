@@ -2,13 +2,14 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from apps.academics.models import Student
 from apps.audit.services import log
 from apps.configuration.models import AcademicSession
 from apps.rbac.permissions import HasPermission
-from common.responses import success
+from common.responses import failure, success
 
 from .models import (
     Activity,
@@ -46,6 +47,14 @@ from .serializers import (
 
 def _current_session():
     return AcademicSession.objects.filter(is_current=True).first()
+
+
+def _child_or_403(request, student_id):
+    """Same ownership guard as apps.finance._child_or_403/apps.academics._child_or_403."""
+    student = get_object_or_404(Student, id=student_id)
+    if student.guardian_user_id != request.user.id:
+        return None
+    return student
 
 
 def _permission_mixin(module):
@@ -127,6 +136,29 @@ class BookLoanReturnView(APIView):
         book.save(update_fields=["available_copies"])
         log(actor=request.user, action="student_services.book_returned", target=loan, request=request)
         return success(message="Book returned.", data=BookLoanSerializer(loan).data)
+
+
+class MyBookLoansView(APIView):
+    """Student Portal > Library: the logged-in student's own borrowed-book
+    history. BookLoan.borrower is a plain accounts.User FK (not Student), so
+    this filters directly on request.user rather than a student_profile."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        qs = BookLoan.objects.filter(borrower=request.user).select_related("book")
+        return success(data=BookLoanSerializer(qs, many=True).data)
+
+
+class ChildBookLoansView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        qs = BookLoan.objects.filter(borrower=student.user).select_related("book")
+        return success(data=BookLoanSerializer(qs, many=True).data)
 
 
 # ================================================================ Hostel
@@ -211,6 +243,28 @@ class HostelVacateView(APIView):
         return success(message="Room vacated.", data=HostelAllocationSerializer(allocation).data)
 
 
+class MyHostelView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = getattr(request.user, "student_profile", None)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        qs = HostelAllocation.objects.filter(student=student).select_related("room__block")
+        return success(data=HostelAllocationSerializer(qs, many=True).data)
+
+
+class ChildHostelView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        qs = HostelAllocation.objects.filter(student=student).select_related("room__block")
+        return success(data=HostelAllocationSerializer(qs, many=True).data)
+
+
 # ================================================================ Transport
 class TransportRoutesView(TransportPermissionMixin, ListCreateAPIView):
     write_action = "create"
@@ -285,6 +339,28 @@ class TransportAssignmentDetailView(TransportPermissionMixin, RetrieveUpdateDest
     def perform_destroy(self, instance):
         log(actor=self.request.user, action="student_services.transport_unassigned", target=instance, request=self.request)
         instance.delete()
+
+
+class MyTransportView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = getattr(request.user, "student_profile", None)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        qs = TransportAssignment.objects.filter(student=student).select_related("route")
+        return success(data=TransportAssignmentSerializer(qs, many=True).data)
+
+
+class ChildTransportView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        qs = TransportAssignment.objects.filter(student=student).select_related("route")
+        return success(data=TransportAssignmentSerializer(qs, many=True).data)
 
 
 # ================================================================ Meals / Mess
@@ -389,6 +465,37 @@ class StudentResourceDetailView(ResourcesPermissionMixin, RetrieveUpdateDestroyA
     def perform_destroy(self, instance):
         log(actor=self.request.user, action="student_services.resource_deleted", target=instance, request=self.request)
         instance.delete()
+
+
+class MyResourcesView(APIView):
+    """Student Portal > E-Learning/Resources: materials uploaded for the
+    logged-in student's own class-arm — same scoping StudentResourcesView
+    already applies for staff, just derived from the caller instead of a
+    ?class_arm= query param."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = getattr(request.user, "student_profile", None)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        if student.class_arm_id is None:
+            return success(data=[])
+        qs = StudentResource.objects.filter(class_arm_id=student.class_arm_id).select_related("class_arm", "uploaded_by")
+        return success(data=StudentResourceSerializer(qs, many=True).data)
+
+
+class ChildResourcesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        if student.class_arm_id is None:
+            return success(data=[])
+        qs = StudentResource.objects.filter(class_arm_id=student.class_arm_id).select_related("class_arm", "uploaded_by")
+        return success(data=StudentResourceSerializer(qs, many=True).data)
 
 
 # ================================================================ Health

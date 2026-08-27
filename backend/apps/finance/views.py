@@ -17,6 +17,7 @@ from apps.academics.models import Student
 from apps.admissions import paystack
 from apps.audit.services import log
 from apps.configuration.models import AcademicSession, SchoolProfile
+from apps.notifications.services import dispatch
 from apps.rbac.permissions import HasPermission
 from apps.settings_app.models import SystemSetting
 from common.responses import failure, success
@@ -50,6 +51,27 @@ FeesPermissionMixin = _permission_mixin("fees")
 ExpensesPermissionMixin = _permission_mixin("expenses")
 PayrollPermissionMixin = _permission_mixin("payroll")
 ReportsPermissionMixin = _permission_mixin("reports")
+
+
+def _notify_invoice_ready(invoice):
+    student = invoice.student
+    dispatch(
+        recipient=student.guardian_user or student.user,
+        title="New Fee Invoice",
+        body=f"A new invoice — {invoice.description} ({invoice.amount}) — has been raised for {student.user.full_name}.",
+        category="payment",
+    )
+
+
+def _notify_payment_received(payment):
+    invoice = payment.invoice
+    student = invoice.student
+    dispatch(
+        recipient=student.guardian_user or student.user,
+        title="Payment Received",
+        body=f"We've received a payment of {payment.amount} for {invoice.description} ({student.user.full_name}). Receipt: {payment.receipt_number}.",
+        category="payment",
+    )
 
 
 # ---------------------------------------------------------------- Fee Structures
@@ -125,8 +147,9 @@ class SchoolFeesGenerateView(FeesPermissionMixin, APIView):
         )
         created = 0
         for student in students:
+            student_had_new_invoice = False
             for structure in structures:
-                _, was_created = Invoice.objects.get_or_create(
+                invoice, was_created = Invoice.objects.get_or_create(
                     student=student, fee_structure=structure, session=session, term=term,
                     defaults={
                         "description": f"{structure.category.name} — {session.name}",
@@ -135,6 +158,9 @@ class SchoolFeesGenerateView(FeesPermissionMixin, APIView):
                 )
                 if was_created:
                     created += 1
+                    student_had_new_invoice = True
+            if student_had_new_invoice:
+                _notify_invoice_ready(invoice)
         log(actor=request.user, action="finance.invoices_generated",
             changes={"school_class": str(school_class), "session": str(session), "count": created}, request=request)
         return success(message=f"Generated {created} invoice(s).", data={"count": created})
@@ -158,6 +184,7 @@ class InvoicesView(FeesPermissionMixin, ListCreateAPIView):
     def perform_create(self, serializer):
         invoice = serializer.save()
         log(actor=self.request.user, action="finance.invoice_created", target=invoice, request=self.request)
+        _notify_invoice_ready(invoice)
 
 
 class InvoiceDetailView(FeesPermissionMixin, RetrieveUpdateDestroyAPIView):
@@ -270,6 +297,7 @@ class PaymentsView(APIView):
         payment = serializer.save(recorded_by=request.user)
         payment.invoice.refresh_status()
         log(actor=request.user, action="finance.payment_recorded", target=payment, request=request)
+        _notify_payment_received(payment)
         return success(message="Payment recorded.", data=PaymentSerializer(payment).data, status=201)
 
 
@@ -438,7 +466,7 @@ class PaystackWebhookView(APIView):
                 return failure(message="Invoice not found for this reference.", status=404)
             if Payment.objects.filter(reference=reference).exists():
                 return success(message="Already processed.")
-            Payment.objects.create(
+            payment = Payment.objects.create(
                 invoice=invoice, amount=amount_naira, method=Payment.Method.ONLINE,
                 reference=reference, status=Payment.Status.COMPLETED,
             )
@@ -446,6 +474,7 @@ class PaystackWebhookView(APIView):
 
         log(actor=None, action="finance.payment_recorded_online", target=invoice,
             changes={"reference": reference, "amount": str(amount_naira)}, request=request)
+        _notify_payment_received(payment)
         return success(message="Payment recorded.")
 
 

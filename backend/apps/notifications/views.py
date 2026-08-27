@@ -22,6 +22,9 @@ class NotificationsListView(ListAPIView):
         qs = Notification.objects.filter(recipient=self.request.user)
         if self.request.query_params.get("unread") == "true":
             qs = qs.filter(is_read=False)
+        category = self.request.query_params.get("category")
+        if category:
+            qs = qs.filter(category=category)
         return qs
 
 

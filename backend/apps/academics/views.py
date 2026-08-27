@@ -9,8 +9,8 @@ from rest_framework.views import APIView
 
 from apps.audit.services import log
 from apps.configuration.models import AcademicSession, ClassArm, GradeScale, SchoolClass, Term
-from apps.rbac.permissions import HasPermission
-from common.responses import success
+from apps.rbac.permissions import HasPermission, get_effective_permissions
+from common.responses import failure, success
 
 from .models import (
     Assignment,
@@ -20,6 +20,8 @@ from .models import (
     Exam,
     ExamScore,
     PromotionRecord,
+    ReportCardRemark,
+    SkillRating,
     Student,
     Subject,
     TimetableSlot,
@@ -154,6 +156,155 @@ class MyChildrenView(APIView):
             guardian_user=request.user, user__is_deleted=False,
         )
         return success(data=StudentSerializer(qs, many=True).data)
+
+
+def _child_or_403(request, student_id):
+    """Same ownership guard as apps.finance._child_or_403: the requesting
+    user must be the linked guardian_user for this exact student."""
+    student = get_object_or_404(Student, id=student_id)
+    if student.guardian_user_id != request.user.id:
+        return None
+    return student
+
+
+def _own_student_or_403(request):
+    return getattr(request.user, "student_profile", None)
+
+
+class MyProfileView(APIView):
+    """Student Portal > Profile: the logged-in student's own enrollment/bio
+    record — view-only (accounts.MeView already covers the identity fields;
+    this fills in the Student-table half: class, guardian info, registration
+    number). No self-service PATCH exists anywhere for these fields today,
+    so this stays read-only rather than half-building an edit flow."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = _own_student_or_403(request)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        return success(data=StudentSerializer(student).data)
+
+
+# ------------------------------------------------------ Self-service: Class & Subjects
+class MyClassView(APIView):
+    """Student Portal > Class & Subjects: the logged-in student's own
+    class-arm, its subject assignments, and class teacher — reuses
+    ClassAcademicSerializer's exact shaping used by the staff Classes page."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = _own_student_or_403(request)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        if student.class_arm_id is None:
+            return success(data=None)
+        session = _current_session()
+        arm = ClassArm.objects.select_related("school_class").prefetch_related(
+            "subject_assignments__subject", "subject_assignments__teacher", "class_teacher_assignments__teacher",
+        ).get(id=student.class_arm_id)
+        return success(data=ClassAcademicSerializer(arm, context={"session": session}).data)
+
+
+class ChildClassView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        if student.class_arm_id is None:
+            return success(data=None)
+        session = _current_session()
+        arm = ClassArm.objects.select_related("school_class").prefetch_related(
+            "subject_assignments__subject", "subject_assignments__teacher", "class_teacher_assignments__teacher",
+        ).get(id=student.class_arm_id)
+        return success(data=ClassAcademicSerializer(arm, context={"session": session}).data)
+
+
+# ------------------------------------------------------ Self-service: Timetable
+class MyTimetableView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = _own_student_or_403(request)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        if student.class_arm_id is None:
+            return success(data=[])
+        qs = TimetableSlot.objects.filter(class_arm_id=student.class_arm_id).select_related("subject", "teacher", "class_arm")
+        return success(data=TimetableSlotSerializer(qs, many=True).data)
+
+
+class ChildTimetableView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        if student.class_arm_id is None:
+            return success(data=[])
+        qs = TimetableSlot.objects.filter(class_arm_id=student.class_arm_id).select_related("subject", "teacher", "class_arm")
+        return success(data=TimetableSlotSerializer(qs, many=True).data)
+
+
+# ------------------------------------------------------ Self-service: Attendance
+class MyAttendanceView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = _own_student_or_403(request)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        qs = AttendanceRecord.objects.filter(student=student).select_related("class_arm")
+        term = request.query_params.get("term")
+        if term:
+            qs = qs.filter(term_id=term)
+        return success(data=AttendanceRecordSerializer(qs, many=True).data)
+
+
+class ChildAttendanceView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        qs = AttendanceRecord.objects.filter(student=student).select_related("class_arm")
+        term = request.query_params.get("term")
+        if term:
+            qs = qs.filter(term_id=term)
+        return success(data=AttendanceRecordSerializer(qs, many=True).data)
+
+
+# ------------------------------------------------------ Self-service: Assignments (read-only)
+class MyAssignmentsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = _own_student_or_403(request)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        if student.class_arm_id is None:
+            return success(data=[])
+        qs = Assignment.objects.filter(class_arm_id=student.class_arm_id).select_related("subject", "teacher")
+        return success(data=AssignmentSerializer(qs, many=True).data)
+
+
+class ChildAssignmentsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        if student.class_arm_id is None:
+            return success(data=[])
+        qs = Assignment.objects.filter(class_arm_id=student.class_arm_id).select_related("subject", "teacher")
+        return success(data=AssignmentSerializer(qs, many=True).data)
 
 
 # ---------------------------------------------------------------- Teachers (read summary over Staff)
@@ -400,9 +551,18 @@ class ExamScoresView(APIView):
         v = serializer.validated_data
         count = 0
         for s in v["scores"]:
+            ca_score = s.get("ca_score")
+            exam_score = s.get("exam_score")
+            # A CA/Exam split, when both parts are given, is the source of
+            # truth for the total — entering them separately shouldn't also
+            # require reconciling a matching "score" value by hand.
+            score = (float(ca_score) + float(exam_score)) if (ca_score is not None and exam_score is not None) else s["score"]
             ExamScore.objects.update_or_create(
                 exam_id=exam_id, student_id=s["student"], subject=v["subject"],
-                defaults={"score": s["score"], "max_score": v["max_score"], "remark": s.get("remark", ""), "entered_by": request.user},
+                defaults={
+                    "score": score, "max_score": v["max_score"], "ca_score": ca_score, "exam_score": exam_score,
+                    "remark": s.get("remark", ""), "entered_by": request.user,
+                },
             )
             count += 1
         log(actor=request.user, action="academics.scores_entered",
@@ -460,6 +620,130 @@ class MarksheetView(APIView):
             "subjects": rows,
             "average": round(sum(r["percentage"] for r in rows) / len(rows), 1) if rows else None,
         })
+
+
+class PublishedExamsView(APIView):
+    """Every published exam, newest first — the self-service picker behind
+    Results/Report Card on both portals. Exams aren't scoped to one student
+    (a class-arm's whole cohort sits the same exam), so this doesn't need a
+    mine/child split like the other self-service views; ReportCardView still
+    enforces per-student ownership on the actual result data."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        qs = Exam.objects.filter(status=Exam.Status.PUBLISHED).order_by("-start_date")
+        return success(data=ExamSerializer(qs, many=True).data)
+
+
+class ReportCardView(APIView):
+    """The full compiled report card for one student's exam — CA/Exam split,
+    grade, class position, attendance, skills, and remarks. Callable by
+    staff with results.view (including before publish, to proof it), by the
+    owning student, or by that student's linked guardian — the latter two
+    only once the exam has been published, matching the rule that unpublished
+    results are a staff-only preview."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, exam_id, student_id):
+        exam = get_object_or_404(Exam, id=exam_id)
+        student = get_object_or_404(Student.objects.select_related("user", "class_arm"), id=student_id)
+
+        perms = get_effective_permissions(request.user)
+        is_staff_viewer = "*" in perms or "results.view" in perms
+        is_owning_student = getattr(request.user, "student_profile", None) and student.user_id == request.user.id
+        is_owning_guardian = student.guardian_user_id == request.user.id
+        if not (is_staff_viewer or is_owning_student or is_owning_guardian):
+            return failure(message="You do not have access to this report card.", status=403)
+        if not is_staff_viewer and exam.status != Exam.Status.PUBLISHED:
+            return failure(message="Results have not been published yet.", status=403)
+
+        scores = ExamScore.objects.filter(exam=exam, student=student).select_related("subject")
+        scales = list(GradeScale.objects.all())
+
+        def grade_for(percentage):
+            for scale in scales:
+                if scale.min_score <= percentage <= scale.max_score:
+                    return scale.name
+            return None
+
+        subject_rows = []
+        for s in scores:
+            pct = round(float(s.score) / float(s.max_score) * 100, 1) if s.max_score else 0
+            subject_rows.append({
+                "subject": s.subject.name, "ca_score": s.ca_score, "exam_score": s.exam_score,
+                "total": s.score, "max_score": s.max_score, "percentage": pct,
+                "grade": grade_for(pct), "remark": s.remark,
+            })
+        average = round(sum(r["percentage"] for r in subject_rows) / len(subject_rows), 1) if subject_rows else None
+
+        # Class position/rank is computed at read time off every classmate's
+        # average across this exam, not stored — so it can never go stale as
+        # scores are edited or new students are added to the class.
+        position, class_size = None, 0
+        if student.class_arm_id:
+            peer_rows = ExamScore.objects.filter(
+                exam=exam, student__class_arm_id=student.class_arm_id,
+            ).values("student_id", "score", "max_score")
+            by_student = {}
+            for row in peer_rows:
+                pct = float(row["score"]) / float(row["max_score"]) * 100 if row["max_score"] else 0
+                by_student.setdefault(row["student_id"], []).append(pct)
+            averages = {sid: sum(vals) / len(vals) for sid, vals in by_student.items()}
+            ranked = [sid for sid, _ in sorted(averages.items(), key=lambda kv: kv[1], reverse=True)]
+            class_size = len(ranked)
+            if student.id in ranked:
+                position = ranked.index(student.id) + 1
+
+        attendance_qs = AttendanceRecord.objects.filter(student=student, term=exam.term)
+        attendance_total = attendance_qs.count()
+        attendance_present = attendance_qs.filter(status=AttendanceRecord.Status.PRESENT).count()
+
+        promotion = PromotionRecord.objects.filter(student=student, from_session=exam.session).order_by("-promoted_at").first()
+        remark_row = ReportCardRemark.objects.filter(exam=exam, student=student).first()
+        skills = list(SkillRating.objects.filter(exam=exam, student=student).values("skill", "rating"))
+
+        return success(data={
+            "student": {
+                "id": str(student.id), "name": student.user.full_name, "identifier": student.user.identifier,
+                "class_arm": str(student.class_arm) if student.class_arm else None,
+            },
+            "exam": {"id": str(exam.id), "name": exam.name, "session": exam.session.name, "term": exam.term.name, "status": exam.status},
+            "subjects": subject_rows,
+            "average": average,
+            "class_position": position,
+            "class_size": class_size,
+            "attendance": {"present": attendance_present, "total": attendance_total},
+            "status": promotion.get_outcome_display() if promotion else None,
+            "skills": skills,
+            "class_teacher_remark": remark_row.class_teacher_remark if remark_row else "",
+            "principal_remark": remark_row.principal_remark if remark_row else "",
+        })
+
+
+class ReportCardRemarkView(APIView):
+    """Staff upsert of the report-card narrative remarks + skill ratings for
+    one student's exam — the only mutating counterpart to ReportCardView."""
+
+    permission_classes = [HasPermission("results.enter")]
+
+    def put(self, request, exam_id, student_id):
+        exam = get_object_or_404(Exam, id=exam_id)
+        student = get_object_or_404(Student, id=student_id)
+        remark, _created = ReportCardRemark.objects.update_or_create(
+            exam=exam, student=student,
+            defaults={
+                "class_teacher_remark": request.data.get("class_teacher_remark", ""),
+                "principal_remark": request.data.get("principal_remark", ""),
+            },
+        )
+        valid_skills = {c.value for c in SkillRating.Skill}
+        for skill, rating in (request.data.get("skills") or {}).items():
+            if skill in valid_skills:
+                SkillRating.objects.update_or_create(exam=exam, student=student, skill=skill, defaults={"rating": rating})
+        log(actor=request.user, action="academics.report_card_remarks_set", target=remark, request=request)
+        return success(message="Report card saved.")
 
 
 # ---------------------------------------------------------------- Assignments

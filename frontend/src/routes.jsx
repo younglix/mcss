@@ -7,6 +7,33 @@ import ApplyDocumentUpload from './pages/Public/ApplyNow/DocumentUpload.jsx';
 import ApplyReviewSubmit from './pages/Public/ApplyNow/ReviewSubmit.jsx';
 import ApplyConfirmation from './pages/Public/ApplyNow/Confirmation.jsx';
 import ApplyStatusCheck from './pages/Public/ApplyNow/StatusCheck.jsx';
+import StudentProfile from './pages/Student/Profile.jsx';
+import StudentClassSubjects from './pages/Student/ClassSubjects.jsx';
+import StudentTimetable from './pages/Student/Timetable.jsx';
+import StudentAttendance from './pages/Student/Attendance.jsx';
+import StudentAssignments from './pages/Student/Assignments.jsx';
+import StudentResults from './pages/Student/Results.jsx';
+import StudentLibrary from './pages/Student/Library.jsx';
+import StudentHostel from './pages/Student/Hostel.jsx';
+import StudentTransport from './pages/Student/Transport.jsx';
+import StudentResources from './pages/Student/Resources.jsx';
+import StudentAnnouncements from './pages/Student/Announcements.jsx';
+import StudentEvents from './pages/Student/Events.jsx';
+import StudentMessages from './pages/Student/Messages.jsx';
+import StudentSettings from './pages/Student/Settings.jsx';
+import ParentChildren from './pages/Parent/Children.jsx';
+import ParentAttendance from './pages/Parent/Attendance.jsx';
+import ParentResults from './pages/Parent/Results.jsx';
+import ParentAssignments from './pages/Parent/Assignments.jsx';
+import ParentTimetable from './pages/Parent/Timetable.jsx';
+import ParentLibrary from './pages/Parent/Library.jsx';
+import ParentHostel from './pages/Parent/Hostel.jsx';
+import ParentTransport from './pages/Parent/Transport.jsx';
+import ParentMessages from './pages/Parent/Messages.jsx';
+import ParentAnnouncements from './pages/Parent/Announcements.jsx';
+import ParentEvents from './pages/Parent/Events.jsx';
+import ParentFeeNotifications from './pages/Parent/FeeNotifications.jsx';
+import ParentSettings from './pages/Parent/Settings.jsx';
 import SuperAdminOverview from './pages/SuperAdmin/dashboard/Overview.jsx';
 import SuperAdminFinancialSummary from './pages/SuperAdmin/dashboard/FinancialSummary.jsx';
 import SuperAdminAcademicSummary from './pages/SuperAdmin/dashboard/AcademicSummary.jsx';
@@ -177,8 +204,35 @@ export const routes = [
   { path: "/admin/academics/report-card", label: "Official Report Card", source: "official_report_card_responsive_mcss", element: <OfficialReportCard /> },
   { path: "/student", label: "Student Dashboard", source: "student_dashboard_mcss", element: <StudentDashboard /> },
   { path: "/student/finance", label: "Student Fees", source: "student_finance_mcss", element: <StudentFinance /> },
+  { path: "/student/profile", label: "Student Profile", source: "student_profile_mcss", element: <StudentProfile /> },
+  { path: "/student/class", label: "Student Class & Subjects", source: "student_class_subjects_mcss", element: <StudentClassSubjects /> },
+  { path: "/student/timetable", label: "Student Timetable", source: "student_timetable_mcss", element: <StudentTimetable /> },
+  { path: "/student/attendance", label: "Student Attendance", source: "student_attendance_mcss", element: <StudentAttendance /> },
+  { path: "/student/assignments", label: "Student Assignments", source: "student_assignments_mcss", element: <StudentAssignments /> },
+  { path: "/student/results", label: "Student Results", source: "student_results_mcss", element: <StudentResults /> },
+  { path: "/student/library", label: "Student Library", source: "student_library_mcss", element: <StudentLibrary /> },
+  { path: "/student/hostel", label: "Student Hostel", source: "student_hostel_mcss", element: <StudentHostel /> },
+  { path: "/student/transport", label: "Student Transport", source: "student_transport_mcss", element: <StudentTransport /> },
+  { path: "/student/resources", label: "Student Resources", source: "student_resources_mcss", element: <StudentResources /> },
+  { path: "/student/announcements", label: "Student Announcements", source: "student_announcements_mcss", element: <StudentAnnouncements /> },
+  { path: "/student/events", label: "Student Events", source: "student_events_mcss", element: <StudentEvents /> },
+  { path: "/student/messages", label: "Student Messages", source: "student_messages_mcss", element: <StudentMessages /> },
+  { path: "/student/settings", label: "Student Settings", source: "student_settings_mcss", element: <StudentSettings /> },
   { path: "/parent", label: "Parent Dashboard", source: "parent_dashboard_mcss", element: <ParentDashboard /> },
   { path: "/parent/finance", label: "Parent Fees", source: "parent_finance_mcss", element: <ParentFinance /> },
+  { path: "/parent/children", label: "Parent Children's Profiles", source: "parent_children_mcss", element: <ParentChildren /> },
+  { path: "/parent/attendance", label: "Parent Attendance", source: "parent_attendance_mcss", element: <ParentAttendance /> },
+  { path: "/parent/results", label: "Parent Results", source: "parent_results_mcss", element: <ParentResults /> },
+  { path: "/parent/assignments", label: "Parent Assignments", source: "parent_assignments_mcss", element: <ParentAssignments /> },
+  { path: "/parent/timetable", label: "Parent Timetable", source: "parent_timetable_mcss", element: <ParentTimetable /> },
+  { path: "/parent/library", label: "Parent Library", source: "parent_library_mcss", element: <ParentLibrary /> },
+  { path: "/parent/hostel", label: "Parent Hostel", source: "parent_hostel_mcss", element: <ParentHostel /> },
+  { path: "/parent/transport", label: "Parent Transport", source: "parent_transport_mcss", element: <ParentTransport /> },
+  { path: "/parent/messages", label: "Parent Teacher Communication", source: "parent_messages_mcss", element: <ParentMessages /> },
+  { path: "/parent/announcements", label: "Parent Announcements", source: "parent_announcements_mcss", element: <ParentAnnouncements /> },
+  { path: "/parent/events", label: "Parent Events", source: "parent_events_mcss", element: <ParentEvents /> },
+  { path: "/parent/fee-notifications", label: "Parent Fee Notifications", source: "parent_fee_notifications_mcss", element: <ParentFeeNotifications /> },
+  { path: "/parent/settings", label: "Parent Settings", source: "parent_settings_mcss", element: <ParentSettings /> },
   { path: "/bursary", label: "Bursary Dashboard", source: "bursary_dashboard_mcss", element: <BursaryDashboard /> },
   { path: "/staff/teacher", label: "Teacher Score Entry", source: "teacher_portal_responsive_score_entry", element: <TeacherScoreEntry /> },
   { path: "/staff/class-teacher", label: "Class Teacher Overview", source: "class_teacher_portal_my_class_overview", element: <ClassTeacherOverview /> },

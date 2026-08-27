@@ -7,6 +7,8 @@ urlpatterns = [
     path("library/books", views.BooksView.as_view(), name="ss-books"),
     path("library/books/<uuid:book_id>", views.BookDetailView.as_view(), name="ss-book-detail"),
     path("library/loans", views.BookLoansView.as_view(), name="ss-book-loans"),
+    path("library/loans/mine", views.MyBookLoansView.as_view(), name="ss-my-book-loans"),
+    path("library/loans/child/<uuid:student_id>", views.ChildBookLoansView.as_view(), name="ss-child-book-loans"),
     path("library/loans/<uuid:loan_id>/return", views.BookLoanReturnView.as_view(), name="ss-book-loan-return"),
 
     # Hostel
@@ -15,6 +17,8 @@ urlpatterns = [
     path("hostel/blocks/<uuid:block_id>/rooms", views.HostelRoomsView.as_view(), name="ss-hostel-rooms"),
     path("hostel/rooms/<uuid:room_id>", views.HostelRoomDetailView.as_view(), name="ss-hostel-room-detail"),
     path("hostel/allocations", views.HostelAllocationsView.as_view(), name="ss-hostel-allocations"),
+    path("hostel/allocations/mine", views.MyHostelView.as_view(), name="ss-my-hostel"),
+    path("hostel/allocations/child/<uuid:student_id>", views.ChildHostelView.as_view(), name="ss-child-hostel"),
     path("hostel/allocations/<uuid:allocation_id>/vacate", views.HostelVacateView.as_view(), name="ss-hostel-vacate"),
 
     # Transport
@@ -23,6 +27,8 @@ urlpatterns = [
     path("transport/vehicles", views.VehiclesView.as_view(), name="ss-vehicles"),
     path("transport/vehicles/<uuid:vehicle_id>", views.VehicleDetailView.as_view(), name="ss-vehicle-detail"),
     path("transport/assignments", views.TransportAssignmentsView.as_view(), name="ss-transport-assignments"),
+    path("transport/assignments/mine", views.MyTransportView.as_view(), name="ss-my-transport"),
+    path("transport/assignments/child/<uuid:student_id>", views.ChildTransportView.as_view(), name="ss-child-transport"),
     path("transport/assignments/<uuid:assignment_id>", views.TransportAssignmentDetailView.as_view(), name="ss-transport-assignment-detail"),
 
     # Meals / Mess
@@ -37,6 +43,8 @@ urlpatterns = [
 
     # Student Resources
     path("resources", views.StudentResourcesView.as_view(), name="ss-resources"),
+    path("resources/mine", views.MyResourcesView.as_view(), name="ss-my-resources"),
+    path("resources/child/<uuid:student_id>", views.ChildResourcesView.as_view(), name="ss-child-resources"),
     path("resources/<uuid:resource_id>", views.StudentResourceDetailView.as_view(), name="ss-resource-detail"),
 
     # Health

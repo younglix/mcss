@@ -14,6 +14,8 @@ from .models import (
     Exam,
     ExamScore,
     PromotionRecord,
+    ReportCardRemark,
+    SkillRating,
     Student,
     Subject,
     TimetableSlot,
@@ -41,7 +43,7 @@ class StudentSerializer(serializers.ModelSerializer):
             "id", "user", "full_name", "email", "identifier", "is_active",
             "class_arm", "class_arm_label", "date_of_birth", "gender",
             "guardian_name", "guardian_phone", "guardian_email",
-            "admission_date", "status", "created_at",
+            "admission_date", "status", "registration_number", "created_at",
         ]
         read_only_fields = ["id", "user", "created_at"]
 
@@ -220,7 +222,7 @@ class ExamScoreSerializer(serializers.ModelSerializer):
         model = ExamScore
         fields = [
             "id", "exam", "student", "student_name", "subject", "subject_name",
-            "score", "max_score", "remark", "percentage", "entered_by",
+            "score", "max_score", "ca_score", "exam_score", "remark", "percentage", "entered_by",
         ]
         read_only_fields = ["id", "entered_by"]
 
@@ -245,8 +247,9 @@ class ExamScoreBulkEntrySerializer(serializers.Serializer):
 
     def validate_scores(self, scores):
         for s in scores:
-            if "student" not in s or "score" not in s:
-                raise serializers.ValidationError("Each entry needs 'student' and 'score'.")
+            has_split = "ca_score" in s and "exam_score" in s
+            if "student" not in s or not (has_split or "score" in s):
+                raise serializers.ValidationError("Each entry needs 'student' and either 'score' or both 'ca_score'/'exam_score'.")
         return scores
 
 

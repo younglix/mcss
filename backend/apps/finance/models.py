@@ -113,7 +113,7 @@ class Invoice(BaseModel):
 
 
 def _generate_first_school_fee_invoices(student):
-    from apps.settings_app.numbering import generate_number
+    from apps.notifications.services import dispatch
 
     if student.invoices.filter(purpose=Invoice.Purpose.FIRST_SCHOOL_FEE).exists():
         return  # already generated — idempotent no-op
@@ -127,11 +127,21 @@ def _generate_first_school_fee_invoices(student):
     structures = FeeStructure.objects.filter(session=session).filter(
         models.Q(school_class=school_class) | models.Q(school_class__isnull=True)
     )
+    created_any = False
     for structure in structures:
-        Invoice.objects.get_or_create(
+        _invoice, created = Invoice.objects.get_or_create(
             student=student, fee_structure=structure, session=session, term=None,
             purpose=Invoice.Purpose.FIRST_SCHOOL_FEE,
             defaults={"description": f"{structure.category.name} — {session.name}", "amount": structure.amount},
+        )
+        created_any = created_any or created
+
+    if created_any:
+        dispatch(
+            recipient=student.guardian_user or student.user,
+            title="First School Fee Invoice Ready",
+            body=f"Your First School Fee invoice for {student.user.full_name} is ready. Log in to the portal to pay.",
+            category="payment",
         )
 
 

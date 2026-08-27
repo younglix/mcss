@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 
 from apps.notifications.channels.email import send_raw
-from apps.notifications.services import send_credentials_email
+from apps.notifications.services import dispatch, send_credentials_email
 from apps.settings_app.models import SystemSetting
 from apps.settings_app.numbering import generate_number
 
@@ -117,9 +117,15 @@ def approve_application(application, reviewer):
 
     current_session = AcademicSession.objects.filter(is_current=True).first() or AcademicSession.objects.first()
     if current_session:
-        Invoice.objects.create(
+        invoice = Invoice.objects.create(
             student=student, session=current_session, purpose=Invoice.Purpose.ACCEPTANCE_FEE,
             description="Acceptance Fee", amount=_acceptance_fee_amount(),
+        )
+        dispatch(
+            recipient=guardian_user or student_user,
+            title="Acceptance Fee Invoice Ready",
+            body=f"An Acceptance Fee invoice of {invoice.amount} has been raised for {application.full_name}. Log in to the portal to pay.",
+            category="payment",
         )
 
     return student
