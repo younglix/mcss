@@ -37,11 +37,20 @@ class Invoice(BaseModel):
         PAID = "paid", "Paid"
         WAIVED = "waived", "Waived"
 
+    class Purpose(models.TextChoices):
+        """Blank for ordinary invoices (bulk-generated school fees, optional
+        add-ons). The two admission-workflow values mark the auto-generated
+        invoices refresh_status() chains off of — a small explicit field
+        rather than matching on `description` text, which staff can edit."""
+        ACCEPTANCE_FEE = "acceptance_fee", "Acceptance Fee"
+        FIRST_SCHOOL_FEE = "first_school_fee", "First School Fee"
+
     invoice_number = models.CharField(max_length=30, unique=True, editable=False)
     student = models.ForeignKey("academics.Student", on_delete=models.CASCADE, related_name="invoices")
     fee_structure = models.ForeignKey(
         FeeStructure, on_delete=models.SET_NULL, null=True, blank=True, related_name="invoices",
     )
+    purpose = models.CharField(max_length=20, choices=Purpose.choices, blank=True, default="")
     description = models.CharField(max_length=200)
     session = models.ForeignKey("configuration.AcademicSession", on_delete=models.CASCADE, related_name="invoices")
     term = models.ForeignKey("configuration.Term", on_delete=models.CASCADE, null=True, blank=True, related_name="invoices")
@@ -70,6 +79,7 @@ class Invoice(BaseModel):
         return self.amount - self.amount_paid
 
     def refresh_status(self):
+        was_paid = self.status == self.Status.PAID
         paid = self.amount_paid
         if self.status == self.Status.WAIVED:
             pass
@@ -80,6 +90,63 @@ class Invoice(BaseModel):
         else:
             self.status = self.Status.PAID
         self.save(update_fields=["status"])
+
+        if self.status == self.Status.PAID and not was_paid and self.purpose:
+            self._advance_admission_workflow()
+
+    def _advance_admission_workflow(self):
+        """Chains the admission-workflow invoices: Acceptance Fee paid ->
+        auto-generate the First School Fee invoice(s); First School Fee(s)
+        paid -> generate the student's Registration Number. Guarded by
+        existence/presence checks (not just the was_paid transition above)
+        so this is safe to call more than once for the same invoice."""
+        from apps.academics.models import Student
+
+        student = self.student
+        if student.status != Student.Status.PENDING:
+            return
+
+        if self.purpose == self.Purpose.ACCEPTANCE_FEE:
+            _generate_first_school_fee_invoices(student)
+        elif self.purpose == self.Purpose.FIRST_SCHOOL_FEE:
+            _maybe_generate_registration_number(student)
+
+
+def _generate_first_school_fee_invoices(student):
+    from apps.settings_app.numbering import generate_number
+
+    if student.invoices.filter(purpose=Invoice.Purpose.FIRST_SCHOOL_FEE).exists():
+        return  # already generated — idempotent no-op
+
+    application = getattr(student, "source_application", None)
+    school_class = application.class_applying_for if application else None
+    if school_class is None:
+        return  # nothing to bill against; staff can generate manually later
+
+    session = student.invoices.filter(purpose=Invoice.Purpose.ACCEPTANCE_FEE).first().session
+    structures = FeeStructure.objects.filter(session=session).filter(
+        models.Q(school_class=school_class) | models.Q(school_class__isnull=True)
+    )
+    for structure in structures:
+        Invoice.objects.get_or_create(
+            student=student, fee_structure=structure, session=session, term=None,
+            purpose=Invoice.Purpose.FIRST_SCHOOL_FEE,
+            defaults={"description": f"{structure.category.name} — {session.name}", "amount": structure.amount},
+        )
+
+
+def _maybe_generate_registration_number(student):
+    from apps.settings_app.numbering import generate_number
+
+    if student.registration_number:
+        return  # already generated — idempotent no-op
+
+    batch = student.invoices.filter(purpose=Invoice.Purpose.FIRST_SCHOOL_FEE)
+    if not batch.exists() or batch.exclude(status=Invoice.Status.PAID).exists():
+        return  # not all first-school-fee invoices are settled yet
+
+    student.registration_number = generate_number("registration")
+    student.save(update_fields=["registration_number"])
 
 
 class Payment(BaseModel):
@@ -105,6 +172,16 @@ class Payment(BaseModel):
 
     class Meta(BaseModel.Meta):
         ordering = ["-paid_at"]
+        constraints = [
+            # The idempotency guard for the Paystack webhook: `reference` is
+            # the gateway's transaction reference, and a redelivered webhook
+            # for one already recorded must be rejected at the DB level too,
+            # not just by the application-level existence check.
+            models.UniqueConstraint(
+                fields=["reference"], condition=~models.Q(reference="") & models.Q(reference__isnull=False),
+                name="finance_payment_reference_uniq",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.receipt_number} — {self.amount}"

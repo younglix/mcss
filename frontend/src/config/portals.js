@@ -15,13 +15,13 @@ export const portals = {
     sidebarNav: [
       { key: 'dashboard', label: 'Dashboard', icon: 'dashboard', path: '/student', status: 'active' },
       { key: 'academics', label: 'Academics', icon: 'school', path: '/student/academics', status: 'planned' },
-      { key: 'finance', label: 'Finance', icon: 'payments', path: '/student/finance', status: 'planned' },
+      { key: 'finance', label: 'Finance', icon: 'payments', path: '/student/finance', status: 'active' },
       { key: 'schedule', label: 'Schedule', icon: 'calendar_today', path: '/student/schedule', status: 'planned' },
     ],
     bottomNav: [
       { key: 'dashboard', label: 'Home', icon: 'dashboard', path: '/student', status: 'active' },
       { key: 'academics', label: 'Academics', icon: 'school', path: '/student/academics', status: 'planned' },
-      { key: 'finance', label: 'Fees', icon: 'payments', path: '/student/finance', status: 'planned' },
+      { key: 'finance', label: 'Fees', icon: 'payments', path: '/student/finance', status: 'active' },
       { key: 'more', label: 'More', icon: 'more_horiz', path: '/student/more', status: 'planned' },
     ],
   },
@@ -282,13 +282,13 @@ export const portals = {
     sidebarNav: [
       { key: 'dashboard', label: 'Dashboard', icon: 'dashboard', path: '/parent', status: 'active' },
       { key: 'academics', label: 'Academics', icon: 'school', path: '/parent/academics', status: 'planned' },
-      { key: 'finance', label: 'Finance', icon: 'payments', path: '/parent/finance', status: 'planned' },
+      { key: 'finance', label: 'Finance', icon: 'payments', path: '/parent/finance', status: 'active' },
       { key: 'schedule', label: 'Schedule', icon: 'calendar_today', path: '/parent/schedule', status: 'planned' },
     ],
     bottomNav: [
       { key: 'dashboard', label: 'Home', icon: 'dashboard', path: '/parent', status: 'active' },
       { key: 'academics', label: 'Academics', icon: 'school', path: '/parent/academics', status: 'planned' },
-      { key: 'finance', label: 'Fees', icon: 'payments', path: '/parent/finance', status: 'planned' },
+      { key: 'finance', label: 'Fees', icon: 'payments', path: '/parent/finance', status: 'active' },
       { key: 'more', label: 'More', icon: 'more_horiz', path: '/parent/more', status: 'planned' },
     ],
   },

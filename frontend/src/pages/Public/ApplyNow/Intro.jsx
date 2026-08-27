@@ -3,12 +3,19 @@ import { useNavigate, Link } from 'react-router-dom';
 import PublicHeader from '../../../components/public/PublicHeader.jsx';
 import PublicFooter from '../../../components/public/PublicFooter.jsx';
 import ApplyStepper from '../../../components/public/ApplyStepper.jsx';
-import { sessions, processSteps, requiredDocs } from './applyData.js';
+import { sessions, levels, processSteps, requiredDocs } from './applyData.js';
+import { saveDraft, getDraft } from './applyDraft.js';
 
 export default function ApplyIntro() {
   const navigate = useNavigate();
   const [session, setSession] = useState(sessions[0].key);
+  const [level, setLevel] = useState(getDraft().level || levels[0].key);
   const [agreed, setAgreed] = useState(false);
+
+  const handleStart = () => {
+    saveDraft({ level });
+    navigate('/apply/bio-data');
+  };
 
   useEffect(() => {
     document.title = 'Apply | MCSS Portal';
@@ -57,6 +64,29 @@ export default function ApplyIntro() {
               <div className="bg-surface-container-lowest p-xl rounded-lg border border-outline/10 max-w-2xl mx-auto">
                 <div className="space-y-lg">
                   <div>
+                    <label className="font-label-md text-label-md text-primary block mb-sm">Applying For</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                      {levels.map((option) => (
+                        <button
+                          key={option.key}
+                          type="button"
+                          onClick={() => setLevel(option.key)}
+                          className={`relative p-md rounded-lg text-left transition-all border-2 ${
+                            level === option.key ? 'border-primary bg-primary/5' : 'border-outline/20 hover:border-primary'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-label-md text-label-md text-on-surface">{option.label}</p>
+                              <p className="font-label-sm text-label-sm text-on-surface-variant">{option.note}</p>
+                            </div>
+                            {level === option.key && <span className="material-symbols-outlined text-primary">check_circle</span>}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
                     <label className="font-label-md text-label-md text-primary block mb-sm">Select Intended Academic Session</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
                       {sessions.map((option) => (
@@ -102,7 +132,7 @@ export default function ApplyIntro() {
                 <button
                   type="button"
                   disabled={!agreed}
-                  onClick={() => navigate('/apply/bio-data')}
+                  onClick={handleStart}
                   className="px-xl py-lg bg-primary text-on-primary rounded-lg font-headline-md text-headline-sm hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none shadow-lg hover:-translate-y-1 transition-all flex items-center gap-sm"
                 >
                   Start Application

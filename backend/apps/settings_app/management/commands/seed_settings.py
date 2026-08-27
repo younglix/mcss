@@ -68,6 +68,11 @@ DEFAULT_SETTINGS = [
     ("numbering.application_format", "numbering", "APP/{year}/{seq:05}", False),
     ("numbering.staff_format", "numbering", "STF/{year}/{seq:04}", False),
     ("numbering.expense_format", "numbering", "EXP/{year}/{seq:05}", False),
+    # Registration Number — generated once the first school fee clears (see
+    # apps.finance.models._maybe_generate_registration_number), distinct
+    # from the Student ID (numbering.admission_format, generated at
+    # admission approval).
+    ("numbering.registration_format", "numbering", "REG/{year}/{seq:04}", False),
     # Academic — rules/defaults, not a duplicate of the real academic records
     # (grading scale is configuration.GradeScale, current session/term is
     # configuration.AcademicSession/Term — both linked to from this settings
@@ -96,6 +101,11 @@ DEFAULT_SETTINGS = [
     ("finance.financial_year_start_month", "finance", 1, False),
     ("finance.default_discount_percent", "finance", 0, False),
     ("finance.tax_percent", "finance", 0, False),
+    # A flat fee (unlike school fees, which already vary by class via
+    # FeeStructure) charged on admission acceptance — read by
+    # apps.admissions.services.approve_application when it opens the
+    # Acceptance Fee invoice.
+    ("finance.acceptance_fee_amount", "finance", 0, False),
     # Users & Security — genuinely enforced: password policy feeds
     # apps.accounts.validators.ConfigurablePasswordValidator (wired into
     # AUTH_PASSWORD_VALIDATORS, so it applies to every password entry

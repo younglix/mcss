@@ -11,6 +11,7 @@ class CustomField(BaseModel):
     class Entity(models.TextChoices):
         STUDENT = "student", "Student"
         STAFF = "staff", "Staff"
+        APPLICATION = "application", "Admission Application"
 
     class FieldType(models.TextChoices):
         TEXT = "text", "Text"

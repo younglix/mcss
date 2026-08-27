@@ -7,6 +7,7 @@ urlpatterns = [
     path("subjects/<uuid:subject_id>", views.SubjectDetailView.as_view(), name="academics-subject-detail"),
 
     path("students", views.StudentsView.as_view(), name="academics-students"),
+    path("students/my-children", views.MyChildrenView.as_view(), name="academics-my-children"),
     path("students/<uuid:pk>", views.StudentDetailView.as_view(), name="academics-student-detail"),
 
     path("teachers", views.TeachersView.as_view(), name="academics-teachers"),

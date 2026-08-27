@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
 from apps.audit.services import log
@@ -14,6 +15,21 @@ class CustomFieldsPermissionMixin:
     def get_permissions(self):
         code = "custom_fields.view" if self.request.method in ("GET", "HEAD", "OPTIONS") else "custom_fields.edit"
         return [HasPermission(code)]
+
+
+class PublicApplicationValuesMixin:
+    """The admission form is public, so its custom fields (definitions and
+    the applicant's own answers) must be readable/writable without auth —
+    same trust model the rest of apps.admissions already uses (the
+    reference_number/application id itself is the unguessable credential).
+    Every other entity keeps the normal authenticated custom_fields.*
+    permission gate."""
+
+    def get_permissions(self):
+        entity = self.request.query_params.get("entity") or self.request.data.get("entity")
+        if entity == "application":
+            return [AllowAny()]
+        return super().get_permissions()
 
 
 class CustomFieldsView(CustomFieldsPermissionMixin, ListCreateAPIView):
@@ -45,7 +61,7 @@ class CustomFieldDetailView(CustomFieldsPermissionMixin, RetrieveUpdateDestroyAP
         instance.delete()
 
 
-class CustomFieldValuesView(CustomFieldsPermissionMixin, APIView):
+class CustomFieldValuesView(PublicApplicationValuesMixin, CustomFieldsPermissionMixin, APIView):
     """GET returns every active field for the given entity, each carrying
     its current value (or None) for the given entity_id — one call gives the
     frontend everything it needs to render the dynamic section of a
@@ -75,7 +91,7 @@ class CustomFieldValuesView(CustomFieldsPermissionMixin, APIView):
         return success(data=data)
 
 
-class CustomFieldValuesBulkUpsertView(CustomFieldsPermissionMixin, APIView):
+class CustomFieldValuesBulkUpsertView(PublicApplicationValuesMixin, CustomFieldsPermissionMixin, APIView):
     def put(self, request):
         serializer = CustomFieldValueBulkUpsertSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -90,6 +106,7 @@ class CustomFieldValuesBulkUpsertView(CustomFieldsPermissionMixin, APIView):
             )
             updated.append(str(field.id))
 
-        log(actor=request.user, action="custom_fields.values_updated",
+        actor = request.user if request.user.is_authenticated else None
+        log(actor=actor, action="custom_fields.values_updated",
             changes={"entity": entity, "entity_id": str(entity_id), "field_ids": updated}, request=request)
         return success(message="Custom field values saved.", data={"updated_field_ids": updated})

@@ -16,6 +16,7 @@ def _default_format(key):
         "receipt": "RCT/{year}/{seq:05}",
         "invoice": "INV/{year}/{seq:05}",
         "expense": "EXP/{year}/{seq:05}",
+        "registration": "REG/{year}/{seq:04}",
     }.get(key, "{year}/{seq:05}")
 
 

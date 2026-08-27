@@ -34,10 +34,19 @@ def send(recipient, title, body):
     if not recipient.email:
         logger.warning("Cannot send email notification: user %s has no email.", recipient.id)
         return
+    send_raw(recipient.email, title, body)
+
+
+def send_raw(to_email, subject, body):
+    """Same SMTP path as send(), but for recipients with no accounts.User
+    row at all — e.g. a rejected admission applicant, who never gets one."""
+    if not to_email:
+        logger.warning("Cannot send email: no address given.")
+        return
 
     config = _smtp_config()
     if not config:
-        logger.info("Email not sent to %s: no SMTP host configured (Communication settings).", recipient.email)
+        logger.info("Email not sent to %s: no SMTP host configured (Communication settings).", to_email)
         return
 
     connection = get_connection(
@@ -46,8 +55,8 @@ def send(recipient, title, body):
     )
     try:
         send_mail(
-            subject=title, message=body, from_email=config["from_email"],
-            recipient_list=[recipient.email], connection=connection,
+            subject=subject, message=body, from_email=config["from_email"],
+            recipient_list=[to_email], connection=connection,
         )
     except Exception:
-        logger.exception("Failed to send email to %s via configured SMTP.", recipient.email)
+        logger.exception("Failed to send email to %s via configured SMTP.", to_email)

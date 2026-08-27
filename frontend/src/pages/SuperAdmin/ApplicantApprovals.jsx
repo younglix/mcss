@@ -19,27 +19,55 @@ const STATUS_LABEL = { submitted: 'Submitted', under_review: 'Under Review', acc
 function DetailDrawer({ application, onClose, reload }) {
   const [notes, setNotes] = useState(application?.review_notes || '');
   const [saving, setSaving] = useState(false);
+  const [actionError, setActionError] = useState('');
 
   const handleReview = async (status) => {
     setSaving(true);
+    setActionError('');
     try {
       await api.post(`/admissions/applications/${application.id}/review`, { status, review_notes: notes });
       onClose();
       reload();
+    } catch (err) {
+      setActionError(err.message || 'Could not update this application.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAccept = async () => {
+    setSaving(true);
+    setActionError('');
+    try {
+      await api.post(`/admissions/applications/${application.id}/accept`, {});
+      onClose();
+      reload();
+    } catch (err) {
+      setActionError(err.message || 'Could not accept this application.');
     } finally {
       setSaving(false);
     }
   };
 
   if (!application) return null;
+  const isSecondary = application.level === 'secondary';
 
   return (
     <Drawer open={!!application} onClose={onClose} title={application.full_name}>
       <div className="space-y-lg">
-        <div className="flex items-center gap-sm">
+        <div className="flex items-center gap-sm flex-wrap">
           <Badge tone={STATUS_TONE[application.status]}>{STATUS_LABEL[application.status]}</Badge>
+          <Badge tone="secondary">{isSecondary ? 'Secondary' : 'Primary'}</Badge>
           <span className="font-label-sm text-label-sm text-on-surface-variant">{application.reference_number}</span>
         </div>
+
+        {application.student_identifier && (
+          <div className="bg-secondary-container/30 border border-secondary/20 rounded-lg p-md space-y-xs">
+            <p className="font-label-md text-label-md font-bold text-secondary">Provisioned</p>
+            <p className="font-label-sm text-label-sm text-on-surface">Student ID: <span className="font-bold">{application.student_identifier || '—'}</span></p>
+            <p className="font-label-sm text-label-sm text-on-surface">Registration No.: <span className="font-bold">{application.registration_number || 'Pending fee payment'}</span></p>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-md">
           <div>
@@ -55,8 +83,16 @@ function DetailDrawer({ application, onClose, reload }) {
             <p className="font-label-md text-label-md">{application.class_applying_for_name || '—'}</p>
           </div>
           <div>
-            <p className="font-label-sm text-label-sm text-on-surface-variant">Previous School</p>
-            <p className="font-label-md text-label-md">{application.previous_school || '—'}</p>
+            <p className="font-label-sm text-label-sm text-on-surface-variant">Present Class</p>
+            <p className="font-label-md text-label-md">{application.present_class || '—'}</p>
+          </div>
+          <div>
+            <p className="font-label-sm text-label-sm text-on-surface-variant">Religion</p>
+            <p className="font-label-md text-label-md capitalize">{application.religion === 'others' ? application.religion_other : application.religion || '—'}</p>
+          </div>
+          <div>
+            <p className="font-label-sm text-label-sm text-on-surface-variant">Nationality / State</p>
+            <p className="font-label-md text-label-md">{application.nationality || '—'} / {application.state_of_origin || '—'}</p>
           </div>
           <div className="col-span-2">
             <p className="font-label-sm text-label-sm text-on-surface-variant">Contact</p>
@@ -68,10 +104,25 @@ function DetailDrawer({ application, onClose, reload }) {
           </div>
         </div>
 
-        <div className="border-t border-outline/10 pt-md">
-          <h4 className="font-label-md text-label-md font-bold text-primary mb-sm">Guardian</h4>
-          <p className="font-label-md text-label-md">{application.guardian_name || '—'}</p>
-          <p className="font-label-sm text-label-sm text-on-surface-variant">{application.guardian_phone || '—'} · {application.guardian_email || '—'}</p>
+        {application.has_guardian && (
+          <div className="border-t border-outline/10 pt-md">
+            <h4 className="font-label-md text-label-md font-bold text-primary mb-sm">Guardian</h4>
+            <p className="font-label-md text-label-md">{application.guardian_name || '—'}</p>
+            <p className="font-label-sm text-label-sm text-on-surface-variant">{application.guardian_phone || '—'} · {application.guardian_email || '—'}</p>
+          </div>
+        )}
+
+        <div className="border-t border-outline/10 pt-md grid grid-cols-2 gap-md">
+          <div>
+            <h4 className="font-label-md text-label-md font-bold text-primary mb-sm">Father</h4>
+            <p className="font-label-sm text-label-sm">{application.father_name || '—'}</p>
+            <p className="font-label-sm text-label-sm text-on-surface-variant">{application.father_phone || '—'}</p>
+          </div>
+          <div>
+            <h4 className="font-label-md text-label-md font-bold text-primary mb-sm">Mother</h4>
+            <p className="font-label-sm text-label-sm">{application.mother_name || '—'}</p>
+            <p className="font-label-sm text-label-sm text-on-surface-variant">{application.mother_phone || '—'}</p>
+          </div>
         </div>
 
         <div className="border-t border-outline/10 pt-md">
@@ -93,17 +144,27 @@ function DetailDrawer({ application, onClose, reload }) {
           <FormField field={{ key: 'notes', id: 'review_notes', label: 'Review Notes', type: 'textarea' }} value={notes} onChange={setNotes} />
         </div>
 
-        <div className="flex flex-wrap gap-sm pt-md border-t border-outline/10">
-          {application.status !== 'under_review' && (
-            <Button variant="secondary" disabled={saving} onClick={() => handleReview('under_review')}>Mark Under Review</Button>
-          )}
-          {application.status !== 'accepted' && (
-            <Button variant="primary" disabled={saving} onClick={() => handleReview('accepted')}>Accept</Button>
-          )}
-          {application.status !== 'rejected' && (
-            <Button variant="ghost" disabled={saving} onClick={() => handleReview('rejected')}>Reject</Button>
-          )}
-        </div>
+        {actionError && <p className="font-label-md text-label-md text-error">{actionError}</p>}
+
+        {!isSecondary ? (
+          <div className="bg-surface-container p-md rounded-lg">
+            <p className="font-label-sm text-label-sm text-on-surface-variant">
+              Primary applications are view-only for now — there is no downstream enrollment workflow for this level yet.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-sm pt-md border-t border-outline/10">
+            {application.status !== 'under_review' && application.status === 'submitted' && (
+              <Button variant="secondary" disabled={saving} onClick={() => handleReview('under_review')}>Mark Under Review</Button>
+            )}
+            {application.status !== 'accepted' && application.status !== 'rejected' && (
+              <Button variant="primary" disabled={saving} onClick={handleAccept}>Accept</Button>
+            )}
+            {application.status !== 'rejected' && application.status !== 'accepted' && (
+              <Button variant="ghost" disabled={saving} onClick={() => handleReview('rejected')}>Reject</Button>
+            )}
+          </div>
+        )}
       </div>
     </Drawer>
   );
@@ -150,6 +211,7 @@ export default function SuperAdminApplicantApprovals() {
                   <tr className="bg-primary text-on-primary">
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Applicant</th>
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Reference</th>
+                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Level</th>
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Applying For</th>
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Status</th>
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider text-right">Actions</th>
@@ -160,6 +222,7 @@ export default function SuperAdminApplicantApprovals() {
                     <tr key={a.id} className="hover:bg-surface-container-low transition-colors">
                       <td className="px-lg py-4 font-body-md text-body-md font-semibold text-on-surface">{a.full_name}</td>
                       <td className="px-lg py-4 font-label-sm text-label-sm text-on-surface-variant">{a.reference_number}</td>
+                      <td className="px-lg py-4 font-label-sm text-label-sm text-on-surface-variant capitalize">{a.level}</td>
                       <td className="px-lg py-4 font-label-sm text-label-sm text-on-surface-variant">{a.class_applying_for_name || '—'}</td>
                       <td className="px-lg py-4"><Badge tone={STATUS_TONE[a.status]}>{STATUS_LABEL[a.status]}</Badge></td>
                       <td className="px-lg py-4 text-right">

@@ -17,7 +17,7 @@ export default function ApplyReviewSubmit() {
 
   useEffect(() => {
     document.title = 'Apply: Review & Submit | MCSS Portal';
-    if (!draft.full_name) {
+    if (!draft.surname) {
       navigate('/apply/bio-data');
       return;
     }
@@ -25,34 +25,47 @@ export default function ApplyReviewSubmit() {
   }, [draft, navigate]);
 
   const className = classOptions.find((c) => c.id === draft.class_applying_for)?.name;
+  const fullName = [draft.surname, draft.first_name, draft.middle_name].filter(Boolean).join(' ');
 
   const bioFields = [
-    ['Full Legal Name', draft.full_name],
+    ['Full Legal Name', fullName],
+    ['Level', draft.level === 'primary' ? 'Primary' : 'Secondary'],
     ['Date of Birth', draft.date_of_birth || '—'],
-    ['Previous School', draft.previous_school || '—'],
+    ['Present Class', draft.present_class || '—'],
     ['Applying For', className || '—'],
   ];
 
   const readyDocs = Object.entries(draft.documents_ready || {}).filter(([, v]) => v).map(([k]) => k);
 
+  const SUBMIT_FIELDS = [
+    'level', 'surname', 'first_name', 'middle_name', 'date_of_birth', 'gender',
+    'present_class', 'schools_attended', 'religion', 'religion_other',
+    'nationality', 'state_of_origin', 'email', 'phone', 'address',
+    'has_guardian', 'guardian_name', 'guardian_phone', 'guardian_email',
+    'father_name', 'father_occupation', 'father_phone', 'father_place_of_work',
+    'father_home_address', 'father_office_address', 'father_email',
+    'mother_name', 'mother_occupation', 'mother_phone', 'mother_place_of_work',
+    'mother_home_address', 'mother_office_address', 'mother_email',
+    'siblings_in_school', 'guardian_signature_name',
+    'class_applying_for', 'previous_school',
+  ];
+
   const handleSubmit = async () => {
     setSubmitting(true);
     setError('');
     try {
-      const payload = {
-        full_name: draft.full_name,
-        date_of_birth: draft.date_of_birth || null,
-        gender: draft.gender || '',
-        email: draft.guardian_email || '',
-        phone: draft.guardian_phone || '',
-        address: draft.address || '',
-        guardian_name: draft.guardian_name,
-        guardian_phone: draft.guardian_phone || '',
-        guardian_email: draft.guardian_email || '',
-        class_applying_for: draft.class_applying_for || null,
-        previous_school: draft.previous_school || '',
-      };
+      const payload = Object.fromEntries(SUBMIT_FIELDS.map((key) => [key, draft[key] ?? '']));
       const result = await api.post('/admissions/apply', payload, { auth: false });
+
+      const customFieldValues = draft.customFieldValues || {};
+      const fieldIds = Object.keys(customFieldValues);
+      if (fieldIds.length > 0 && result.id) {
+        await api.put('/custom-fields/values/bulk', {
+          entity: 'application', entity_id: result.id,
+          values: fieldIds.map((field_id) => ({ field_id, value: customFieldValues[field_id] })),
+        }, { auth: false }).catch(() => {}); // best-effort — the core application is already submitted either way
+      }
+
       saveResult(result);
       clearDraft();
       navigate('/apply/confirmation');

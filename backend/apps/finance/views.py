@@ -1,4 +1,7 @@
+import secrets
+
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.db.models import Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -6,15 +9,17 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from xhtml2pdf import pisa
 
 from apps.academics.models import Student
+from apps.admissions import paystack
 from apps.audit.services import log
 from apps.configuration.models import AcademicSession, SchoolProfile
 from apps.rbac.permissions import HasPermission
 from apps.settings_app.models import SystemSetting
-from common.responses import success
+from common.responses import failure, success
 
 from .models import Expense, FeeStructure, Invoice, Payment, PayrollRun, Payslip, StaffSalary
 from .serializers import (
@@ -182,6 +187,71 @@ class InvoiceWaiveView(APIView):
         return success(message="Invoice waived.", data=InvoiceSerializer(invoice).data)
 
 
+class MyInvoicesView(APIView):
+    """The logged-in student's own invoices — Student Portal > Fees. Deliberately
+    separate from the staff InvoicesView above: a student has no fees.* RBAC
+    permission and must never be able to pass a `student` query param to see
+    someone else's."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = getattr(request.user, "student_profile", None)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        qs = Invoice.objects.filter(student=student).select_related("student__user", "student__class_arm")
+        return success(data=InvoiceSerializer(qs, many=True).data)
+
+
+class MyPaymentsView(APIView):
+    """The logged-in student's own payment history — Student Portal >
+    Payment History. A parent viewing a child's payments goes through the
+    child-scoped equivalent, not this endpoint (parents have no
+    student_profile of their own)."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = getattr(request.user, "student_profile", None)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        qs = Payment.objects.filter(invoice__student=student).select_related("invoice__student__user")
+        return success(data=PaymentSerializer(qs, many=True).data)
+
+
+def _child_or_403(request, student_id):
+    """Ownership check for the Parent Portal's view-only Fees/Payment
+    History: the requesting user must be the linked guardian_user for this
+    exact student. Parents never get InvoicePayView — that action lives on
+    the student portal only, per the flow's stated view-only rule."""
+    student = get_object_or_404(Student, id=student_id)
+    if student.guardian_user_id != request.user.id:
+        return None
+    return student
+
+
+class ChildInvoicesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        qs = Invoice.objects.filter(student=student).select_related("student__user", "student__class_arm")
+        return success(data=InvoiceSerializer(qs, many=True).data)
+
+
+class ChildPaymentsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        qs = Payment.objects.filter(invoice__student=student).select_related("invoice__student__user")
+        return success(data=PaymentSerializer(qs, many=True).data)
+
+
 # ---------------------------------------------------------------- Payments / Receipts
 class PaymentsView(APIView):
     def get_permissions(self):
@@ -212,13 +282,26 @@ class PaymentReceiptPDFView(APIView):
     result directly rather than writing to MEDIA_ROOT (nothing in this repo
     serves media files in production yet, so streaming needs no new infra)."""
 
-    permission_classes = [HasPermission("fees.view")]
+    # Staff with fees.view, OR the student who owns the payment, OR that
+    # student's linked guardian — a receipt is legitimately something all
+    # three should be able to pull, so this checks ownership in the view
+    # body rather than gating with a single staff-only RBAC permission.
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, payment_id):
         payment = get_object_or_404(
             Payment.objects.select_related("invoice__student__user", "invoice__student__class_arm__school_class"),
             id=payment_id,
         )
+        from apps.rbac.permissions import get_effective_permissions
+
+        perms = get_effective_permissions(request.user)
+        is_staff_viewer = "*" in perms or "fees.view" in perms
+        is_owning_student = getattr(request.user, "student_profile", None) and payment.invoice.student.user_id == request.user.id
+        is_owning_guardian = payment.invoice.student.guardian_user_id == request.user.id
+        if not (is_staff_viewer or is_owning_student or is_owning_guardian):
+            return failure(message="You do not have access to this receipt.", status=403)
+
         profile = SchoolProfile.objects.first()
         settings_by_key = {
             s.key: s.value for s in SystemSetting.objects.filter(key__in=[
@@ -266,6 +349,104 @@ class PaymentReceiptPDFView(APIView):
         if pisa_status.err:
             return HttpResponse("Could not generate receipt PDF.", status=500)
         return pdf_buffer
+
+
+class InvoicePayView(APIView):
+    """Lets the student who owns an invoice pay it online — narrower and
+    differently-scoped than staff's fees.* RBAC (a student must never be
+    able to touch another invoice, and shouldn't need bursary permissions
+    just to pay their own fees). Reused unmodified for every invoice a
+    student ever pays online: acceptance fee, first school fee, and later
+    optional/add-on fees — one payment-initiation mechanism, not one per
+    fee type."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, invoice_id):
+        student = getattr(request.user, "student_profile", None)
+        if student is None:
+            return failure(message="Only a student can pay their own invoice.", status=403)
+        invoice = get_object_or_404(Invoice, id=invoice_id, student=student)
+        if invoice.status == Invoice.Status.PAID:
+            return failure(message="This invoice is already fully paid.", status=400)
+        if invoice.status == Invoice.Status.WAIVED:
+            return failure(message="This invoice has been waived.", status=400)
+
+        if not paystack.is_configured():
+            return failure(
+                message="Online payment isn't configured yet. Please contact the school to arrange payment.",
+                status=503,
+            )
+
+        reference = f"MCSS-{invoice.id.hex}-{secrets.token_hex(4)}"
+        callback_url = request.build_absolute_uri("/student/finance")
+        data = paystack.initialize_transaction(
+            email=request.user.email or "no-reply@mountcarmel.edu",
+            amount_naira=invoice.balance, reference=reference, callback_url=callback_url,
+        )
+        if not data:
+            return failure(message="Could not start the payment. Please try again shortly.", status=502)
+        return success(data={"payment_url": data["authorization_url"], "reference": reference})
+
+
+class PaystackWebhookView(APIView):
+    """Paystack's server-to-server callback on a successful charge. Public
+    by necessity (Paystack, not a logged-in user, calls this), so trust is
+    entirely in the verified signature + the secondary verify_transaction()
+    check — never in the request body alone."""
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        signature = request.META.get("HTTP_X_PAYSTACK_SIGNATURE", "")
+        if not paystack.verify_signature(request.body, signature):
+            return failure(message="Invalid signature.", status=401)
+
+        payload = request.data
+        if payload.get("event") != "charge.success":
+            return success(message="Ignored.")  # not an event we act on
+
+        reference = payload.get("data", {}).get("reference", "")
+        # Idempotency: a redelivered webhook for an already-recorded
+        # reference is a safe no-op — backed by the DB partial-unique
+        # constraint on Payment.reference too, so a race can't double-insert.
+        if not reference or Payment.objects.filter(reference=reference).exists():
+            return success(message="Already processed.")
+
+        # Verified server-to-server against Paystack itself before trusting
+        # the webhook body at all — done outside the lock below, since it's
+        # a network call and shouldn't extend how long the invoice row stays
+        # locked.
+        verified = paystack.verify_transaction(reference)
+        if not verified or verified.get("status") != "success":
+            return failure(message="Transaction could not be verified.", status=400)
+
+        try:
+            invoice_id_hex = reference.split("-")[1]
+        except IndexError:
+            return failure(message="Malformed reference.", status=400)
+
+        amount_naira = verified.get("amount", 0) / 100  # Paystack amounts are in kobo
+        with transaction.atomic():
+            # select_for_update() only actually locks inside an open
+            # transaction — and the existence re-check must happen after
+            # acquiring the lock, or two near-simultaneous redeliveries could
+            # both pass the earlier check and both attempt to create a Payment.
+            try:
+                invoice = Invoice.objects.select_for_update().get(id=invoice_id_hex)
+            except (ValueError, Invoice.DoesNotExist):
+                return failure(message="Invoice not found for this reference.", status=404)
+            if Payment.objects.filter(reference=reference).exists():
+                return success(message="Already processed.")
+            Payment.objects.create(
+                invoice=invoice, amount=amount_naira, method=Payment.Method.ONLINE,
+                reference=reference, status=Payment.Status.COMPLETED,
+            )
+            invoice.refresh_status()
+
+        log(actor=None, action="finance.payment_recorded_online", target=invoice,
+            changes={"reference": reference, "amount": str(amount_naira)}, request=request)
+        return success(message="Payment recorded.")
 
 
 class PaymentRefundView(APIView):

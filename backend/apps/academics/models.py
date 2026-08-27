@@ -28,6 +28,7 @@ class Student(BaseModel):
         FEMALE = "female", "Female"
 
     class Status(models.TextChoices):
+        PENDING = "pending", "Pending"       # admitted via the online workflow, not yet registered/active
         ACTIVE = "active", "Active"
         GRADUATED = "graduated", "Graduated"
         WITHDRAWN = "withdrawn", "Withdrawn"
@@ -42,11 +43,27 @@ class Student(BaseModel):
     guardian_name = models.CharField(max_length=150, blank=True)
     guardian_phone = models.CharField(max_length=20, blank=True)
     guardian_email = models.EmailField(blank=True)
+    # Linked parent-portal account, if one was created/reused for this
+    # student — distinct from the plain-text guardian_* fields above, which
+    # stay for display even when no portal account exists.
+    guardian_user = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="guarded_students"
+    )
     admission_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
+    # The permanent, searchable identifier generated once the first school
+    # fee clears (see apps.admissions.services) — distinct from the
+    # Student ID (user.identifier, generated at admission approval).
+    registration_number = models.CharField(max_length=30, blank=True, null=True)
 
     class Meta(BaseModel.Meta):
         ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["registration_number"], condition=models.Q(registration_number__isnull=False),
+                name="academics_student_registration_number_uniq",
+            ),
+        ]
 
     def __str__(self):
         return self.user.full_name

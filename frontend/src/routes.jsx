@@ -82,7 +82,9 @@ import AdminTransportDashboard from './pages/Admin/Transport/Dashboard.jsx';
 import AdminActivityDashboard from './pages/Admin/Activity/Dashboard.jsx';
 import OfficialReportCard from './pages/Admin/Academics/ReportCard.jsx';
 import StudentDashboard from './pages/Student/Dashboard.jsx';
+import StudentFinance from './pages/Student/Finance.jsx';
 import ParentDashboard from './pages/Parent/Dashboard.jsx';
+import ParentFinance from './pages/Parent/Finance.jsx';
 import BursaryDashboard from './pages/Bursary/Dashboard.jsx';
 import TeacherScoreEntry from './pages/Staff/Teacher/ScoreEntry.jsx';
 import ClassTeacherOverview from './pages/Staff/ClassTeacher/ClassOverview.jsx';
@@ -174,7 +176,9 @@ export const routes = [
   { path: "/admin/activity", label: "Activity Admin", source: "activity_coordinator_event_management", element: <AdminActivityDashboard /> },
   { path: "/admin/academics/report-card", label: "Official Report Card", source: "official_report_card_responsive_mcss", element: <OfficialReportCard /> },
   { path: "/student", label: "Student Dashboard", source: "student_dashboard_mcss", element: <StudentDashboard /> },
+  { path: "/student/finance", label: "Student Fees", source: "student_finance_mcss", element: <StudentFinance /> },
   { path: "/parent", label: "Parent Dashboard", source: "parent_dashboard_mcss", element: <ParentDashboard /> },
+  { path: "/parent/finance", label: "Parent Fees", source: "parent_finance_mcss", element: <ParentFinance /> },
   { path: "/bursary", label: "Bursary Dashboard", source: "bursary_dashboard_mcss", element: <BursaryDashboard /> },
   { path: "/staff/teacher", label: "Teacher Score Entry", source: "teacher_portal_responsive_score_entry", element: <TeacherScoreEntry /> },
   { path: "/staff/class-teacher", label: "Class Teacher Overview", source: "class_teacher_portal_my_class_overview", element: <ClassTeacherOverview /> },

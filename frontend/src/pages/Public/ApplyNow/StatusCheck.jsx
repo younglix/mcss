@@ -101,6 +101,27 @@ export default function ApplyStatusCheck() {
                   <p className="font-body-md text-body-md font-bold text-on-surface">{new Date(result.submitted_at).toLocaleDateString()}</p>
                 </div>
               </div>
+
+              {result.status === 'accepted' && (
+                <div className="mt-lg pt-lg border-t border-outline/10">
+                  <p className="font-label-sm text-label-sm text-outline mb-xs">Acceptance Fee</p>
+                  {result.acceptance_fee ? (
+                    <p className="font-body-md text-body-md font-bold text-on-surface capitalize">
+                      {result.acceptance_fee.status} — balance ₦{Number(result.acceptance_fee.balance).toLocaleString()}
+                    </p>
+                  ) : (
+                    <p className="font-body-md text-body-md text-on-surface-variant">Not yet generated.</p>
+                  )}
+                  {result.registration_number && (
+                    <p className="mt-sm font-body-md text-body-md text-on-surface">
+                      Registration Number: <span className="font-bold">{result.registration_number}</span>
+                    </p>
+                  )}
+                  <p className="mt-md font-label-sm text-label-sm text-on-surface-variant">
+                    Log in to your student portal with the credentials emailed to you to continue enrollment and pay fees.
+                  </p>
+                </div>
+              )}
             </div>
           </section>
         )}

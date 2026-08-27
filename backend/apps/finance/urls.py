@@ -10,12 +10,18 @@ urlpatterns = [
     path("school-fees/generate", views.SchoolFeesGenerateView.as_view(), name="finance-school-fees-generate"),
 
     path("invoices", views.InvoicesView.as_view(), name="finance-invoices"),
+    path("invoices/mine", views.MyInvoicesView.as_view(), name="finance-my-invoices"),
+    path("invoices/child/<uuid:student_id>", views.ChildInvoicesView.as_view(), name="finance-child-invoices"),
     path("invoices/<uuid:invoice_id>", views.InvoiceDetailView.as_view(), name="finance-invoice-detail"),
     path("invoices/<uuid:invoice_id>/waive", views.InvoiceWaiveView.as_view(), name="finance-invoice-waive"),
+    path("invoices/<uuid:invoice_id>/pay", views.InvoicePayView.as_view(), name="finance-invoice-pay"),
 
     path("payments", views.PaymentsView.as_view(), name="finance-payments"),
+    path("payments/mine", views.MyPaymentsView.as_view(), name="finance-my-payments"),
+    path("payments/child/<uuid:student_id>", views.ChildPaymentsView.as_view(), name="finance-child-payments"),
     path("payments/<uuid:payment_id>/refund", views.PaymentRefundView.as_view(), name="finance-payment-refund"),
     path("payments/<uuid:payment_id>/receipt.pdf", views.PaymentReceiptPDFView.as_view(), name="finance-payment-receipt-pdf"),
+    path("payments/paystack/webhook", views.PaystackWebhookView.as_view(), name="finance-paystack-webhook"),
 
     path("expenses", views.ExpensesView.as_view(), name="finance-expenses"),
     path("expenses/<uuid:expense_id>", views.ExpenseDetailView.as_view(), name="finance-expense-detail"),

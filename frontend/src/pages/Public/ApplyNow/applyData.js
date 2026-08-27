@@ -3,6 +3,11 @@ export const sessions = [
   { key: '2025-2026', label: '2025/2026 Session', note: 'Advance Registration' },
 ];
 
+export const levels = [
+  { key: 'secondary', label: 'Secondary School', note: 'JSS1 – SSS3' },
+  { key: 'primary', label: 'Primary School', note: 'Primary 1 – 6' },
+];
+
 export const processSteps = [
   { icon: 'description', title: '1. Complete Form', body: 'Provide accurate personal and academic information.' },
   { icon: 'upload_file', title: '2. Upload Documents', body: 'Attach birth certificate and previous school reports.' },

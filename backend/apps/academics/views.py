@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from apps.audit.services import log
@@ -139,6 +140,20 @@ class StudentDetailView(StudentPermissionMixin, RetrieveUpdateDestroyAPIView):
         instance.user.soft_delete()
         instance.user.is_active = False
         instance.user.save(update_fields=["is_active"])
+
+
+class MyChildrenView(APIView):
+    """Parent Portal's child-switcher: every Student this logged-in user is
+    the linked guardian_user for. One parent, many students — populated at
+    admission acceptance (apps.admissions.services.find_or_create_parent)."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        qs = Student.objects.select_related("user", "class_arm").filter(
+            guardian_user=request.user, user__is_deleted=False,
+        )
+        return success(data=StudentSerializer(qs, many=True).data)
 
 
 # ---------------------------------------------------------------- Teachers (read summary over Staff)
