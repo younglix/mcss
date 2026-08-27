@@ -216,3 +216,23 @@ class GradeScaleDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
 class FeeCategoriesView(ConfigPermissionMixin, ListCreateAPIView):
     serializer_class = FeeCategorySerializer
     queryset = FeeCategory.objects.all()
+
+    def perform_create(self, serializer):
+        category = serializer.save()
+        log(actor=self.request.user, action="config.fee_category_created", target=category, request=self.request)
+
+
+class FeeCategoryDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = FeeCategorySerializer
+    queryset = FeeCategory.objects.all()
+    lookup_url_kwarg = "fee_category_id"
+
+    def perform_update(self, serializer):
+        category = serializer.save()
+        log(actor=self.request.user, action="config.fee_category_updated", target=category, request=self.request)
+
+    def perform_destroy(self, instance):
+        if instance.fee_structures.exists():
+            raise ValidationError("Can't delete a fee item that's already used in a fee structure. Remove those first.")
+        log(actor=self.request.user, action="config.fee_category_deleted", target=instance, request=self.request)
+        instance.delete()

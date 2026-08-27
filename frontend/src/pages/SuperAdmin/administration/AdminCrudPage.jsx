@@ -34,6 +34,12 @@ export default function AdminCrudPage({
   // and `columns` may be functions of that extra data instead of plain
   // arrays: (extra) => [...].
   extraEndpoints,
+  // Optional (key, value, formValues, setFormValues, extra) hook fired
+  // after a field's own value is set — lets a page side-effect other fields
+  // (e.g. picking a catalog item auto-fills description/amount). The
+  // changed field's own key/value is unaffected by this; it's purely for
+  // extra derived updates.
+  onFieldChange,
 }) {
   const endpoints = useMemo(() => ({ items: endpoint, ...extraEndpoints }), [endpoint, extraEndpoints]);
   const { data, loading, error, reload } = useDashboardData(endpoints);
@@ -192,7 +198,10 @@ export default function AdminCrudPage({
               key={field.key}
               field={field}
               value={formValues[field.key]}
-              onChange={(v) => setFormValues((prev) => ({ ...prev, [field.key]: v }))}
+              onChange={(v) => {
+                setFormValues((prev) => ({ ...prev, [field.key]: v }));
+                onFieldChange?.(field.key, v, formValues, setFormValues, extra);
+              }}
               error={formErrors[field.key]?.[0] || formErrors[field.key]}
             />
           ))}

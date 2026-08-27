@@ -69,11 +69,11 @@ export default function ParentFinance() {
   const childOptions = children.map((c) => ({ id: c.id, name: c.full_name, avatarUrl: null }));
 
   return (
-    <AppShell portalId="parent" pageTitle="Fees" user={{ name: user?.full_name || 'Parent' }}>
+    <AppShell portalId="parent" pageTitle="Fees & Receipts" user={{ name: user?.full_name || 'Parent' }}>
       <div className="space-y-lg sm:space-y-xl">
         <PageHeader
-          title="School Fees"
-          subtitle="What each child owes, and their full payment history. Fees are paid from the student's own portal."
+          title="Fees & Receipts"
+          subtitle="Every fee ticket each child owes, and their full payment/receipt history. Fees are paid from the student's own portal."
           actions={children.length > 0 && (
             <ChildSwitcher children={childOptions} activeId={activeChildId} onSelect={setActiveChildId} onAdd={() => {}} />
           )}
@@ -96,7 +96,7 @@ export default function ParentFinance() {
                 <table className="w-full min-w-150 text-left border-collapse">
                   <thead>
                     <tr className="bg-primary text-on-primary">
-                      <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Description</th>
+                      <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Fee Ticket</th>
                       <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Amount</th>
                       <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Balance</th>
                       <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Status</th>

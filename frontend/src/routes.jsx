@@ -70,6 +70,7 @@ import SuperAdminActivities from './pages/SuperAdmin/student-services/Activities
 import SuperAdminResources from './pages/SuperAdmin/student-services/Resources.jsx';
 import SuperAdminHealth from './pages/SuperAdmin/student-services/Health.jsx';
 import SuperAdminSchoolFees from './pages/SuperAdmin/finance/SchoolFees.jsx';
+import SuperAdminFeeItems from './pages/SuperAdmin/finance/FeeItems.jsx';
 import SuperAdminFeeStructures from './pages/SuperAdmin/finance/FeeStructures.jsx';
 import SuperAdminInvoices from './pages/SuperAdmin/finance/Invoices.jsx';
 import SuperAdminPayments from './pages/SuperAdmin/finance/Payments.jsx';
@@ -164,6 +165,7 @@ export const routes = [
   { path: "/super-admin/student-services/resources", label: "Student Resources", source: "super_admin_student_services_resources", element: <SuperAdminResources /> },
   { path: "/super-admin/student-services/health", label: "Health / Medical Records", source: "super_admin_student_services_health", element: <SuperAdminHealth /> },
   { path: "/super-admin/finance/school-fees", label: "School Fees", source: "super_admin_finance_school_fees", element: <SuperAdminSchoolFees /> },
+  { path: "/super-admin/finance/fee-items", label: "Fee Items", source: "super_admin_finance_fee_items", element: <SuperAdminFeeItems /> },
   { path: "/super-admin/finance/fee-structures", label: "Fee Structures", source: "super_admin_finance_fee_structures", element: <SuperAdminFeeStructures /> },
   { path: "/super-admin/finance/invoices", label: "Invoices", source: "super_admin_finance_invoices", element: <SuperAdminInvoices /> },
   { path: "/super-admin/finance/payments", label: "Payments", source: "super_admin_finance_payments", element: <SuperAdminPayments /> },

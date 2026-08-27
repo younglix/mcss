@@ -62,9 +62,9 @@ export default function StudentFinance() {
   };
 
   return (
-    <AppShell portalId="student" pageTitle="Fees" user={{ name: user?.full_name || 'Student' }}>
+    <AppShell portalId="student" pageTitle="Fees & Receipts" user={{ name: user?.full_name || 'Student' }}>
       <div className="space-y-lg sm:space-y-xl">
-        <PageHeader title="School Fees" subtitle="What you owe, and every payment you've made — pay online whenever a fee is outstanding." />
+        <PageHeader title="Fees & Receipts" subtitle="Every fee ticket you owe, and every payment you've made — pay online whenever a ticket is outstanding, and download the receipt once it's paid." />
 
         {(error || payError) && (
           <Card padding="lg" className="border border-error/30 bg-error-container/10">
@@ -82,7 +82,7 @@ export default function StudentFinance() {
               <table className="w-full min-w-150 text-left border-collapse">
                 <thead>
                   <tr className="bg-primary text-on-primary">
-                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Description</th>
+                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Fee Ticket</th>
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Amount</th>
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Balance</th>
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Status</th>

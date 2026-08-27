@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { categories, familyRoles, staffRoles, superAdmin, detectFamilyRole } from './loginData.js';
 
 const inputClasses = 'mcss-field w-full pl-11 pr-md hover:border-primary';
 
-// The backend is the source of truth for what a user actually is — this
-// only decides WHERE to land them, based on what /auth/login just
-// returned, never on which category tab the user happened to click.
+// The backend is the sole source of truth for what a user actually is —
+// this only decides WHERE to land them, based on what /auth/login just
+// returned. There's no portal picker on this page at all: one form, one
+// submit, and the account's own role decides the destination.
 function resolveHomePath({ permissions, user, requestedFrom }) {
   if (requestedFrom && requestedFrom !== '/login') return requestedFrom;
   if (permissions?.includes('*')) return '/super-admin';
@@ -21,11 +21,9 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, verifyOtp } = useAuth();
-  const [activeCategory, setActiveCategory] = useState(categories[0].key);
   const [showPassword, setShowPassword] = useState(false);
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedStaffRole, setSelectedStaffRole] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [otpChallenge, setOtpChallenge] = useState(null); // { challengeId } once 2FA is required
@@ -35,40 +33,7 @@ export default function Login() {
     document.title = 'Portal Login | MCSS Portal';
   }, []);
 
-  useEffect(() => {
-    setIdentifier('');
-    setPassword('');
-    setSelectedStaffRole(null);
-    setFormError('');
-    setOtpChallenge(null);
-    setOtpCode('');
-  }, [activeCategory]);
-
-  const detectedFamily = activeCategory === 'family' ? detectFamilyRole(identifier) : null;
-
-  const idField =
-    activeCategory === 'family'
-      ? { label: 'Student ID or Parent Email/Phone', placeholder: 'e.g. MC-2024-001 or parent@email.com' }
-      : activeCategory === 'staff'
-        ? { label: selectedStaffRole ? `${selectedStaffRole.label} ID Number` : 'Staff ID Number', placeholder: 'e.g. MC-STAFF-021' }
-        : { label: superAdmin.idLabel, placeholder: superAdmin.placeholder };
-
-  const canSubmit =
-    identifier.trim().length > 0 &&
-    password.length > 0 &&
-    (activeCategory === 'family' ? !!detectedFamily : activeCategory === 'staff' ? !!selectedStaffRole : true);
-
-  const submitLabel =
-    activeCategory === 'family'
-      ? detectedFamily
-        ? `Continue as ${familyRoles[detectedFamily].label}`
-        : 'Authenticate Securely'
-      : activeCategory === 'staff'
-        ? selectedStaffRole
-          ? `Continue as ${selectedStaffRole.label}`
-          : 'Select a role to continue'
-        : 'Authenticate as Super Admin';
-
+  const canSubmit = identifier.trim().length > 0 && password.length > 0;
   const requestedFrom = location.state?.from?.pathname;
 
   const handleSubmit = async (e) => {
@@ -152,80 +117,29 @@ export default function Login() {
         <div className="max-w-md w-full mx-auto my-auto p-lg flex flex-col gap-xl">
           <header className="flex flex-col gap-xs animate-fade-slide-in">
             <span className="font-label-md text-primary tracking-widest uppercase">Secure Access</span>
-            <h2 className="font-headline-lg text-headline-md text-on-surface">Institutional Portal</h2>
-            <p className="font-body-md text-on-surface-variant">Choose your portal category to authenticate.</p>
+            <h2 className="font-headline-lg text-headline-md text-on-surface">Portal Login</h2>
+            <p className="font-body-md text-on-surface-variant">
+              Sign in with your email, Student ID, or Staff ID — we'll take you straight to your portal.
+            </p>
           </header>
 
           {!otpChallenge && (
-          <>
-          <div className="grid grid-cols-3 gap-sm">
-            {categories.map((cat) => (
-              <button
-                key={cat.key}
-                type="button"
-                onClick={() => setActiveCategory(cat.key)}
-                className={`flex flex-col items-center justify-center gap-1 py-md px-sm rounded-lg border-2 transition-all duration-300 ${
-                  activeCategory === cat.key
-                    ? 'border-primary bg-primary text-on-primary shadow-md scale-[1.02]'
-                    : 'border-outline/15 bg-surface-container-lowest text-on-surface-variant hover:border-primary/40'
-                }`}
-              >
-                <span className="material-symbols-outlined text-xl">{cat.icon}</span>
-                <span className="font-label-sm text-label-sm font-bold text-center leading-tight">{cat.label}</span>
-              </button>
-            ))}
-          </div>
-
           <form className="flex flex-col gap-lg" onSubmit={handleSubmit}>
-            <div key={activeCategory} className="flex flex-col gap-lg animate-fade-slide-in">
-              <p className="font-label-sm text-label-sm text-on-surface-variant -mt-xs">{categories.find((c) => c.key === activeCategory).description}</p>
-
-              {activeCategory === 'staff' && (
-                <div className="grid grid-cols-3 gap-xs">
-                  {staffRoles.map((role) => (
-                    <button
-                      key={role.key}
-                      type="button"
-                      onClick={() => setSelectedStaffRole(role)}
-                      className={`flex flex-col items-center justify-center gap-1 p-xs py-sm rounded-lg border transition-all duration-200 ${
-                        selectedStaffRole?.key === role.key ? 'border-primary bg-primary/5 text-primary' : 'border-outline/15 text-on-surface-variant hover:border-primary/40'
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-lg">{role.icon}</span>
-                      <span className="font-label-sm text-label-xs font-bold text-center leading-tight">{role.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex flex-col gap-xs">
-                <label className="font-label-md text-on-surface-variant" htmlFor="identifier">
-                  {idField.label}
-                </label>
-                <div className="relative">
-                  <span className="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">person</span>
-                  <input
-                    className={inputClasses}
-                    id="identifier"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder={idField.placeholder}
-                    type="text"
-                  />
-                </div>
-                {activeCategory === 'family' && (
-                  <div className="min-h-6">
-                    {detectedFamily && (
-                      <span
-                        key={detectedFamily}
-                        className="animate-fade-slide-in inline-flex items-center gap-xs bg-secondary-container text-on-secondary-container px-sm py-1 rounded-full font-label-sm text-label-sm font-bold mt-xs"
-                      >
-                        <span className="material-symbols-outlined text-sm">{familyRoles[detectedFamily].icon}</span>
-                        Detected: {familyRoles[detectedFamily].label} Portal
-                      </span>
-                    )}
-                  </div>
-                )}
+            <div className="flex flex-col gap-xs">
+              <label className="font-label-md text-on-surface-variant" htmlFor="identifier">
+                Email, Student ID, or Staff ID
+              </label>
+              <div className="relative">
+                <span className="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">person</span>
+                <input
+                  className={inputClasses}
+                  id="identifier"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder="e.g. you@mountcarmel.edu or MC/2026/0001"
+                  type="text"
+                  autoFocus
+                />
               </div>
             </div>
 
@@ -276,11 +190,10 @@ export default function Login() {
               disabled={!canSubmit || submitting}
               className="bg-secondary text-on-secondary font-label-md font-bold py-md rounded shadow-sm hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none transition-all active:scale-[0.98] flex items-center justify-center gap-sm mt-xs"
             >
-              {submitting ? 'Signing in…' : submitLabel}
+              {submitting ? 'Signing in…' : 'Sign In'}
               {!submitting && <span className="material-symbols-outlined text-body-md">login</span>}
             </button>
           </form>
-          </>
           )}
 
           {otpChallenge && (

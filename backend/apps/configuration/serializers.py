@@ -68,4 +68,4 @@ class GradeScaleSerializer(serializers.ModelSerializer):
 class FeeCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = FeeCategory
-        fields = ["id", "name", "is_recurring"]
+        fields = ["id", "name", "is_recurring", "amount"]

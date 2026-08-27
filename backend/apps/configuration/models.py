@@ -102,6 +102,12 @@ class GradeScale(BaseModel):
 class FeeCategory(BaseModel):
     name = models.CharField(max_length=100, unique=True)   # "Tuition", "ICT", "Development"
     is_recurring = models.BooleanField(default=True)
+    # The standard/default price for this fee item — e.g. "Sportswear" =
+    # 1000. Distinct from FeeStructure.amount, which prices a category per
+    # class/session/term for bulk school-fees generation; this is the flat
+    # price used when a staff member charges a one-off ticket to a student
+    # directly from the catalog, no session/class scoping required.
+    amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
 
     class Meta(BaseModel.Meta):
         ordering = ["name"]
