@@ -21,6 +21,8 @@ import StudentAnnouncements from './pages/Student/Announcements.jsx';
 import StudentEvents from './pages/Student/Events.jsx';
 import StudentMessages from './pages/Student/Messages.jsx';
 import StudentSettings from './pages/Student/Settings.jsx';
+import AccountPage from './pages/Account/AccountPage.jsx';
+import ParentProfile from './pages/Parent/Profile.jsx';
 import ParentChildren from './pages/Parent/Children.jsx';
 import ParentAttendance from './pages/Parent/Attendance.jsx';
 import ParentResults from './pages/Parent/Results.jsx';
@@ -130,6 +132,7 @@ export const routes = [
   { path: "/apply/confirmation", label: "Apply Confirmation", source: "admission_application_confirmation", element: <ApplyConfirmation /> },
   { path: "/apply/status", label: "Apply Status", source: "admission_application_status_check", element: <ApplyStatusCheck /> },
   { path: "/super-admin", label: "Super Admin Dashboard", source: "super_admin_dashboard_platform_overview", element: <SuperAdminOverview /> },
+  { path: "/super-admin/account", label: "Super Admin My Account", source: "super_admin_account_mcss", element: <AccountPage portalId="superAdmin" /> },
   { path: "/super-admin/financial-summary", label: "Financial Summary", source: "super_admin_dashboard_financial_summary", element: <SuperAdminFinancialSummary /> },
   { path: "/super-admin/academic-summary", label: "Academic Summary", source: "super_admin_dashboard_academic_summary", element: <SuperAdminAcademicSummary /> },
   { path: "/super-admin/operations-summary", label: "Operations Summary", source: "super_admin_dashboard_operations_summary", element: <SuperAdminOperationsSummary /> },
@@ -194,6 +197,7 @@ export const routes = [
   { path: "/super-admin/audit", label: "Audit Log", source: "audit_log_super_admin_portal", element: <SuperAdminAuditLog /> },
   { path: "/super-admin/applicants", label: "Applicant Approvals", source: "applicant_approval_queue_super_admin", element: <SuperAdminApplicantApprovals /> },
   { path: "/admin", label: "Admin Dashboard", source: "admin_dashboard_responsive_mcss", element: <AdminDashboard /> },
+  { path: "/admin/account", label: "Admin My Account", source: "admin_account_mcss", element: <AccountPage portalId="admin" /> },
   { path: "/admin/students", label: "Student Directory", source: "student_directory_admin_portal", element: <AdminStudentDirectory /> },
   { path: "/admin/library", label: "Library Admin", source: "library_portal_admin_dashboard", element: <AdminLibraryDashboard /> },
   { path: "/admin/hostel", label: "Hostel Admin", source: "hostel_management_admin_portal", element: <AdminHostelDashboard /> },
@@ -223,6 +227,7 @@ export const routes = [
   { path: "/parent", label: "Parent Dashboard", source: "parent_dashboard_mcss", element: <ParentDashboard /> },
   { path: "/parent/finance", label: "Parent Fees", source: "parent_finance_mcss", element: <ParentFinance /> },
   { path: "/parent/children", label: "Parent Children's Profiles", source: "parent_children_mcss", element: <ParentChildren /> },
+  { path: "/parent/profile", label: "Parent Profile", source: "parent_profile_mcss", element: <ParentProfile /> },
   { path: "/parent/attendance", label: "Parent Attendance", source: "parent_attendance_mcss", element: <ParentAttendance /> },
   { path: "/parent/results", label: "Parent Results", source: "parent_results_mcss", element: <ParentResults /> },
   { path: "/parent/assignments", label: "Parent Assignments", source: "parent_assignments_mcss", element: <ParentAssignments /> },
@@ -236,8 +241,13 @@ export const routes = [
   { path: "/parent/fee-notifications", label: "Parent Fee Notifications", source: "parent_fee_notifications_mcss", element: <ParentFeeNotifications /> },
   { path: "/parent/settings", label: "Parent Settings", source: "parent_settings_mcss", element: <ParentSettings /> },
   { path: "/bursary", label: "Bursary Dashboard", source: "bursary_dashboard_mcss", element: <BursaryDashboard /> },
+  { path: "/bursary/account", label: "Bursary My Account", source: "bursary_account_mcss", element: <AccountPage portalId="bursary" /> },
   { path: "/staff/teacher", label: "Teacher Score Entry", source: "teacher_portal_responsive_score_entry", element: <TeacherScoreEntry /> },
+  { path: "/staff/teacher/account", label: "Teacher My Account", source: "teacher_account_mcss", element: <AccountPage portalId="teacher" /> },
   { path: "/staff/class-teacher", label: "Class Teacher Overview", source: "class_teacher_portal_my_class_overview", element: <ClassTeacherOverview /> },
+  { path: "/staff/class-teacher/account", label: "Class Teacher My Account", source: "class_teacher_account_mcss", element: <AccountPage portalId="classTeacher" /> },
   { path: "/staff/exam-officer", label: "Exam Officer Marksheet", source: "exam_officer_marksheet_compilation", element: <ExamOfficerMarksheet /> },
+  { path: "/staff/exam-officer/account", label: "Exam Officer My Account", source: "exam_officer_account_mcss", element: <AccountPage portalId="examOfficer" /> },
   { path: "/staff/library", label: "Library Attendant", source: "library_attendant_portal_scoped_view", element: <LibraryAttendantDashboard /> },
+  { path: "/staff/library/account", label: "Library Attendant My Account", source: "library_attendant_account_mcss", element: <AccountPage portalId="libraryAttendant" /> },
 ];

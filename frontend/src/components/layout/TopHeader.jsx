@@ -1,25 +1,18 @@
 import { Link } from 'react-router-dom';
-import Avatar from '../ui/Avatar.jsx';
 import IconButton from '../ui/IconButton.jsx';
 import PreferenceControls from '../ui/PreferenceControls.jsx';
+import SearchBox from './SearchBox.jsx';
+import ProfileMenu from './ProfileMenu.jsx';
 
 const DEFAULT_LOGO = '/mcss-logo.png';
 
 /**
  * Minimal top bar per the "Institutional Heritage" reference: wordmark,
- * search, notifications, avatar. Deliberately omits the branch selector
- * and dark-mode toggle the older per-page headers carried.
+ * search, notifications, account menu. Search and the account menu read
+ * portalId directly (nav items, destinations) rather than being handed
+ * pre-built props, since every portal needs the same two behaviors.
  */
-export default function TopHeader({
-  wordmark,
-  logoUrl,
-  homePath = '/',
-  onSearchClick,
-  notificationCount = 0,
-  avatarUrl,
-  avatarAlt = 'Profile',
-  avatarFallback,
-}) {
+export default function TopHeader({ wordmark, logoUrl, homePath = '/', portalId, notificationCount = 0 }) {
   return (
     <header className="sticky top-0 z-30 bg-surface border-b border-outline-variant h-16 flex items-center px-md sm:px-gutter">
       <div className="flex items-center justify-between w-full max-w-container-max mx-auto">
@@ -28,10 +21,10 @@ export default function TopHeader({
           <span className="font-headline-md text-headline-sm sm:text-headline-md text-primary font-bold truncate">{wordmark}</span>
         </Link>
         <div className="flex items-center gap-xs shrink-0">
-          <IconButton icon="search" label="Search" onClick={onSearchClick} />
+          <SearchBox portalId={portalId} />
           <IconButton icon="notifications" label="Notifications" badge={notificationCount > 0} />
           <PreferenceControls />
-          <Avatar src={avatarUrl} alt={avatarAlt} fallbackInitials={avatarFallback} size="sm" className="ml-xs" />
+          <ProfileMenu portalId={portalId} />
         </div>
       </div>
     </header>
