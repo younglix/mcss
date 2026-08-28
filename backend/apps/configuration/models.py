@@ -6,8 +6,11 @@ from common.models import BaseModel
 class SchoolProfile(BaseModel):
     name = models.CharField(max_length=200)
     short_name = models.CharField(max_length=50, blank=True)
-    logo = models.URLField(blank=True)
-    favicon = models.URLField(blank=True)
+    # Plain CharField, not URLField: a locally-stored upload (before S3 keys
+    # are configured) resolves to a relative /media/... path, which
+    # URLField's absolute-URL validator would reject outright.
+    logo = models.CharField(max_length=500, blank=True)
+    favicon = models.CharField(max_length=500, blank=True)
     address = models.TextField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)

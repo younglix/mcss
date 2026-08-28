@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
@@ -28,3 +30,8 @@ urlpatterns = [
     path("api/v1/admissions/", include("apps.admissions.urls")),
     path("api/v1/custom-fields/", include("apps.custom_fields.urls")),
 ]
+
+if settings.DEBUG:
+    # Local-storage fallback (no S3 keys yet) is only ever servable in dev —
+    # production has nothing wired to serve MEDIA_ROOT, by design.
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

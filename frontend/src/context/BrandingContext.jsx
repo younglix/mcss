@@ -3,7 +3,10 @@ import { api } from '../lib/api.js';
 
 const BrandingContext = createContext(null);
 
-const FALLBACK = { name: 'Mount Carmel', short_name: '', logo: '', favicon: '', motto: '', primary_color: '', secondary_color: '' };
+const FALLBACK = {
+  name: 'Mount Carmel', short_name: '', logo: '', favicon: '', motto: '',
+  primary_color: '', secondary_color: '', light_logo: '', dark_logo: '', landscape_logo: '',
+};
 
 /**
  * School identity + theme colors, loaded once at app boot from the

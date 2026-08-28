@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
+import ImageUploadField from '../../../components/ui/ImageUploadField.jsx';
 import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { api, ApiError } from '../../../lib/api.js';
@@ -14,7 +15,6 @@ const FIELDS = [
   { key: 'phone', label: 'Phone', type: 'text' },
   { key: 'email', label: 'Email', type: 'text' },
   { key: 'address', label: 'Address', type: 'textarea' },
-  { key: 'logo', label: 'Logo URL', type: 'text' },
 ];
 
 export default function SuperAdminSchoolConfiguration() {
@@ -78,6 +78,18 @@ export default function SuperAdminSchoolConfiguration() {
                   />
                 </div>
               ))}
+              <ImageUploadField
+                label="Logo"
+                hint="The school's default logo — used everywhere a theme/landscape variant isn't set."
+                value={values.logo}
+                onChange={(v) => { setSaved(false); setValues((prev) => ({ ...prev, logo: v })); }}
+              />
+              <ImageUploadField
+                label="Favicon"
+                hint="Small icon shown in the browser tab."
+                value={values.favicon}
+                onChange={(v) => { setSaved(false); setValues((prev) => ({ ...prev, favicon: v })); }}
+              />
             </div>
             <div className="flex justify-end pt-md border-t border-outline/10">
               <Button type="submit" variant="primary" disabled={saving}>

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
+import ImageUploadField from '../../../components/ui/ImageUploadField.jsx';
 import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { useBranding } from '../../../context/BrandingContext.jsx';
@@ -26,12 +27,13 @@ const TYPOGRAPHY_FIELDS = [
   { key: 'appearance.base_font_size', label: 'Base Font Size (px)', type: 'number' },
 ];
 
-const BRANDING_FIELDS = [
-  { key: 'appearance.light_logo', label: 'Light Logo URL', type: 'text' },
-  { key: 'appearance.dark_logo', label: 'Dark Logo URL', type: 'text' },
-  { key: 'appearance.landscape_logo', label: 'Landscape Logo URL', type: 'text' },
-  { key: 'appearance.school_seal', label: 'School Seal / Stamp URL', type: 'text' },
+const LOGO_UPLOAD_FIELDS = [
+  { key: 'appearance.light_logo', label: 'Light Mode Logo', hint: 'Shown across the app when light mode is active.' },
+  { key: 'appearance.dark_logo', label: 'Dark Mode Logo', hint: 'Shown across the app when dark mode is active.' },
+  { key: 'appearance.landscape_logo', label: 'Landscape Logo', hint: 'Wide banner logo — the public site header and the login screen.' },
 ];
+
+const SCHOOL_SEAL_FIELD = { key: 'appearance.school_seal', label: 'School Seal / Stamp URL', type: 'text' };
 
 const BRANDING_TOGGLES = [
   { key: 'appearance.pdf_branding_enabled', label: 'Apply branding to generated PDFs' },
@@ -131,9 +133,12 @@ export default function SuperAdminAppearanceSettings() {
           <Card padding="lg" className="max-w-3xl">
             <h2 className="font-headline-md text-headline-md text-primary mb-md">Branding</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-lg mb-lg">
-              {BRANDING_FIELDS.map((field) => (
-                <FormField key={field.key} field={{ ...field, id: field.key }} value={values[field.key]} onChange={(v) => update(field.key, v)} />
+              {LOGO_UPLOAD_FIELDS.map((field) => (
+                <ImageUploadField key={field.key} label={field.label} hint={field.hint} value={values[field.key]} onChange={(v) => update(field.key, v)} />
               ))}
+            </div>
+            <div className="max-w-sm mb-lg">
+              <FormField field={{ ...SCHOOL_SEAL_FIELD, id: SCHOOL_SEAL_FIELD.key }} value={values[SCHOOL_SEAL_FIELD.key]} onChange={(v) => update(SCHOOL_SEAL_FIELD.key, v)} />
             </div>
             <div className="space-y-xs border-t border-outline/10 pt-md">
               {BRANDING_TOGGLES.map((field) => (

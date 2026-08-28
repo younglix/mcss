@@ -1,10 +1,15 @@
+import uuid
+from pathlib import Path
+
+from django.conf import settings as django_settings
+from django.core.files.storage import default_storage
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
 from apps.audit.services import log
 from apps.configuration.models import SchoolProfile
-from apps.rbac.permissions import HasPermission
+from apps.rbac.permissions import HasPermission, get_effective_permissions
 from common.responses import failure, success
 
 from .models import SystemSetting
@@ -35,7 +40,49 @@ class PublicBrandingView(APIView):
             "motto": profile.motto if profile else "",
             "primary_color": appearance.get("appearance.primary_color", ""),
             "secondary_color": appearance.get("appearance.secondary_color", ""),
+            "light_logo": appearance.get("appearance.light_logo", ""),
+            "dark_logo": appearance.get("appearance.dark_logo", ""),
+            "landscape_logo": appearance.get("appearance.landscape_logo", ""),
         })
+
+
+class AssetUploadView(APIView):
+    """Generic image upload for admin-configurable branding fields (school
+    logo/favicon, appearance's light/dark/landscape logos, and any future
+    admin-managed image) — returns a URL the caller saves as that field's
+    own value, same as if it had been pasted in. Not tied to a single
+    settings group, so it checks for either editor permission rather than
+    reusing one mixin.
+
+    Uploads land in S3 when AWS credentials are configured (STORAGES in
+    config/settings/base.py); outside DEBUG, with no credentials set yet,
+    this refuses uploads rather than silently writing to local disk nothing
+    in production can actually serve."""
+
+    permission_classes = [IsAuthenticated]
+    MAX_BYTES = 5 * 1024 * 1024
+
+    def post(self, request):
+        perms = get_effective_permissions(request.user)
+        if not ("*" in perms or "config.edit" in perms or "settings.edit" in perms):
+            return failure(message="You don't have permission to upload branding assets.", status=403)
+
+        if not django_settings.DEBUG and not django_settings.S3_CONFIGURED:
+            return failure(message="Image storage isn't configured yet. Add S3 credentials to enable uploads.", status=503)
+
+        file = request.FILES.get("file")
+        if not file:
+            return failure(message="No file provided.", status=400)
+        if not (file.content_type or "").startswith("image/"):
+            return failure(message="Only image files are allowed.", status=400)
+        if file.size > self.MAX_BYTES:
+            return failure(message="Image must be smaller than 5MB.", status=400)
+
+        ext = Path(file.name).suffix.lower() or ".png"
+        saved_path = default_storage.save(f"branding/{uuid.uuid4().hex}{ext}", file)
+        url = default_storage.url(saved_path)
+        log(actor=request.user, action="settings.asset_uploaded", changes={"path": saved_path}, request=request)
+        return success(data={"url": url})
 
 
 class SettingsListView(SettingsPermissionMixin, APIView):

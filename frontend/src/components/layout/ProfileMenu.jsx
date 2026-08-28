@@ -25,7 +25,7 @@ const GENERIC_ACCOUNT_PATH = {
 export default function ProfileMenu({ portalId }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { isDark, toggleTheme } = useUIPreferences();
+  const { isDark, toggleTheme, focusMode, toggleFocusMode } = useUIPreferences();
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -96,6 +96,13 @@ export default function ProfileMenu({ portalId }) {
                 <span className="font-body-md text-body-md text-on-surface">{isDark ? 'Dark Mode' : 'Light Mode'}</span>
               </span>
               <span className="font-label-sm text-label-sm text-primary">Switch</span>
+            </button>
+            <button type="button" onClick={toggleFocusMode} className="w-full flex items-center justify-between gap-sm px-md py-sm text-left hover:bg-surface-container-low transition-colors">
+              <span className="flex items-center gap-sm">
+                <span className="material-symbols-outlined text-on-surface-variant text-[20px]">center_focus_strong</span>
+                <span className="font-body-md text-body-md text-on-surface">Focus Mode</span>
+              </span>
+              <span className="font-label-sm text-label-sm text-primary">{focusMode ? 'On' : 'Off'}</span>
             </button>
           </div>
           <div className="py-xs border-t border-outline/10">

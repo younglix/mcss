@@ -11,6 +11,10 @@ export default defineConfig({
       // listening locally.
       '/api': { target: 'http://localhost:8000', changeOrigin: true },
       '/ws': { target: 'ws://localhost:8000', ws: true },
+      // Only serves anything when the backend is running in DEBUG without
+      // S3 keys configured yet (local-disk upload fallback) — see
+      // AssetUploadView / STORAGES in backend/config/settings/base.py.
+      '/media': { target: 'http://localhost:8000', changeOrigin: true },
     },
   },
   plugins: [

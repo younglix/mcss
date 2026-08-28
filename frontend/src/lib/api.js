@@ -60,7 +60,11 @@ async function refreshAccessToken() {
 }
 
 async function request(path, { method = 'GET', body, auth = true, retry = true } = {}) {
-  const headers = { 'Content-Type': 'application/json' };
+  // FormData (file uploads) must NOT be JSON-stringified, and must NOT get
+  // an explicit Content-Type — the browser sets its own multipart boundary,
+  // which a manually-set header would override incorrectly.
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
   if (auth) {
     const token = getAccessToken();
     if (token) headers.Authorization = `Bearer ${token}`;
@@ -69,7 +73,7 @@ async function request(path, { method = 'GET', body, auth = true, retry = true }
   const res = await fetch(`/api/v1${path}`, {
     method,
     headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
   });
 
   if (res.status === 401 && auth && retry && getRefreshToken()) {

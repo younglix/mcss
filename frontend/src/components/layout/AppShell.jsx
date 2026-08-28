@@ -3,6 +3,7 @@ import { getPortal } from '../../config/portals.js';
 import usePageTitle from '../../hooks/usePageTitle.js';
 import { useBranding } from '../../context/BrandingContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useUIPreferences } from '../../context/UIPreferences.jsx';
 import { useApplyAppearance } from '../../hooks/useApplyAppearance.js';
 import TopHeader from './TopHeader.jsx';
 import Sidebar from './Sidebar.jsx';
@@ -19,14 +20,18 @@ export default function AppShell({ portalId, pageTitle, children }) {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { branding } = useBranding();
+  const { isDark } = useUIPreferences();
   useApplyAppearance();
   usePageTitle(pageTitle || portal.label);
 
   // Real school identity (General settings) wins over the static per-portal
   // fallback — this is what makes editing the school name/logo actually
-  // show up in the chrome instead of just being saved to a table.
+  // show up in the chrome instead of just being saved to a table. The
+  // theme-specific logo is optional per school — falls back to the one
+  // default logo when only that's been set.
   const wordmark = branding.short_name || branding.name || portal.brand.wordmark;
-  const brand = { ...portal.brand, wordmark, logoUrl: branding.logo || undefined };
+  const themedLogo = isDark ? branding.dark_logo : branding.light_logo;
+  const brand = { ...portal.brand, wordmark, logoUrl: themedLogo || branding.logo || undefined };
 
   const handleSignOut = () => {
     logout();

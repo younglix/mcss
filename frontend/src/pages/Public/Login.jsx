@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useBranding } from '../../context/BrandingContext.jsx';
 
 const inputClasses = 'mcss-field w-full pl-11 pr-md hover:border-primary';
 
@@ -21,6 +22,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, verifyOtp } = useAuth();
+  const { branding } = useBranding();
   const [showPassword, setShowPassword] = useState(false);
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -76,13 +78,23 @@ export default function Login() {
         <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-primary-container rounded-full blur-[100px] opacity-30" />
         <div className="relative z-10 flex flex-col h-full">
           <Link to="/" className="flex items-center gap-md">
-            <div className="w-16 h-16 flex items-center justify-center bg-surface-container-lowest rounded-lg shadow-md p-sm shrink-0">
-              <span className="material-symbols-outlined text-primary text-3xl">school</span>
-            </div>
-            <div>
-              <h1 className="font-headline-md text-headline-md text-on-nav leading-tight">Mount Carmel</h1>
-              <p className="font-label-md text-on-nav/70 tracking-[0.1em] uppercase">Secondary School</p>
-            </div>
+            {branding.landscape_logo ? (
+              <img src={branding.landscape_logo} alt={branding.name} className="h-16 w-auto max-w-full object-contain" />
+            ) : (
+              <>
+                <div className="w-16 h-16 flex items-center justify-center bg-surface-container-lowest rounded-lg shadow-md p-sm shrink-0">
+                  {branding.logo ? (
+                    <img src={branding.logo} alt="" className="w-full h-full object-contain" />
+                  ) : (
+                    <span className="material-symbols-outlined text-primary text-3xl">school</span>
+                  )}
+                </div>
+                <div>
+                  <h1 className="font-headline-md text-headline-md text-on-nav leading-tight">{branding.short_name || branding.name}</h1>
+                  <p className="font-label-md text-on-nav/70 tracking-[0.1em] uppercase">Secondary School</p>
+                </div>
+              </>
+            )}
           </Link>
 
           <div className="mt-auto mb-12">

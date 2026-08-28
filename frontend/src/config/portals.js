@@ -14,7 +14,6 @@ export const portals = {
     brand: { wordmark: 'Mount Carmel', motto: 'Scientia et Virtus', mottoNote: 'Est. 1954' },
     sidebarNav: [
       { key: 'dashboard', label: 'Dashboard', icon: 'dashboard', path: '/student', status: 'active' },
-      { key: 'profile', label: 'Profile', icon: 'person', path: '/student/profile', status: 'active' },
       { key: 'class', label: 'Class & Subjects', icon: 'school', path: '/student/class', status: 'active' },
       { key: 'timetable', label: 'Timetable', icon: 'calendar_today', path: '/student/timetable', status: 'active' },
       { key: 'attendance', label: 'Attendance', icon: 'event_available', path: '/student/attendance', status: 'active' },
@@ -28,7 +27,6 @@ export const portals = {
       { key: 'announcements', label: 'Announcements', icon: 'campaign', path: '/student/announcements', status: 'active' },
       { key: 'events', label: 'Events / Calendar', icon: 'event', path: '/student/events', status: 'active' },
       { key: 'messages', label: 'Messages', icon: 'forum', path: '/student/messages', status: 'active' },
-      { key: 'settings', label: 'Settings', icon: 'settings', path: '/student/settings', status: 'active' },
     ],
     bottomNav: [
       { key: 'dashboard', label: 'Home', icon: 'dashboard', path: '/student', status: 'active' },
@@ -307,7 +305,6 @@ export const portals = {
       { key: 'announcements', label: 'Announcements', icon: 'campaign', path: '/parent/announcements', status: 'active' },
       { key: 'events', label: 'Events / Calendar', icon: 'event', path: '/parent/events', status: 'active' },
       { key: 'fee-notifications', label: 'Fee Notifications', icon: 'notifications', path: '/parent/fee-notifications', status: 'active' },
-      { key: 'settings', label: 'Settings', icon: 'settings', path: '/parent/settings', status: 'active' },
     ],
     bottomNav: [
       { key: 'dashboard', label: 'Home', icon: 'dashboard', path: '/parent', status: 'active' },

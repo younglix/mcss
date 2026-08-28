@@ -202,11 +202,35 @@ CACHES = {
     )
 }
 
-# --- Storage (S3/R2, wired for later phases) ---------------------------------------------------------------
+# --- Storage (S3/R2) ---------------------------------------------------------------
+# Platform asset storage (logos, favicons, and any future uploaded media) —
+# these env vars were already anticipated but never actually wired to a
+# storage backend. When AWS_ACCESS_KEY_ID/AWS_STORAGE_BUCKET_NAME are unset
+# (e.g. before real keys are provisioned), uploads fall back to local disk
+# in DEBUG so the feature is still testable; AssetUploadView refuses to
+# accept uploads outside DEBUG until real credentials are set, since nothing
+# serves local media files in production.
 AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", default="")
 AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", default="")
 AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME", default="")
-AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", default="")
+AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default="eu-north-1")
+# Only for S3-compatible non-AWS providers (e.g. Cloudflare R2) — leave
+# unset to talk to real AWS S3 directly.
+AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", default="") or None
+AWS_DEFAULT_ACL = "public-read"
+AWS_S3_FILE_OVERWRITE = False
+AWS_QUERYSTRING_AUTH = False
+
+S3_CONFIGURED = bool(AWS_ACCESS_KEY_ID and AWS_STORAGE_BUCKET_NAME)
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage" if S3_CONFIGURED else "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # --- App-specific ---------------------------------------------------------------
 OTP_EXPIRY_MINUTES = 5

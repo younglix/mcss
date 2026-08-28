@@ -2,22 +2,34 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { navLinks } from '../../pages/Public/landingData.js';
 import PreferenceControls from '../ui/PreferenceControls.jsx';
+import { useBranding } from '../../context/BrandingContext.jsx';
 
 export default function PublicHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { branding } = useBranding();
 
   return (
     <>
       <header className="bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline/10 sticky top-0 z-50">
         <div className="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
           <Link to="/" className="flex items-center gap-sm">
-            <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-sm shrink-0">
-              <span className="material-symbols-outlined text-on-primary">school</span>
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-headline-md text-body-lg font-bold text-primary">Mount Carmel</span>
-              <span className="text-label-xs tracking-[0.2em] uppercase text-secondary font-bold">Secondary School</span>
-            </div>
+            {branding.landscape_logo ? (
+              <img src={branding.landscape_logo} alt={branding.name} className="h-10 w-auto max-w-full object-contain" />
+            ) : (
+              <>
+                <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-sm shrink-0 overflow-hidden">
+                  {branding.logo ? (
+                    <img src={branding.logo} alt="" className="w-full h-full object-contain" />
+                  ) : (
+                    <span className="material-symbols-outlined text-on-primary">school</span>
+                  )}
+                </div>
+                <div className="flex flex-col leading-none">
+                  <span className="font-headline-md text-body-lg font-bold text-primary">{branding.short_name || branding.name}</span>
+                  <span className="text-label-xs tracking-[0.2em] uppercase text-secondary font-bold">Secondary School</span>
+                </div>
+              </>
+            )}
           </Link>
 
           <nav className="hidden md:flex items-center gap-xl">
