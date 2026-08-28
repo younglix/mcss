@@ -43,7 +43,27 @@ class PublicBrandingView(APIView):
             "light_logo": appearance.get("appearance.light_logo", ""),
             "dark_logo": appearance.get("appearance.dark_logo", ""),
             "landscape_logo": appearance.get("appearance.landscape_logo", ""),
+            "address": profile.address if profile else "",
+            "phone": profile.phone if profile else "",
+            "email": profile.email if profile else "",
         })
+
+
+class PublicWebsiteContentView(APIView):
+    """Unauthenticated — the Landing page's own layout content (the
+    website.* settings group: hero, about, academics, fees, gallery, ...).
+    Contact details (address/phone/email) live on PublicBrandingView
+    instead, since that's already fetched once at app boot everywhere,
+    including every public Apply Now page the footer also appears on."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        content = {
+            s.key.split(".", 1)[1]: s.value
+            for s in SystemSetting.objects.filter(group="website", is_secret=False)
+        }
+        return success(data=content)
 
 
 class AssetUploadView(APIView):

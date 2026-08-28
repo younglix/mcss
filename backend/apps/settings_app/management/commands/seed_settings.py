@@ -136,6 +136,51 @@ DEFAULT_SETTINGS = [
     ("website.social_twitter", "website", "", False),
     ("website.social_instagram", "website", "", False),
     ("website.footer_text", "website", "", False),
+    # Landing-page layout content — seeded with the same copy the page
+    # already shipped with (previously hardcoded in frontend landingData.js)
+    # so seeding this is a no-op visually; only editing a field in Website
+    # settings changes what the public site shows.
+    ("website.banner_enabled", "website", True, False),
+    ("website.banner_text", "website", "Admissions for the 2024/2025 academic session are currently ongoing.", False),
+    ("website.banner_cta", "website", "Apply Online Now", False),
+    ("website.hero_eyebrow", "website", "Founded in Faith • Rooted in Excellence", False),
+    ("website.hero_title", "website", "Divine Wisdom", False),
+    ("website.hero_title_accent", "website", "is Wealth.", False),
+    ("website.hero_body", "website", "At Mount Carmel Secondary, we blend storied Catholic traditions with rigorous technical precision. Our mission is to mold leaders who carry both the light of wisdom and the strength of character.", False),
+    ("website.hero_image", "website", "https://lh3.googleusercontent.com/aida-public/AB6AXuDouJ-CkRkpM1fizV5IKwOjVoSKooPQOMVu9DXeByuz7-IQVW4vH5s43x6EiABw9tLp03iMzM-P6kV1EGx1IjIwJA8K0kmfw72KzGyksyQlnnqJ26YfjzKzo1TMr0-5JUaHlW45YLnol8_RlcPHUWm1w1UigK_TT90KhiGoeAIrQ31DJAiV2S-yh6YXWIMSas4uGE9dwl0p_9G5nuT7jddIoG5KXEAgEH9PWeRXP42Jl2HNddS9xlEgkHlH3Do8UUnp-EkrO_R_Rzsx", False),
+    ("website.hero_stat_value", "website", "100%", False),
+    ("website.hero_stat_label", "website", "WAEC Success Rate", False),
+    ("website.about_eyebrow", "website", "Institutional Heritage", False),
+    ("website.about_title", "website", "A Legacy of Catholic", False),
+    ("website.about_title_accent", "website", "Prestige & Learning", False),
+    ("website.about_body", "website", "Mount Carmel Secondary School stands as a testament to the enduring power of Catholic education. Founded on the principles of the Carmelite tradition, we provide a structured environment where students are encouraged to seek truth, practice charity, and pursue academic rigor.", False),
+    ("website.about_image1", "website", "https://lh3.googleusercontent.com/aida-public/AB6AXuDItye1aM7pswGnhSj9dDMPcGK67jWkrhvoRxL3ZoxgKIMMHkjM02U_JVupuRy5GDM6WvPLWFtyNw9qhItbikbdyIqWWEGfD-vyVcC_SZ3n0hXQxSgTuMJGBXvMOpsxjZFsczhc9Rx8UUJT6TSuip_99UZZ1IIQPy9dxYpKiP7Ygt7eLK2nRLyc7v45qQMKZeWj2kI4zMftfaqvL6CSBJ_NONqOgcrEIy20rGLzqo9hacsw8l1UHGek2sskldF5dCUnGnMeKU7mPJpN", False),
+    ("website.about_image2", "website", "https://lh3.googleusercontent.com/aida-public/AB6AXuCuUz9RyRjMWfluZX4V-YEx6BXjYaJMjaP-H8a24SY18o-aD8twRTqhjhFZ1VEIZRebFTCY9YfMf73dzdgEQyYk7rZUY0qxAneYlf9K7TZC13Lh3NJKlC1L-iLHJjz4BwVyTti7YteOlYUtHDijn41w8bpYyiIJ3pqwMuG06SrAIt-mgXvStS4RhUwXV0grkjKiCVPv5KaiJBssIL3kZEfltDqz91hnUA9psqTs8Qm9XO5-euz072EFJ9IfmrUnGx1ZnbNtGve88R39", False),
+    ("website.about_points", "website", [
+        {"icon": "auto_stories", "title": "Spiritual Formation", "body": "Daily mass and regular retreats for soul-building."},
+        {"icon": "science", "title": "Technical Precision", "body": "State-of-the-art STEM laboratories and coding hubs."},
+        {"icon": "diversity_1", "title": "Character Mentorship", "body": "Personal tutors for every student's growth path."},
+    ], False),
+    ("website.academics_eyebrow", "website", "Academic Programs", False),
+    ("website.academics_title", "website", "Structured for Mastery", False),
+    ("website.academics_programs", "website", [
+        {"icon": "menu_book", "grades": "Grades 7 - 9", "name": "Junior Secondary School",
+         "body": "Establishing a solid foundation in core sciences, humanities, and spiritual doctrine. We focus on discovery and discipline.",
+         "tag": "12 Subjects Curriculum"},
+        {"icon": "experiment", "grades": "Grades 10 - 12", "name": "Senior Secondary School",
+         "body": "Specialized tracks in Science, Commercial, and Arts. Preparing students for global university entrance and professional life.",
+         "tag": "UTME & WAEC Preparation"},
+    ], False),
+    ("website.fees_title", "website", "Investment in", False),
+    ("website.fees_title_accent", "website", "Their Future", False),
+    ("website.fees_body", "website", "Transparent fee structure with multiple payment options. We offer merit-based scholarships for exceptionally gifted students.", False),
+    ("website.gallery_title", "website", "The Carmel Experience", False),
+    ("website.gallery_body", "website", "A glimpse into the life, culture, and facilities that define our institution.", False),
+    ("website.gallery_images", "website", [
+        {"url": "https://lh3.googleusercontent.com/aida-public/AB6AXuA6y1DzymhVUKktHrrTBOyIQ98dDBNpIXX0DJ7PDYAKDtHqn98fp5dkmkZGKq1q0vfKMCsbRiGu0Yx7PioaZKkn84kmADBarJ7-SFjtsbk3qmPQTEJpd5J2eRnCY9PZ_62fMIGrouNiG6FJa20_HgYbN6chsZ8CC6ToWDqcsc4FgX2FuIsNwUfB23cquxnf5R0WM2YqFYbtIsTn-sr5KK3yPJlO8A4ZzPQkE14__p545c4fF3pVOWaHq1WDCs0f2QkjgjqfxRAFE1XW", "label": "Innovation Labs"},
+        {"url": "https://lh3.googleusercontent.com/aida-public/AB6AXuBsmi0JlBO0VdCDNswteLQjqlWIRzXnPbiqSf9I4P9rWVECVOeSkFewGDhEhYlDnqyeEGGgA2Ikclth5DBGu4MbpQqj_o6BP2lMCvENBZJLgOkC-BZ69nJn4nmTJt6Q6bTtCB2ttRUr4DuB8Yyem2nrW0n24Y0kzI2xfJ7i3QVhHse_5Puy0XSkSjzamNCeTMyElNf8fyYpe40NgVtYTUocmtoj_1fWZ6g2tfq_LmIgmrhoe4aOe2T5x0tcxQVTaCJJ5dVs95vN6BQ5", "label": "Sports Complex"},
+        {"url": "https://lh3.googleusercontent.com/aida-public/AB6AXuCV3nC3B1VIB1eN9cLHav96wrTLscREzAogs3qhEGgKKKc4ASdHSEzu6pLp0_XHVGe9uXv5KBDwGb9Zdrnbs3YSibBQlKyrotAwWjixRfWwWzBOzrqe6RYet6yqphtWV7po1faXUAJCx_WanIMUBs0FqW2FH9JGU0KOTBpOrpIqk9mpZV6yUjK0VJsO_2A2mvvYx7ctCAycShxTF5Q4EVW2d1qINe1uK_emSnMjk3LRWZLYS3nndcGyZRp4vlzSqld5CLNX5ULWDd0W", "label": "Sacred Spaces"},
+    ], False),
 ]
 
 

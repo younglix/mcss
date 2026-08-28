@@ -6,6 +6,7 @@ const BrandingContext = createContext(null);
 const FALLBACK = {
   name: 'Mount Carmel', short_name: '', logo: '', favicon: '', motto: '',
   primary_color: '', secondary_color: '', light_logo: '', dark_logo: '', landscape_logo: '',
+  address: '', phone: '', email: '',
 };
 
 /**
