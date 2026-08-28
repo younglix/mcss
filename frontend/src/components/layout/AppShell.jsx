@@ -3,7 +3,7 @@ import { getPortal } from '../../config/portals.js';
 import usePageTitle from '../../hooks/usePageTitle.js';
 import { useBranding } from '../../context/BrandingContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { useUIPreferences } from '../../context/UIPreferences.jsx';
+import { useUIPreferences, SIDEBAR_COLLAPSED_WIDTH } from '../../context/UIPreferences.jsx';
 import { useApplyAppearance } from '../../hooks/useApplyAppearance.js';
 import TopHeader from './TopHeader.jsx';
 import Sidebar from './Sidebar.jsx';
@@ -20,7 +20,8 @@ export default function AppShell({ portalId, pageTitle, children }) {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { branding } = useBranding();
-  const { isDark } = useUIPreferences();
+  const { isDark, sidebarWidth, sidebarCollapsed } = useUIPreferences();
+  const sidebarPx = sidebarCollapsed ? SIDEBAR_COLLAPSED_WIDTH : sidebarWidth;
   useApplyAppearance();
   usePageTitle(pageTitle || portal.label);
 
@@ -39,12 +40,12 @@ export default function AppShell({ portalId, pageTitle, children }) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" style={{ '--sidebar-w': `${sidebarPx}px` }}>
       <div className="no-print">
         <TopHeader wordmark={wordmark} logoUrl={brand.logoUrl} homePath={portal.homePath} portalId={portalId} />
         <Sidebar items={portal.sidebarNav} brand={brand} onSignOut={handleSignOut} />
       </div>
-      <main className="lg:ml-72 pb-24 lg:pb-xl px-md sm:px-gutter xl:px-xl pt-lg max-w-container-max mx-auto print:ml-0 print:p-0 print:max-w-none">
+      <main className="lg:ml-(--sidebar-w) pb-24 lg:pb-xl px-md sm:px-gutter xl:px-xl pt-lg max-w-container-max mx-auto print:ml-0 print:p-0 print:max-w-none transition-[margin-left] duration-200 ease-out">
         {children}
       </main>
       <div className="no-print">
