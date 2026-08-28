@@ -41,7 +41,7 @@ export default function Sidebar({ items, brand, onSignOut }) {
   return (
     <aside
       style={{ width }}
-      className={`hidden lg:flex flex-col fixed left-0 top-16 bottom-0 z-20 bg-nav text-on-nav py-lg shadow-[4px_0_24px_rgba(0,0,0,0.15)] overflow-y-auto relative ${
+      className={`hidden lg:flex flex-col fixed left-0 top-16 bottom-0 z-20 bg-nav text-on-nav py-lg shadow-[4px_0_24px_rgba(0,0,0,0.15)] overflow-y-auto ${
         dragging ? '' : 'transition-[width] duration-200 ease-out'
       }`}
     >
