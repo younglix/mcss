@@ -7,6 +7,9 @@ from .models import (
     JobApplication,
     JobPosting,
     LeaveRequest,
+    PerformanceReview,
+    StaffAttendance,
+    StaffContract,
     StaffDocument,
 )
 
@@ -40,6 +43,54 @@ class StaffDocumentSerializer(serializers.ModelSerializer):
         model = StaffDocument
         fields = ["id", "staff", "staff_name", "title", "file_url", "category", "uploaded_by", "uploaded_by_name", "uploaded_at"]
         read_only_fields = ["id", "uploaded_by", "uploaded_at"]
+
+
+class StaffAttendanceSerializer(serializers.ModelSerializer):
+    staff_name = serializers.CharField(source="staff.full_name", read_only=True)
+    recorded_by_name = serializers.CharField(source="recorded_by.full_name", read_only=True, default=None)
+
+    class Meta:
+        model = StaffAttendance
+        fields = [
+            "id", "staff", "staff_name", "date", "clock_in", "clock_out",
+            "status", "notes", "recorded_by", "recorded_by_name",
+        ]
+        read_only_fields = ["id", "recorded_by"]
+
+
+class StaffContractSerializer(serializers.ModelSerializer):
+    staff_name = serializers.CharField(source="staff.full_name", read_only=True)
+    created_by_name = serializers.CharField(source="created_by.full_name", read_only=True, default=None)
+
+    class Meta:
+        model = StaffContract
+        fields = [
+            "id", "staff", "staff_name", "contract_type", "start_date", "end_date",
+            "terms", "file_url", "status", "created_by", "created_by_name", "created_at",
+        ]
+        read_only_fields = ["id", "created_by", "created_at"]
+
+    def validate(self, attrs):
+        start = attrs.get("start_date", getattr(self.instance, "start_date", None))
+        end = attrs.get("end_date", getattr(self.instance, "end_date", None))
+        if start and end and end < start:
+            raise serializers.ValidationError({"end_date": "End date cannot be before the start date."})
+        return attrs
+
+
+class PerformanceReviewSerializer(serializers.ModelSerializer):
+    staff_name = serializers.CharField(source="staff.full_name", read_only=True)
+    reviewer_name = serializers.CharField(source="reviewer.full_name", read_only=True, default=None)
+
+    class Meta:
+        model = PerformanceReview
+        fields = ["id", "staff", "staff_name", "reviewer", "reviewer_name", "period", "rating", "comments", "reviewed_at"]
+        read_only_fields = ["id", "reviewer", "reviewed_at"]
+
+    def validate_rating(self, value):
+        if not (1 <= value <= 5):
+            raise serializers.ValidationError("Rating must be between 1 and 5.")
+        return value
 
 
 # ---------------------------------------------------------------- Recruitment

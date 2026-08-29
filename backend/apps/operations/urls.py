@@ -9,6 +9,21 @@ urlpatterns = [
     path("hr/leave-requests/<uuid:leave_id>/review", views.LeaveRequestReviewView.as_view(), name="ops-leave-request-review"),
     path("hr/documents", views.StaffDocumentsView.as_view(), name="ops-staff-documents"),
     path("hr/documents/<uuid:document_id>", views.StaffDocumentDetailView.as_view(), name="ops-staff-document-detail"),
+    path("hr/upload", views.HRFileUploadView.as_view(), name="ops-hr-upload"),
+    path("hr/dashboard", views.HRDashboardView.as_view(), name="ops-hr-dashboard"),
+    path("hr/reports", views.HRReportsView.as_view(), name="ops-hr-reports"),
+
+    # Staff Attendance
+    path("hr/attendance", views.StaffAttendanceView.as_view(), name="ops-staff-attendance"),
+    path("hr/attendance/<uuid:record_id>", views.StaffAttendanceDetailView.as_view(), name="ops-staff-attendance-detail"),
+
+    # Contracts
+    path("hr/contracts", views.StaffContractsView.as_view(), name="ops-staff-contracts"),
+    path("hr/contracts/<uuid:contract_id>", views.StaffContractDetailView.as_view(), name="ops-staff-contract-detail"),
+
+    # Performance
+    path("hr/performance", views.PerformanceReviewsView.as_view(), name="ops-performance-reviews"),
+    path("hr/performance/<uuid:review_id>", views.PerformanceReviewDetailView.as_view(), name="ops-performance-review-detail"),
 
     # Recruitment
     path("recruitment/postings", views.JobPostingsView.as_view(), name="ops-job-postings"),

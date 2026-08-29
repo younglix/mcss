@@ -44,6 +44,7 @@ from .serializers import (
     InvoiceSerializer,
     PaymentSerializer,
     PayrollRunSerializer,
+    PayslipSerializer,
     SchoolFeesGenerateSerializer,
     ScholarshipAllocationSerializer,
     ScholarshipSerializer,
@@ -818,6 +819,28 @@ class PayrollRunDetailView(PayrollPermissionMixin, APIView):
     def get(self, request, run_id):
         run = get_object_or_404(PayrollRun.objects.prefetch_related("payslips__staff"), id=run_id)
         return success(data=PayrollRunSerializer(run).data)
+
+
+class PayslipsView(PayrollPermissionMixin, APIView):
+    """HR Portal > Payslips: every payslip ever generated, flattened across
+    runs — Payroll itself stays run-centric (set up salaries, generate/
+    approve a month's batch); this is the quick lookup/browse view."""
+
+    def get(self, request):
+        qs = Payslip.objects.select_related("staff", "run").order_by("-run__year", "-run__month", "staff__full_name")
+        staff = request.query_params.get("staff")
+        if staff:
+            qs = qs.filter(staff_id=staff)
+        data = [
+            {
+                **PayslipSerializer(p).data,
+                "run_status": p.run.status,
+                "month": p.run.month,
+                "year": p.run.year,
+            }
+            for p in qs
+        ]
+        return success(data=data)
 
 
 class PayrollRunGenerateView(APIView):

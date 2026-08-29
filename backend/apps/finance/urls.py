@@ -49,6 +49,7 @@ urlpatterns = [
     path("payroll/runs/<uuid:run_id>", views.PayrollRunDetailView.as_view(), name="finance-payroll-run-detail"),
     path("payroll/runs/<uuid:run_id>/generate", views.PayrollRunGenerateView.as_view(), name="finance-payroll-run-generate"),
     path("payroll/runs/<uuid:run_id>/approve", views.PayrollRunApproveView.as_view(), name="finance-payroll-run-approve"),
+    path("payslips", views.PayslipsView.as_view(), name="finance-payslips"),
 
     path("reports", views.FinancialReportsView.as_view(), name="finance-reports"),
 ]

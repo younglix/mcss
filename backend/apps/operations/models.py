@@ -45,7 +45,11 @@ class StaffDocument(BaseModel):
 
     staff = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="hr_documents")
     title = models.CharField(max_length=200)
-    file_url = models.URLField(blank=True)
+    # CharField, not URLField: local-disk storage (dev, or prod without S3
+    # keys yet) returns a relative /media/... path, which URLField's
+    # absolute-URL validator rejects outright — same fix as
+    # SchoolProfile.logo/favicon and StudentResource.file_url.
+    file_url = models.CharField(max_length=500, blank=True)
     category = models.CharField(max_length=20, choices=Category.choices, default=Category.OTHER)
     uploaded_by = models.ForeignKey(
         "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="hr_documents_uploaded"
@@ -57,6 +61,83 @@ class StaffDocument(BaseModel):
 
     def __str__(self):
         return f"{self.title} — {self.staff.full_name}"
+
+
+class StaffAttendance(BaseModel):
+    """Daily clock-in/out for staff — distinct from academics.AttendanceRecord,
+    which is students-only and keyed off a class-arm roster rather than a
+    single daily punch per staff member."""
+
+    class Status(models.TextChoices):
+        PRESENT = "present", "Present"
+        ABSENT = "absent", "Absent"
+        LATE = "late", "Late"
+        ON_LEAVE = "on_leave", "On Leave"
+
+    staff = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="attendance_records")
+    date = models.DateField()
+    clock_in = models.TimeField(null=True, blank=True)
+    clock_out = models.TimeField(null=True, blank=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PRESENT)
+    notes = models.CharField(max_length=255, blank=True)
+    recorded_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="staff_attendance_recorded"
+    )
+
+    class Meta(BaseModel.Meta):
+        unique_together = ("staff", "date")
+        ordering = ["-date"]
+
+    def __str__(self):
+        return f"{self.staff.full_name} — {self.date} ({self.status})"
+
+
+class StaffContract(BaseModel):
+    class ContractType(models.TextChoices):
+        PERMANENT = "permanent", "Permanent"
+        FIXED_TERM = "fixed_term", "Fixed Term"
+        PROBATION = "probation", "Probation"
+        CONSULTANT = "consultant", "Consultant"
+
+    class Status(models.TextChoices):
+        ACTIVE = "active", "Active"
+        EXPIRED = "expired", "Expired"
+        TERMINATED = "terminated", "Terminated"
+
+    staff = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="contracts")
+    contract_type = models.CharField(max_length=20, choices=ContractType.choices, default=ContractType.PERMANENT)
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True, help_text="Blank for a permanent, open-ended contract.")
+    terms = models.TextField(blank=True)
+    file_url = models.CharField(max_length=500, blank=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
+    created_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="contracts_created"
+    )
+
+    class Meta(BaseModel.Meta):
+        ordering = ["-start_date"]
+
+    def __str__(self):
+        return f"{self.staff.full_name} — {self.get_contract_type_display()}"
+
+
+class PerformanceReview(BaseModel):
+    staff = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="performance_reviews")
+    reviewer = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="performance_reviews_given"
+    )
+    period = models.CharField(max_length=50, help_text="e.g. '2026 Term 1', 'Q1 2026'")
+    rating = models.PositiveSmallIntegerField(help_text="1-5")
+    comments = models.TextField(blank=True)
+    reviewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta(BaseModel.Meta):
+        unique_together = ("staff", "period")
+        ordering = ["-reviewed_at"]
+
+    def __str__(self):
+        return f"{self.staff.full_name} — {self.period}: {self.rating}/5"
 
 
 # ---------------------------------------------------------------- Recruitment
@@ -84,7 +165,9 @@ class JobPosting(BaseModel):
 class JobApplication(BaseModel):
     class Status(models.TextChoices):
         SUBMITTED = "submitted", "Submitted"
+        SCREENING = "screening", "Screening"
         SHORTLISTED = "shortlisted", "Shortlisted"
+        INTERVIEW = "interview", "Interview"
         REJECTED = "rejected", "Rejected"
         HIRED = "hired", "Hired"
 

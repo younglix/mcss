@@ -35,6 +35,9 @@ PERMISSIONS = {
     "resources":    ["view", "create", "edit", "delete"],
     "health":       ["view", "create", "edit", "delete"],
     "hr":           ["view", "create", "edit", "delete", "approve"],
+    "staff_attendance": ["view", "create", "edit"],
+    "contracts":    ["view", "create", "edit", "delete"],
+    "performance":  ["view", "create", "edit", "delete"],
     "recruitment":  ["view", "create", "edit", "delete"],
     "inventory":    ["view", "create", "edit", "delete"],
     "assets":       ["view", "create", "edit", "delete", "assign"],
@@ -88,8 +91,29 @@ DEFAULT_ROLES = {
     },
     "hr": {
         "name": "HR",
-        "description": "Staff records and payroll administration.",
-        "permissions": ["staff.view", "staff.create", "staff.edit", "payroll.view", "payroll.run"],
+        "description": "Staff lifecycle and payroll administration.",
+        "permissions": [
+            # Employee Records — was "staff.*", a permission module nothing
+            # actually checks; Staff Management/UserManagementPage is
+            # gated by users.* (plus roles.view/assign and custom_fields.*
+            # for the same screen's role-toggle and staff custom fields).
+            "users.view", "users.create", "users.edit", "users.delete", "users.reset_password",
+            "roles.view", "roles.assign",
+            "custom_fields.view", "custom_fields.edit",
+            "hr.view", "hr.create", "hr.edit", "hr.delete", "hr.approve",
+            "staff_attendance.view", "staff_attendance.create", "staff_attendance.edit",
+            "contracts.view", "contracts.create", "contracts.edit", "contracts.delete",
+            "performance.view", "performance.create", "performance.edit", "performance.delete",
+            "recruitment.view", "recruitment.create", "recruitment.edit", "recruitment.delete",
+            "payroll.view", "payroll.run", "payroll.approve",
+            # Departments live under config.* (no dedicated module) — same
+            # read-only-by-default trade-off as Accountant's config.view,
+            # but HR also gets config.edit since managing department
+            # structure is explicitly part of this role's job.
+            "config.view", "config.edit",
+            "communication.view", "communication.send",
+            "dashboard.view", "reports.view",
+        ],
     },
     "student": {
         "name": "Student",
