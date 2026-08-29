@@ -2,7 +2,19 @@ from rest_framework import serializers
 
 from apps.configuration.models import AcademicSession, SchoolClass, Term
 
-from .models import Expense, FeeStructure, Invoice, Payment, PayrollRun, Payslip, StaffSalary
+from .models import (
+    Discount,
+    Expense,
+    FeeStructure,
+    Income,
+    Invoice,
+    Payment,
+    PayrollRun,
+    Payslip,
+    Scholarship,
+    ScholarshipAllocation,
+    StaffSalary,
+)
 
 
 class FeeStructureSerializer(serializers.ModelSerializer):
@@ -43,15 +55,18 @@ class InvoiceSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source="student.user.full_name", read_only=True)
     class_arm_label = serializers.SerializerMethodField()
     amount_paid = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    total_discount = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    net_amount = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     balance = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
 
     class Meta:
         model = Invoice
         fields = [
             "id", "invoice_number", "student", "student_name", "class_arm_label", "fee_structure", "purpose",
-            "description", "session", "term", "amount", "amount_paid", "balance", "due_date", "status", "created_at",
+            "description", "session", "term", "amount", "amount_paid", "total_discount", "net_amount", "balance",
+            "due_date", "status", "created_at",
         ]
-        read_only_fields = ["id", "invoice_number", "amount_paid", "balance", "status", "created_at"]
+        read_only_fields = ["id", "invoice_number", "amount_paid", "total_discount", "net_amount", "balance", "status", "created_at"]
 
     def get_class_arm_label(self, obj):
         return str(obj.student.class_arm) if obj.student.class_arm else None
@@ -69,14 +84,21 @@ class SchoolFeesGenerateSerializer(serializers.Serializer):
 class PaymentSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source="invoice.student.user.full_name", read_only=True)
     invoice_description = serializers.CharField(source="invoice.description", read_only=True)
+    verified_by_name = serializers.CharField(source="verified_by.full_name", read_only=True, default=None)
+    reconciled_by_name = serializers.CharField(source="reconciled_by.full_name", read_only=True, default=None)
 
     class Meta:
         model = Payment
         fields = [
             "id", "invoice", "student_name", "invoice_description", "amount", "method",
             "reference", "receipt_number", "status", "paid_at", "recorded_by",
+            "verified_by", "verified_by_name", "verified_at",
+            "is_reconciled", "reconciled_by", "reconciled_by_name", "reconciled_at",
         ]
-        read_only_fields = ["id", "receipt_number", "status", "recorded_by", "paid_at"]
+        read_only_fields = [
+            "id", "receipt_number", "status", "recorded_by", "paid_at",
+            "verified_by", "verified_at", "is_reconciled", "reconciled_by", "reconciled_at",
+        ]
 
     def validate(self, attrs):
         invoice = attrs.get("invoice")
@@ -91,6 +113,56 @@ class ExpenseSerializer(serializers.ModelSerializer):
         model = Expense
         fields = ["id", "expense_number", "category", "description", "amount", "date", "paid_to", "recorded_by"]
         read_only_fields = ["id", "expense_number", "recorded_by"]
+
+
+class IncomeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Income
+        fields = ["id", "income_number", "category", "description", "amount", "date", "received_from", "recorded_by"]
+        read_only_fields = ["id", "income_number", "recorded_by"]
+
+
+class DiscountSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source="invoice.student.user.full_name", read_only=True)
+    invoice_description = serializers.CharField(source="invoice.description", read_only=True)
+    applied_by_name = serializers.CharField(source="applied_by.full_name", read_only=True, default=None)
+
+    class Meta:
+        model = Discount
+        fields = [
+            "id", "invoice", "student_name", "invoice_description", "amount", "reason",
+            "scholarship_allocation", "applied_by", "applied_by_name", "created_at",
+        ]
+        read_only_fields = ["id", "scholarship_allocation", "applied_by", "created_at"]
+
+    def validate(self, attrs):
+        invoice = attrs.get("invoice")
+        amount = attrs.get("amount")
+        if invoice and amount is not None and amount > invoice.net_amount:
+            raise serializers.ValidationError({"amount": f"Exceeds the invoice's remaining un-discounted amount of {invoice.net_amount}."})
+        return attrs
+
+
+class ScholarshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Scholarship
+        fields = ["id", "name", "description", "coverage_type", "coverage_value"]
+        read_only_fields = ["id"]
+
+
+class ScholarshipAllocationSerializer(serializers.ModelSerializer):
+    scholarship_name = serializers.CharField(source="scholarship.name", read_only=True)
+    student_name = serializers.CharField(source="student.user.full_name", read_only=True)
+    session_name = serializers.CharField(source="session.name", read_only=True)
+    awarded_by_name = serializers.CharField(source="awarded_by.full_name", read_only=True, default=None)
+
+    class Meta:
+        model = ScholarshipAllocation
+        fields = [
+            "id", "scholarship", "scholarship_name", "student", "student_name",
+            "session", "session_name", "notes", "awarded_by", "awarded_by_name", "awarded_at",
+        ]
+        read_only_fields = ["id", "awarded_by", "awarded_at"]
 
 
 class StaffSalarySerializer(serializers.ModelSerializer):

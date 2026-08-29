@@ -20,11 +20,27 @@ urlpatterns = [
     path("payments/mine", views.MyPaymentsView.as_view(), name="finance-my-payments"),
     path("payments/child/<uuid:student_id>", views.ChildPaymentsView.as_view(), name="finance-child-payments"),
     path("payments/<uuid:payment_id>/refund", views.PaymentRefundView.as_view(), name="finance-payment-refund"),
+    path("payments/<uuid:payment_id>/verify", views.PaymentVerifyView.as_view(), name="finance-payment-verify"),
+    path("payments/<uuid:payment_id>/reconcile", views.PaymentReconcileView.as_view(), name="finance-payment-reconcile"),
     path("payments/<uuid:payment_id>/receipt.pdf", views.PaymentReceiptPDFView.as_view(), name="finance-payment-receipt-pdf"),
     path("payments/paystack/webhook", views.PaystackWebhookView.as_view(), name="finance-paystack-webhook"),
 
     path("expenses", views.ExpensesView.as_view(), name="finance-expenses"),
     path("expenses/<uuid:expense_id>", views.ExpenseDetailView.as_view(), name="finance-expense-detail"),
+
+    path("income", views.IncomeView.as_view(), name="finance-income"),
+    path("income/<uuid:income_id>", views.IncomeDetailView.as_view(), name="finance-income-detail"),
+
+    path("discounts", views.DiscountsView.as_view(), name="finance-discounts"),
+    path("discounts/<uuid:discount_id>", views.DiscountDetailView.as_view(), name="finance-discount-detail"),
+
+    path("scholarships", views.ScholarshipsView.as_view(), name="finance-scholarships"),
+    path("scholarships/<uuid:scholarship_id>", views.ScholarshipDetailView.as_view(), name="finance-scholarship-detail"),
+    path("scholarships/allocations", views.ScholarshipAllocationsView.as_view(), name="finance-scholarship-allocations"),
+    path("scholarships/allocations/<uuid:allocation_id>", views.ScholarshipAllocationDetailView.as_view(), name="finance-scholarship-allocation-detail"),
+
+    path("outstanding", views.OutstandingFeesView.as_view(), name="finance-outstanding"),
+    path("reminders", views.FeeReminderView.as_view(), name="finance-reminders"),
 
     path("salaries", views.StaffSalariesView.as_view(), name="finance-salaries"),
     path("salaries/<uuid:salary_id>", views.StaffSalaryDetailView.as_view(), name="finance-salary-detail"),

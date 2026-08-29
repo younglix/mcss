@@ -22,14 +22,31 @@ from apps.rbac.permissions import HasPermission
 from apps.settings_app.models import SystemSetting
 from common.responses import failure, success
 
-from .models import Expense, FeeStructure, Invoice, Payment, PayrollRun, Payslip, StaffSalary
+from . import services
+from .models import (
+    Discount,
+    Expense,
+    FeeStructure,
+    Income,
+    Invoice,
+    Payment,
+    PayrollRun,
+    Payslip,
+    Scholarship,
+    ScholarshipAllocation,
+    StaffSalary,
+)
 from .serializers import (
+    DiscountSerializer,
     ExpenseSerializer,
     FeeStructureSerializer,
+    IncomeSerializer,
     InvoiceSerializer,
     PaymentSerializer,
     PayrollRunSerializer,
     SchoolFeesGenerateSerializer,
+    ScholarshipAllocationSerializer,
+    ScholarshipSerializer,
     StaffSalarySerializer,
 )
 
@@ -51,6 +68,21 @@ FeesPermissionMixin = _permission_mixin("fees")
 ExpensesPermissionMixin = _permission_mixin("expenses")
 PayrollPermissionMixin = _permission_mixin("payroll")
 ReportsPermissionMixin = _permission_mixin("reports")
+IncomePermissionMixin = _permission_mixin("income")
+
+
+class DiscountsPermissionMixin:
+    write_action = "apply"
+
+    def get_permissions(self):
+        code = "discounts.view" if self.request.method in ("GET", "HEAD", "OPTIONS") else f"discounts.{self.write_action}"
+        return [HasPermission(code)]
+
+
+class ScholarshipsPermissionMixin:
+    def get_permissions(self):
+        code = "scholarships.view" if self.request.method in ("GET", "HEAD", "OPTIONS") else "scholarships.manage"
+        return [HasPermission(code)]
 
 
 def _notify_invoice_ready(invoice):
@@ -294,10 +326,17 @@ class PaymentsView(APIView):
     def post(self, request):
         serializer = PaymentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        payment = serializer.save(recorded_by=request.user)
-        payment.invoice.refresh_status()
-        log(actor=request.user, action="finance.payment_recorded", target=payment, request=request)
-        _notify_payment_received(payment)
+        # `pending: true` records this as awaiting verification (a bank
+        # transfer/POS slip not yet confirmed against the account) instead
+        # of crediting the invoice immediately — omitted or false keeps the
+        # existing instant-complete behavior every caller already relies on.
+        status_kwargs = {"status": Payment.Status.PENDING} if request.data.get("pending") else {}
+        payment = serializer.save(recorded_by=request.user, **status_kwargs)
+        if payment.status == Payment.Status.COMPLETED:
+            payment.invoice.refresh_status()
+            _notify_payment_received(payment)
+        log(actor=request.user, action="finance.payment_recorded", target=payment,
+            changes={"pending": payment.status == Payment.Status.PENDING}, request=request)
         return success(message="Payment recorded.", data=PaymentSerializer(payment).data, status=201)
 
 
@@ -490,6 +529,49 @@ class PaymentRefundView(APIView):
         return success(message="Payment refunded.", data=PaymentSerializer(payment).data)
 
 
+class PaymentVerifyView(APIView):
+    """Payment Verification: confirms a pending bank transfer/POS/cheque
+    actually arrived — only then does it credit the invoice. Cash and
+    webhook-recorded online payments never pass through here since they're
+    already Payment.Status.COMPLETED the moment they're created."""
+
+    permission_classes = [HasPermission("fees.verify")]
+
+    def post(self, request, payment_id):
+        payment = get_object_or_404(Payment, id=payment_id)
+        if payment.status != Payment.Status.PENDING:
+            raise ValidationError("Only a pending payment can be verified.")
+        payment.status = Payment.Status.COMPLETED
+        payment.verified_by = request.user
+        payment.verified_at = timezone.now()
+        payment.save(update_fields=["status", "verified_by", "verified_at"])
+        payment.invoice.refresh_status()
+        log(actor=request.user, action="finance.payment_verified", target=payment, request=request)
+        _notify_payment_received(payment)
+        return success(message="Payment verified.", data=PaymentSerializer(payment).data)
+
+
+class PaymentReconcileView(APIView):
+    """Reconciliation: a periodic audit step, separate from verification —
+    checking off a already-completed payment against the bank statement or
+    gateway settlement report. Toggle rather than one-way so a mis-click is
+    reversible without needing a separate "unreconcile" endpoint."""
+
+    permission_classes = [HasPermission("fees.reconcile")]
+
+    def post(self, request, payment_id):
+        payment = get_object_or_404(Payment, id=payment_id)
+        if payment.status != Payment.Status.COMPLETED:
+            raise ValidationError("Only a completed payment can be reconciled.")
+        payment.is_reconciled = not payment.is_reconciled
+        payment.reconciled_by = request.user if payment.is_reconciled else None
+        payment.reconciled_at = timezone.now() if payment.is_reconciled else None
+        payment.save(update_fields=["is_reconciled", "reconciled_by", "reconciled_at"])
+        log(actor=request.user, action="finance.payment_reconciled" if payment.is_reconciled else "finance.payment_unreconciled",
+            target=payment, request=request)
+        return success(message="Reconciled." if payment.is_reconciled else "Un-reconciled.", data=PaymentSerializer(payment).data)
+
+
 # ---------------------------------------------------------------- Expenses
 class ExpensesView(ExpensesPermissionMixin, ListCreateAPIView):
     write_action = "create"
@@ -513,6 +595,187 @@ class ExpenseDetailView(ExpensesPermissionMixin, RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         log(actor=self.request.user, action="finance.expense_deleted", target=instance, request=self.request)
         instance.delete()
+
+
+# ---------------------------------------------------------------- Income
+class IncomeView(IncomePermissionMixin, ListCreateAPIView):
+    write_action = "create"
+    serializer_class = IncomeSerializer
+    queryset = Income.objects.all()
+
+    def perform_create(self, serializer):
+        income = serializer.save(recorded_by=self.request.user)
+        log(actor=self.request.user, action="finance.income_recorded", target=income, request=self.request)
+
+
+class IncomeDetailView(IncomePermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = IncomeSerializer
+    queryset = Income.objects.all()
+    lookup_url_kwarg = "income_id"
+
+    def perform_update(self, serializer):
+        income = serializer.save()
+        log(actor=self.request.user, action="finance.income_updated", target=income, request=self.request)
+
+    def perform_destroy(self, instance):
+        log(actor=self.request.user, action="finance.income_deleted", target=instance, request=self.request)
+        instance.delete()
+
+
+# ---------------------------------------------------------------- Discounts
+class DiscountsView(DiscountsPermissionMixin, ListCreateAPIView):
+    serializer_class = DiscountSerializer
+
+    def get_queryset(self):
+        qs = Discount.objects.select_related("invoice__student__user")
+        invoice = self.request.query_params.get("invoice")
+        if invoice:
+            qs = qs.filter(invoice_id=invoice)
+        return qs
+
+    def perform_create(self, serializer):
+        discount = serializer.save(applied_by=self.request.user)
+        discount.invoice.refresh_status()
+        log(actor=self.request.user, action="finance.discount_applied", target=discount, request=self.request)
+
+
+class DiscountDetailView(DiscountsPermissionMixin, RetrieveUpdateDestroyAPIView):
+    write_action = "delete"
+    serializer_class = DiscountSerializer
+    queryset = Discount.objects.all()
+    lookup_url_kwarg = "discount_id"
+
+    def perform_destroy(self, instance):
+        invoice = instance.invoice
+        log(actor=self.request.user, action="finance.discount_removed", target=instance, request=self.request)
+        instance.delete()
+        invoice.refresh_status()
+
+
+# ---------------------------------------------------------------- Scholarships
+class ScholarshipsView(ScholarshipsPermissionMixin, ListCreateAPIView):
+    serializer_class = ScholarshipSerializer
+    queryset = Scholarship.objects.all()
+
+    def perform_create(self, serializer):
+        scholarship = serializer.save()
+        log(actor=self.request.user, action="finance.scholarship_created", target=scholarship, request=self.request)
+
+
+class ScholarshipDetailView(ScholarshipsPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = ScholarshipSerializer
+    queryset = Scholarship.objects.all()
+    lookup_url_kwarg = "scholarship_id"
+
+    def perform_update(self, serializer):
+        scholarship = serializer.save()
+        log(actor=self.request.user, action="finance.scholarship_updated", target=scholarship, request=self.request)
+
+    def perform_destroy(self, instance):
+        log(actor=self.request.user, action="finance.scholarship_deleted", target=instance, request=self.request)
+        instance.delete()
+
+
+class ScholarshipAllocationsView(ScholarshipsPermissionMixin, ListCreateAPIView):
+    serializer_class = ScholarshipAllocationSerializer
+
+    def get_queryset(self):
+        qs = ScholarshipAllocation.objects.select_related("scholarship", "student__user", "session")
+        student = self.request.query_params.get("student")
+        if student:
+            qs = qs.filter(student_id=student)
+        return qs
+
+    def perform_create(self, serializer):
+        allocation = serializer.save(awarded_by=self.request.user)
+        discounted_count = services.apply_scholarship_allocation(allocation, applied_by=self.request.user)
+        log(actor=self.request.user, action="finance.scholarship_allocated", target=allocation,
+            changes={"invoices_discounted": discounted_count}, request=self.request)
+
+
+class ScholarshipAllocationDetailView(ScholarshipsPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = ScholarshipAllocationSerializer
+    queryset = ScholarshipAllocation.objects.all()
+    lookup_url_kwarg = "allocation_id"
+
+    def perform_destroy(self, instance):
+        # The discounts this allocation already produced stay on their
+        # invoices — revoking a scholarship shouldn't retroactively re-bill
+        # a student for a term already underway; staff can remove the
+        # underlying Discount rows separately if that's genuinely intended.
+        log(actor=self.request.user, action="finance.scholarship_allocation_removed", target=instance, request=self.request)
+        instance.delete()
+
+
+# ---------------------------------------------------------------- Outstanding Fees
+class OutstandingFeesView(FeesPermissionMixin, APIView):
+    """Bursary > Outstanding Fees: every student with a nonzero balance,
+    school-wide — the debtor list. SchoolFeesSummaryView above stays scoped
+    to one class at a time for the School Fees ledger; this is the
+    unscoped, sorted-by-balance view bursary actually needs to chase debt."""
+
+    def get(self, request):
+        invoices = Invoice.objects.exclude(status__in=[Invoice.Status.PAID, Invoice.Status.WAIVED]).select_related(
+            "student__user", "student__class_arm__school_class",
+        )
+        by_student = {}
+        for inv in invoices:
+            balance = inv.balance
+            if balance <= 0:
+                continue
+            row = by_student.setdefault(inv.student_id, {
+                "student": str(inv.student_id),
+                "student_name": inv.student.user.full_name,
+                "class_arm_label": str(inv.student.class_arm) if inv.student.class_arm else None,
+                "balance": 0,
+                "invoice_count": 0,
+            })
+            row["balance"] += balance
+            row["invoice_count"] += 1
+        rows = sorted(by_student.values(), key=lambda r: r["balance"], reverse=True)
+        return success(data=rows, meta={"total_outstanding": sum(r["balance"] for r in rows), "debtor_count": len(rows)})
+
+
+# ---------------------------------------------------------------- Communication
+class FeeReminderView(APIView):
+    """Bursary > Communication: fee reminders to parents/students — either
+    one targeted student, or every debtor at once (no `student` in the
+    body), reusing the same notification pipeline every other payment event
+    already dispatches through."""
+
+    permission_classes = [HasPermission("fees.remind")]
+
+    def post(self, request):
+        student_id = request.data.get("student")
+        message = request.data.get("message", "").strip()
+
+        invoices = Invoice.objects.exclude(status__in=[Invoice.Status.PAID, Invoice.Status.WAIVED]).select_related("student__user")
+        if student_id:
+            invoices = invoices.filter(student_id=student_id)
+
+        by_student = {}
+        for inv in invoices:
+            if inv.balance <= 0:
+                continue
+            by_student.setdefault(inv.student_id, inv.student)
+
+        sent = 0
+        for student in by_student.values():
+            balance = sum((i.balance for i in Invoice.objects.filter(student=student).exclude(
+                status__in=[Invoice.Status.PAID, Invoice.Status.WAIVED],
+            )), start=0)
+            dispatch(
+                recipient=student.guardian_user or student.user,
+                title="Outstanding Fee Reminder",
+                body=message or f"{student.user.full_name} has an outstanding balance of {balance}. Please arrange payment.",
+                category="payment",
+            )
+            sent += 1
+
+        if sent == 0:
+            return failure(message="No outstanding balance to send a reminder for.", status=400)
+        log(actor=request.user, action="finance.fee_reminders_sent", changes={"count": sent}, request=request)
+        return success(message=f"Reminder sent to {sent} guardian/student(s).", data={"count": sent})
 
 
 # ---------------------------------------------------------------- Payroll
@@ -603,10 +866,15 @@ class FinancialReportsView(ReportsPermissionMixin, APIView):
         session = AcademicSession.objects.filter(is_current=True).first()
 
         total_invoiced = Invoice.objects.aggregate(total=Sum("amount"))["total"] or 0
+        total_discounts = Discount.objects.aggregate(total=Sum("amount"))["total"] or 0
         total_collected = Payment.objects.filter(status=Payment.Status.COMPLETED).aggregate(total=Sum("amount"))["total"] or 0
-        outstanding = total_invoiced - total_collected
+        # Net of discounts — an amount that was waived off via a discount was
+        # never actually owed, so it shouldn't inflate outstanding debt.
+        outstanding = (total_invoiced - total_discounts) - total_collected
 
         total_expenses = Expense.objects.aggregate(total=Sum("amount"))["total"] or 0
+        total_other_income = Income.objects.aggregate(total=Sum("amount"))["total"] or 0
+        total_income = total_collected + total_other_income
 
         collected_by_category = list(
             Payment.objects.filter(status=Payment.Status.COMPLETED)
@@ -617,6 +885,9 @@ class FinancialReportsView(ReportsPermissionMixin, APIView):
         expenses_by_category = list(
             Expense.objects.values("category").annotate(total=Sum("amount")).order_by("-total")
         )
+        income_by_category = list(
+            Income.objects.values("category").annotate(total=Sum("amount")).order_by("-total")
+        )
 
         latest_run = PayrollRun.objects.order_by("-year", "-month").first()
         payroll_total = latest_run.payslips.aggregate(total=Sum("net_pay"))["total"] or 0 if latest_run else 0
@@ -624,15 +895,19 @@ class FinancialReportsView(ReportsPermissionMixin, APIView):
         return success(data={
             "session": session.name if session else None,
             "total_invoiced": total_invoiced,
+            "total_discounts": total_discounts,
             "total_collected": total_collected,
             "outstanding": outstanding,
+            "total_other_income": total_other_income,
+            "total_income": total_income,
             "total_expenses": total_expenses,
-            "net_position": total_collected - total_expenses,
+            "net_position": total_income - total_expenses,
             "collected_by_category": [
                 {"category": r["invoice__fee_structure__category__name"] or "Uncategorized", "total": r["total"]}
                 for r in collected_by_category
             ],
             "expenses_by_category": [{"category": r["category"], "total": r["total"]} for r in expenses_by_category],
+            "income_by_category": [{"category": r["category"], "total": r["total"]} for r in income_by_category],
             "latest_payroll_run": {
                 "id": str(latest_run.id), "month": latest_run.month, "year": latest_run.year,
                 "status": latest_run.status, "total_net_pay": payroll_total,
