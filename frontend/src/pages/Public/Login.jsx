@@ -21,6 +21,7 @@ function resolveHomePath({ permissions, roles, user, requestedFrom }) {
   // dashboard otherwise.
   if (user?.user_type === 'staff' && roles?.includes('teacher') && !roles?.includes('principal')) return '/staff/teacher';
   if (user?.user_type === 'staff' && roles?.includes('accountant') && !roles?.includes('principal')) return '/bursary';
+  if (user?.user_type === 'staff' && roles?.includes('hr') && !roles?.includes('principal')) return '/hr';
   if (user?.user_type === 'staff') return '/admin';
   return '/';
 }

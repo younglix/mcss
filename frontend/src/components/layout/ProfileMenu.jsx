@@ -16,6 +16,7 @@ const GENERIC_ACCOUNT_PATH = {
   superAdmin: '/super-admin/account',
   admin: '/admin/account',
   bursary: '/bursary/account',
+  hr: '/hr/account',
   teacher: '/staff/teacher/account',
   classTeacher: '/staff/class-teacher/account',
   examOfficer: '/staff/exam-officer/account',

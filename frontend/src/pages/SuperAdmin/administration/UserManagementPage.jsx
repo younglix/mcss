@@ -19,7 +19,7 @@ const USER_TYPE_OPTIONS = [
 
 const emptyForm = { full_name: '', email: '', phone: '', identifier: '', user_type: 'staff', password: '' };
 
-export default function UserManagementPage({ pageTitle, title, subtitle, userTypeFilter, emptyIcon = 'group' }) {
+export default function UserManagementPage({ portalId = 'superAdmin', pageTitle, title, subtitle, userTypeFilter, emptyIcon = 'group' }) {
   const usersEndpoint = userTypeFilter ? `/users/?user_type=${userTypeFilter}` : '/users/';
   const endpoints = useMemo(() => ({ users: usersEndpoint, roles: '/rbac/roles' }), [usersEndpoint]);
   const { data, loading, error, reload } = useDashboardData(endpoints);
@@ -166,7 +166,7 @@ export default function UserManagementPage({ pageTitle, title, subtitle, userTyp
   };
 
   return (
-    <DashboardPageShell pageTitle={pageTitle} title={title} subtitle={subtitle} loading={loading} error={error} onReload={reload} skeletonCount={1}>
+    <DashboardPageShell portalId={portalId} pageTitle={pageTitle} title={title} subtitle={subtitle} loading={loading} error={error} onReload={reload} skeletonCount={1}>
       {data && (
         <div>
           {actionError && (

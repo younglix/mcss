@@ -129,6 +129,19 @@ import BursaryExpenses from './pages/Bursary/Expenses.jsx';
 import BursaryIncome from './pages/Bursary/Income.jsx';
 import BursaryFinancialReports from './pages/Bursary/FinancialReports.jsx';
 import BursaryCommunication from './pages/Bursary/Communication.jsx';
+import HRDashboard from './pages/HR/Dashboard.jsx';
+import HREmployeeRecords from './pages/HR/EmployeeRecords.jsx';
+import HRRecruitment from './pages/HR/Recruitment.jsx';
+import HRAttendance from './pages/HR/Attendance.jsx';
+import HRLeave from './pages/HR/Leave.jsx';
+import HRContracts from './pages/HR/Contracts.jsx';
+import HRDepartments from './pages/HR/Departments.jsx';
+import HRPayroll from './pages/HR/Payroll.jsx';
+import HRPayslips from './pages/HR/Payslips.jsx';
+import HRDocuments from './pages/HR/Documents.jsx';
+import HRPerformance from './pages/HR/Performance.jsx';
+import HRReports from './pages/HR/Reports.jsx';
+import HRCommunication from './pages/HR/Communication.jsx';
 import TeacherDashboard from './pages/Staff/Teacher/Dashboard.jsx';
 import TeacherMyClasses from './pages/Staff/Teacher/MyClasses.jsx';
 import TeacherMySubjects from './pages/Staff/Teacher/MySubjects.jsx';
@@ -283,6 +296,20 @@ export const routes = [
   { path: "/bursary/income", label: "Bursary Income", source: "bursary_income", element: <BursaryIncome /> },
   { path: "/bursary/reports", label: "Bursary Financial Reports", source: "bursary_reports", element: <BursaryFinancialReports /> },
   { path: "/bursary/communication", label: "Bursary Communication", source: "bursary_communication", element: <BursaryCommunication /> },
+  { path: "/hr", label: "HR Dashboard", source: "hr_dashboard", element: <HRDashboard /> },
+  { path: "/hr/employees", label: "HR Employee Records", source: "hr_employees", element: <HREmployeeRecords /> },
+  { path: "/hr/recruitment", label: "HR Recruitment", source: "hr_recruitment", element: <HRRecruitment /> },
+  { path: "/hr/attendance", label: "HR Staff Attendance", source: "hr_attendance", element: <HRAttendance /> },
+  { path: "/hr/leave", label: "HR Leave", source: "hr_leave", element: <HRLeave /> },
+  { path: "/hr/contracts", label: "HR Contracts", source: "hr_contracts", element: <HRContracts /> },
+  { path: "/hr/departments", label: "HR Departments", source: "hr_departments", element: <HRDepartments /> },
+  { path: "/hr/payroll", label: "HR Payroll", source: "hr_payroll", element: <HRPayroll /> },
+  { path: "/hr/payslips", label: "HR Payslips", source: "hr_payslips", element: <HRPayslips /> },
+  { path: "/hr/documents", label: "HR Staff Documents", source: "hr_documents", element: <HRDocuments /> },
+  { path: "/hr/performance", label: "HR Performance", source: "hr_performance", element: <HRPerformance /> },
+  { path: "/hr/reports", label: "HR Staff Reports", source: "hr_reports", element: <HRReports /> },
+  { path: "/hr/communication", label: "HR Communication", source: "hr_communication", element: <HRCommunication /> },
+  { path: "/hr/account", label: "HR My Account", source: "hr_account_mcss", element: <AccountPage portalId="hr" /> },
   { path: "/bursary/account", label: "Bursary My Account", source: "bursary_account_mcss", element: <AccountPage portalId="bursary" /> },
   { path: "/staff/teacher", label: "Teacher Dashboard", source: "teacher_portal_dashboard", element: <TeacherDashboard /> },
   { path: "/staff/teacher/classes", label: "Teacher My Classes", source: "teacher_portal_my_classes", element: <TeacherMyClasses /> },
