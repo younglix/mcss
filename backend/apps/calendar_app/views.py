@@ -60,7 +60,11 @@ class MyEventsView(ListAPIView):
 
     def get_queryset(self):
         role = self.request.query_params.get("audience")
-        allowed = {Event.Audience.ALL, role} if role in (Event.Audience.STUDENTS, Event.Audience.PARENTS) else {Event.Audience.ALL}
+        allowed = (
+            {Event.Audience.ALL, role}
+            if role in (Event.Audience.STUDENTS, Event.Audience.PARENTS, Event.Audience.STAFF)
+            else {Event.Audience.ALL}
+        )
         qs = Event.objects.filter(audience__in=allowed)
         date_from = self.request.query_params.get("from")
         date_to = self.request.query_params.get("to")

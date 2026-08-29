@@ -21,6 +21,7 @@ from .models import (
     ExamScore,
     PromotionRecord,
     ReportCardRemark,
+    ResultSubmission,
     SkillRating,
     Student,
     Subject,
@@ -38,6 +39,7 @@ from .serializers import (
     ExamSerializer,
     PromotionActionSerializer,
     PromotionRecordSerializer,
+    ResultSubmissionSerializer,
     StudentCreateSerializer,
     StudentSerializer,
     SubjectSerializer,
@@ -49,6 +51,40 @@ User = get_user_model()
 
 def _current_session():
     return AcademicSession.objects.filter(is_current=True).first()
+
+
+# ------------------------------------------------------ Teacher self-service ownership
+# Mirrors the _child_or_403/_own_student_or_403 pattern above: these self-
+# service "teaching" views skip HasPermission entirely (IsAuthenticated
+# only) and instead gate purely on "is this actually one of my own classes/
+# subjects this session" — so a teacher account never needs to be granted
+# admin-wide academics.* permissions just to run their own workflow.
+def _teaching_class_arm_ids(user, session):
+    """Every class-arm this teacher touches this session: either teaching a
+    subject there, or being its form/class teacher."""
+    if not session:
+        return set()
+    taught = set(
+        ClassSubjectAssignment.objects.filter(teacher=user, session=session).values_list("class_arm_id", flat=True)
+    )
+    class_teacher_of = set(
+        ClassTeacherAssignment.objects.filter(teacher=user, session=session).values_list("class_arm_id", flat=True)
+    )
+    return taught | class_teacher_of
+
+
+def _teaches_subject_in_arm(user, session, class_arm_id, subject_id):
+    if not session:
+        return False
+    return ClassSubjectAssignment.objects.filter(
+        teacher=user, session=session, class_arm_id=class_arm_id, subject_id=subject_id
+    ).exists()
+
+
+def _is_class_teacher_of(user, session, class_arm_id):
+    if not session:
+        return False
+    return ClassTeacherAssignment.objects.filter(teacher=user, session=session, class_arm_id=class_arm_id).exists()
 
 
 def _permission_mixin(module):
@@ -860,4 +896,337 @@ class AcademicReportsView(ReportsPermissionMixin, APIView):
                 {"subject": r["subject__name"], "average": round(r["avg_score"], 1), "entries": r["entries"]}
                 for r in avg_by_subject
             ],
+        })
+
+
+# ================================================================ Teacher Portal ("teaching")
+# Everything below is the Teacher Portal's self-service layer: scoped to
+# "classes/subjects this logged-in staff member actually teaches this
+# session", the same way the student/parent "mine"/"child" views above are
+# scoped to one student's own record. No academics.* RBAC permission is
+# required — IsAuthenticated plus the ownership helpers above is the gate,
+# so any staff account works the moment they have a ClassSubjectAssignment
+# or ClassTeacherAssignment row, regardless of what admin role they hold.
+
+class MyTeachingClassesView(APIView):
+    """Teacher Portal > My Classes: every class-arm this teacher touches
+    this session, with which subject(s) they teach there and whether
+    they're its form/class teacher."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        session = _current_session()
+        arm_ids = _teaching_class_arm_ids(request.user, session)
+        if not arm_ids:
+            return success(data=[])
+        arms = ClassArm.objects.select_related("school_class").filter(id__in=arm_ids)
+        my_subject_assignments = ClassSubjectAssignment.objects.filter(
+            teacher=request.user, session=session, class_arm_id__in=arm_ids
+        ).select_related("subject")
+        subjects_by_arm = {}
+        for a in my_subject_assignments:
+            subjects_by_arm.setdefault(a.class_arm_id, []).append({"id": str(a.subject.id), "name": a.subject.name})
+        class_teacher_arm_ids = set(
+            ClassTeacherAssignment.objects.filter(teacher=request.user, session=session, class_arm_id__in=arm_ids)
+            .values_list("class_arm_id", flat=True)
+        )
+        data = [
+            {
+                "id": str(arm.id),
+                "name": str(arm),
+                "school_class_name": arm.school_class.name,
+                "student_count": arm.students.filter(status=Student.Status.ACTIVE).count(),
+                "subjects": subjects_by_arm.get(arm.id, []),
+                "is_class_teacher": arm.id in class_teacher_arm_ids,
+            }
+            for arm in arms
+        ]
+        return success(data=data, meta={"session": session.name if session else None})
+
+
+class MyTeachingSubjectsView(APIView):
+    """Teacher Portal > My Subjects: distinct subjects taught this session,
+    each with the class-arms they're taught in."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        session = _current_session()
+        assignments = ClassSubjectAssignment.objects.filter(teacher=request.user, session=session).select_related(
+            "subject", "class_arm__school_class"
+        ) if session else ClassSubjectAssignment.objects.none()
+        by_subject = {}
+        for a in assignments:
+            entry = by_subject.setdefault(a.subject_id, {"id": str(a.subject.id), "name": a.subject.name, "class_arms": []})
+            entry["class_arms"].append({"id": str(a.class_arm.id), "name": str(a.class_arm)})
+        return success(data=list(by_subject.values()))
+
+
+class MyTeachingTimetableView(APIView):
+    """Teacher Portal > My Timetable: every slot this teacher is timetabled
+    to teach this session, across all their classes."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        session = _current_session()
+        qs = TimetableSlot.objects.filter(teacher=request.user, session=session).select_related(
+            "subject", "class_arm__school_class"
+        ) if session else TimetableSlot.objects.none()
+        return success(data=TimetableSlotSerializer(qs, many=True).data)
+
+
+class MyTeachingStudentsView(APIView):
+    """Teacher Portal > Student List: roster of one class-arm, only if this
+    teacher actually teaches or class-teaches that arm."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        session = _current_session()
+        class_arm = request.query_params.get("class_arm")
+        if not class_arm:
+            return failure(message="class_arm is required.", status=400)
+        if class_arm not in {str(i) for i in _teaching_class_arm_ids(request.user, session)}:
+            return failure(message="Not one of your classes.", status=403)
+        qs = Student.objects.select_related("user", "class_arm").filter(
+            class_arm_id=class_arm, user__is_deleted=False,
+        )
+        return success(data=StudentSerializer(qs, many=True).data)
+
+
+class MyTeachingAttendanceView(APIView):
+    """Teacher Portal > Attendance: view/take attendance for one of my
+    classes on one date. GET returns the roster's current marks (defaulting
+    to 'present' if unmarked yet); POST bulk-marks the whole roster."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        session = _current_session()
+        class_arm = request.query_params.get("class_arm")
+        date = request.query_params.get("date")
+        if not class_arm or not date:
+            return failure(message="class_arm and date are required.", status=400)
+        if class_arm not in {str(i) for i in _teaching_class_arm_ids(request.user, session)}:
+            return failure(message="Not one of your classes.", status=403)
+        roster = Student.objects.select_related("user").filter(class_arm_id=class_arm, user__is_deleted=False, status=Student.Status.ACTIVE)
+        marks = {
+            r.student_id: r.status
+            for r in AttendanceRecord.objects.filter(class_arm_id=class_arm, date=date)
+        }
+        data = [
+            {"id": str(s.id), "full_name": s.user.full_name, "status": marks.get(s.id, AttendanceRecord.Status.PRESENT)}
+            for s in roster
+        ]
+        return success(data=data)
+
+    def post(self, request):
+        session = _current_session()
+        class_arm = request.data.get("class_arm")
+        date = request.data.get("date")
+        records = request.data.get("records")
+        if not class_arm or not date or not records:
+            return failure(message="class_arm, date and records are required.", status=400)
+        if class_arm not in {str(i) for i in _teaching_class_arm_ids(request.user, session)}:
+            return failure(message="Not one of your classes.", status=403)
+        term = Term.objects.filter(session=session, is_current=True).first() if session else None
+        if not term:
+            return failure(message="No current term is set.", status=400)
+        valid_statuses = {c.value for c in AttendanceRecord.Status}
+        count = 0
+        for r in records:
+            if r.get("status") not in valid_statuses or not r.get("student"):
+                continue
+            AttendanceRecord.objects.update_or_create(
+                student_id=r["student"], date=date,
+                defaults={"class_arm_id": class_arm, "term": term, "status": r["status"], "recorded_by": request.user},
+            )
+            count += 1
+        log(actor=request.user, action="academics.attendance_bulk_marked",
+            changes={"class_arm": str(class_arm), "date": str(date), "count": count}, request=request)
+        return success(message=f"Attendance recorded for {count} student(s).", data={"count": count})
+
+
+class MyTeachingAssignmentsView(APIView):
+    """Teacher Portal > Assignments: assignments I've set, and creating new
+    ones for a class/subject I actually teach."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        qs = Assignment.objects.filter(teacher=request.user).select_related("subject", "class_arm__school_class").order_by("-due_date")
+        return success(data=AssignmentSerializer(qs, many=True).data)
+
+    def post(self, request):
+        session = _current_session()
+        class_arm = request.data.get("class_arm")
+        subject = request.data.get("subject")
+        if not _teaches_subject_in_arm(request.user, session, class_arm, subject):
+            return failure(message="You don't teach that subject in that class.", status=403)
+        serializer = AssignmentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        term = Term.objects.filter(session=session, is_current=True).first() if session else None
+        assignment = serializer.save(session=session, term=term, teacher=request.user)
+        log(actor=request.user, action="academics.assignment_created", target=assignment, request=request)
+        return success(message="Assignment created.", data=AssignmentSerializer(assignment).data, status=201)
+
+
+class MyTeachingAssignmentDetailView(APIView):
+    """Edit/withdraw one of my own assignments."""
+
+    permission_classes = [IsAuthenticated]
+
+    def _own_or_404(self, request, assignment_id):
+        assignment = get_object_or_404(Assignment, id=assignment_id)
+        return assignment if assignment.teacher_id == request.user.id else None
+
+    def patch(self, request, assignment_id):
+        assignment = self._own_or_404(request, assignment_id)
+        if assignment is None:
+            return failure(message="Not your assignment.", status=403)
+        serializer = AssignmentSerializer(assignment, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        assignment = serializer.save()
+        log(actor=request.user, action="academics.assignment_updated", target=assignment, request=request)
+        return success(message="Assignment updated.", data=AssignmentSerializer(assignment).data)
+
+    def delete(self, request, assignment_id):
+        assignment = self._own_or_404(request, assignment_id)
+        if assignment is None:
+            return failure(message="Not your assignment.", status=403)
+        log(actor=request.user, action="academics.assignment_deleted", target=assignment, request=request)
+        assignment.delete()
+        return success(message="Assignment removed.")
+
+
+class MyTeachingExamsView(APIView):
+    """Teacher Portal > exam picker for Tests & CA / Exams / Marks Entry —
+    every exam in the current session (any type/status: a teacher needs to
+    enter scores before an exam is marked completed, not just after)."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        session = _current_session()
+        qs = Exam.objects.filter(session=session).order_by("-start_date") if session else Exam.objects.none()
+        exam_type = request.query_params.get("exam_type")
+        if exam_type:
+            qs = qs.filter(exam_type=exam_type)
+        return success(data=ExamSerializer(qs, many=True).data)
+
+
+class MyTeachingScoresView(APIView):
+    """Teacher Portal > Tests & CA / Exams / Marks Entry: enter scores for
+    one exam+class+subject I actually teach. GET also reports whether this
+    slice has already been submitted for approval."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, exam_id):
+        session = _current_session()
+        subject = request.query_params.get("subject")
+        class_arm = request.query_params.get("class_arm")
+        if not subject or not class_arm:
+            return failure(message="subject and class_arm are required.", status=400)
+        if not _teaches_subject_in_arm(request.user, session, class_arm, subject):
+            return failure(message="You don't teach that subject in that class.", status=403)
+        qs = ExamScore.objects.filter(exam_id=exam_id, subject_id=subject, student__class_arm_id=class_arm).select_related("student__user")
+        submission = ResultSubmission.objects.filter(exam_id=exam_id, class_arm_id=class_arm, subject_id=subject).first()
+        return success(data={
+            "scores": ExamScoreSerializer(qs, many=True).data,
+            "submission": ResultSubmissionSerializer(submission).data if submission else None,
+        })
+
+    def post(self, request, exam_id):
+        session = _current_session()
+        subject = request.data.get("subject")
+        class_arm = request.data.get("class_arm")
+        if not _teaches_subject_in_arm(request.user, session, class_arm, subject):
+            return failure(message="You don't teach that subject in that class.", status=403)
+        submitted = ResultSubmission.objects.filter(exam_id=exam_id, class_arm_id=class_arm, subject_id=subject).exists()
+        if submitted:
+            return failure(message="These scores were already submitted for approval — ask an admin to reopen them before editing.", status=409)
+        serializer = ExamScoreBulkEntrySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        v = serializer.validated_data
+        count = 0
+        for s in v["scores"]:
+            ca_score = s.get("ca_score")
+            exam_score = s.get("exam_score")
+            score = (float(ca_score) + float(exam_score)) if (ca_score is not None and exam_score is not None) else s["score"]
+            ExamScore.objects.update_or_create(
+                exam_id=exam_id, student_id=s["student"], subject=v["subject"],
+                defaults={
+                    "score": score, "max_score": v["max_score"], "ca_score": ca_score, "exam_score": exam_score,
+                    "remark": s.get("remark", ""), "entered_by": request.user,
+                },
+            )
+            count += 1
+        log(actor=request.user, action="academics.scores_entered",
+            changes={"exam": str(exam_id), "subject": str(v["subject"]), "count": count}, request=request)
+        return success(message=f"Scores entered for {count} student(s).", data={"count": count})
+
+
+class MyTeachingResultSubmitView(APIView):
+    """Teacher Portal > Results: lock in one class+subject's scores for
+    this exam and send them to the HOD/principal for approval — the
+    counterpart admins act on via results.approve, once that review queue
+    exists. Submitting doesn't publish results to students; it only stops
+    the teacher (and this endpoint) from editing further."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, exam_id):
+        session = _current_session()
+        subject = request.data.get("subject")
+        class_arm = request.data.get("class_arm")
+        if not _teaches_subject_in_arm(request.user, session, class_arm, subject):
+            return failure(message="You don't teach that subject in that class.", status=403)
+        if not ExamScore.objects.filter(exam_id=exam_id, subject_id=subject, student__class_arm_id=class_arm).exists():
+            return failure(message="Enter at least one score before submitting.", status=400)
+        submission, created = ResultSubmission.objects.get_or_create(
+            exam_id=exam_id, class_arm_id=class_arm, subject_id=subject,
+            defaults={"teacher": request.user, "status": ResultSubmission.Status.SUBMITTED},
+        )
+        if not created:
+            return failure(message="Already submitted.", status=409)
+        log(actor=request.user, action="academics.results_submitted", target=submission, request=request)
+        return success(message="Results submitted for approval.", data=ResultSubmissionSerializer(submission).data)
+
+
+class MyTeachingDashboardView(APIView):
+    """Teacher Portal > Dashboard: my classes, today's timetable, pending
+    tasks (attendance not yet taken today, assignments due soon), and the
+    same active site announcements every portal shows."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        session = _current_session()
+        arm_ids = _teaching_class_arm_ids(request.user, session)
+        today = timezone.localdate()
+        today_slots = TimetableSlot.objects.filter(
+            teacher=request.user, session=session, day=today.strftime("%A").lower(),
+        ).select_related("subject", "class_arm__school_class").order_by("start_time") if session else TimetableSlot.objects.none()
+
+        marked_today = set(
+            AttendanceRecord.objects.filter(class_arm_id__in=arm_ids, date=today).values_list("class_arm_id", flat=True)
+        )
+        arms = ClassArm.objects.select_related("school_class").filter(id__in=arm_ids)
+        pending_attendance = [
+            {"id": str(a.id), "name": str(a)} for a in arms if a.id not in marked_today
+        ]
+
+        upcoming_assignments = Assignment.objects.filter(
+            teacher=request.user, due_date__gte=today,
+        ).select_related("subject", "class_arm__school_class").order_by("due_date")[:5]
+
+        return success(data={
+            "session": session.name if session else None,
+            "class_count": len(arm_ids),
+            "today_timetable": TimetableSlotSerializer(today_slots, many=True).data,
+            "pending_attendance": pending_attendance,
+            "upcoming_assignments": AssignmentSerializer(upcoming_assignments, many=True).data,
         })

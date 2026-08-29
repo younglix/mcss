@@ -185,7 +185,11 @@ class ActivityParticipant(BaseModel):
 class StudentResource(BaseModel):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    file_url = models.URLField(blank=True)
+    # CharField, not URLField: local-disk storage (dev, or prod without S3
+    # keys yet) returns a relative /media/... path, which URLField's
+    # absolute-URL validator rejects outright — same fix as
+    # SchoolProfile.logo/favicon.
+    file_url = models.CharField(max_length=500, blank=True)
     category = models.CharField(max_length=100, blank=True)
     class_arm = models.ForeignKey(
         "configuration.ClassArm", on_delete=models.SET_NULL, null=True, blank=True, related_name="resources"

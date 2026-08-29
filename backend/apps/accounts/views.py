@@ -61,6 +61,12 @@ def _build_auth_payload(user, request):
         "refresh": tokens["refresh"],
         "user": UserSerializer(user).data,
         "permissions": sorted(get_effective_permissions(user)),
+        # Role slugs, not just flattened permissions — Login.jsx needs these
+        # to route staff accounts to the right portal (e.g. Teacher vs the
+        # generic Admin dashboard), since a Principal's permission set is a
+        # superset of a Teacher's and can't be told apart from permissions
+        # alone.
+        "roles": [] if user.is_superadmin else list(user.user_roles.select_related("role").values_list("role__slug", flat=True)),
     }
 
 

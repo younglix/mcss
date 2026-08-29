@@ -1,3 +1,8 @@
+import uuid
+from pathlib import Path
+
+from django.conf import settings as django_settings
+from django.core.files.storage import default_storage
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
@@ -5,7 +10,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from apps.academics.models import Student
+from apps.academics.models import ClassSubjectAssignment, ClassTeacherAssignment, Student
 from apps.audit.services import log
 from apps.configuration.models import AcademicSession
 from apps.rbac.permissions import HasPermission
@@ -496,6 +501,85 @@ class ChildResourcesView(APIView):
             return success(data=[])
         qs = StudentResource.objects.filter(class_arm_id=student.class_arm_id).select_related("class_arm", "uploaded_by")
         return success(data=StudentResourceSerializer(qs, many=True).data)
+
+
+def _teaching_class_arm_ids(user, session):
+    """Same helper as apps.academics.views — duplicated locally rather than
+    imported cross-app, matching this codebase's existing convention of
+    small per-app ownership helpers (see _child_or_403 above) over a shared
+    utility module."""
+    if not session:
+        return set()
+    taught = set(ClassSubjectAssignment.objects.filter(teacher=user, session=session).values_list("class_arm_id", flat=True))
+    class_teacher_of = set(ClassTeacherAssignment.objects.filter(teacher=user, session=session).values_list("class_arm_id", flat=True))
+    return taught | class_teacher_of
+
+
+class MyTeachingResourcesView(APIView):
+    """Teacher Portal > Lesson Notes / Resources & E-Learning: materials for
+    any class-arm I teach, whoever uploaded them, plus uploading new ones —
+    both nav items share this endpoint, distinguished only by the
+    `category` filter/value the frontend passes ("Lesson Note" vs anything
+    else), so they don't need two near-identical models."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        session = _current_session()
+        arm_ids = _teaching_class_arm_ids(request.user, session)
+        qs = StudentResource.objects.filter(class_arm_id__in=arm_ids).select_related("class_arm", "uploaded_by")
+        category = request.query_params.get("category")
+        if category:
+            qs = qs.filter(category=category)
+        return success(data=StudentResourceSerializer(qs, many=True).data)
+
+    def post(self, request):
+        session = _current_session()
+        class_arm = request.data.get("class_arm")
+        if class_arm not in {str(i) for i in _teaching_class_arm_ids(request.user, session)}:
+            return failure(message="Not one of your classes.", status=403)
+        serializer = StudentResourceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        resource = serializer.save(uploaded_by=request.user)
+        log(actor=request.user, action="student_services.resource_created", target=resource, request=request)
+        return success(message="Uploaded.", data=StudentResourceSerializer(resource).data, status=201)
+
+
+class MyTeachingResourceUploadView(APIView):
+    """Raw file upload backing the Lesson Notes / Resources uploader — same
+    storage plumbing as settings_app.AssetUploadView (S3 when configured,
+    local disk only in DEBUG) but open to any authenticated staff member
+    and any file type, not just images, since lesson notes/past questions
+    are commonly PDFs and documents."""
+
+    permission_classes = [IsAuthenticated]
+    MAX_BYTES = 15 * 1024 * 1024
+
+    def post(self, request):
+        if not django_settings.DEBUG and not django_settings.S3_CONFIGURED:
+            return failure(message="File storage isn't configured yet. Add S3 credentials to enable uploads.", status=503)
+        file = request.FILES.get("file")
+        if not file:
+            return failure(message="No file provided.", status=400)
+        if file.size > self.MAX_BYTES:
+            return failure(message="File must be smaller than 15MB.", status=400)
+        ext = Path(file.name).suffix.lower() or ".bin"
+        saved_path = default_storage.save(f"resources/{uuid.uuid4().hex}{ext}", file)
+        url = default_storage.url(saved_path)
+        log(actor=request.user, action="student_services.resource_file_uploaded", changes={"path": saved_path}, request=request)
+        return success(data={"url": url, "file_name": file.name})
+
+
+class MyTeachingResourceDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, resource_id):
+        resource = get_object_or_404(StudentResource, id=resource_id)
+        if resource.uploaded_by_id != request.user.id:
+            return failure(message="You can only remove your own uploads.", status=403)
+        log(actor=request.user, action="student_services.resource_deleted", target=resource, request=request)
+        resource.delete()
+        return success(message="Removed.")
 
 
 # ================================================================ Health

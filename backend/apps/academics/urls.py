@@ -49,4 +49,17 @@ urlpatterns = [
     path("promotion/action", views.PromotionActionView.as_view(), name="academics-promotion-action"),
 
     path("reports", views.AcademicReportsView.as_view(), name="academics-reports"),
+
+    # ------------------------------------------------ Teacher Portal ("teaching")
+    path("teaching/dashboard", views.MyTeachingDashboardView.as_view(), name="academics-teaching-dashboard"),
+    path("teaching/classes", views.MyTeachingClassesView.as_view(), name="academics-teaching-classes"),
+    path("teaching/subjects", views.MyTeachingSubjectsView.as_view(), name="academics-teaching-subjects"),
+    path("teaching/timetable", views.MyTeachingTimetableView.as_view(), name="academics-teaching-timetable"),
+    path("teaching/students", views.MyTeachingStudentsView.as_view(), name="academics-teaching-students"),
+    path("teaching/attendance", views.MyTeachingAttendanceView.as_view(), name="academics-teaching-attendance"),
+    path("teaching/assignments", views.MyTeachingAssignmentsView.as_view(), name="academics-teaching-assignments"),
+    path("teaching/assignments/<uuid:assignment_id>", views.MyTeachingAssignmentDetailView.as_view(), name="academics-teaching-assignment-detail"),
+    path("teaching/exams", views.MyTeachingExamsView.as_view(), name="academics-teaching-exams"),
+    path("teaching/exams/<uuid:exam_id>/scores", views.MyTeachingScoresView.as_view(), name="academics-teaching-scores"),
+    path("teaching/exams/<uuid:exam_id>/submit", views.MyTeachingResultSubmitView.as_view(), name="academics-teaching-submit"),
 ]

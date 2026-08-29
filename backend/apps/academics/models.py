@@ -258,6 +258,41 @@ class SkillRating(BaseModel):
         return f"{self.student} — {self.get_skill_display()}: {self.rating}"
 
 
+class ResultSubmission(BaseModel):
+    """Tracks a teacher's submit-for-approval step on one class-arm+subject's
+    scores for one exam — separate from Exam.status (which is exam-wide,
+    shared across every class/subject sitting it) since approval happens per
+    teacher's own slice before a principal publishes the exam as a whole."""
+
+    class Status(models.TextChoices):
+        SUBMITTED = "submitted", "Submitted"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name="result_submissions")
+    class_arm = models.ForeignKey(
+        "configuration.ClassArm", on_delete=models.CASCADE, related_name="result_submissions"
+    )
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name="result_submissions")
+    teacher = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="result_submissions"
+    )
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.SUBMITTED)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    reviewed_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="result_submissions_reviewed"
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    review_note = models.CharField(max_length=255, blank=True)
+
+    class Meta(BaseModel.Meta):
+        unique_together = ("exam", "class_arm", "subject")
+        ordering = ["-submitted_at"]
+
+    def __str__(self):
+        return f"{self.subject.name} — {self.class_arm} ({self.exam.name}): {self.status}"
+
+
 class Assignment(BaseModel):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)

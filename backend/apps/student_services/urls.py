@@ -45,6 +45,9 @@ urlpatterns = [
     path("resources", views.StudentResourcesView.as_view(), name="ss-resources"),
     path("resources/mine", views.MyResourcesView.as_view(), name="ss-my-resources"),
     path("resources/child/<uuid:student_id>", views.ChildResourcesView.as_view(), name="ss-child-resources"),
+    path("resources/teaching", views.MyTeachingResourcesView.as_view(), name="ss-teaching-resources"),
+    path("resources/teaching/upload", views.MyTeachingResourceUploadView.as_view(), name="ss-teaching-resource-upload"),
+    path("resources/teaching/<uuid:resource_id>", views.MyTeachingResourceDetailView.as_view(), name="ss-teaching-resource-detail"),
     path("resources/<uuid:resource_id>", views.StudentResourceDetailView.as_view(), name="ss-resource-detail"),
 
     # Health
