@@ -116,7 +116,23 @@ import StudentFinance from './pages/Student/Finance.jsx';
 import ParentDashboard from './pages/Parent/Dashboard.jsx';
 import ParentFinance from './pages/Parent/Finance.jsx';
 import BursaryDashboard from './pages/Bursary/Dashboard.jsx';
-import TeacherScoreEntry from './pages/Staff/Teacher/ScoreEntry.jsx';
+import TeacherDashboard from './pages/Staff/Teacher/Dashboard.jsx';
+import TeacherMyClasses from './pages/Staff/Teacher/MyClasses.jsx';
+import TeacherMySubjects from './pages/Staff/Teacher/MySubjects.jsx';
+import TeacherTimetable from './pages/Staff/Teacher/Timetable.jsx';
+import TeacherStudentList from './pages/Staff/Teacher/StudentList.jsx';
+import TeacherAttendance from './pages/Staff/Teacher/Attendance.jsx';
+import TeacherAssignments from './pages/Staff/Teacher/Assignments.jsx';
+import TeacherTestsAndCA from './pages/Staff/Teacher/TestsAndCA.jsx';
+import TeacherExams from './pages/Staff/Teacher/Exams.jsx';
+import TeacherMarksEntry from './pages/Staff/Teacher/MarksEntry.jsx';
+import TeacherResults from './pages/Staff/Teacher/Results.jsx';
+import TeacherLessonNotes from './pages/Staff/Teacher/LessonNotes.jsx';
+import TeacherStudentPerformance from './pages/Staff/Teacher/StudentPerformance.jsx';
+import TeacherResources from './pages/Staff/Teacher/Resources.jsx';
+import TeacherAnnouncements from './pages/Staff/Teacher/Announcements.jsx';
+import TeacherMessages from './pages/Staff/Teacher/Messages.jsx';
+import TeacherCalendar from './pages/Staff/Teacher/Calendar.jsx';
 import ClassTeacherOverview from './pages/Staff/ClassTeacher/ClassOverview.jsx';
 import ExamOfficerMarksheet from './pages/Staff/ExamOfficer/MarksheetCompilation.jsx';
 import LibraryAttendantDashboard from './pages/Staff/LibraryAttendant/Dashboard.jsx';
@@ -242,7 +258,23 @@ export const routes = [
   { path: "/parent/settings", label: "Parent Settings", source: "parent_settings_mcss", element: <ParentSettings /> },
   { path: "/bursary", label: "Bursary Dashboard", source: "bursary_dashboard_mcss", element: <BursaryDashboard /> },
   { path: "/bursary/account", label: "Bursary My Account", source: "bursary_account_mcss", element: <AccountPage portalId="bursary" /> },
-  { path: "/staff/teacher", label: "Teacher Score Entry", source: "teacher_portal_responsive_score_entry", element: <TeacherScoreEntry /> },
+  { path: "/staff/teacher", label: "Teacher Dashboard", source: "teacher_portal_dashboard", element: <TeacherDashboard /> },
+  { path: "/staff/teacher/classes", label: "Teacher My Classes", source: "teacher_portal_my_classes", element: <TeacherMyClasses /> },
+  { path: "/staff/teacher/subjects", label: "Teacher My Subjects", source: "teacher_portal_my_subjects", element: <TeacherMySubjects /> },
+  { path: "/staff/teacher/timetable", label: "Teacher My Timetable", source: "teacher_portal_my_timetable", element: <TeacherTimetable /> },
+  { path: "/staff/teacher/students", label: "Teacher Student List", source: "teacher_portal_student_list", element: <TeacherStudentList /> },
+  { path: "/staff/teacher/attendance", label: "Teacher Attendance", source: "teacher_portal_attendance", element: <TeacherAttendance /> },
+  { path: "/staff/teacher/assignments", label: "Teacher Assignments", source: "teacher_portal_assignments", element: <TeacherAssignments /> },
+  { path: "/staff/teacher/tests-ca", label: "Teacher Tests & CA", source: "teacher_portal_tests_ca", element: <TeacherTestsAndCA /> },
+  { path: "/staff/teacher/exams", label: "Teacher Exams", source: "teacher_portal_exams", element: <TeacherExams /> },
+  { path: "/staff/teacher/marks-entry", label: "Teacher Marks Entry", source: "teacher_portal_marks_entry", element: <TeacherMarksEntry /> },
+  { path: "/staff/teacher/results", label: "Teacher Results", source: "teacher_portal_results", element: <TeacherResults /> },
+  { path: "/staff/teacher/lesson-notes", label: "Teacher Lesson Notes", source: "teacher_portal_lesson_notes", element: <TeacherLessonNotes /> },
+  { path: "/staff/teacher/performance", label: "Teacher Student Performance", source: "teacher_portal_student_performance", element: <TeacherStudentPerformance /> },
+  { path: "/staff/teacher/resources", label: "Teacher Resources", source: "teacher_portal_resources", element: <TeacherResources /> },
+  { path: "/staff/teacher/announcements", label: "Teacher Announcements", source: "teacher_portal_announcements", element: <TeacherAnnouncements /> },
+  { path: "/staff/teacher/messages", label: "Teacher Messages", source: "teacher_portal_messages", element: <TeacherMessages /> },
+  { path: "/staff/teacher/calendar", label: "Teacher Calendar", source: "teacher_portal_calendar", element: <TeacherCalendar /> },
   { path: "/staff/teacher/account", label: "Teacher My Account", source: "teacher_account_mcss", element: <AccountPage portalId="teacher" /> },
   { path: "/staff/class-teacher", label: "Class Teacher Overview", source: "class_teacher_portal_my_class_overview", element: <ClassTeacherOverview /> },
   { path: "/staff/class-teacher/account", label: "Class Teacher My Account", source: "class_teacher_account_mcss", element: <AccountPage portalId="classTeacher" /> },

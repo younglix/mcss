@@ -9,11 +9,16 @@ const inputClasses = 'mcss-field w-full pl-11 pr-md hover:border-primary';
 // this only decides WHERE to land them, based on what /auth/login just
 // returned. There's no portal picker on this page at all: one form, one
 // submit, and the account's own role decides the destination.
-function resolveHomePath({ permissions, user, requestedFrom }) {
+function resolveHomePath({ permissions, roles, user, requestedFrom }) {
   if (requestedFrom && requestedFrom !== '/login') return requestedFrom;
   if (permissions?.includes('*')) return '/super-admin';
   if (user?.user_type === 'parent') return '/parent';
   if (user?.user_type === 'student') return '/student';
+  // A Principal's role also has every permission a Teacher's does, so this
+  // has to branch on the role slug itself, not on a permission it happens
+  // to hold — teacher is checked first since it's the narrower/more common
+  // staff role, falling through to the general Admin dashboard otherwise.
+  if (user?.user_type === 'staff' && roles?.includes('teacher') && !roles?.includes('principal')) return '/staff/teacher';
   if (user?.user_type === 'staff') return '/admin';
   return '/';
 }
@@ -48,7 +53,7 @@ export default function Login() {
       if (result.requiresOtp) {
         setOtpChallenge({ challengeId: result.challengeId });
       } else {
-        navigate(resolveHomePath({ permissions: result.permissions, user: result.user, requestedFrom }));
+        navigate(resolveHomePath({ permissions: result.permissions, roles: result.roles, user: result.user, requestedFrom }));
       }
     } catch (err) {
       setFormError(err.message || 'Unable to sign in. Please check your credentials.');
@@ -64,7 +69,7 @@ export default function Login() {
     setSubmitting(true);
     try {
       const result = await verifyOtp(otpChallenge.challengeId, otpCode);
-      navigate(resolveHomePath({ permissions: result.permissions, user: result.user, requestedFrom }));
+      navigate(resolveHomePath({ permissions: result.permissions, roles: result.roles, user: result.user, requestedFrom }));
     } catch (err) {
       setFormError(err.message || 'Invalid or expired code.');
     } finally {

@@ -37,6 +37,7 @@ export function AuthProvider({ children }) {
     setTokens({ access: data.access, refresh: data.refresh });
     setUser(data.user);
     setPermissions(data.permissions);
+    setRoles(data.roles || []);
     setStatus('authenticated');
   };
 
@@ -46,13 +47,13 @@ export function AuthProvider({ children }) {
       return { requiresOtp: true, challengeId: data.challenge_id };
     }
     applySession(data);
-    return { requiresOtp: false, user: data.user, permissions: data.permissions };
+    return { requiresOtp: false, user: data.user, permissions: data.permissions, roles: data.roles || [] };
   }, []);
 
   const verifyOtp = useCallback(async (challengeId, code) => {
     const data = await api.post('/auth/verify-otp', { challenge_id: challengeId, code }, { auth: false });
     applySession(data);
-    return { user: data.user, permissions: data.permissions };
+    return { user: data.user, permissions: data.permissions, roles: data.roles || [] };
   }, []);
 
   const logout = useCallback(async () => {
