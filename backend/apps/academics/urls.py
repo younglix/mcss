@@ -62,4 +62,9 @@ urlpatterns = [
     path("teaching/exams", views.MyTeachingExamsView.as_view(), name="academics-teaching-exams"),
     path("teaching/exams/<uuid:exam_id>/scores", views.MyTeachingScoresView.as_view(), name="academics-teaching-scores"),
     path("teaching/exams/<uuid:exam_id>/submit", views.MyTeachingResultSubmitView.as_view(), name="academics-teaching-submit"),
+
+    # ------------------------------------------------ Principal Portal
+    path("principal/dashboard", views.PrincipalDashboardView.as_view(), name="academics-principal-dashboard"),
+    path("result-submissions/pending", views.PendingResultSubmissionsView.as_view(), name="academics-pending-result-submissions"),
+    path("result-submissions/<uuid:submission_id>/review", views.ResultSubmissionReviewView.as_view(), name="academics-result-submission-review"),
 ]

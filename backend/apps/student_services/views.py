@@ -21,6 +21,7 @@ from .models import (
     ActivityParticipant,
     Book,
     BookLoan,
+    DisciplineRecord,
     HealthIncident,
     HealthRecord,
     HostelAllocation,
@@ -37,6 +38,7 @@ from .serializers import (
     ActivitySerializer,
     BookLoanSerializer,
     BookSerializer,
+    DisciplineRecordSerializer,
     HealthIncidentSerializer,
     HealthRecordSerializer,
     HostelAllocationSerializer,
@@ -80,6 +82,7 @@ MessPermissionMixin = _permission_mixin("mess")
 ActivitiesPermissionMixin = _permission_mixin("activities")
 ResourcesPermissionMixin = _permission_mixin("resources")
 HealthPermissionMixin = _permission_mixin("health")
+DisciplinePermissionMixin = _permission_mixin("discipline")
 
 
 # ================================================================ Library
@@ -621,4 +624,38 @@ class HealthIncidentDetailView(HealthPermissionMixin, RetrieveUpdateDestroyAPIVi
 
     def perform_destroy(self, instance):
         log(actor=self.request.user, action="student_services.health_incident_deleted", target=instance, request=self.request)
+        instance.delete()
+
+
+# ================================================================ Discipline
+class DisciplineRecordsView(DisciplinePermissionMixin, ListCreateAPIView):
+    write_action = "create"
+    serializer_class = DisciplineRecordSerializer
+
+    def get_queryset(self):
+        qs = DisciplineRecord.objects.select_related("student__user", "student__class_arm", "recorded_by")
+        student = self.request.query_params.get("student")
+        severity = self.request.query_params.get("severity")
+        if student:
+            qs = qs.filter(student_id=student)
+        if severity:
+            qs = qs.filter(severity=severity)
+        return qs
+
+    def perform_create(self, serializer):
+        record = serializer.save(recorded_by=self.request.user)
+        log(actor=self.request.user, action="student_services.discipline_recorded", target=record, request=self.request)
+
+
+class DisciplineRecordDetailView(DisciplinePermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = DisciplineRecordSerializer
+    queryset = DisciplineRecord.objects.all()
+    lookup_url_kwarg = "record_id"
+
+    def perform_update(self, serializer):
+        record = serializer.save()
+        log(actor=self.request.user, action="student_services.discipline_updated", target=record, request=self.request)
+
+    def perform_destroy(self, instance):
+        log(actor=self.request.user, action="student_services.discipline_deleted", target=instance, request=self.request)
         instance.delete()

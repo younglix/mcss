@@ -5,6 +5,7 @@ from .models import (
     ActivityParticipant,
     Book,
     BookLoan,
+    DisciplineRecord,
     HealthIncident,
     HealthRecord,
     HostelAllocation,
@@ -169,3 +170,21 @@ class HealthIncidentSerializer(serializers.ModelSerializer):
         model = HealthIncident
         fields = ["id", "student", "date", "description", "action_taken", "recorded_by", "recorded_by_name"]
         read_only_fields = ["id", "student", "date", "recorded_by"]
+
+
+# ---------------------------------------------------------------- Discipline
+class DisciplineRecordSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source="student.user.full_name", read_only=True)
+    class_arm_label = serializers.SerializerMethodField()
+    recorded_by_name = serializers.CharField(source="recorded_by.full_name", read_only=True, default=None)
+
+    class Meta:
+        model = DisciplineRecord
+        fields = [
+            "id", "student", "student_name", "class_arm_label", "incident_date", "category",
+            "description", "action_taken", "severity", "recorded_by", "recorded_by_name", "created_at",
+        ]
+        read_only_fields = ["id", "recorded_by", "created_at"]
+
+    def get_class_arm_label(self, obj):
+        return str(obj.student.class_arm) if obj.student.class_arm else None

@@ -54,4 +54,8 @@ urlpatterns = [
     path("health/students/<uuid:student_id>/record", views.HealthRecordView.as_view(), name="ss-health-record"),
     path("health/students/<uuid:student_id>/incidents", views.HealthIncidentsView.as_view(), name="ss-health-incidents"),
     path("health/incidents/<uuid:incident_id>", views.HealthIncidentDetailView.as_view(), name="ss-health-incident-detail"),
+
+    # Discipline
+    path("discipline", views.DisciplineRecordsView.as_view(), name="ss-discipline"),
+    path("discipline/<uuid:record_id>", views.DisciplineRecordDetailView.as_view(), name="ss-discipline-detail"),
 ]

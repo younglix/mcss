@@ -269,15 +269,18 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
 
 class ResultSubmissionSerializer(serializers.ModelSerializer):
+    exam_name = serializers.CharField(source="exam.name", read_only=True)
     subject_name = serializers.CharField(source="subject.name", read_only=True)
     class_arm_label = serializers.CharField(source="class_arm.__str__", read_only=True)
     teacher_name = serializers.CharField(source="teacher.full_name", read_only=True, default=None)
+    reviewed_by_name = serializers.CharField(source="reviewed_by.full_name", read_only=True, default=None)
 
     class Meta:
         model = ResultSubmission
         fields = [
-            "id", "exam", "class_arm", "class_arm_label", "subject", "subject_name",
-            "teacher", "teacher_name", "status", "submitted_at", "reviewed_by", "reviewed_at", "review_note",
+            "id", "exam", "exam_name", "class_arm", "class_arm_label", "subject", "subject_name",
+            "teacher", "teacher_name", "status", "submitted_at",
+            "reviewed_by", "reviewed_by_name", "reviewed_at", "review_note",
         ]
         read_only_fields = fields
 

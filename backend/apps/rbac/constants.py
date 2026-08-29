@@ -34,6 +34,7 @@ PERMISSIONS = {
     "activities":   ["view", "create", "edit", "delete", "enroll"],
     "resources":    ["view", "create", "edit", "delete"],
     "health":       ["view", "create", "edit", "delete"],
+    "discipline":   ["view", "create", "edit", "delete"],
     "hr":           ["view", "create", "edit", "delete", "approve"],
     "staff_attendance": ["view", "create", "edit"],
     "contracts":    ["view", "create", "edit", "delete"],

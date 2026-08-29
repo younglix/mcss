@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Avg, Count, Q
+from django.db.models import Avg, Count, Q, Sum
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
@@ -1229,4 +1229,95 @@ class MyTeachingDashboardView(APIView):
             "today_timetable": TimetableSlotSerializer(today_slots, many=True).data,
             "pending_attendance": pending_attendance,
             "upcoming_assignments": AssignmentSerializer(upcoming_assignments, many=True).data,
+        })
+
+
+# ================================================================ Principal Portal: Results Approval
+class PendingResultSubmissionsView(APIView):
+    """Principal Portal > Approvals: every teacher's class+subject result
+    submission still awaiting sign-off — the results half of the Approvals
+    inbox (admissions applications are the other half, see apps.admissions)."""
+
+    permission_classes = [HasPermission("results.approve")]
+
+    def get(self, request):
+        qs = ResultSubmission.objects.filter(status=ResultSubmission.Status.SUBMITTED).select_related(
+            "exam", "class_arm__school_class", "subject", "teacher",
+        )
+        return success(data=ResultSubmissionSerializer(qs, many=True).data)
+
+
+class ResultSubmissionReviewView(APIView):
+    """Approve or reject one teacher's submitted class+subject results.
+    Rejecting unlocks that slice for the teacher to edit and resubmit —
+    approving doesn't publish results to students by itself; publishing
+    the exam as a whole stays ExamPublishView's job, once every submission
+    for it looks good."""
+
+    permission_classes = [HasPermission("results.approve")]
+
+    def post(self, request, submission_id):
+        submission = get_object_or_404(ResultSubmission, id=submission_id)
+        outcome = request.data.get("status")
+        if outcome not in (ResultSubmission.Status.APPROVED, ResultSubmission.Status.REJECTED):
+            raise ValidationError({"status": ["Must be 'approved' or 'rejected'."]})
+        if submission.status != ResultSubmission.Status.SUBMITTED:
+            raise ValidationError("Only a pending submission can be reviewed.")
+
+        submission.status = outcome
+        submission.reviewed_by = request.user
+        submission.reviewed_at = timezone.now()
+        submission.review_note = request.data.get("review_note", "")
+        submission.save(update_fields=["status", "reviewed_by", "reviewed_at", "review_note"])
+
+        # Rejecting hands the slice back to the teacher — deleting the
+        # ResultSubmission row (rather than just flipping its status) is
+        # what MyTeachingScoresView.post checks to decide whether the
+        # teacher can edit again, matching "resubmit" being a fresh
+        # get_or_create rather than a status transition on this same row.
+        if outcome == ResultSubmission.Status.REJECTED:
+            submission.delete()
+
+        log(actor=request.user, action=f"academics.results_{outcome}", target=submission, request=request)
+        return success(message=f"Results {outcome}.", data=ResultSubmissionSerializer(submission).data)
+
+
+class PrincipalDashboardView(APIView):
+    """Principal Portal > Dashboard: school-wide stats — students, staff,
+    today's attendance, fees, and upcoming exams — pulled from academics,
+    finance, and accounts rather than duplicated into a new table."""
+
+    permission_classes = [HasPermission("dashboard.view")]
+
+    def get(self, request):
+        from apps.finance.models import Invoice, Payment
+
+        session = _current_session()
+        today = timezone.localdate()
+
+        total_students = Student.objects.filter(status=Student.Status.ACTIVE).count()
+        total_staff = User.objects.filter(user_type=User.UserType.STAFF, is_deleted=False, is_active=True).count()
+
+        today_attendance = AttendanceRecord.objects.filter(date=today)
+        present_today = today_attendance.filter(status=AttendanceRecord.Status.PRESENT).count()
+        absent_today = today_attendance.filter(status=AttendanceRecord.Status.ABSENT).count()
+
+        total_invoiced = Invoice.objects.aggregate(total=Sum("amount"))["total"] or 0
+        total_discounted = sum((inv.total_discount for inv in Invoice.objects.all()), start=0)
+        total_collected = Payment.objects.filter(status=Payment.Status.COMPLETED).aggregate(total=Sum("amount"))["total"] or 0
+        outstanding = (total_invoiced - total_discounted) - total_collected
+
+        upcoming_exams = Exam.objects.filter(session=session, start_date__gte=today).order_by("start_date")[:5] if session else Exam.objects.none()
+        pending_approvals = ResultSubmission.objects.filter(status=ResultSubmission.Status.SUBMITTED).count()
+
+        return success(data={
+            "session": session.name if session else None,
+            "total_students": total_students,
+            "total_staff": total_staff,
+            "present_today": present_today,
+            "absent_today": absent_today,
+            "fees_collected": total_collected,
+            "fees_outstanding": outstanding,
+            "pending_approvals": pending_approvals,
+            "upcoming_exams": ExamSerializer(upcoming_exams, many=True).data,
         })

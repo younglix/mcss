@@ -236,3 +236,31 @@ class HealthIncident(BaseModel):
 
     def __str__(self):
         return f"{self.student} — {self.date}"
+
+
+# ---------------------------------------------------------------- Discipline
+class DisciplineRecord(BaseModel):
+    """Principal Portal > Discipline: a school-wide log of student conduct
+    incidents — deliberately its own model rather than reusing HealthIncident
+    (a different kind of "incident" with a different audience/purpose)."""
+
+    class Severity(models.TextChoices):
+        MINOR = "minor", "Minor"
+        MODERATE = "moderate", "Moderate"
+        SEVERE = "severe", "Severe"
+
+    student = models.ForeignKey("academics.Student", on_delete=models.CASCADE, related_name="discipline_records")
+    incident_date = models.DateField()
+    category = models.CharField(max_length=100, blank=True, help_text="e.g. Fighting, Truancy, Bullying")
+    description = models.TextField()
+    action_taken = models.TextField(blank=True)
+    severity = models.CharField(max_length=10, choices=Severity.choices, default=Severity.MINOR)
+    recorded_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="discipline_records_recorded"
+    )
+
+    class Meta(BaseModel.Meta):
+        ordering = ["-incident_date"]
+
+    def __str__(self):
+        return f"{self.student} — {self.incident_date} ({self.severity})"
