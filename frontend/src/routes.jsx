@@ -142,6 +142,21 @@ import HRDocuments from './pages/HR/Documents.jsx';
 import HRPerformance from './pages/HR/Performance.jsx';
 import HRReports from './pages/HR/Reports.jsx';
 import HRCommunication from './pages/HR/Communication.jsx';
+import PrincipalDashboard from './pages/Principal/Dashboard.jsx';
+import PrincipalStudents from './pages/Principal/Students.jsx';
+import PrincipalStaff from './pages/Principal/Staff.jsx';
+import PrincipalAcademics from './pages/Principal/Academics.jsx';
+import PrincipalAttendance from './pages/Principal/Attendance.jsx';
+import PrincipalResults from './pages/Principal/Results.jsx';
+import PrincipalPerformance from './pages/Principal/Performance.jsx';
+import PrincipalDiscipline from './pages/Principal/Discipline.jsx';
+import PrincipalFeeReports from './pages/Principal/FeeReports.jsx';
+import PrincipalApprovals from './pages/Principal/Approvals.jsx';
+import PrincipalAdmissions from './pages/Principal/Admissions.jsx';
+import PrincipalActivities from './pages/Principal/Activities.jsx';
+import PrincipalCommunication from './pages/Principal/Communication.jsx';
+import PrincipalCalendar from './pages/Principal/Calendar.jsx';
+import PrincipalReports from './pages/Principal/Reports.jsx';
 import TeacherDashboard from './pages/Staff/Teacher/Dashboard.jsx';
 import TeacherMyClasses from './pages/Staff/Teacher/MyClasses.jsx';
 import TeacherMySubjects from './pages/Staff/Teacher/MySubjects.jsx';
@@ -310,6 +325,22 @@ export const routes = [
   { path: "/hr/reports", label: "HR Staff Reports", source: "hr_reports", element: <HRReports /> },
   { path: "/hr/communication", label: "HR Communication", source: "hr_communication", element: <HRCommunication /> },
   { path: "/hr/account", label: "HR My Account", source: "hr_account_mcss", element: <AccountPage portalId="hr" /> },
+  { path: "/principal", label: "Principal Dashboard", source: "principal_dashboard", element: <PrincipalDashboard /> },
+  { path: "/principal/students", label: "Principal Students", source: "principal_students", element: <PrincipalStudents /> },
+  { path: "/principal/staff", label: "Principal Staff", source: "principal_staff", element: <PrincipalStaff /> },
+  { path: "/principal/academics", label: "Principal Academics", source: "principal_academics", element: <PrincipalAcademics /> },
+  { path: "/principal/attendance", label: "Principal Attendance", source: "principal_attendance", element: <PrincipalAttendance /> },
+  { path: "/principal/results", label: "Principal Examinations & Results", source: "principal_results", element: <PrincipalResults /> },
+  { path: "/principal/performance", label: "Principal Academic Performance", source: "principal_performance", element: <PrincipalPerformance /> },
+  { path: "/principal/discipline", label: "Principal Discipline", source: "principal_discipline", element: <PrincipalDiscipline /> },
+  { path: "/principal/fee-reports", label: "Principal Fee Reports", source: "principal_fee_reports", element: <PrincipalFeeReports /> },
+  { path: "/principal/approvals", label: "Principal Approvals", source: "principal_approvals", element: <PrincipalApprovals /> },
+  { path: "/principal/admissions", label: "Principal Admissions", source: "principal_admissions", element: <PrincipalAdmissions /> },
+  { path: "/principal/activities", label: "Principal School Activities", source: "principal_activities", element: <PrincipalActivities /> },
+  { path: "/principal/communication", label: "Principal Communication", source: "principal_communication", element: <PrincipalCommunication /> },
+  { path: "/principal/calendar", label: "Principal Calendar", source: "principal_calendar", element: <PrincipalCalendar /> },
+  { path: "/principal/reports", label: "Principal Reports", source: "principal_reports", element: <PrincipalReports /> },
+  { path: "/principal/account", label: "Principal My Account", source: "principal_account_mcss", element: <AccountPage portalId="principal" /> },
   { path: "/bursary/account", label: "Bursary My Account", source: "bursary_account_mcss", element: <AccountPage portalId="bursary" /> },
   { path: "/staff/teacher", label: "Teacher Dashboard", source: "teacher_portal_dashboard", element: <TeacherDashboard /> },
   { path: "/staff/teacher/classes", label: "Teacher My Classes", source: "teacher_portal_my_classes", element: <TeacherMyClasses /> },
