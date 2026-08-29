@@ -14,11 +14,13 @@ function resolveHomePath({ permissions, roles, user, requestedFrom }) {
   if (permissions?.includes('*')) return '/super-admin';
   if (user?.user_type === 'parent') return '/parent';
   if (user?.user_type === 'student') return '/student';
-  // A Principal's role also has every permission a Teacher's does, so this
-  // has to branch on the role slug itself, not on a permission it happens
-  // to hold — teacher is checked first since it's the narrower/more common
-  // staff role, falling through to the general Admin dashboard otherwise.
+  // A Principal's role also has every permission a Teacher's or
+  // Accountant's does, so this has to branch on the role slug itself, not
+  // on a permission it happens to hold — narrower/more specific staff
+  // roles are checked first, falling through to the general Admin
+  // dashboard otherwise.
   if (user?.user_type === 'staff' && roles?.includes('teacher') && !roles?.includes('principal')) return '/staff/teacher';
+  if (user?.user_type === 'staff' && roles?.includes('accountant') && !roles?.includes('principal')) return '/bursary';
   if (user?.user_type === 'staff') return '/admin';
   return '/';
 }

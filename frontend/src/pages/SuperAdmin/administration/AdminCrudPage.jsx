@@ -18,6 +18,7 @@ import { api, ApiError } from '../../../lib/api.js';
  * Drawer, ConfirmDialog, and FormField from here.
  */
 export default function AdminCrudPage({
+  portalId = 'superAdmin',
   pageTitle,
   title,
   subtitle,
@@ -40,6 +41,10 @@ export default function AdminCrudPage({
   // changed field's own key/value is unaffected by this; it's purely for
   // extra derived updates.
   onFieldChange,
+  // Optional (extra, reload) => node rendered above the "New X" button and
+  // list — a page-specific action that doesn't fit the flat-list CRUD
+  // shape itself (e.g. Student Invoices' bulk-generate-by-class action).
+  renderBeforeList,
 }) {
   const endpoints = useMemo(() => ({ items: endpoint, ...extraEndpoints }), [endpoint, extraEndpoints]);
   const { data, loading, error, reload } = useDashboardData(endpoints);
@@ -127,6 +132,7 @@ export default function AdminCrudPage({
 
   return (
     <DashboardPageShell
+      portalId={portalId}
       pageTitle={pageTitle}
       title={title}
       subtitle={subtitle}
@@ -137,6 +143,7 @@ export default function AdminCrudPage({
     >
       {data && (
         <div>
+          {renderBeforeList?.(extra, reload)}
           <div className="flex justify-end mb-md">
             <Button variant="primary" iconLeft="add" onClick={openCreate}>
               New {itemLabel}

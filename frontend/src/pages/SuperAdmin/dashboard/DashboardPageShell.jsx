@@ -11,11 +11,11 @@ import { useAuth } from '../../../context/AuthContext.jsx';
  * banner. Each page just supplies its own title/subtitle/data-fetch state
  * and renders its own content once loaded.
  */
-export default function DashboardPageShell({ pageTitle, title, subtitle, loading, error, onReload, skeletonCount = 4, children }) {
+export default function DashboardPageShell({ portalId = 'superAdmin', pageTitle, title, subtitle, loading, error, onReload, skeletonCount = 4, children }) {
   const { user } = useAuth();
 
   return (
-    <AppShell portalId="superAdmin" pageTitle={pageTitle} user={{ name: user?.full_name || 'Super Admin' }}>
+    <AppShell portalId={portalId} pageTitle={pageTitle} user={{ name: user?.full_name || 'Super Admin' }}>
       <div className="space-y-lg sm:space-y-xl">
         <PageHeader
           title={title}

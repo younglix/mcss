@@ -116,6 +116,19 @@ import StudentFinance from './pages/Student/Finance.jsx';
 import ParentDashboard from './pages/Parent/Dashboard.jsx';
 import ParentFinance from './pages/Parent/Finance.jsx';
 import BursaryDashboard from './pages/Bursary/Dashboard.jsx';
+import BursaryFeeStructure from './pages/Bursary/FeeStructure.jsx';
+import BursaryStudentInvoices from './pages/Bursary/StudentInvoices.jsx';
+import BursaryPayments from './pages/Bursary/Payments.jsx';
+import BursaryPaymentVerification from './pages/Bursary/PaymentVerification.jsx';
+import BursaryReceipts from './pages/Bursary/Receipts.jsx';
+import BursaryDiscounts from './pages/Bursary/Discounts.jsx';
+import BursaryScholarships from './pages/Bursary/Scholarships.jsx';
+import BursaryOutstandingFees from './pages/Bursary/OutstandingFees.jsx';
+import BursaryReconciliation from './pages/Bursary/Reconciliation.jsx';
+import BursaryExpenses from './pages/Bursary/Expenses.jsx';
+import BursaryIncome from './pages/Bursary/Income.jsx';
+import BursaryFinancialReports from './pages/Bursary/FinancialReports.jsx';
+import BursaryCommunication from './pages/Bursary/Communication.jsx';
 import TeacherDashboard from './pages/Staff/Teacher/Dashboard.jsx';
 import TeacherMyClasses from './pages/Staff/Teacher/MyClasses.jsx';
 import TeacherMySubjects from './pages/Staff/Teacher/MySubjects.jsx';
@@ -257,6 +270,19 @@ export const routes = [
   { path: "/parent/fee-notifications", label: "Parent Fee Notifications", source: "parent_fee_notifications_mcss", element: <ParentFeeNotifications /> },
   { path: "/parent/settings", label: "Parent Settings", source: "parent_settings_mcss", element: <ParentSettings /> },
   { path: "/bursary", label: "Bursary Dashboard", source: "bursary_dashboard_mcss", element: <BursaryDashboard /> },
+  { path: "/bursary/fee-structure", label: "Bursary Fee Structure", source: "bursary_fee_structure", element: <BursaryFeeStructure /> },
+  { path: "/bursary/invoices", label: "Bursary Student Invoices", source: "bursary_invoices", element: <BursaryStudentInvoices /> },
+  { path: "/bursary/payments", label: "Bursary Payments", source: "bursary_payments", element: <BursaryPayments /> },
+  { path: "/bursary/payment-verification", label: "Bursary Payment Verification", source: "bursary_payment_verification", element: <BursaryPaymentVerification /> },
+  { path: "/bursary/receipts", label: "Bursary Receipts", source: "bursary_receipts", element: <BursaryReceipts /> },
+  { path: "/bursary/discounts", label: "Bursary Discounts", source: "bursary_discounts", element: <BursaryDiscounts /> },
+  { path: "/bursary/scholarships", label: "Bursary Scholarships", source: "bursary_scholarships", element: <BursaryScholarships /> },
+  { path: "/bursary/outstanding-fees", label: "Bursary Outstanding Fees", source: "bursary_outstanding_fees", element: <BursaryOutstandingFees /> },
+  { path: "/bursary/reconciliation", label: "Bursary Reconciliation", source: "bursary_reconciliation", element: <BursaryReconciliation /> },
+  { path: "/bursary/expenses", label: "Bursary Expenses", source: "bursary_expenses", element: <BursaryExpenses /> },
+  { path: "/bursary/income", label: "Bursary Income", source: "bursary_income", element: <BursaryIncome /> },
+  { path: "/bursary/reports", label: "Bursary Financial Reports", source: "bursary_reports", element: <BursaryFinancialReports /> },
+  { path: "/bursary/communication", label: "Bursary Communication", source: "bursary_communication", element: <BursaryCommunication /> },
   { path: "/bursary/account", label: "Bursary My Account", source: "bursary_account_mcss", element: <AccountPage portalId="bursary" /> },
   { path: "/staff/teacher", label: "Teacher Dashboard", source: "teacher_portal_dashboard", element: <TeacherDashboard /> },
   { path: "/staff/teacher/classes", label: "Teacher My Classes", source: "teacher_portal_my_classes", element: <TeacherMyClasses /> },
