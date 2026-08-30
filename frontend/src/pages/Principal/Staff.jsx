@@ -8,14 +8,18 @@ import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
 export default function PrincipalStaff() {
   const endpoints = useMemo(() => ({ staff: '/users/?user_type=staff' }), []);
   const { data, loading, error, reload } = useDashboardData(endpoints);
-  const staff = data?.staff || [];
+  // Principal oversight is teaching staff, not the whole back office —
+  // accountants, HR, etc. stay out of this view. Teacher is a role assignment
+  // (accounts.roles), not a separate user_type, so this filters client-side
+  // rather than at the API layer.
+  const staff = (data?.staff || []).filter((s) => s.roles.includes('teacher'));
 
   return (
     <DashboardPageShell
       portalId="principal"
       pageTitle="Staff"
       title="Staff"
-      subtitle="Every staff account and their assigned role — hiring and records stay with HR."
+      subtitle="Teaching staff and their assigned role — hiring and records stay with HR."
       loading={loading}
       error={error}
       onReload={reload}
