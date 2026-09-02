@@ -176,6 +176,13 @@ import TeacherMessages from './pages/Staff/Teacher/Messages.jsx';
 import TeacherCalendar from './pages/Staff/Teacher/Calendar.jsx';
 import ClassTeacherOverview from './pages/Staff/ClassTeacher/ClassOverview.jsx';
 import ExamOfficerMarksheet from './pages/Staff/ExamOfficer/MarksheetCompilation.jsx';
+import ExamOfficerDashboard from './pages/Staff/ExamOfficer/Dashboard.jsx';
+import ExamOfficerBanks from './pages/Staff/ExamOfficer/Banks.jsx';
+import ExamOfficerExams from './pages/Staff/ExamOfficer/Exams.jsx';
+import ExamOfficerMonitor from './pages/Staff/ExamOfficer/Monitor.jsx';
+import TeacherCbeQuestions from './pages/Staff/Teacher/CbeQuestions.jsx';
+import ExamAccessLogin from './pages/Exam/AccessLogin.jsx';
+import ExamTake from './pages/Exam/Take.jsx';
 import LibraryAttendantDashboard from './pages/Staff/LibraryAttendant/Dashboard.jsx';
 
 export const routes = [
@@ -363,7 +370,14 @@ export const routes = [
   { path: "/staff/class-teacher", label: "Class Teacher Overview", source: "class_teacher_portal_my_class_overview", element: <ClassTeacherOverview /> },
   { path: "/staff/class-teacher/account", label: "Class Teacher My Account", source: "class_teacher_account_mcss", element: <AccountPage portalId="classTeacher" /> },
   { path: "/staff/exam-officer", label: "Exam Officer Marksheet", source: "exam_officer_marksheet_compilation", element: <ExamOfficerMarksheet /> },
+  { path: "/staff/exam-officer/dashboard", label: "Exam Officer Dashboard", source: "exam_officer_dashboard", element: <ExamOfficerDashboard /> },
+  { path: "/staff/exam-officer/banks", label: "Exam Officer Question Banks", source: "exam_officer_banks", element: <ExamOfficerBanks /> },
+  { path: "/staff/exam-officer/exams", label: "Exam Officer CBE Exams", source: "exam_officer_exams", element: <ExamOfficerExams /> },
+  { path: "/staff/exam-officer/monitor", label: "Exam Officer Live Monitor", source: "exam_officer_monitor", element: <ExamOfficerMonitor /> },
   { path: "/staff/exam-officer/account", label: "Exam Officer My Account", source: "exam_officer_account_mcss", element: <AccountPage portalId="examOfficer" /> },
+  { path: "/staff/teacher/cbe-questions", label: "Teacher CBE Questions", source: "teacher_cbe_questions", element: <TeacherCbeQuestions /> },
+  { path: "/exam-access", label: "Exam Access Login", source: "exam_access_login", element: <ExamAccessLogin /> },
+  { path: "/exam/:examId/take", label: "Take Exam", source: "exam_take", element: <ExamTake /> },
   { path: "/staff/library", label: "Library Attendant", source: "library_attendant_portal_scoped_view", element: <LibraryAttendantDashboard /> },
   { path: "/staff/library/account", label: "Library Attendant My Account", source: "library_attendant_account_mcss", element: <AccountPage portalId="libraryAttendant" /> },
 ];
