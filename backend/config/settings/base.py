@@ -222,7 +222,12 @@ AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default="eu-north-1")
 # Only for S3-compatible non-AWS providers (e.g. Cloudflare R2) — leave
 # unset to talk to real AWS S3 directly.
 AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", default="") or None
-AWS_DEFAULT_ACL = "public-read"
+# Every bucket created since April 2023 defaults to ACLs disabled ("Bucket
+# owner enforced" Object Ownership) — sending an object ACL on upload would
+# just fail with AccessControlListNotSupported. Public read is granted via
+# a bucket policy instead (see backend/README.md's S3 setup steps), so no
+# ACL is set here at all; leaving AWS_DEFAULT_ACL unset is what tells
+# django-storages not to send one.
 AWS_S3_FILE_OVERWRITE = False
 AWS_QUERYSTRING_AUTH = False
 
