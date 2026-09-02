@@ -3,14 +3,16 @@ import { useNavigate, Link } from 'react-router-dom';
 import PublicHeader from '../../../components/public/PublicHeader.jsx';
 import PublicFooter from '../../../components/public/PublicFooter.jsx';
 import ApplyStepper from '../../../components/public/ApplyStepper.jsx';
-import { sessions, levels, processSteps, requiredDocs } from './applyData.js';
+import { levels, processSteps, requiredDocs } from './applyData.js';
 import { saveDraft, getDraft } from './applyDraft.js';
+import { api } from '../../../lib/api.js';
 
 export default function ApplyIntro() {
   const navigate = useNavigate();
-  const [session, setSession] = useState(sessions[0].key);
   const [level, setLevel] = useState(getDraft().level || levels[0].key);
   const [agreed, setAgreed] = useState(false);
+  const [config, setConfig] = useState(null); // { is_open, reason, opens_at, closes_at, session_name }
+  const [configError, setConfigError] = useState(false);
 
   const handleStart = () => {
     saveDraft({ level });
@@ -19,6 +21,7 @@ export default function ApplyIntro() {
 
   useEffect(() => {
     document.title = 'Apply | MCSS Portal';
+    api.get('/admissions/apply/config', { auth: false }).then(setConfig).catch(() => setConfigError(true));
   }, []);
 
   return (
@@ -42,6 +45,29 @@ export default function ApplyIntro() {
             </div>
 
             <div className="max-w-4xl w-full">
+            {config && !config.is_open ? (
+              <div className="max-w-2xl mx-auto text-center py-xl">
+                <span className="material-symbols-outlined text-primary text-5xl mb-md">event_busy</span>
+                <h3 className="font-headline-lg text-headline-md text-primary mb-sm">Applications Are Currently Closed</h3>
+                <p className="font-body-md text-on-surface-variant">
+                  {config.reason || 'The school is not accepting new applications right now.'}
+                </p>
+                <p className="font-label-sm text-label-sm text-outline mt-lg">
+                  Check back later, or contact the school office for more information on the next admission window.
+                </p>
+              </div>
+            ) : configError ? (
+              <div className="max-w-2xl mx-auto text-center py-xl">
+                <span className="material-symbols-outlined text-error text-5xl mb-md">error</span>
+                <h3 className="font-headline-lg text-headline-md text-primary mb-sm">Could Not Load Application Status</h3>
+                <p className="font-body-md text-on-surface-variant">Please refresh the page or try again shortly.</p>
+              </div>
+            ) : !config ? (
+              <div className="max-w-2xl mx-auto text-center py-xl">
+                <p className="font-body-md text-on-surface-variant">Loading…</p>
+              </div>
+            ) : (
+              <>
               <header className="text-center mb-xl">
                 <h2 className="font-label-md text-label-md text-secondary tracking-widest uppercase mb-xs">Step 01: Getting Started</h2>
                 <h3 className="font-headline-lg text-headline-md text-primary">Admission Application Process</h3>
@@ -87,26 +113,15 @@ export default function ApplyIntro() {
                     </div>
                   </div>
                   <div>
-                    <label className="font-label-md text-label-md text-primary block mb-sm">Select Intended Academic Session</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
-                      {sessions.map((option) => (
-                        <button
-                          key={option.key}
-                          type="button"
-                          onClick={() => setSession(option.key)}
-                          className={`relative p-md rounded-lg text-left transition-all border-2 ${
-                            session === option.key ? 'border-primary bg-primary/5' : 'border-outline/20 hover:border-primary'
-                          }`}
-                        >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="font-label-md text-label-md text-on-surface">{option.label}</p>
-                              <p className="font-label-sm text-label-sm text-on-surface-variant">{option.note}</p>
-                            </div>
-                            {session === option.key && <span className="material-symbols-outlined text-primary">check_circle</span>}
-                          </div>
-                        </button>
-                      ))}
+                    <label className="font-label-md text-label-md text-primary block mb-sm">Academic Session</label>
+                    <div className="p-md rounded-lg border-2 border-primary bg-primary/5 flex items-center gap-md">
+                      <span className="material-symbols-outlined text-primary">event</span>
+                      <div>
+                        <p className="font-label-md text-label-md text-on-surface">
+                          {config?.session_name ? `${config.session_name} Session` : 'The upcoming academic session'}
+                        </p>
+                        <p className="font-label-sm text-label-sm text-on-surface-variant">This intake's target session, set by the school.</p>
+                      </div>
                     </div>
                   </div>
                   <div className="pt-md">
@@ -140,6 +155,8 @@ export default function ApplyIntro() {
                 </button>
                 <p className="font-label-sm text-label-sm text-outline">Average completion time: 15-20 minutes</p>
               </div>
+              </>
+            )}
             </div>
           </div>
         </section>

@@ -39,6 +39,58 @@ def _acceptance_fee_amount():
     return setting.value if setting and setting.value else 0
 
 
+def get_admission_window():
+    """Whether the public Apply flow is currently usable — Super Admin now
+    creates/controls this (student_admission.is_open + an optional
+    opens_at/closes_at duration and target session) instead of the form
+    always being live. `is_open` is the master switch: turning it off closes
+    applications immediately regardless of dates; turning it on only
+    actually opens the form while today falls inside the configured window,
+    if one was set (an unset date on either side means no bound on that
+    side)."""
+    from django.utils.dateparse import parse_date
+
+    from apps.configuration.models import AcademicSession
+
+    keys = [
+        "student_admission.is_open", "student_admission.opens_at",
+        "student_admission.closes_at", "student_admission.session",
+    ]
+    settings_by_key = {s.key: s.value for s in SystemSetting.objects.filter(key__in=keys)}
+    is_open_flag = bool(settings_by_key.get("student_admission.is_open"))
+    opens_at = settings_by_key.get("student_admission.opens_at") or None
+    closes_at = settings_by_key.get("student_admission.closes_at") or None
+    session_id = settings_by_key.get("student_admission.session") or None
+
+    session_name = None
+    if session_id:
+        session = AcademicSession.objects.filter(id=session_id).first()
+        session_name = session.name if session else None
+
+    today = timezone.localdate()
+    parsed_opens = parse_date(opens_at) if opens_at else None
+    parsed_closes = parse_date(closes_at) if closes_at else None
+    reason = None
+    is_open = is_open_flag
+    if is_open and parsed_opens and today < parsed_opens:
+        is_open = False
+        reason = f"Applications open on {opens_at}."
+    elif is_open and parsed_closes and today > parsed_closes:
+        is_open = False
+        reason = f"Applications closed on {closes_at}."
+    elif not is_open_flag:
+        reason = "Applications are not currently being accepted. Please check back later."
+
+    return {
+        "is_open": is_open,
+        "reason": reason,
+        "opens_at": opens_at,
+        "closes_at": closes_at,
+        "session_id": session_id,
+        "session_name": session_name,
+    }
+
+
 @transaction.atomic
 def approve_application(application, reviewer):
     """The full accept -> provision step: creates the student portal (Student

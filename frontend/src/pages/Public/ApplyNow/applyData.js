@@ -1,8 +1,3 @@
-export const sessions = [
-  { key: '2024-2025', label: '2024/2025 Session', note: 'Regular Admission' },
-  { key: '2025-2026', label: '2025/2026 Session', note: 'Advance Registration' },
-];
-
 export const levels = [
   { key: 'secondary', label: 'Secondary School', note: 'JSS1 – SSS3' },
   { key: 'primary', label: 'Primary School', note: 'Primary 1 – 6' },

@@ -71,6 +71,11 @@ class PublicApplicationSubmitSerializer(serializers.ModelSerializer):
 
 class PublicApplicationConfigSerializer(serializers.Serializer):
     guardian_required = serializers.BooleanField()
+    is_open = serializers.BooleanField()
+    reason = serializers.CharField(allow_null=True)
+    opens_at = serializers.CharField(allow_null=True)
+    closes_at = serializers.CharField(allow_null=True)
+    session_name = serializers.CharField(allow_null=True)
 
 
 class PublicApplicationStatusSerializer(serializers.ModelSerializer):

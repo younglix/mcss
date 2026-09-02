@@ -88,6 +88,14 @@ DEFAULT_SETTINGS = [
     ("student_admission.guardian_required", "student_admission", True, False),
     ("student_admission.required_documents", "student_admission", "Birth Certificate, Passport Photograph, Previous Report Card", False),
     ("student_admission.admission_requirements", "student_admission", "", False),
+    # Admission window — Super Admin now creates/controls this instead of
+    # the public Apply form always being live. is_open is the master
+    # switch; defaults closed on first seed so a fresh deploy doesn't
+    # silently reopen applications until someone deliberately turns it on.
+    ("student_admission.is_open", "student_admission", False, False),
+    ("student_admission.opens_at", "student_admission", "", False),
+    ("student_admission.closes_at", "student_admission", "", False),
+    ("student_admission.session", "student_admission", "", False),
     # Staff & HR
     ("staff_hr.employment_types", "staff_hr", "Full-time, Part-time, Contract", False),
     ("staff_hr.working_hours", "staff_hr", "8:00 AM - 4:00 PM", False),

@@ -31,13 +31,18 @@ class ApplicationConfigView(APIView):
     def get(self, request):
         setting = SystemSetting.objects.filter(key="student_admission.guardian_required").first()
         guardian_required = bool(setting.value) if setting else False
-        return success(data=PublicApplicationConfigSerializer({"guardian_required": guardian_required}).data)
+        window = services.get_admission_window()
+        return success(data=PublicApplicationConfigSerializer({"guardian_required": guardian_required, **window}).data)
 
 
 class ApplicationSubmitView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        window = services.get_admission_window()
+        if not window["is_open"]:
+            return failure(message=window["reason"] or "Applications are not currently being accepted.", status=403)
+
         data = dict(request.data)
         guardian_required_setting = SystemSetting.objects.filter(key="student_admission.guardian_required").first()
         if guardian_required_setting and guardian_required_setting.value:
