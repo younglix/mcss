@@ -44,6 +44,7 @@ PERMISSIONS = {
     "assets":       ["view", "create", "edit", "delete", "assign"],
     "admissions":   ["view", "edit", "review"],
     "custom_fields": ["view", "edit"],
+    "exam": ["view", "questions_submit", "bank_approve", "config_edit", "activate", "attempt_reset", "grading_edit", "monitor"],
     # ...expands per module as later phases land
 }
 
@@ -71,6 +72,19 @@ DEFAULT_ROLES = {
             "results.view", "results.enter", "results.edit",
             "subjects.view", "classes.view", "timetable.view",
             "exams.view", "assignments.view", "assignments.create", "assignments.edit", "assignments.delete",
+            # CBE question authoring — approving/configuring/running the
+            # exam itself is the Exam Officer's job, not the teacher's.
+            "exam.view", "exam.questions_submit",
+        ],
+    },
+    "exam_officer": {
+        "name": "Exam Officer",
+        "description": "Approves question banks, configures and runs computer-based exams.",
+        "permissions": [
+            "exam.view", "exam.bank_approve", "exam.config_edit", "exam.activate",
+            "exam.attempt_reset", "exam.grading_edit", "exam.monitor",
+            "subjects.view", "classes.view", "students.view", "exams.view", "results.view",
+            "config.view", "dashboard.view",
         ],
     },
     "accountant": {

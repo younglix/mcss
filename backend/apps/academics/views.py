@@ -935,6 +935,7 @@ class MyTeachingClassesView(APIView):
             {
                 "id": str(arm.id),
                 "name": str(arm),
+                "school_class": str(arm.school_class_id),
                 "school_class_name": arm.school_class.name,
                 "student_count": arm.students.filter(status=Student.Status.ACTIVE).count(),
                 "subjects": subjects_by_arm.get(arm.id, []),

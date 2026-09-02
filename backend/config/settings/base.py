@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "apps.operations",
     "apps.admissions",
     "apps.custom_fields",
+    "apps.examinations",
 ]
 
 MIDDLEWARE = [
@@ -188,6 +189,10 @@ CELERY_BEAT_SCHEDULE = {
     "cleanup-expired-auth-artifacts": {
         "task": "apps.accounts.tasks.cleanup_expired_auth_artifacts",
         "schedule": timedelta(hours=24),
+    },
+    "sweep-expired-exam-attempts": {
+        "task": "apps.examinations.tasks.sweep_expired_attempts",
+        "schedule": timedelta(minutes=1),
     },
 }
 

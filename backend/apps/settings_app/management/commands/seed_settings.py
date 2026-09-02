@@ -181,6 +181,7 @@ DEFAULT_SETTINGS = [
         {"url": "https://lh3.googleusercontent.com/aida-public/AB6AXuBsmi0JlBO0VdCDNswteLQjqlWIRzXnPbiqSf9I4P9rWVECVOeSkFewGDhEhYlDnqyeEGGgA2Ikclth5DBGu4MbpQqj_o6BP2lMCvENBZJLgOkC-BZ69nJn4nmTJt6Q6bTtCB2ttRUr4DuB8Yyem2nrW0n24Y0kzI2xfJ7i3QVhHse_5Puy0XSkSjzamNCeTMyElNf8fyYpe40NgVtYTUocmtoj_1fWZ6g2tfq_LmIgmrhoe4aOe2T5x0tcxQVTaCJJ5dVs95vN6BQ5", "label": "Sports Complex"},
         {"url": "https://lh3.googleusercontent.com/aida-public/AB6AXuCV3nC3B1VIB1eN9cLHav96wrTLscREzAogs3qhEGgKKKc4ASdHSEzu6pLp0_XHVGe9uXv5KBDwGb9Zdrnbs3YSibBQlKyrotAwWjixRfWwWzBOzrqe6RYet6yqphtWV7po1faXUAJCx_WanIMUBs0FqW2FH9JGU0KOTBpOrpIqk9mpZV6yUjK0VJsO_2A2mvvYx7ctCAycShxTF5Q4EVW2d1qINe1uK_emSnMjk3LRWZLYS3nndcGyZRp4vlzSqld5CLNX5ULWDd0W", "label": "Sacred Spaces"},
     ], False),
+    ("exam.min_bank_size", "exam", 150, False),
 ]
 
 

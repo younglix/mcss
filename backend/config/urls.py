@@ -29,6 +29,7 @@ urlpatterns = [
     path("api/v1/operations/", include("apps.operations.urls")),
     path("api/v1/admissions/", include("apps.admissions.urls")),
     path("api/v1/custom-fields/", include("apps.custom_fields.urls")),
+    path("api/v1/exam/", include("apps.examinations.urls")),
 ]
 
 if settings.DEBUG:

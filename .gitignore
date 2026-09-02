@@ -10,3 +10,6 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 
+
+# Real student/staff data extracted from the legacy school system — never commit PII
+data_migration/
