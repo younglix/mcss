@@ -4,7 +4,7 @@ PERMISSIONS = {
     "results":    ["view", "enter", "edit", "approve", "publish"],
     "fees":       ["view", "create", "edit", "delete", "collect", "refund", "waive", "verify", "reconcile", "remind"],
     "staff":      ["view", "create", "edit", "delete"],
-    "payroll":    ["view", "run", "approve"],
+    "payroll":    ["view", "run", "approve", "export"],
     "config":     ["view", "edit"],
     "settings":   ["view", "edit"],
     "roles":      ["view", "create", "edit", "delete", "assign"],
@@ -124,7 +124,7 @@ DEFAULT_ROLES = {
             "contracts.view", "contracts.create", "contracts.edit", "contracts.delete",
             "performance.view", "performance.create", "performance.edit", "performance.delete",
             "recruitment.view", "recruitment.create", "recruitment.edit", "recruitment.delete",
-            "payroll.view", "payroll.run", "payroll.approve",
+            "payroll.view", "payroll.run", "payroll.approve", "payroll.export",
             # Departments live under config.* (no dedicated module) — same
             # read-only-by-default trade-off as Accountant's config.view,
             # but HR also gets config.edit since managing department

@@ -137,6 +137,7 @@ import HRLeave from './pages/HR/Leave.jsx';
 import HRContracts from './pages/HR/Contracts.jsx';
 import HRDepartments from './pages/HR/Departments.jsx';
 import HRPayroll from './pages/HR/Payroll.jsx';
+import HRNonAcademicPayroll from './pages/HR/NonAcademicPayroll.jsx';
 import HRPayslips from './pages/HR/Payslips.jsx';
 import HRDocuments from './pages/HR/Documents.jsx';
 import HRPerformance from './pages/HR/Performance.jsx';
@@ -326,6 +327,7 @@ export const routes = [
   { path: "/hr/contracts", label: "HR Contracts", source: "hr_contracts", element: <HRContracts /> },
   { path: "/hr/departments", label: "HR Departments", source: "hr_departments", element: <HRDepartments /> },
   { path: "/hr/payroll", label: "HR Payroll", source: "hr_payroll", element: <HRPayroll /> },
+  { path: "/hr/non-academic-payroll", label: "HR Non-Academic Staff Pay", source: "hr_non_academic_payroll", element: <HRNonAcademicPayroll /> },
   { path: "/hr/payslips", label: "HR Payslips", source: "hr_payslips", element: <HRPayslips /> },
   { path: "/hr/documents", label: "HR Staff Documents", source: "hr_documents", element: <HRDocuments /> },
   { path: "/hr/performance", label: "HR Performance", source: "hr_performance", element: <HRPerformance /> },

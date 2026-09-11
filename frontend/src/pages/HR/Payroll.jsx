@@ -155,6 +155,41 @@ function RunsSection({ runs, reload }) {
   const [actionError, setActionError] = useState('');
   const [payslipsFor, setPayslipsFor] = useState(null);
   const [busyRunId, setBusyRunId] = useState(null);
+  const [payoutFor, setPayoutFor] = useState(null);
+  const [narration, setNarration] = useState('');
+  const [downloading, setDownloading] = useState(false);
+  const [payoutResult, setPayoutResult] = useState('');
+
+  const openPayoutSheet = (run) => {
+    setPayoutFor(run);
+    setNarration(`${MONTHS[run.month - 1].toUpperCase()} SALARY`);
+    setPayoutResult('');
+    setActionError('');
+  };
+
+  const handleDownloadPayout = async () => {
+    if (!narration.trim()) return;
+    setDownloading(true);
+    setActionError('');
+    setPayoutResult('');
+    try {
+      const headers = await api.download(
+        `/finance/payroll/payout-sheet?run=${payoutFor.id}&narration=${encodeURIComponent(narration.trim())}`,
+        `payout-sheet-${narration.trim().replace(/\s+/g, '-')}.xlsx`,
+      );
+      const missing = Number(headers['x-payout-missing-payslip'] || 0);
+      const total = Number(headers['x-payout-total-rows'] || 0);
+      setPayoutResult(
+        missing > 0
+          ? `Downloaded ${total} row(s) — ${missing} had no payslip for this run, so their Amount was left blank.`
+          : `Downloaded ${total} row(s). Every row has an Amount.`,
+      );
+    } catch (err) {
+      setActionError(err instanceof ApiError ? err.message : 'Could not generate the payout sheet.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const handleCreateRun = async (e) => {
     e.preventDefault();
@@ -226,6 +261,9 @@ function RunsSection({ runs, reload }) {
                       View Payslips
                     </button>
                   )}
+                  <Button variant="secondary" size="sm" iconLeft="download" onClick={() => openPayoutSheet(run)}>
+                    Payout Sheet
+                  </Button>
                   {run.status === 'draft' && (
                     <>
                       <Button variant="ghost" onClick={() => handleGenerate(run)} disabled={busyRunId === run.id}>
@@ -278,6 +316,40 @@ function RunsSection({ runs, reload }) {
                 <span className="font-label-sm text-label-sm text-on-surface-variant">Net: {p.net_pay}</span>
               </div>
             ))}
+          </div>
+        )}
+      </Drawer>
+
+      <Drawer
+        open={!!payoutFor}
+        onClose={() => setPayoutFor(null)}
+        title={payoutFor ? `Payout Sheet — ${MONTHS[payoutFor.month - 1]} ${payoutFor.year}` : ''}
+      >
+        {payoutFor && (
+          <div className="space-y-lg">
+            <p className="font-body-md text-body-md text-on-surface-variant">
+              Every active staff member's payslip for this run, plus every active non-academic (payroll-only) staff
+              record, in the bank's exact column format. Set the narration — it's applied to the first row and
+              every row below it references the one above, so retyping it here later updates the whole column.
+            </p>
+            <FormField
+              field={{ key: 'narration', id: 'payout_narration', label: 'Narration', type: 'text', required: true, placeholder: 'e.g. SEPTEMBER SALARY' }}
+              value={narration}
+              onChange={setNarration}
+            />
+            {payoutResult && (
+              <p className="font-label-md text-label-md text-secondary bg-secondary-container/20 border border-secondary/20 rounded-lg px-md py-sm">
+                {payoutResult}
+              </p>
+            )}
+            <div className="flex justify-end gap-sm pt-md border-t border-outline/10">
+              <Button type="button" variant="ghost" onClick={() => setPayoutFor(null)}>
+                Close
+              </Button>
+              <Button variant="primary" iconLeft="download" onClick={handleDownloadPayout} disabled={downloading || !narration.trim()}>
+                {downloading ? 'Preparing…' : 'Download'}
+              </Button>
+            </div>
           </div>
         )}
       </Drawer>

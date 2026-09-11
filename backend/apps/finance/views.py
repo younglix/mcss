@@ -29,6 +29,7 @@ from .models import (
     FeeStructure,
     Income,
     Invoice,
+    NonAcademicStaffPayout,
     Payment,
     PayrollRun,
     Payslip,
@@ -42,6 +43,7 @@ from .serializers import (
     FeeStructureSerializer,
     IncomeSerializer,
     InvoiceSerializer,
+    NonAcademicStaffPayoutSerializer,
     PaymentSerializer,
     PayrollRunSerializer,
     PayslipSerializer,
@@ -805,6 +807,41 @@ class StaffSalaryDetailView(PayrollPermissionMixin, RetrieveUpdateDestroyAPIView
         instance.delete()
 
 
+class NonAcademicStaffPayoutsView(PayrollPermissionMixin, ListCreateAPIView):
+    """Payroll-only people with no portal account — HR's own record, fully
+    separate from the structured StaffSalary/PayrollRun/Payslip pipeline.
+    Same payroll.* gate as StaffSalary since it's the same "HR runs payroll"
+    authority, just a different pay mechanism."""
+
+    write_action = "run"
+    serializer_class = NonAcademicStaffPayoutSerializer
+
+    def get_queryset(self):
+        qs = NonAcademicStaffPayout.objects.all()
+        if self.request.query_params.get("active_only"):
+            qs = qs.filter(is_active=True)
+        return qs
+
+    def perform_create(self, serializer):
+        record = serializer.save(created_by=self.request.user)
+        log(actor=self.request.user, action="finance.non_academic_payout_created", target=record, request=self.request)
+
+
+class NonAcademicStaffPayoutDetailView(PayrollPermissionMixin, RetrieveUpdateDestroyAPIView):
+    write_action = "run"
+    serializer_class = NonAcademicStaffPayoutSerializer
+    queryset = NonAcademicStaffPayout.objects.all()
+    lookup_url_kwarg = "payout_id"
+
+    def perform_update(self, serializer):
+        record = serializer.save()
+        log(actor=self.request.user, action="finance.non_academic_payout_updated", target=record, request=self.request)
+
+    def perform_destroy(self, instance):
+        log(actor=self.request.user, action="finance.non_academic_payout_deleted", target=instance, request=self.request)
+        instance.delete()
+
+
 class PayrollRunsView(PayrollPermissionMixin, ListCreateAPIView):
     write_action = "run"
     serializer_class = PayrollRunSerializer
@@ -881,6 +918,48 @@ class PayrollRunApproveView(APIView):
         run.save(update_fields=["status", "approved_by", "approved_at"])
         log(actor=request.user, action="finance.payroll_approved", target=run, request=request)
         return success(message="Payroll run approved.", data=PayrollRunSerializer(run).data)
+
+
+class PayoutSheetExportView(APIView):
+    """Streams the bank payout .xlsx — live off the DB every time, never
+    stored. `run` is optional: omit it (or pass a run with no payslips yet)
+    and regular staff just come out with a blank Amount, same as any other
+    staff member missing a payslip; non-academic staff never depend on it."""
+
+    permission_classes = [HasPermission("payroll.export")]
+
+    def get(self, request):
+        run = None
+        run_id = request.query_params.get("run")
+        if run_id:
+            run = get_object_or_404(PayrollRun, id=run_id)
+        narration = (request.query_params.get("narration") or "").strip()
+        if not narration:
+            return failure(message="Provide a narration (e.g. \"SEPTEMBER SALARY\").", status=400)
+
+        workbook, stats = services.build_payout_sheet(run, narration)
+
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        filename = f"payout-sheet-{narration}.xlsx".replace(" ", "-")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        # The response body is the file itself, so "surface a count of rows
+        # missing a payslip" (spec) rides along as a header instead — the
+        # frontend reads it off the same download response and shows HR a
+        # message once the file has saved.
+        response["X-Payout-Total-Rows"] = str(stats["total_rows"])
+        response["X-Payout-Regular-Staff"] = str(stats["regular_staff"])
+        response["X-Payout-Non-Academic-Staff"] = str(stats["non_academic_staff"])
+        response["X-Payout-Missing-Payslip"] = str(stats["missing_payslip"])
+        response["Access-Control-Expose-Headers"] = (
+            "X-Payout-Total-Rows, X-Payout-Regular-Staff, X-Payout-Non-Academic-Staff, X-Payout-Missing-Payslip"
+        )
+        workbook.save(response)
+
+        log(actor=request.user, action="finance.payout_sheet_generated",
+            target=run, changes={"narration": narration, **stats}, request=request)
+        return response
 
 
 # ---------------------------------------------------------------- Financial Reports

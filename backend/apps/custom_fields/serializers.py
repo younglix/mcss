@@ -6,7 +6,7 @@ from .models import CustomField, CustomFieldValue
 class CustomFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomField
-        fields = ["id", "entity", "key", "label", "field_type", "options", "required", "order", "is_active", "created_at"]
+        fields = ["id", "entity", "key", "label", "field_type", "options", "required", "order", "is_active", "is_sensitive", "created_at"]
         read_only_fields = ["id", "created_at"]
 
     def validate_options(self, value):

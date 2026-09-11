@@ -324,6 +324,7 @@ export const portals = {
       { key: 'contracts', label: 'Contracts', icon: 'description', path: '/hr/contracts', status: 'active' },
       { key: 'departments', label: 'Departments', icon: 'apartment', path: '/hr/departments', status: 'active' },
       { key: 'payroll', label: 'Payroll', icon: 'payments', path: '/hr/payroll', status: 'active' },
+      { key: 'non-academic-payroll', label: 'Non-Academic Staff Pay', icon: 'engineering', path: '/hr/non-academic-payroll', status: 'active' },
       { key: 'payslips', label: 'Payslips', icon: 'receipt_long', path: '/hr/payslips', status: 'active' },
       { key: 'documents', label: 'Staff Documents', icon: 'folder_shared', path: '/hr/documents', status: 'active' },
       { key: 'performance', label: 'Performance', icon: 'insights', path: '/hr/performance', status: 'active' },

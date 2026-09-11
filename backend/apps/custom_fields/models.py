@@ -11,6 +11,7 @@ class CustomField(BaseModel):
     class Entity(models.TextChoices):
         STUDENT = "student", "Student"
         STAFF = "staff", "Staff"
+        PARENT = "parent", "Parent"
         APPLICATION = "application", "Admission Application"
 
     class FieldType(models.TextChoices):
@@ -29,6 +30,10 @@ class CustomField(BaseModel):
     required = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    # e.g. NIN, bank account number — stored as plain text (no encryption asked
+    # for), but never returned in full to a non-superadmin reader; see
+    # CustomFieldValueSerializer / the self-service view in this app.
+    is_sensitive = models.BooleanField(default=False)
 
     class Meta(BaseModel.Meta):
         ordering = ["entity", "order", "label"]

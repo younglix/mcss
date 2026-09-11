@@ -37,6 +37,11 @@ DEFAULT_SETTINGS = [
     # class-arm reallocation. Only the 1st/2nd-term result of this type
     # triggers it — a 3rd-term result hands off to promotion instead.
     ("reallocation.trigger_exam_type", "reallocation", "final", False),
+    # The Super Admin's global open/closed switch over everyone's self-service
+    # Edit Profile screen (Requirement 1) — starts open since the system is
+    # still being populated. Toggled via the existing generic
+    # PATCH /settings/profiles.self_edit_open, no dedicated endpoint needed.
+    ("profiles.self_edit_open", "profiles", True, False),
     # General — locale/format defaults. Institutional identity (name, logo,
     # address, ...) lives on configuration.SchoolProfile, not here — this is
     # only the preferences that don't belong on that model.

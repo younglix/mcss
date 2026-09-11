@@ -13,7 +13,9 @@ import { api, ApiError } from '../../../lib/api.js';
 const ENTITY_TABS = [
   { key: 'student', label: 'Student' },
   { key: 'staff', label: 'Staff' },
+  { key: 'parent', label: 'Parent' },
 ];
+const ENTITY_LABEL = Object.fromEntries(ENTITY_TABS.map((t) => [t.key, t.label]));
 
 const TYPE_LABELS = {
   text: 'Text', textarea: 'Paragraph', number: 'Number', date: 'Date', select: 'Dropdown', checkbox: 'Yes/No',
@@ -23,7 +25,61 @@ function slugify(label) {
   return label.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 }
 
-const emptyForm = { label: '', key: '', field_type: 'text', options: '', required: false, order: 0 };
+const emptyForm = { label: '', key: '', field_type: 'text', options: '', required: false, order: 0, is_sensitive: false };
+
+/** The Super Admin's global open/closed switch over everyone's self-service
+ * Edit Profile screen — a plain wrapper around the existing generic
+ * settings endpoint, no dedicated backend route needed for this. */
+function SelfEditLockToggle() {
+  const [open, setOpen] = useState(null); // null = not loaded yet
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useMemo(() => {
+    api.get('/settings/profiles.self_edit_open')
+      .then((res) => setOpen(!!res.value))
+      .catch(() => setError('Could not load the current switch state.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const toggle = async () => {
+    setSaving(true);
+    setError('');
+    try {
+      await api.patch('/settings/profiles.self_edit_open', { value: !open });
+      setOpen((prev) => !prev);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not change the switch.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card padding="lg" className="mb-lg">
+      <div className="flex items-center justify-between flex-wrap gap-md">
+        <div>
+          <h3 className="font-headline-md text-headline-sm text-on-surface">Self-Service Profile Editing</h3>
+          <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+            While open, every role can fill in their own Edit Profile screen. Close it once everyone's done — you can
+            always reopen it later to let everyone edit again, and you can edit anyone's profile directly at any time
+            regardless of this switch.
+          </p>
+          {error && <p className="font-label-sm text-label-sm text-error mt-xs">{error}</p>}
+        </div>
+        {loading ? (
+          <span className="font-label-sm text-label-sm text-on-surface-variant">Loading…</span>
+        ) : (
+          <Button variant={open ? 'secondary' : 'primary'} onClick={toggle} disabled={saving}>
+            {saving ? 'Working…' : open ? 'Close Self-Editing' : 'Open Self-Editing'}
+          </Button>
+        )}
+        {!loading && <Badge tone={open ? 'success' : 'secondary'}>{open ? 'Open' : 'Closed'}</Badge>}
+      </div>
+    </Card>
+  );
+}
 
 export default function SuperAdminFormsCustomFields() {
   const [entity, setEntity] = useState('student');
@@ -52,6 +108,7 @@ export default function SuperAdminFormsCustomFields() {
     setFormValues({
       label: field.label, key: field.key, field_type: field.field_type,
       options: (field.options || []).join(', '), required: field.required, order: field.order,
+      is_sensitive: field.is_sensitive,
     });
     setFormErrors({});
     setDrawerOpen(true);
@@ -79,6 +136,7 @@ export default function SuperAdminFormsCustomFields() {
           : [],
         required: !!formValues.required,
         order: Number(formValues.order) || 0,
+        is_sensitive: !!formValues.is_sensitive,
       };
       if (editingField) {
         await api.patch(`/custom-fields/${editingField.id}`, payload);
@@ -133,6 +191,10 @@ export default function SuperAdminFormsCustomFields() {
       : []),
     { key: 'required', label: 'Required', type: 'checkbox' },
     { key: 'order', label: 'Display Order', type: 'number' },
+    {
+      key: 'is_sensitive', label: 'Sensitive (e.g. NIN, bank account) — masked once saved, only the Super Admin sees it in full',
+      type: 'checkbox',
+    },
   ];
 
   return (
@@ -147,6 +209,7 @@ export default function SuperAdminFormsCustomFields() {
     >
       {data && (
         <div>
+          <SelfEditLockToggle />
           <div className="flex flex-wrap items-center justify-between gap-md mb-md">
             <div className="flex gap-xs">
               {ENTITY_TABS.map((tab) => (
@@ -171,7 +234,7 @@ export default function SuperAdminFormsCustomFields() {
 
           <Card padding={fields.length ? 'none' : 'lg'}>
             {fields.length === 0 ? (
-              <EmptyState icon="dynamic_form" text={`No custom fields defined for ${entity === 'student' ? 'Students' : 'Staff'} yet`} />
+              <EmptyState icon="dynamic_form" text={`No custom fields defined for ${ENTITY_LABEL[entity]} yet`} />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-175 text-left border-collapse">
@@ -181,6 +244,7 @@ export default function SuperAdminFormsCustomFields() {
                       <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Key</th>
                       <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Type</th>
                       <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Required</th>
+                      <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Sensitive</th>
                       <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Active</th>
                       <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider text-right">Actions</th>
                     </tr>
@@ -192,6 +256,7 @@ export default function SuperAdminFormsCustomFields() {
                         <td className="px-lg py-4 font-label-sm text-label-sm text-on-surface-variant">{field.key}</td>
                         <td className="px-lg py-4 font-label-sm text-label-sm text-on-surface-variant">{TYPE_LABELS[field.field_type] || field.field_type}</td>
                         <td className="px-lg py-4">{field.required ? <Badge tone="secondary">Required</Badge> : <span className="text-outline">—</span>}</td>
+                        <td className="px-lg py-4">{field.is_sensitive ? <Badge tone="warning">Masked</Badge> : <span className="text-outline">—</span>}</td>
                         <td className="px-lg py-4">
                           <button type="button" onClick={() => toggleActive(field)}>
                             <Badge tone={field.is_active ? 'success' : 'secondary'}>{field.is_active ? 'Active' : 'Inactive'}</Badge>
@@ -215,7 +280,7 @@ export default function SuperAdminFormsCustomFields() {
         </div>
       )}
 
-      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title={editingField ? 'Edit Field' : `New ${entity === 'student' ? 'Student' : 'Staff'} Field`}>
+      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title={editingField ? 'Edit Field' : `New ${ENTITY_LABEL[entity]} Field`}>
         <form onSubmit={handleSubmit} className="space-y-lg">
           {formErrors.__all__ && <p className="font-label-md text-label-md text-error">{formErrors.__all__}</p>}
           {drawerFields.map((field) => (

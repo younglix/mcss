@@ -381,6 +381,41 @@ class PayrollRun(BaseModel):
         return f"Payroll {self.month}/{self.year}"
 
 
+class NonAcademicStaffPayout(BaseModel):
+    """A payroll-only person with no portal account at all — a cleaner,
+    driver, gardener, security guard, etc. Deliberately NOT linked to
+    accounts.User: they never log in, never touch the payroll structure
+    (StaffSalary/PayrollRun/Payslip), and never see an Edit Profile screen.
+    HR types everything here directly and owns it end-to-end; the only
+    consumer is the payout sheet export, which is why every field on this
+    model is exactly one column of that sheet."""
+
+    full_name = models.CharField(max_length=150)
+    title = models.CharField(max_length=100, blank=True)
+    payment_reference = models.CharField(max_length=50, blank=True)
+    beneficiary_code = models.CharField(max_length=50, blank=True)
+    account_number = models.CharField(max_length=20, blank=True)
+    account_type = models.CharField(max_length=20, blank=True)
+    sort_code = models.CharField(max_length=20, blank=True)
+    is_cashcard = models.BooleanField(default=False)
+    email = models.EmailField(blank=True)
+    currency_code = models.CharField(max_length=10, default="NGN")
+    # Plain text, not a Decimal — HR types this directly per the spec ("a
+    # plain text input that HR enters and edits directly"), with no
+    # structured basic/allowances/deductions breakdown behind it.
+    pay_amount = models.CharField(max_length=30, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="non_academic_payouts_created"
+    )
+
+    class Meta(BaseModel.Meta):
+        ordering = ["full_name"]
+
+    def __str__(self):
+        return f"{self.full_name} ({self.title or 'non-academic staff'})"
+
+
 class Payslip(BaseModel):
     run = models.ForeignKey(PayrollRun, on_delete=models.CASCADE, related_name="payslips")
     staff = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="payslips")

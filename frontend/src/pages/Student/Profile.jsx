@@ -2,6 +2,7 @@ import AppShell from '../../components/layout/AppShell.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
+import DynamicProfileFields from '../../components/account/DynamicProfileFields.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useDashboardData } from '../SuperAdmin/dashboard/useDashboardData.js';
 import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
@@ -28,7 +29,7 @@ export default function StudentProfile() {
   return (
     <AppShell portalId="student" pageTitle="Profile" user={{ name: user?.full_name || 'Student' }}>
       <div className="space-y-lg sm:space-y-xl">
-        <PageHeader title="My Profile" subtitle="Your account and enrollment details. Contact the school office to correct anything here." />
+        <PageHeader title="My Profile" subtitle="Your account and enrollment details. Contact the school office to correct anything below — the Additional Information section is yours to fill in." />
 
         {error && (
           <Card padding="lg" className="border border-error/30 bg-error-container/10">
@@ -70,6 +71,8 @@ export default function StudentProfile() {
                 <Field label="Guardian Email" value={profile?.guardian_email} />
               </div>
             </Card>
+
+            <DynamicProfileFields />
           </>
         )}
       </div>

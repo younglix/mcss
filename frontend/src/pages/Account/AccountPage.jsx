@@ -4,6 +4,7 @@ import PageHeader from '../../components/ui/PageHeader.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Button from '../../components/ui/Button.jsx';
 import FormField from '../../components/ui/FormField.jsx';
+import DynamicProfileFields from '../../components/account/DynamicProfileFields.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useDashboardData } from '../SuperAdmin/dashboard/useDashboardData.js';
 import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
@@ -80,6 +81,8 @@ export default function AccountPage({ portalId }) {
             <Field label="Staff ID" value={user?.identifier} />
           </div>
         </Card>
+
+        <DynamicProfileFields />
 
         <Card padding="lg" className="max-w-125">
           <h3 className="font-label-md text-primary uppercase border-b border-outline/10 pb-xs mb-md">Change Password</h3>

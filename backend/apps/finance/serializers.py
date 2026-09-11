@@ -8,6 +8,7 @@ from .models import (
     FeeStructure,
     Income,
     Invoice,
+    NonAcademicStaffPayout,
     Payment,
     PayrollRun,
     Payslip,
@@ -172,6 +173,17 @@ class StaffSalarySerializer(serializers.ModelSerializer):
         model = StaffSalary
         fields = ["id", "staff", "staff_name", "basic_salary", "allowances", "deductions"]
         read_only_fields = ["id"]
+
+
+class NonAcademicStaffPayoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NonAcademicStaffPayout
+        fields = [
+            "id", "full_name", "title", "payment_reference", "beneficiary_code",
+            "account_number", "account_type", "sort_code", "is_cashcard",
+            "email", "currency_code", "pay_amount", "is_active", "created_at",
+        ]
+        read_only_fields = ["id", "created_at"]
 
 
 class PayslipSerializer(serializers.ModelSerializer):
