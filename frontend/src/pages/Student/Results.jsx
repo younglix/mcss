@@ -3,10 +3,11 @@ import AppShell from '../../components/layout/AppShell.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
+import Button from '../../components/ui/Button.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useDashboardData } from '../SuperAdmin/dashboard/useDashboardData.js';
 import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
-import { api } from '../../lib/api.js';
+import { api, ApiError } from '../../lib/api.js';
 
 const ENDPOINTS = { exams: '/academics/exams/published', profile: '/academics/students/mine' };
 
@@ -31,10 +32,28 @@ export default function StudentResults() {
   const [examId, setExamId] = useState('');
   const [report, setReport] = useState(null);
   const [reportError, setReportError] = useState('');
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (exams.length && !examId) setExamId(exams[0].id);
   }, [exams, examId]);
+
+  const handleDownload = async () => {
+    if (!examId || !profile?.id) return;
+    setDownloading(true);
+    setReportError('');
+    try {
+      const exam = exams.find((ex) => ex.id === examId);
+      await api.download(
+        `/academics/exams/${examId}/report-card/${profile.id}/pdf`,
+        `report-card-${(exam?.name || 'result').replace(/\s+/g, '-')}.pdf`,
+      );
+    } catch (err) {
+      setReportError(err instanceof ApiError ? err.message : 'Could not download the report card.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     if (!examId || !profile?.id) return;
@@ -52,9 +71,14 @@ export default function StudentResults() {
           title="Results / Report Card"
           subtitle="Your compiled, published results for each exam."
           actions={exams.length > 0 && (
-            <select value={examId} onChange={(e) => setExamId(e.target.value)} className="mcss-field px-md w-auto">
-              {exams.map((ex) => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
-            </select>
+            <div className="flex items-center gap-sm flex-wrap">
+              <select value={examId} onChange={(e) => setExamId(e.target.value)} className="mcss-field px-md w-auto">
+                {exams.map((ex) => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
+              </select>
+              <Button variant="secondary" size="sm" iconLeft="download" onClick={handleDownload} disabled={downloading || !report}>
+                {downloading ? 'Preparing…' : 'Download PDF'}
+              </Button>
+            </div>
           )}
         />
 

@@ -3,12 +3,15 @@ from django.utils.crypto import get_random_string
 from rest_framework import serializers
 
 from apps.accounts.serializers import UserCreateSerializer
-from apps.configuration.models import AcademicSession, ClassArm, Term
+from apps.configuration.models import AcademicSession, ClassArm, SchoolClass, Term
 from apps.settings_app.numbering import generate_number
 
 from .models import (
     Assignment,
     AttendanceRecord,
+    ClassBandingConfig,
+    ClassReallocation,
+    ClassReallocationMove,
     ClassSubjectAssignment,
     ClassTeacherAssignment,
     Exam,
@@ -37,19 +40,26 @@ class StudentSerializer(serializers.ModelSerializer):
     identifier = serializers.CharField(source="user.identifier", read_only=True)
     is_active = serializers.BooleanField(source="user.is_active", read_only=True)
     class_arm_label = serializers.SerializerMethodField()
+    # Set once a class reallocation is released; where this student moves at
+    # the next term's start. Display-only — class_arm above is still current.
+    next_class_arm_label = serializers.SerializerMethodField()
 
     class Meta:
         model = Student
         fields = [
             "id", "user", "full_name", "email", "identifier", "is_active",
-            "class_arm", "class_arm_label", "date_of_birth", "gender",
+            "class_arm", "class_arm_label", "next_class_arm", "next_class_arm_label",
+            "date_of_birth", "gender",
             "guardian_name", "guardian_phone", "guardian_email",
             "admission_date", "status", "registration_number", "created_at",
         ]
-        read_only_fields = ["id", "user", "created_at"]
+        read_only_fields = ["id", "user", "created_at", "next_class_arm"]
 
     def get_class_arm_label(self, obj):
         return str(obj.class_arm) if obj.class_arm else None
+
+    def get_next_class_arm_label(self, obj):
+        return str(obj.next_class_arm) if obj.next_class_arm_id else None
 
 
 class StudentCreateSerializer(serializers.ModelSerializer):
@@ -325,3 +335,142 @@ class PromotionActionSerializer(serializers.Serializer):
             if d["outcome"] == PromotionRecord.Outcome.PROMOTED and not d.get("to_class_arm"):
                 raise serializers.ValidationError("'promoted' decisions need a 'to_class_arm'.")
         return decisions
+
+
+# ------------------------------------------------ Class-arm reallocation
+class ClassBandingConfigSerializer(serializers.ModelSerializer):
+    school_class_name = serializers.CharField(source="school_class.name", read_only=True)
+    holding_arm_label = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ClassBandingConfig
+        fields = ["id", "school_class", "school_class_name", "enabled", "holding_arm", "holding_arm_label"]
+        read_only_fields = ["id", "school_class"]
+
+    def get_holding_arm_label(self, obj):
+        return str(obj.holding_arm) if obj.holding_arm else None
+
+    def validate_holding_arm(self, arm):
+        if arm and self.instance and arm.school_class_id != self.instance.school_class_id:
+            raise serializers.ValidationError("The holding arm must belong to this class.")
+        return arm
+
+
+class ClassReallocationMoveSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source="student.user.full_name", read_only=True)
+    from_arm_label = serializers.SerializerMethodField()
+    to_arm_label = serializers.SerializerMethodField()
+    direction = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ClassReallocationMove
+        fields = [
+            "id", "student", "student_name", "from_arm", "from_arm_label",
+            "to_arm", "to_arm_label", "mechanism", "term_average", "rank",
+            "capacity_delta", "direction",
+        ]
+        read_only_fields = fields
+
+    def get_from_arm_label(self, obj):
+        return str(obj.from_arm) if obj.from_arm else None
+
+    def get_to_arm_label(self, obj):
+        return str(obj.to_arm) if obj.to_arm else None
+
+    def get_direction(self, obj):
+        if obj.mechanism == ClassReallocationMove.Mechanism.NS_ABSORPTION:
+            return "intake"
+        if obj.from_arm_id == obj.to_arm_id:
+            return "unchanged"
+        if obj.from_arm and obj.to_arm:
+            # bands rank by name (A best); a lexically smaller target = a rise
+            return "up" if obj.to_arm.name < obj.from_arm.name else "down"
+        return "banded"
+
+
+class ClassReallocationSerializer(serializers.ModelSerializer):
+    school_class_name = serializers.CharField(source="school_class.name", read_only=True)
+    session_name = serializers.CharField(source="session.name", read_only=True)
+    term_name = serializers.CharField(source="term.name", read_only=True)
+    source_exam_name = serializers.CharField(source="source_exam.name", read_only=True, default=None)
+    move_count = serializers.IntegerField(source="moves.count", read_only=True)
+
+    class Meta:
+        model = ClassReallocation
+        fields = [
+            "id", "school_class", "school_class_name", "session", "session_name",
+            "term", "term_name", "source_exam", "source_exam_name", "status",
+            "computed_by", "computed_at", "released_by", "released_at",
+            "applied_by", "applied_at", "notes", "move_count",
+        ]
+        read_only_fields = fields
+
+
+class ClassReallocationDetailSerializer(ClassReallocationSerializer):
+    """Adds the full move list + a per-band before/after summary, so a review
+    screen can show exactly what a release would do before it happens."""
+
+    moves = ClassReallocationMoveSerializer(many=True, read_only=True)
+    arm_summary = serializers.SerializerMethodField()
+
+    class Meta(ClassReallocationSerializer.Meta):
+        fields = ClassReallocationSerializer.Meta.fields + ["moves", "arm_summary"]
+
+    def get_arm_summary(self, obj):
+        from .services import banded_arms
+
+        config = getattr(obj.school_class, "banding_config", None)
+        if not config:
+            return []
+        bands = banded_arms(obj.school_class, config)
+        moves = list(obj.moves.all())
+        moved_ids = {m.student_id for m in moves}
+
+        current = {a.id: 0 for a in bands}
+        for s in Student.objects.filter(
+            class_arm__school_class=obj.school_class, status=Student.Status.ACTIVE,
+        ).exclude(class_arm_id=config.holding_arm_id).values_list("class_arm_id", flat=True):
+            if s in current:
+                current[s] += 1
+
+        proposed = {a.id: 0 for a in bands}
+        proposed_avgs = {a.id: [] for a in bands}
+        for m in moves:
+            if m.to_arm_id in proposed:
+                proposed[m.to_arm_id] += 1
+                if m.term_average is not None:
+                    proposed_avgs[m.to_arm_id].append(m.term_average)
+        # ungradeable existing students stay put — count them in their band
+        for s in Student.objects.filter(
+            class_arm__school_class=obj.school_class, status=Student.Status.ACTIVE,
+        ).exclude(class_arm_id=config.holding_arm_id).exclude(id__in=moved_ids).values_list("class_arm_id", flat=True):
+            if s in proposed:
+                proposed[s] += 1
+
+        delta = {a.id: 0 for a in bands}
+        for m in moves:
+            if m.capacity_delta and m.to_arm_id in delta:
+                delta[m.to_arm_id] += m.capacity_delta
+
+        out = []
+        for a in bands:
+            avgs = sorted(proposed_avgs[a.id])
+            out.append({
+                "arm": str(a), "arm_id": str(a.id),
+                "current_count": current[a.id],
+                "proposed_count": proposed[a.id],
+                "capacity": a.capacity,
+                "capacity_after": (a.capacity + delta[a.id]) if a.capacity is not None else None,
+                "proposed_score_range": [float(avgs[0]), float(avgs[-1])] if avgs else None,
+            })
+        return out
+
+
+class ReallocationComputeSerializer(serializers.Serializer):
+    school_class = serializers.PrimaryKeyRelatedField(queryset=SchoolClass.objects.all())
+    source_exam = serializers.PrimaryKeyRelatedField(queryset=Exam.objects.all())
+    kind = serializers.ChoiceField(choices=["reallocation", "initial_banding"], default="reallocation")
+
+
+class ArmCapacitySerializer(serializers.Serializer):
+    capacity = serializers.IntegerField(min_value=0, allow_null=True)

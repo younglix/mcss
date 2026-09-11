@@ -33,6 +33,10 @@ DEFAULT_SETTINGS = [
     ("result.pass_mark", "result", 50, False),
     ("result.show_position", "result", True, False),
     ("result.lock_after_publish", "result", True, False),
+    # Which exam type's publication counts as "the term result" that fires
+    # class-arm reallocation. Only the 1st/2nd-term result of this type
+    # triggers it — a 3rd-term result hands off to promotion instead.
+    ("reallocation.trigger_exam_type", "reallocation", "final", False),
     # General — locale/format defaults. Institutional identity (name, logo,
     # address, ...) lives on configuration.SchoolProfile, not here — this is
     # only the preferences that don't belong on that model.

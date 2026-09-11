@@ -3,10 +3,11 @@ import AppShell from '../../components/layout/AppShell.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
+import Button from '../../components/ui/Button.jsx';
 import ChildSwitcher from '../../components/parent/ChildSwitcher.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
-import { api } from '../../lib/api.js';
+import { api, ApiError } from '../../lib/api.js';
 
 const SKILL_LABEL = { punctuality: 'Punctuality', neatness: 'Neatness', leadership: 'Leadership', honesty: 'Honesty' };
 
@@ -29,6 +30,7 @@ export default function ParentResults() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     Promise.all([api.get('/academics/students/my-children'), api.get('/academics/exams/published')])
@@ -52,6 +54,22 @@ export default function ParentResults() {
 
   const childOptions = children.map((c) => ({ id: c.id, name: c.full_name, avatarUrl: null }));
 
+  const handleDownload = async () => {
+    if (!examId || !activeChildId) return;
+    setDownloading(true);
+    setError('');
+    try {
+      const exam = exams.find((ex) => ex.id === examId);
+      const child = children.find((c) => c.id === activeChildId);
+      const label = [child?.full_name, exam?.name].filter(Boolean).join('-').replace(/\s+/g, '-') || 'report-card';
+      await api.download(`/academics/exams/${examId}/report-card/${activeChildId}/pdf`, `${label}.pdf`);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not download the report card.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <AppShell portalId="parent" pageTitle="Results" user={{ name: user?.full_name || 'Parent' }}>
       <div className="space-y-lg sm:space-y-xl">
@@ -67,6 +85,11 @@ export default function ParentResults() {
               )}
               {children.length > 0 && (
                 <ChildSwitcher children={childOptions} activeId={activeChildId} onSelect={setActiveChildId} onAdd={() => {}} />
+              )}
+              {exams.length > 0 && children.length > 0 && (
+                <Button variant="secondary" size="sm" iconLeft="download" onClick={handleDownload} disabled={downloading || !report}>
+                  {downloading ? 'Preparing…' : 'Download PDF'}
+                </Button>
               )}
             </div>
           }

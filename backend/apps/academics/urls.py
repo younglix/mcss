@@ -37,6 +37,7 @@ urlpatterns = [
     path("exams/<uuid:exam_id>/scores", views.ExamScoresView.as_view(), name="academics-exam-scores"),
     path("exams/<uuid:exam_id>/marksheet/<uuid:student_id>", views.MarksheetView.as_view(), name="academics-marksheet"),
     path("exams/<uuid:exam_id>/report-card/<uuid:student_id>", views.ReportCardView.as_view(), name="academics-report-card"),
+    path("exams/<uuid:exam_id>/report-card/<uuid:student_id>/pdf", views.ReportCardPDFView.as_view(), name="academics-report-card-pdf"),
     path("exams/<uuid:exam_id>/report-card/<uuid:student_id>/remarks", views.ReportCardRemarkView.as_view(), name="academics-report-card-remarks"),
     path("scores/<uuid:score_id>", views.ExamScoreDetailView.as_view(), name="academics-score-detail"),
 
@@ -47,6 +48,16 @@ urlpatterns = [
 
     path("promotion/records", views.PromotionRecordsView.as_view(), name="academics-promotion-records"),
     path("promotion/action", views.PromotionActionView.as_view(), name="academics-promotion-action"),
+
+    # Class-arm performance-based reallocation
+    path("banding-config", views.BandingConfigView.as_view(), name="academics-banding-config"),
+    path("banding-config/<uuid:class_id>", views.BandingConfigView.as_view(), name="academics-banding-config-detail"),
+    path("arms/<uuid:arm_id>/capacity", views.ArmCapacityView.as_view(), name="academics-arm-capacity"),
+    path("reallocations", views.ReallocationsView.as_view(), name="academics-reallocations"),
+    path("reallocations/compute", views.ReallocationComputeView.as_view(), name="academics-reallocation-compute"),
+    path("reallocations/<uuid:reallocation_id>", views.ReallocationDetailView.as_view(), name="academics-reallocation-detail"),
+    path("reallocations/<uuid:reallocation_id>/release", views.ReallocationReleaseView.as_view(), name="academics-reallocation-release"),
+    path("reallocations/<uuid:reallocation_id>/apply", views.ReallocationApplyView.as_view(), name="academics-reallocation-apply"),
 
     path("reports", views.AcademicReportsView.as_view(), name="academics-reports"),
 

@@ -103,10 +103,46 @@ async function request(path, { method = 'GET', body, auth = true, retry = true }
   return payload ? payload.data : null;
 }
 
+// For endpoints that return a real file (PDF, CSV, ...) rather than the
+// {success, data} JSON envelope — auth still needs the bearer header, so a
+// plain <a href> can't be used. Fetches as a blob and triggers the browser's
+// normal save flow via a throwaway object URL. Returns the response headers
+// (plain object) in case the endpoint reports something alongside the file
+// itself — e.g. the payout sheet's X-Payout-* counts, which can't ride in
+// the response body since that body *is* the file.
+async function downloadFile(path, filename) {
+  const token = getAccessToken();
+  const res = await fetch(`/api/v1${path}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) {
+    let message = `Download failed (${res.status})`;
+    try {
+      const payload = await res.json();
+      message = payload?.message || message;
+    } catch {
+      // response wasn't JSON (a real file streams past this branch anyway)
+    }
+    throw new ApiError(message, { status: res.status });
+  }
+  const headers = Object.fromEntries(res.headers.entries());
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename || 'download';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  return headers;
+}
+
 export const api = {
   get: (path, opts) => request(path, { ...opts, method: 'GET' }),
   post: (path, body, opts) => request(path, { ...opts, method: 'POST', body }),
   patch: (path, body, opts) => request(path, { ...opts, method: 'PATCH', body }),
   put: (path, body, opts) => request(path, { ...opts, method: 'PUT', body }),
   delete: (path, opts) => request(path, { ...opts, method: 'DELETE' }),
+  download: downloadFile,
 };

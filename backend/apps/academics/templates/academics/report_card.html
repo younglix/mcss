@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @page { size: A4; margin: 1.2cm; }
+  body { font-family: Helvetica, Arial, sans-serif; color: #111; font-size: 9pt; }
+  .header-table { width: 100%; margin-bottom: 8px; }
+  .header-table td { vertical-align: middle; }
+  .logo-cell { width: 70px; }
+  .logo-cell img { width: 64px; height: 64px; }
+  .photo-cell { width: 70px; text-align: right; }
+  .photo-cell img { width: 64px; height: 64px; border: 1px solid #fff; }
+  .school-name { font-size: 16pt; font-weight: bold; text-align: center; margin: 0; color: {{ primary_color }}; }
+  .school-meta { font-size: 8pt; text-align: center; margin: 2px 0 0 0; color: #333; }
+  .title-bar { background-color: {{ secondary_color }}; color: #ffffff; text-align: center;
+               padding: 6px 0; font-size: 12pt; font-weight: bold; margin: 6px 0; }
+  .bios-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+  .bios-table td { border: 1px solid #000; padding: 4px 6px; width: 33.33%; font-size: 8.5pt; }
+  .bios-label { font-weight: bold; color: {{ secondary_color }}; display: block; font-size: 7.5pt; }
+  .section-title { background-color: {{ primary_color }}; color: #ffffff; text-align: center;
+                    padding: 4px 0; font-size: 10pt; font-weight: bold; margin: 8px 0 0 0; }
+  .subjects-table { width: 100%; border-collapse: collapse; }
+  .subjects-table th, .subjects-table td { border: 1px solid #000; padding: 3px 4px; text-align: center; font-size: 7.5pt; }
+  .subjects-table th { background-color: #f0f0f0; }
+  .subjects-table td.subject-name { text-align: left; }
+  .summary-row td { text-align: right; font-weight: bold; font-size: 8pt; }
+  .analysis-container { width: 100%; margin-top: 8px; }
+  .analysis-container td { vertical-align: top; width: 50%; padding-right: 6px; }
+  .analysis-table { width: 100%; border-collapse: collapse; }
+  .analysis-table td { border: 1px solid #000; padding: 4px 6px; font-size: 8pt; }
+  .analysis-table td.label { font-weight: bold; width: 55%; }
+  .rating-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  .rating-table th, .rating-table td { border: 1px solid #000; padding: 3px; text-align: center; font-size: 7.5pt; }
+  .rating-table td.skill-name { text-align: left; }
+  .grading-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .grading-table td { border: 1px solid #000; padding: 3px; text-align: center; font-size: 7.5pt; }
+  .grading-cell { background-color: {{ primary_color }}; color: #ffffff; font-weight: bold; }
+  .grade-range { background-color: #f5f5f5; }
+  .grade-letter { background-color: {{ primary_color }}; color: #ffffff; font-weight: bold; }
+  .footer-note { margin-top: 10px; font-size: 7.5pt; color: #666; text-align: center; }
+</style>
+</head>
+<body>
+
+  <table class="header-table">
+    <tr>
+      <td class="logo-cell">{% if logo_url %}<img src="{{ logo_url }}" />{% endif %}</td>
+      <td>
+        <p class="school-name">{{ school_name }}</p>
+        {% if school_address %}<p class="school-meta">{{ school_address }}</p>{% endif %}
+        {% if school_contact %}<p class="school-meta">{{ school_contact }}</p>{% endif %}
+      </td>
+      <td class="photo-cell">{% if photo_url %}<img src="{{ photo_url }}" />{% endif %}</td>
+    </tr>
+  </table>
+
+  <div class="title-bar">CONTINUOUS ASSESSMENT REPORT</div>
+
+  <table class="bios-table">
+    <tr>
+      <td><span class="bios-label">NAME OF STUDENT</span>{{ student_name }}</td>
+      <td><span class="bios-label">AGE</span>{{ age|default:"—" }}{% if age %} Years{% endif %}</td>
+      <td><span class="bios-label">ADMISSION NUMBER</span>{{ admission_number|default:"—" }}</td>
+    </tr>
+    <tr>
+      <td><span class="bios-label">TERM</span>{{ term_name }}</td>
+      <td><span class="bios-label">ATTENDANCE</span>{{ attendance_present }} / {{ attendance_total }}</td>
+      <td><span class="bios-label">CLASS</span>{{ class_arm_label }}</td>
+    </tr>
+    <tr>
+      <td><span class="bios-label">ACADEMIC SESSION</span>{{ session_name }}</td>
+      <td><span class="bios-label">NUMBER IN CLASS</span>{{ class_size }}</td>
+      <td><span class="bios-label">STUDENT ID</span>{{ student_identifier }}</td>
+    </tr>
+  </table>
+
+  <div class="section-title">COGNITIVE ASSESSMENT</div>
+  <table class="subjects-table">
+    <tr>
+      <th>SN</th><th>SUBJECT</th><th>C.A.</th><th>Exam</th><th>Total 100%</th>
+      <th>Class Avg.</th><th>Class Max</th><th>Class Min</th><th>Position</th><th>Grade</th><th>REMARK</th>
+    </tr>
+    {% for row in subject_rows %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td class="subject-name">{{ row.subject }}</td>
+      <td>{{ row.ca_score|default:"—" }}</td>
+      <td>{{ row.exam_score|default:"—" }}</td>
+      <td>{{ row.total }}</td>
+      <td>{{ row.class_avg|default:"—" }}</td>
+      <td>{{ row.class_max|default:"—" }}</td>
+      <td>{{ row.class_min|default:"—" }}</td>
+      <td>{{ row.position }}</td>
+      <td>{{ row.grade }}</td>
+      <td>{{ row.remark|default:"—" }}</td>
+    </tr>
+    {% endfor %}
+    <tr class="summary-row"><td colspan="10">NUMBER OF SUBJECTS PASSED</td><td>{{ passed }} OF {{ total_subjects }}</td></tr>
+    <tr class="summary-row"><td colspan="10">NUMBER OF SUBJECTS FAILED</td><td>{{ failed }} OF {{ total_subjects }}</td></tr>
+  </table>
+
+  <table class="analysis-container">
+    <tr>
+      <td>
+        <div class="section-title">FINAL ANALYSIS</div>
+        <table class="analysis-table">
+          <tr><td class="label">TOTAL MARKS OBTAINABLE</td><td>{{ total_obtainable }}</td></tr>
+          <tr><td class="label">TOTAL MARKS OBTAINED</td><td>{{ total_obtained }}</td></tr>
+          <tr><td class="label">CLASS AVERAGE</td><td>{{ class_average|default:"—" }}</td></tr>
+          <tr><td class="label">STUDENT AVERAGE</td><td>{{ student_average|default:"—" }}</td></tr>
+          <tr><td class="label">POSITION</td><td>{{ position }} out of {{ class_size }}</td></tr>
+          <tr><td class="label">TEACHER'S COMMENT</td><td><i>{{ class_teacher_remark|default:"—" }}</i></td></tr>
+          <tr><td class="label">PRINCIPAL'S COMMENT</td><td><i>{{ principal_remark|default:"—" }}</i></td></tr>
+          <tr><td class="label">TERM ENDED</td><td>{{ term_ended|default:"—" }}</td></tr>
+          <tr><td class="label">NEXT TERM BEGINS</td><td>{{ next_term_begins|default:"—" }}</td></tr>
+        </table>
+      </td>
+      <td>
+        <div class="section-title">SKILLS &amp; BEHAVIOUR</div>
+        <table class="rating-table">
+          <tr><th style="text-align:left;">Skill</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th></tr>
+          {% for sk in skills %}
+          <tr>
+            <td class="skill-name">{{ sk.label }}</td>
+            <td>{% if sk.rating == 5 %}X{% endif %}</td>
+            <td>{% if sk.rating == 4 %}X{% endif %}</td>
+            <td>{% if sk.rating == 3 %}X{% endif %}</td>
+            <td>{% if sk.rating == 2 %}X{% endif %}</td>
+            <td>{% if sk.rating == 1 %}X{% endif %}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6">No ratings recorded.</td></tr>
+          {% endfor %}
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <table class="grading-table">
+    <tr>
+      <td class="grading-cell" rowspan="2">GRADING</td>
+      {% for g in grading_key %}
+      <td class="grade-range">{{ g.range }}</td>
+      {% endfor %}
+    </tr>
+    <tr>
+      {% for g in grading_key %}
+      <td class="grade-letter">{{ g.letter }}</td>
+      {% endfor %}
+    </tr>
+  </table>
+
+  <div class="footer-note">Generated on {{ generated_at }} · {{ school_name }} Report Card System</div>
+
+</body>
+</html>

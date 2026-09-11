@@ -194,6 +194,11 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.examinations.tasks.sweep_expired_attempts",
         "schedule": timedelta(minutes=1),
     },
+    # Auto-apply released class-arm reallocations once their target term starts.
+    "apply-due-class-reallocations": {
+        "task": "apps.academics.tasks.apply_due_reallocations",
+        "schedule": timedelta(hours=6),
+    },
 }
 
 CACHES = {

@@ -1,11 +1,14 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, Q, Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from xhtml2pdf import pisa
 
 from apps.audit.services import log
 from apps.configuration.models import AcademicSession, ClassArm, GradeScale, SchoolClass, Term
@@ -15,6 +18,8 @@ from common.responses import failure, success
 from .models import (
     Assignment,
     AttendanceRecord,
+    ClassBandingConfig,
+    ClassReallocation,
     ClassSubjectAssignment,
     ClassTeacherAssignment,
     Exam,
@@ -28,10 +33,14 @@ from .models import (
     TimetableSlot,
 )
 from .serializers import (
+    ArmCapacitySerializer,
     AssignmentSerializer,
     AttendanceBulkMarkSerializer,
     AttendanceRecordSerializer,
     ClassAcademicSerializer,
+    ClassBandingConfigSerializer,
+    ClassReallocationDetailSerializer,
+    ClassReallocationSerializer,
     ClassSubjectAssignmentSerializer,
     ClassTeacherAssignmentSerializer,
     ExamScoreBulkEntrySerializer,
@@ -39,6 +48,7 @@ from .serializers import (
     ExamSerializer,
     PromotionActionSerializer,
     PromotionRecordSerializer,
+    ReallocationComputeSerializer,
     ResultSubmissionSerializer,
     StudentCreateSerializer,
     StudentSerializer,
@@ -148,7 +158,7 @@ class StudentsView(StudentPermissionMixin, ListCreateAPIView):
         # unmatched/placeholder id just yields an empty list instead of
         # django-filter's ModelChoiceFilter rejecting it as an invalid
         # choice — the frontend queries a nil UUID before a class is picked.
-        qs = Student.objects.select_related("user", "class_arm").filter(user__is_deleted=False)
+        qs = Student.objects.select_related("user", "class_arm__school_class", "next_class_arm__school_class").filter(user__is_deleted=False)
         class_arm = self.request.query_params.get("class_arm")
         if class_arm:
             qs = qs.filter(class_arm_id=class_arm)
@@ -167,7 +177,7 @@ class StudentsView(StudentPermissionMixin, ListCreateAPIView):
 
 class StudentDetailView(StudentPermissionMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = StudentSerializer
-    queryset = Student.objects.select_related("user", "class_arm").filter(user__is_deleted=False)
+    queryset = Student.objects.select_related("user", "class_arm__school_class", "next_class_arm__school_class").filter(user__is_deleted=False)
 
     def perform_update(self, serializer):
         student = serializer.save()
@@ -188,7 +198,7 @@ class MyChildrenView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = Student.objects.select_related("user", "class_arm").filter(
+        qs = Student.objects.select_related("user", "class_arm__school_class", "next_class_arm__school_class").filter(
             guardian_user=request.user, user__is_deleted=False,
         )
         return success(data=StudentSerializer(qs, many=True).data)
@@ -563,6 +573,12 @@ class ExamPublishView(APIView):
         exam.status = Exam.Status.PUBLISHED
         exam.save(update_fields=["status"])
         log(actor=request.user, action="academics.exam_published", target=exam, request=request)
+        # Fire performance-based class-arm reallocation for opted-in classes.
+        # The task itself filters: only the configured term-result exam type,
+        # only a 1st/2nd-term result (3rd term is promotion's job). Runs
+        # eagerly (synchronously) when there's no Redis broker.
+        from .tasks import compute_reallocations_for_exam
+        compute_reallocations_for_exam.delay(str(exam.id), str(request.user.id))
         return success(message="Results published.", data=ExamSerializer(exam).data)
 
 
@@ -672,6 +688,24 @@ class PublishedExamsView(APIView):
         return success(data=ExamSerializer(qs, many=True).data)
 
 
+def _report_card_access_denied(request, exam, student):
+    """Shared by ReportCardView and ReportCardPDFView: staff with
+    results.view (including before publish, to proof it), or the owning
+    student, or that student's linked guardian — the latter two only once
+    the exam has been published, matching the rule that unpublished results
+    are a staff-only preview. Returns a failure() response to short-circuit
+    on, or None when access is allowed."""
+    perms = get_effective_permissions(request.user)
+    is_staff_viewer = "*" in perms or "results.view" in perms
+    is_owning_student = getattr(request.user, "student_profile", None) and student.user_id == request.user.id
+    is_owning_guardian = student.guardian_user_id == request.user.id
+    if not (is_staff_viewer or is_owning_student or is_owning_guardian):
+        return failure(message="You do not have access to this report card.", status=403)
+    if not is_staff_viewer and exam.status != Exam.Status.PUBLISHED:
+        return failure(message="Results have not been published yet.", status=403)
+    return None
+
+
 class ReportCardView(APIView):
     """The full compiled report card for one student's exam — CA/Exam split,
     grade, class position, attendance, skills, and remarks. Callable by
@@ -684,16 +718,11 @@ class ReportCardView(APIView):
 
     def get(self, request, exam_id, student_id):
         exam = get_object_or_404(Exam, id=exam_id)
-        student = get_object_or_404(Student.objects.select_related("user", "class_arm"), id=student_id)
+        student = get_object_or_404(Student.objects.select_related("user", "class_arm__school_class", "next_class_arm__school_class"), id=student_id)
 
-        perms = get_effective_permissions(request.user)
-        is_staff_viewer = "*" in perms or "results.view" in perms
-        is_owning_student = getattr(request.user, "student_profile", None) and student.user_id == request.user.id
-        is_owning_guardian = student.guardian_user_id == request.user.id
-        if not (is_staff_viewer or is_owning_student or is_owning_guardian):
-            return failure(message="You do not have access to this report card.", status=403)
-        if not is_staff_viewer and exam.status != Exam.Status.PUBLISHED:
-            return failure(message="Results have not been published yet.", status=403)
+        denied = _report_card_access_denied(request, exam, student)
+        if denied:
+            return denied
 
         scores = ExamScore.objects.filter(exam=exam, student=student).select_related("subject")
         scales = list(GradeScale.objects.all())
@@ -756,6 +785,77 @@ class ReportCardView(APIView):
             "class_teacher_remark": remark_row.class_teacher_remark if remark_row else "",
             "principal_remark": remark_row.principal_remark if remark_row else "",
         })
+
+
+class ReportCardPDFView(APIView):
+    """Downloadable PDF of the report card, styled on the legacy system's own
+    "Continuous Assessment Report" card (school header, student bios, a
+    per-subject class avg/max/min/position table, final analysis, skills,
+    and the grading key) — same ownership/publish gate as ReportCardView,
+    same server-rendered xhtml2pdf pipeline as finance's payment receipt."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, exam_id, student_id):
+        from . import services
+
+        exam = get_object_or_404(Exam.objects.select_related("term", "session"), id=exam_id)
+        student = get_object_or_404(
+            Student.objects.select_related("user", "class_arm__school_class"), id=student_id,
+        )
+
+        denied = _report_card_access_denied(request, exam, student)
+        if denied:
+            return denied
+
+        ctx = services.build_printable_report_card(exam, student)
+        profile = ctx["profile"]
+        contact_parts = [p for p in [profile.phone if profile else "", profile.email if profile else ""] if p]
+
+        html = render_to_string("academics/report_card.html", {
+            "primary_color": "#ff1a8c",
+            "secondary_color": "#1a237e",
+            "logo_url": profile.logo if profile else "",
+            "photo_url": student.user.avatar or "",
+            "school_name": profile.name if profile else "School",
+            "school_address": profile.address if profile else "",
+            "school_contact": " · ".join(contact_parts),
+            "student_name": student.user.full_name,
+            "student_identifier": student.user.identifier or "—",
+            "class_arm_label": ctx["class_arm_label"],
+            "age": ctx["age"],
+            "term_name": exam.term.name,
+            "session_name": exam.session.name,
+            "attendance_present": ctx["attendance_present"],
+            "attendance_total": ctx["attendance_total"],
+            "class_size": ctx["class_size"],
+            "subject_rows": ctx["subject_rows"],
+            "passed": ctx["passed"],
+            "failed": ctx["failed"],
+            "total_subjects": ctx["total_subjects"],
+            "total_obtainable": ctx["total_obtainable"],
+            "total_obtained": ctx["total_obtained"],
+            "class_average": ctx["class_average"],
+            "student_average": ctx["student_average"],
+            "position": ctx["position"],
+            "class_teacher_remark": ctx["class_teacher_remark"],
+            "principal_remark": ctx["principal_remark"],
+            "term_ended": ctx["term_ended"].strftime("%d %B %Y") if ctx["term_ended"] else None,
+            "next_term_begins": ctx["next_term_begins"].strftime("%d %B %Y") if ctx["next_term_begins"] else None,
+            "skills": ctx["skills"],
+            "grading_key": ctx["grading_key"],
+            "generated_at": timezone.now().strftime("%d %b %Y, %I:%M %p"),
+        })
+
+        pdf_buffer = HttpResponse(content_type="application/pdf")
+        filename = f"report-card-{student.user.identifier or student.id}-{exam.term.name}-{exam.session.name}.pdf".replace("/", "-").replace(" ", "-")
+        pdf_buffer["Content-Disposition"] = f'attachment; filename="{filename}"'
+        pisa_status = pisa.CreatePDF(html, dest=pdf_buffer)
+        if pisa_status.err:
+            return HttpResponse("Could not generate report card PDF.", status=500)
+        log(actor=request.user, action="academics.report_card_downloaded", target=student, request=request,
+            changes={"exam": exam.name})
+        return pdf_buffer
 
 
 class ReportCardRemarkView(APIView):
@@ -856,6 +956,139 @@ class PromotionActionView(APIView):
         log(actor=request.user, action="academics.students_promoted",
             changes={"from_class_arm": str(v["from_class_arm"]), "count": len(records)}, request=request)
         return success(message=f"Processed {len(records)} student(s).", data=PromotionRecordSerializer(records, many=True).data)
+
+
+# ---------------------------------------------------------------- Class-arm reallocation
+class BandingConfigView(APIView):
+    """List every class's banding config (creating a blank one per class on
+    first read so the UI has a row to toggle), and update one class's config
+    (enable/disable, set the N_S holding arm)."""
+
+    def get_permissions(self):
+        return [HasPermission("reallocation.view" if self.request.method == "GET" else "reallocation.configure")]
+
+    def get(self, request, class_id=None):
+        configs = {c.school_class_id: c for c in ClassBandingConfig.objects.select_related("school_class", "holding_arm")}
+        rows = []
+        for klass in SchoolClass.objects.order_by("level_order"):
+            cfg = configs.get(klass.id) or ClassBandingConfig.objects.create(school_class=klass)
+            rows.append(ClassBandingConfigSerializer(cfg).data)
+        return success(data=rows)
+
+    def patch(self, request, class_id=None):
+        if class_id is None:
+            return failure(message="PATCH a specific class: /banding-config/<class_id>.", status=400)
+        cfg, _ = ClassBandingConfig.objects.get_or_create(school_class_id=class_id)
+        serializer = ClassBandingConfigSerializer(cfg, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        log(actor=request.user, action="academics.banding_config_updated", target=cfg,
+            changes={k: str(v) for k, v in serializer.validated_data.items()}, request=request)
+        return success(message="Banding config updated.", data=ClassBandingConfigSerializer(cfg).data)
+
+
+class ArmCapacityView(APIView):
+    """The only manual writer of ClassArm.capacity — behind its own
+    permission, and every change is audit-logged (see services.set_arm_capacity)
+    so a hand-edit can't quietly bypass the "only N_S absorption raises
+    capacity" ratchet."""
+
+    permission_classes = [HasPermission("reallocation.configure")]
+
+    def put(self, request, arm_id):
+        from . import services
+
+        arm = get_object_or_404(ClassArm, id=arm_id)
+        serializer = ArmCapacitySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        services.set_arm_capacity(arm, serializer.validated_data["capacity"], actor=request.user, request=request)
+        return success(message="Capacity updated.", data={"id": str(arm.id), "capacity": arm.capacity})
+
+
+class ReallocationsView(APIView):
+    permission_classes = [HasPermission("reallocation.view")]
+
+    def get(self, request):
+        qs = ClassReallocation.objects.select_related(
+            "school_class", "session", "term", "source_exam", "computed_by", "released_by", "applied_by",
+        ).prefetch_related("moves")
+        for param, field in (("school_class", "school_class_id"), ("session", "session_id"),
+                             ("term", "term_id"), ("status", "status")):
+            value = request.query_params.get(param)
+            if value:
+                qs = qs.filter(**{field: value})
+        return success(data=ClassReallocationSerializer(qs, many=True).data)
+
+
+class ReallocationDetailView(APIView):
+    permission_classes = [HasPermission("reallocation.view")]
+
+    def get(self, request, reallocation_id):
+        realloc = get_object_or_404(
+            ClassReallocation.objects.select_related("school_class__banding_config", "session", "term", "source_exam")
+            .prefetch_related("moves__student__user", "moves__from_arm", "moves__to_arm"),
+            id=reallocation_id,
+        )
+        return success(data=ClassReallocationDetailSerializer(realloc).data)
+
+
+class ReallocationComputeView(APIView):
+    """Manual (re)compute — for administrative correction, or to band a
+    freshly promoted cohort (`kind=initial_banding`). The automatic path runs
+    off exam publish and needs no permission."""
+
+    permission_classes = [HasPermission("reallocation.configure")]
+
+    def post(self, request):
+        from . import services
+
+        serializer = ReallocationComputeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        v = serializer.validated_data
+        try:
+            if v["kind"] == "initial_banding":
+                realloc = services.compute_initial_banding(v["school_class"], v["source_exam"], actor=request.user)
+            else:
+                realloc = services.compute_reallocation(v["school_class"], v["source_exam"], actor=request.user)
+        except services.ReallocationError as e:
+            return failure(message=str(e), status=400)
+        if realloc is None:
+            return failure(
+                message="Nothing computed — the class isn't opted in, or this is a 3rd-term result "
+                        "(that hands off to promotion).",
+                status=400,
+            )
+        return success(message="Reallocation computed.", data=ClassReallocationDetailSerializer(realloc).data)
+
+
+class ReallocationReleaseView(APIView):
+    permission_classes = [HasPermission("reallocation.release")]
+
+    def post(self, request, reallocation_id):
+        from . import services
+
+        realloc = get_object_or_404(ClassReallocation, id=reallocation_id)
+        try:
+            services.release_reallocation(realloc, actor=request.user)
+        except services.ReallocationError as e:
+            return failure(message=str(e), status=400)
+        return success(message="Reallocation released — students and parents can now see their next arm.",
+                       data=ClassReallocationSerializer(realloc).data)
+
+
+class ReallocationApplyView(APIView):
+    permission_classes = [HasPermission("reallocation.apply")]
+
+    def post(self, request, reallocation_id):
+        from . import services
+
+        realloc = get_object_or_404(ClassReallocation, id=reallocation_id)
+        try:
+            services.apply_reallocation(realloc, actor=request.user)
+        except services.ReallocationError as e:
+            return failure(message=str(e), status=400)
+        return success(message="Reallocation applied — students have been moved to their new arm.",
+                       data=ClassReallocationSerializer(realloc).data)
 
 
 # ---------------------------------------------------------------- Academic Reports
@@ -991,7 +1224,7 @@ class MyTeachingStudentsView(APIView):
             return failure(message="class_arm is required.", status=400)
         if class_arm not in {str(i) for i in _teaching_class_arm_ids(request.user, session)}:
             return failure(message="Not one of your classes.", status=403)
-        qs = Student.objects.select_related("user", "class_arm").filter(
+        qs = Student.objects.select_related("user", "class_arm__school_class", "next_class_arm__school_class").filter(
             class_arm_id=class_arm, user__is_deleted=False,
         )
         return success(data=StudentSerializer(qs, many=True).data)

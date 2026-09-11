@@ -79,6 +79,13 @@ class SchoolClass(BaseModel):
 class ClassArm(BaseModel):
     school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, related_name="arms")
     name = models.CharField(max_length=10)   # "A", "B"
+    # Performance-reallocation band capacity, and a strict ratchet: only N_S
+    # absorption ever raises it (see apps.academics.services), never the
+    # re-rank. Null = uncapped. It must NOT be editable through the generic
+    # config arm endpoint — the only writer is the audited
+    # reallocation.configure endpoint, so a hand-edit can't silently break
+    # the ratchet rule.
+    capacity = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta(BaseModel.Meta):
         ordering = ["school_class__level_order", "name"]

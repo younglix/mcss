@@ -22,6 +22,10 @@ PERMISSIONS = {
     "exams":        ["view", "create", "edit", "delete"],
     "assignments":  ["view", "create", "edit", "delete"],
     "promotion":    ["view", "action"],
+    # Performance-based class-arm reallocation. compute is automatic (no
+    # permission); view = see proposals, release = reveal to students,
+    # apply = enact the move, configure = enable a class / set band capacities.
+    "reallocation": ["view", "release", "apply", "configure"],
     "reports":      ["view"],
     "expenses":     ["view", "create", "edit", "delete"],
     "income":       ["view", "create", "edit", "delete"],

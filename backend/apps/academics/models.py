@@ -38,6 +38,13 @@ class Student(BaseModel):
     class_arm = models.ForeignKey(
         "configuration.ClassArm", on_delete=models.SET_NULL, null=True, blank=True, related_name="students"
     )
+    # Where a released class reallocation will move this student at the next
+    # term's start. Display-only until then — class_arm is untouched, so the
+    # current term (attendance, timetable, its own results) stays correct.
+    # Cleared when the reallocation is applied. See apps.academics.services.
+    next_class_arm = models.ForeignKey(
+        "configuration.ClassArm", on_delete=models.SET_NULL, null=True, blank=True, related_name="incoming_students"
+    )
     date_of_birth = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=10, choices=Gender.choices, blank=True)
     guardian_name = models.CharField(max_length=150, blank=True)
@@ -310,6 +317,133 @@ class Assignment(BaseModel):
 
     def __str__(self):
         return self.title
+
+
+class ClassBandingConfig(BaseModel):
+    """Opt-in switch + settings for performance-based arm reallocation on one
+    class. A class with no config, or a disabled one, is never touched by the
+    reallocation engine (nursery/KG classes, say). `holding_arm` is this
+    class's "N_S" arm — where brand-new intake sits until they have a first
+    term average to be banded on."""
+
+    school_class = models.OneToOneField(
+        "configuration.SchoolClass", on_delete=models.CASCADE, related_name="banding_config"
+    )
+    enabled = models.BooleanField(default=False)
+    holding_arm = models.ForeignKey(
+        "configuration.ClassArm", on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+
+    class Meta(BaseModel.Meta):
+        pass
+
+    def __str__(self):
+        return f"Banding config — {self.school_class.name} ({'on' if self.enabled else 'off'})"
+
+
+class ClassReallocation(BaseModel):
+    """One computed proposal for re-sorting a class's students across its
+    ranked arms (A top, B middle, C lowest), off one term's results.
+
+    Three-step lifecycle, three timestamps — deliberately NOT collapsed:
+
+      computed  → a hidden proposal; nothing on Student/ClassArm has moved
+      released  → students & parents can see their next_class_arm; still
+                  nothing has physically moved — the current term runs on
+                  in the existing arms
+      applied   → at the next term's start: next_class_arm → class_arm, and
+                  arm capacities ratchet up for any absorbed new students
+
+    Only runs for within-session term transitions (1st→2nd, 2nd→3rd). A
+    3rd-term / year-end result is promotion's job, not this engine's; the
+    banding of a freshly promoted cohort happens afterwards as an
+    initial_banding pass (see apps.academics.services)."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Computed (pending release)"
+        RELEASED = "released", "Released (visible, not yet applied)"
+        APPLIED = "applied", "Applied"
+        SUPERSEDED = "superseded", "Superseded by a newer compute"
+
+    school_class = models.ForeignKey(
+        "configuration.SchoolClass", on_delete=models.CASCADE, related_name="reallocations"
+    )
+    session = models.ForeignKey(
+        "configuration.AcademicSession", on_delete=models.CASCADE, related_name="reallocations"
+    )
+    # The term whose results drove this compute. Moves take effect at the
+    # start of the next term in the same session.
+    term = models.ForeignKey(
+        "configuration.Term", on_delete=models.CASCADE, related_name="reallocations"
+    )
+    source_exam = models.ForeignKey(
+        Exam, on_delete=models.SET_NULL, null=True, blank=True, related_name="reallocations"
+    )
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+
+    computed_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="reallocations_computed"
+    )
+    computed_at = models.DateTimeField(auto_now_add=True)
+    released_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="reallocations_released"
+    )
+    released_at = models.DateTimeField(null=True, blank=True)
+    # applied_by is null when apply ran automatically at term rollover.
+    applied_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="reallocations_applied"
+    )
+    applied_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+
+    class Meta(BaseModel.Meta):
+        ordering = ["-computed_at"]
+        constraints = [
+            # At most one live (pending OR released) proposal per class+term.
+            # A re-compute replaces the pending one; an already-released one
+            # must be applied or superseded before another can be computed.
+            models.UniqueConstraint(
+                fields=["school_class", "session", "term"],
+                condition=models.Q(status__in=["pending", "released"]),
+                name="academics_one_live_reallocation_per_class_term",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Reallocation — {self.school_class.name} {self.term.name} {self.session.name} ({self.status})"
+
+
+class ClassReallocationMove(BaseModel):
+    """One student's line in a ClassReallocation: where they move and by which
+    mechanism. `capacity_delta` is +1 only for an N_S student absorbed into a
+    band (that band's capacity ratchets up by the summed deltas at apply
+    time); it is always 0 for a re-rank swap, which never changes a
+    capacity."""
+
+    class Mechanism(models.TextChoices):
+        RERANK = "rerank", "Performance re-rank (swap)"
+        NS_ABSORPTION = "ns_absorption", "N_S absorption (additive)"
+        INITIAL_BANDING = "initial_banding", "Initial banding"
+
+    reallocation = models.ForeignKey(ClassReallocation, on_delete=models.CASCADE, related_name="moves")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="reallocation_moves")
+    from_arm = models.ForeignKey(
+        "configuration.ClassArm", on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+    to_arm = models.ForeignKey(
+        "configuration.ClassArm", on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+    mechanism = models.CharField(max_length=20, choices=Mechanism.choices)
+    term_average = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    rank = models.PositiveIntegerField(null=True, blank=True)
+    capacity_delta = models.SmallIntegerField(default=0)
+
+    class Meta(BaseModel.Meta):
+        unique_together = ("reallocation", "student")
+        ordering = ["rank"]
+
+    def __str__(self):
+        return f"{self.student} — {self.from_arm} → {self.to_arm} ({self.mechanism})"
 
 
 class PromotionRecord(BaseModel):

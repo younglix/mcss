@@ -46,8 +46,11 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class ClassArmSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassArm
-        fields = ["id", "school_class", "name"]
-        read_only_fields = ["id", "school_class"]
+        fields = ["id", "school_class", "name", "capacity"]
+        # capacity is surfaced for display only — it's a reallocation ratchet,
+        # writable solely through the audited reallocation.configure endpoint,
+        # never this generic config path.
+        read_only_fields = ["id", "school_class", "capacity"]
 
 
 class SchoolClassSerializer(serializers.ModelSerializer):
