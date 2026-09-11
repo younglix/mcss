@@ -84,20 +84,7 @@ import SuperAdminHR from './pages/SuperAdmin/operations/HR.jsx';
 import SuperAdminRecruitment from './pages/SuperAdmin/operations/Recruitment.jsx';
 import SuperAdminInventory from './pages/SuperAdmin/operations/Inventory.jsx';
 import SuperAdminAssets from './pages/SuperAdmin/operations/Assets.jsx';
-import SuperAdminGeneralSettings from './pages/SuperAdmin/system-config/General.jsx';
-import SuperAdminAppearanceSettings from './pages/SuperAdmin/system-config/Appearance.jsx';
-import SuperAdminAcademicSettings from './pages/SuperAdmin/system-config/Academic.jsx';
-import SuperAdminStudentAdmissionSettings from './pages/SuperAdmin/system-config/StudentAdmission.jsx';
-import SuperAdminStaffHRSettings from './pages/SuperAdmin/system-config/StaffHR.jsx';
-import SuperAdminFinanceSettings from './pages/SuperAdmin/system-config/Finance.jsx';
-import SuperAdminCommunicationSettings from './pages/SuperAdmin/system-config/Communication.jsx';
-import SuperAdminUsersSecuritySettings from './pages/SuperAdmin/system-config/UsersSecurity.jsx';
-import SuperAdminFormsCustomFields from './pages/SuperAdmin/system-config/FormsCustomFields.jsx';
-import SuperAdminDocumentsTemplates from './pages/SuperAdmin/system-config/DocumentsTemplates.jsx';
-import SuperAdminWebsiteSettings from './pages/SuperAdmin/system-config/Website.jsx';
-import SuperAdminSystemMaintenance from './pages/SuperAdmin/system-config/SystemMaintenance.jsx';
-import SuperAdminIntegrations from './pages/SuperAdmin/system-config/Integrations.jsx';
-import SuperAdminSettings from './pages/SuperAdmin/Settings.jsx';
+import SuperAdminSettings from './pages/SuperAdmin/system-config/Settings.jsx';
 import SuperAdminAuditLog from './pages/SuperAdmin/AuditLog.jsx';
 import SuperAdminApplicantApprovals from './pages/SuperAdmin/ApplicantApprovals.jsx';
 import AdminDashboard from './pages/Admin/Dashboard.jsx';
@@ -245,20 +232,7 @@ export const routes = [
   { path: "/super-admin/operations/recruitment", label: "Recruitment", source: "super_admin_operations_recruitment", element: <SuperAdminRecruitment /> },
   { path: "/super-admin/operations/inventory", label: "Inventory", source: "super_admin_operations_inventory", element: <SuperAdminInventory /> },
   { path: "/super-admin/operations/assets", label: "Assets", source: "super_admin_operations_assets", element: <SuperAdminAssets /> },
-  { path: "/super-admin/system-config/general", label: "General Settings", source: "super_admin_system_config_general", element: <SuperAdminGeneralSettings /> },
-  { path: "/super-admin/system-config/appearance", label: "Appearance Settings", source: "super_admin_system_config_appearance", element: <SuperAdminAppearanceSettings /> },
-  { path: "/super-admin/system-config/academic", label: "Academic Settings", source: "super_admin_system_config_academic", element: <SuperAdminAcademicSettings /> },
-  { path: "/super-admin/system-config/student-admission", label: "Student & Admission Settings", source: "super_admin_system_config_student_admission", element: <SuperAdminStudentAdmissionSettings /> },
-  { path: "/super-admin/system-config/staff-hr", label: "Staff & HR Settings", source: "super_admin_system_config_staff_hr", element: <SuperAdminStaffHRSettings /> },
-  { path: "/super-admin/system-config/finance", label: "Finance Settings", source: "super_admin_system_config_finance", element: <SuperAdminFinanceSettings /> },
-  { path: "/super-admin/system-config/communication", label: "Communication Settings", source: "super_admin_system_config_communication", element: <SuperAdminCommunicationSettings /> },
-  { path: "/super-admin/system-config/users-security", label: "Users & Security Settings", source: "super_admin_system_config_users_security", element: <SuperAdminUsersSecuritySettings /> },
-  { path: "/super-admin/system-config/forms", label: "Forms & Custom Fields", source: "super_admin_system_config_forms", element: <SuperAdminFormsCustomFields /> },
-  { path: "/super-admin/system-config/documents", label: "Documents & Templates", source: "super_admin_system_config_documents", element: <SuperAdminDocumentsTemplates /> },
-  { path: "/super-admin/system-config/website", label: "Website Settings", source: "super_admin_system_config_website", element: <SuperAdminWebsiteSettings /> },
-  { path: "/super-admin/system-config/maintenance", label: "System & Maintenance", source: "super_admin_system_config_maintenance", element: <SuperAdminSystemMaintenance /> },
-  { path: "/super-admin/system-config/integrations", label: "Integrations", source: "super_admin_system_config_integrations", element: <SuperAdminIntegrations /> },
-  { path: "/super-admin/settings", label: "System Settings", source: "platform_settings_super_admin", element: <SuperAdminSettings /> },
+  { path: "/super-admin/settings", label: "Settings", source: "super_admin_settings", element: <SuperAdminSettings /> },
   { path: "/super-admin/audit", label: "Audit Log", source: "audit_log_super_admin_portal", element: <SuperAdminAuditLog /> },
   { path: "/super-admin/applicants", label: "Applicant Approvals", source: "applicant_approval_queue_super_admin", element: <SuperAdminApplicantApprovals /> },
   { path: "/admin", label: "Admin Dashboard", source: "admin_dashboard_responsive_mcss", element: <AdminDashboard /> },

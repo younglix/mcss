@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../../components/ui/Card.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
-import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
+import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { api, ApiError } from '../../../lib/api.js';
 
@@ -25,6 +26,60 @@ const LOGIN_FIELDS = [
 const ALERT_FIELDS = [
   { key: 'security.notify_on_failed_login', id: 'notify_on_failed_login', label: 'Alert a user when their account is locked', type: 'checkbox' },
 ];
+
+/** The Super Admin's global open/closed switch over everyone's self-service
+ * Edit Profile screen — a plain wrapper around the existing generic
+ * settings endpoint, no dedicated backend route needed for this. */
+function SelfEditLockToggle() {
+  const [open, setOpen] = useState(null); // null = not loaded yet
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useMemo(() => {
+    api.get('/settings/profiles.self_edit_open')
+      .then((res) => setOpen(!!res.value))
+      .catch(() => setError('Could not load the current switch state.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const toggle = async () => {
+    setSaving(true);
+    setError('');
+    try {
+      await api.patch('/settings/profiles.self_edit_open', { value: !open });
+      setOpen((prev) => !prev);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not change the switch.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card padding="lg" className="max-w-3xl">
+      <h2 className="font-headline-md text-headline-md text-primary mb-md">Profile Self-Editing</h2>
+      <div className="flex items-center justify-between flex-wrap gap-md">
+        <div>
+          <p className="font-body-md text-body-md text-on-surface-variant">
+            While open, every role can fill in their own Edit Profile screen. Close it once everyone's done — you can
+            always reopen it later to let everyone edit again, and you can edit anyone's profile directly at any time
+            regardless of this switch.
+          </p>
+          {error && <p className="font-label-sm text-label-sm text-error mt-xs">{error}</p>}
+        </div>
+        {loading ? (
+          <span className="font-label-sm text-label-sm text-on-surface-variant">Loading…</span>
+        ) : (
+          <Button variant={open ? 'secondary' : 'primary'} onClick={toggle} disabled={saving}>
+            {saving ? 'Working…' : open ? 'Close Self-Editing' : 'Open Self-Editing'}
+          </Button>
+        )}
+        {!loading && <Badge tone={open ? 'success' : 'secondary'}>{open ? 'Open' : 'Closed'}</Badge>}
+      </div>
+    </Card>
+  );
+}
 
 export default function SuperAdminUsersSecuritySettings() {
   const endpoints = useMemo(() => ENDPOINTS, []);
@@ -55,15 +110,7 @@ export default function SuperAdminUsersSecuritySettings() {
   };
 
   return (
-    <DashboardPageShell
-      pageTitle="Users & Security"
-      title="Users & Security"
-      subtitle="Password policy, login restrictions, and security alerts — applied platform-wide."
-      loading={loading}
-      error={error}
-      onReload={reload}
-      skeletonCount={1}
-    >
+    <SectionShell loading={loading} error={error} onReload={reload}>
       {data && values && (
         <div className="space-y-lg">
           <Card padding="lg" className="max-w-3xl flex flex-wrap items-center justify-between gap-md">
@@ -111,8 +158,10 @@ export default function SuperAdminUsersSecuritySettings() {
               <Button type="submit" variant="primary" disabled={saving}>{saving ? 'Saving…' : 'Save Changes'}</Button>
             </div>
           </form>
+
+          <SelfEditLockToggle />
         </div>
       )}
-    </DashboardPageShell>
+    </SectionShell>
   );
 }

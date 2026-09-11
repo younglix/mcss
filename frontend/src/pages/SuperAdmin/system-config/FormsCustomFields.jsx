@@ -5,7 +5,7 @@ import Button from '../../../components/ui/Button.jsx';
 import Drawer from '../../../components/ui/Drawer.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
 import ConfirmDialog from '../../../components/ui/ConfirmDialog.jsx';
-import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
+import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { EmptyState } from '../dashboard/dashboardHelpers.jsx';
 import { api, ApiError } from '../../../lib/api.js';
@@ -26,60 +26,6 @@ function slugify(label) {
 }
 
 const emptyForm = { label: '', key: '', field_type: 'text', options: '', required: false, order: 0, is_sensitive: false };
-
-/** The Super Admin's global open/closed switch over everyone's self-service
- * Edit Profile screen — a plain wrapper around the existing generic
- * settings endpoint, no dedicated backend route needed for this. */
-function SelfEditLockToggle() {
-  const [open, setOpen] = useState(null); // null = not loaded yet
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-
-  useMemo(() => {
-    api.get('/settings/profiles.self_edit_open')
-      .then((res) => setOpen(!!res.value))
-      .catch(() => setError('Could not load the current switch state.'))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const toggle = async () => {
-    setSaving(true);
-    setError('');
-    try {
-      await api.patch('/settings/profiles.self_edit_open', { value: !open });
-      setOpen((prev) => !prev);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not change the switch.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <Card padding="lg" className="mb-lg">
-      <div className="flex items-center justify-between flex-wrap gap-md">
-        <div>
-          <h3 className="font-headline-md text-headline-sm text-on-surface">Self-Service Profile Editing</h3>
-          <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-            While open, every role can fill in their own Edit Profile screen. Close it once everyone's done — you can
-            always reopen it later to let everyone edit again, and you can edit anyone's profile directly at any time
-            regardless of this switch.
-          </p>
-          {error && <p className="font-label-sm text-label-sm text-error mt-xs">{error}</p>}
-        </div>
-        {loading ? (
-          <span className="font-label-sm text-label-sm text-on-surface-variant">Loading…</span>
-        ) : (
-          <Button variant={open ? 'secondary' : 'primary'} onClick={toggle} disabled={saving}>
-            {saving ? 'Working…' : open ? 'Close Self-Editing' : 'Open Self-Editing'}
-          </Button>
-        )}
-        {!loading && <Badge tone={open ? 'success' : 'secondary'}>{open ? 'Open' : 'Closed'}</Badge>}
-      </div>
-    </Card>
-  );
-}
 
 export default function SuperAdminFormsCustomFields() {
   const [entity, setEntity] = useState('student');
@@ -198,18 +144,9 @@ export default function SuperAdminFormsCustomFields() {
   ];
 
   return (
-    <DashboardPageShell
-      pageTitle="Forms & Custom Fields"
-      title="Forms & Custom Fields"
-      subtitle="Add extra fields to Student and Staff records — they appear automatically in those forms."
-      loading={loading}
-      error={error}
-      onReload={reload}
-      skeletonCount={1}
-    >
+    <SectionShell loading={loading} error={error} onReload={reload}>
       {data && (
         <div>
-          <SelfEditLockToggle />
           <div className="flex flex-wrap items-center justify-between gap-md mb-md">
             <div className="flex gap-xs">
               {ENTITY_TABS.map((tab) => (
@@ -311,6 +248,6 @@ export default function SuperAdminFormsCustomFields() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
       />
-    </DashboardPageShell>
+    </SectionShell>
   );
 }

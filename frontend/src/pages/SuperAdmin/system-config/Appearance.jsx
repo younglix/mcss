@@ -3,7 +3,7 @@ import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
 import ImageUploadField from '../../../components/ui/ImageUploadField.jsx';
-import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
+import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { useBranding } from '../../../context/BrandingContext.jsx';
 import { applyRadiusOverride, applyTypographyOverrides, RADIUS_SCALE_OPTIONS } from '../../../lib/colorTokens.js';
@@ -90,15 +90,7 @@ export default function SuperAdminAppearanceSettings() {
   };
 
   return (
-    <DashboardPageShell
-      pageTitle="Appearance"
-      title="Appearance"
-      subtitle="Theme colors, typography, and branding — applied across the whole platform immediately on save."
-      loading={loading}
-      error={error}
-      onReload={reload}
-      skeletonCount={1}
-    >
+    <SectionShell loading={loading} error={error} onReload={reload}>
       {values && (
         <form onSubmit={handleSubmit} className="space-y-lg">
           {saveError && (
@@ -157,6 +149,6 @@ export default function SuperAdminAppearanceSettings() {
           </div>
         </form>
       )}
-    </DashboardPageShell>
+    </SectionShell>
   );
 }

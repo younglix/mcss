@@ -4,7 +4,7 @@ import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
 import ImageUploadField from '../../../components/ui/ImageUploadField.jsx';
-import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
+import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { api, ApiError } from '../../../lib/api.js';
 
@@ -120,15 +120,7 @@ export default function SuperAdminWebsiteSettings() {
   const galleryImages = values?.['website.gallery_images'] || [];
 
   return (
-    <DashboardPageShell
-      pageTitle="Website"
-      title="Website"
-      subtitle="The public landing page's full layout, plus SEO metadata, social links, and footer text."
-      loading={loading}
-      error={error}
-      onReload={reload}
-      skeletonCount={1}
-    >
+    <SectionShell loading={loading} error={error} onReload={reload}>
       {data && values && (
         <div className="space-y-lg">
           <Card padding="lg" className="max-w-3xl flex flex-wrap items-center justify-between gap-md">
@@ -255,6 +247,6 @@ export default function SuperAdminWebsiteSettings() {
           </form>
         </div>
       )}
-    </DashboardPageShell>
+    </SectionShell>
   );
 }

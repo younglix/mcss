@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
-import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
+import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { useBranding } from '../../../context/BrandingContext.jsx';
 import { api, ApiError } from '../../../lib/api.js';
@@ -76,15 +76,7 @@ export default function SuperAdminGeneralSettings() {
   };
 
   return (
-    <DashboardPageShell
-      pageTitle="General"
-      title="General"
-      subtitle="School identity and locale defaults used across the whole platform."
-      loading={loading}
-      error={error}
-      onReload={reload}
-      skeletonCount={1}
-    >
+    <SectionShell loading={loading} error={error} onReload={reload}>
       {identityValues && localeValues && (
         <form onSubmit={handleSubmit} className="space-y-lg">
           {saveError && (
@@ -132,6 +124,6 @@ export default function SuperAdminGeneralSettings() {
           </div>
         </form>
       )}
-    </DashboardPageShell>
+    </SectionShell>
   );
 }

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
-import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
+import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { api, ApiError } from '../../../lib/api.js';
 
@@ -55,15 +55,7 @@ export default function SuperAdminIntegrations() {
   };
 
   return (
-    <DashboardPageShell
-      pageTitle="Integrations"
-      title="Integrations"
-      subtitle="Payment gateway credentials for online fee collection."
-      loading={loading}
-      error={error}
-      onReload={reload}
-      skeletonCount={1}
-    >
+    <SectionShell loading={loading} error={error} onReload={reload}>
       {data && values && (
         <form onSubmit={handleSubmit} className="space-y-lg">
           {saveError && <p className="font-label-md text-label-md text-error bg-error-container/20 border border-error/20 rounded-lg px-md py-sm max-w-3xl">{saveError}</p>}
@@ -92,6 +84,6 @@ export default function SuperAdminIntegrations() {
           </div>
         </form>
       )}
-    </DashboardPageShell>
+    </SectionShell>
   );
 }

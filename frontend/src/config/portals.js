@@ -130,31 +130,13 @@ export const portals = {
         ],
       },
       {
-        // Replaces the former separate "Communication & Public Website",
-        // "Configuration", and "System" sections — see portals.js audit
-        // notes (2026-08) for what was merged/removed/kept. Roles &
-        // Permissions and Academic Sessions/Classes & Departments were
-        // duplicated 2-4x across those sections; they're linked once here
-        // (Users & Security) and remain reachable via Administration too,
-        // rather than triplicated. Audit Logs/Login History and System
-        // Settings previously claimed 'active' while rendering static mock
-        // data — status reflects real state until each phase lands.
-        key: 'system-config', label: 'System & Config', icon: 'settings_applications',
-        children: [
-          { key: 'sc-general', label: 'General', icon: 'domain', path: '/super-admin/system-config/general', status: 'active' },
-          { key: 'sc-appearance', label: 'Appearance', icon: 'palette', path: '/super-admin/system-config/appearance', status: 'active' },
-          { key: 'sc-academic', label: 'Academic', icon: 'grading', path: '/super-admin/system-config/academic', status: 'active' },
-          { key: 'sc-student-admission', label: 'Student & Admission', icon: 'school', path: '/super-admin/system-config/student-admission', status: 'active' },
-          { key: 'sc-staff-hr', label: 'Staff & HR', icon: 'badge', path: '/super-admin/system-config/staff-hr', status: 'active' },
-          { key: 'sc-finance', label: 'Finance', icon: 'payments', path: '/super-admin/system-config/finance', status: 'active' },
-          { key: 'sc-communication', label: 'Communication', icon: 'campaign', path: '/super-admin/system-config/communication', status: 'active' },
-          { key: 'sc-users-security', label: 'Users & Security', icon: 'admin_panel_settings', path: '/super-admin/system-config/users-security', status: 'active' },
-          { key: 'sc-forms', label: 'Forms & Custom Fields', icon: 'dynamic_form', path: '/super-admin/system-config/forms', status: 'active' },
-          { key: 'sc-documents', label: 'Documents & Templates', icon: 'description', path: '/super-admin/system-config/documents', status: 'active' },
-          { key: 'sc-website', label: 'Website', icon: 'public', path: '/super-admin/system-config/website', status: 'active' },
-          { key: 'sc-maintenance', label: 'System & Maintenance', icon: 'build', path: '/super-admin/system-config/maintenance', status: 'active' },
-          { key: 'sc-integrations', label: 'Integrations', icon: 'integration_instructions', path: '/super-admin/system-config/integrations', status: 'active' },
-        ],
+        // One consolidated Settings tab (2026-09) — replaces the former
+        // 12-item "System & Config" sidebar fan-out, which made specific
+        // settings (admission open/close, profile self-editing, ...) hard
+        // to find since each lived on its own separate route. All of it now
+        // lives on a single page (system-config/Settings.jsx) with an
+        // in-page section switcher instead of 12 sidebar sub-links.
+        key: 'settings', label: 'Settings', icon: 'settings', path: '/super-admin/settings', status: 'active',
       },
     ],
     // Primary mobile nav is the Dashboard's own 4 summary pages. Its other

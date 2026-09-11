@@ -5,7 +5,7 @@ import Button from '../../../components/ui/Button.jsx';
 import Drawer from '../../../components/ui/Drawer.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
 import ConfirmDialog from '../../../components/ui/ConfirmDialog.jsx';
-import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
+import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { EmptyState } from '../dashboard/dashboardHelpers.jsx';
 import { api, ApiError } from '../../../lib/api.js';
@@ -167,15 +167,7 @@ export default function SuperAdminAcademicSettings() {
   };
 
   return (
-    <DashboardPageShell
-      pageTitle="Academic"
-      title="Academic"
-      subtitle="Academic rules and defaults — grading scale, promotion, and result policy."
-      loading={loading}
-      error={error}
-      onReload={reload}
-      skeletonCount={1}
-    >
+    <SectionShell loading={loading} error={error} onReload={reload}>
       {data && values && (
         <div className="space-y-lg">
           <Card padding="lg" className="max-w-3xl flex flex-wrap items-center justify-between gap-md">
@@ -207,6 +199,6 @@ export default function SuperAdminAcademicSettings() {
           </form>
         </div>
       )}
-    </DashboardPageShell>
+    </SectionShell>
   );
 }

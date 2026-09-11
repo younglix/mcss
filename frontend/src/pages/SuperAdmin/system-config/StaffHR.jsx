@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
-import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
+import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { api, ApiError } from '../../../lib/api.js';
 
@@ -48,15 +48,7 @@ export default function SuperAdminStaffHRSettings() {
   };
 
   return (
-    <DashboardPageShell
-      pageTitle="Staff & HR"
-      title="Staff & HR"
-      subtitle="Staff numbering and HR policy defaults."
-      loading={loading}
-      error={error}
-      onReload={reload}
-      skeletonCount={1}
-    >
+    <SectionShell loading={loading} error={error} onReload={reload}>
       {data && values && (
         <div className="space-y-lg">
           <Card padding="lg" className="max-w-3xl flex flex-wrap items-center justify-between gap-md">
@@ -85,6 +77,6 @@ export default function SuperAdminStaffHRSettings() {
           </form>
         </div>
       )}
-    </DashboardPageShell>
+    </SectionShell>
   );
 }

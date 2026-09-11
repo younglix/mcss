@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
-import DashboardPageShell from '../dashboard/DashboardPageShell.jsx';
+import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { api, ApiError } from '../../../lib/api.js';
 
@@ -46,15 +46,7 @@ export default function SuperAdminSystemMaintenance() {
   };
 
   return (
-    <DashboardPageShell
-      pageTitle="System & Maintenance"
-      title="System & Maintenance"
-      subtitle="Maintenance mode blocks everyone but Super Admins while it's on."
-      loading={loading}
-      error={error}
-      onReload={reload}
-      skeletonCount={1}
-    >
+    <SectionShell loading={loading} error={error} onReload={reload}>
       {data && values && (
         <div className="space-y-lg">
           <Card padding="lg" className="max-w-3xl flex flex-wrap items-center justify-between gap-md">
@@ -88,6 +80,6 @@ export default function SuperAdminSystemMaintenance() {
           </form>
         </div>
       )}
-    </DashboardPageShell>
+    </SectionShell>
   );
 }
