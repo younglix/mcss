@@ -55,17 +55,12 @@ export default function ApplyReviewSubmit() {
     setError('');
     try {
       const payload = Object.fromEntries(SUBMIT_FIELDS.map((key) => [key, draft[key] ?? '']));
-      const result = await api.post('/admissions/apply', payload, { auth: false });
-
       const customFieldValues = draft.customFieldValues || {};
-      const fieldIds = Object.keys(customFieldValues);
-      if (fieldIds.length > 0 && result.id) {
-        await api.put('/custom-fields/values/bulk', {
-          entity: 'application', entity_id: result.id,
-          values: fieldIds.map((field_id) => ({ field_id, value: customFieldValues[field_id] })),
-        }, { auth: false }).catch(() => {}); // best-effort — the core application is already submitted either way
-      }
+      payload.custom_field_values = Object.entries(customFieldValues)
+        .filter(([, v]) => v !== '' && v !== undefined)
+        .map(([field_id, value]) => ({ field_id, value }));
 
+      const result = await api.post('/admissions/apply', payload, { auth: false });
       saveResult(result);
       clearDraft();
       navigate('/apply/confirmation');

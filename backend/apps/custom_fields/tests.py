@@ -219,3 +219,65 @@ class SensitiveFieldMaskingTests(ProfileFieldsTestBase):
         no encryption, unlike SystemSetting.is_secret's Fernet scheme."""
         stored = CustomFieldValue.objects.get(field=self.nin_field, entity_id=self.staff.id)
         self.assertEqual(stored.value, "12345678901")
+
+
+class ProfileCompletenessTests(ProfileFieldsTestBase):
+    """Requirement 9 — Super Admin can see existing users missing a
+    required field, including one added long after those users existed."""
+
+    def test_lists_only_users_missing_a_required_field(self):
+        self.qualification_field = CustomField.objects.create(
+            entity=CustomField.Entity.STAFF, key="qualification", label="Qualification",
+            field_type=CustomField.FieldType.TEXT, required=True,
+        )
+        complete_staff = User.objects.create(full_name="Complete Staff", email="complete@x.io", user_type="staff", is_active=True)
+        CustomFieldValue.objects.create(field=self.qualification_field, entity_id=complete_staff.id, value="B.Sc")
+        # self.staff (from setUp) has no qualification value at all.
+
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.get("/api/v1/custom-fields/completeness?entity=staff")
+        self.assertEqual(res.status_code, 200)
+        rows = {r["name"]: r["missing_fields"] for r in res.json()["data"]}
+        self.assertIn("Staff One", rows)
+        self.assertEqual(rows["Staff One"], ["Qualification"])
+        self.assertNotIn("Complete Staff", rows)
+
+    def test_a_field_added_after_users_already_exist_shows_up_immediately(self):
+        """The exact scenario in point 7 of the spec: 500 existing staff,
+        Super Admin adds a new required field later — no re-registration,
+        no migration, they just show up as incomplete right away."""
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.get("/api/v1/custom-fields/completeness?entity=staff")
+        self.assertEqual(res.json()["data"], [])  # no required fields yet
+
+        CustomField.objects.create(
+            entity=CustomField.Entity.STAFF, key="bvn", label="Bank Verification Number",
+            field_type=CustomField.FieldType.TEXT, required=True,
+        )
+        res = self.client.get("/api/v1/custom-fields/completeness?entity=staff")
+        rows = {r["name"]: r["missing_fields"] for r in res.json()["data"]}
+        self.assertEqual(rows.get("Staff One"), ["Bank Verification Number"])
+
+    def test_student_entity_keys_by_student_id_not_user_id(self):
+        from datetime import date
+
+        student_user = User.objects.create(full_name="Kid One", email="kid@x.io", user_type="student", is_active=True)
+        student = Student.objects.create(user=student_user, date_of_birth=date(2012, 1, 1))
+        CustomField.objects.create(
+            entity=CustomField.Entity.STUDENT, key="allergy", label="Allergy", field_type=CustomField.FieldType.TEXT, required=True,
+        )
+
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.get("/api/v1/custom-fields/completeness?entity=student")
+        rows = {r["entity_id"]: r["name"] for r in res.json()["data"]}
+        self.assertIn(str(student.id), rows)
+        self.assertNotIn(str(student_user.id), rows)  # keyed by Student.id, not User.id
+
+    def test_missing_entity_param_is_rejected(self):
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.get("/api/v1/custom-fields/completeness")
+        self.assertEqual(res.status_code, 400)
+
+    def test_requires_permission(self):
+        res = self.client.get("/api/v1/custom-fields/completeness?entity=staff")
+        self.assertEqual(res.status_code, 401)

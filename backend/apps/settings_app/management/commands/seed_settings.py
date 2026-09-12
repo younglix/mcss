@@ -42,6 +42,12 @@ DEFAULT_SETTINGS = [
     # still being populated. Toggled via the existing generic
     # PATCH /settings/profiles.self_edit_open, no dedicated endpoint needed.
     ("profiles.self_edit_open", "profiles", True, False),
+    # HR's on/off switch over the public staff self-registration link
+    # (apps.staff_onboarding) — starts closed so a fresh deploy doesn't
+    # silently accept registrations until HR deliberately turns it on, same
+    # rationale as student_admission.is_open below. Toggled via the existing
+    # generic PATCH /settings/staff_onboarding.is_open.
+    ("staff_onboarding.is_open", "staff_onboarding", False, False),
     # General — locale/format defaults. Institutional identity (name, logo,
     # address, ...) lives on configuration.SchoolProfile, not here — this is
     # only the preferences that don't belong on that model.

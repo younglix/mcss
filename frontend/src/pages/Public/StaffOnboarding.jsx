@@ -6,8 +6,7 @@ import { api, ApiError } from '../../lib/api.js';
 
 const EMPTY_FORM = {
   staff_type: '', full_name: '', email: '', phone: '', sex: '', date_of_birth: '',
-  nin: '', qualification: '', is_form_teacher: false, form_teacher_class_arm: '',
-  non_academic_role_title: '',
+  is_form_teacher: false, form_teacher_class_arm: '', non_academic_role_title: '',
 };
 
 function SubjectClaimRow({ claim, subjects, classArms, onChange, onRemove }) {
@@ -38,6 +37,11 @@ export default function StaffOnboarding() {
   const [config, setConfig] = useState(null);
   const [configError, setConfigError] = useState(false);
   const [values, setValues] = useState(EMPTY_FORM);
+  // Every Super-Admin-defined "staff" custom field currently active — NIN,
+  // Qualification, Account Number, or anything added later — keyed by
+  // field_id, so this form never needs its own hardcoded field list. See
+  // apps.staff_onboarding.views.StaffApplicationConfigView.
+  const [customFieldValues, setCustomFieldValues] = useState({});
   const [claims, setClaims] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -49,6 +53,7 @@ export default function StaffOnboarding() {
   }, []);
 
   const update = (key, v) => setValues((prev) => ({ ...prev, [key]: v }));
+  const updateCustomField = (fieldId, v) => setCustomFieldValues((prev) => ({ ...prev, [fieldId]: v }));
 
   const addClaim = () => setClaims((prev) => [...prev, { key: `${Date.now()}-${prev.length}`, subject: '', class_arm: '' }]);
   const updateClaim = (key, next) => setClaims((prev) => prev.map((c) => (c.key === key ? next : c)));
@@ -71,9 +76,11 @@ export default function StaffOnboarding() {
       } else {
         delete payload.subject_claims;
       }
-      if (!isAcademic) {
-        delete payload.nin;
-        delete payload.qualification;
+      if (isAcademic) {
+        payload.custom_field_values = Object.entries(customFieldValues)
+          .filter(([, v]) => v !== '' && v !== undefined)
+          .map(([field_id, value]) => ({ field_id, value }));
+      } else {
         delete payload.sex;
         delete payload.date_of_birth;
       }
@@ -136,6 +143,15 @@ export default function StaffOnboarding() {
             <div className="text-center py-xl">
               <p className="font-body-md text-on-surface-variant">Loading…</p>
             </div>
+          ) : !config.is_open ? (
+            <div className="bg-surface-container-lowest border border-outline/10 rounded-lg shadow-sm p-xl text-center">
+              <span className="material-symbols-outlined text-outline text-5xl mb-md">event_busy</span>
+              <h2 className="font-headline-md text-headline-sm text-primary mb-sm">Registration Is Currently Unavailable</h2>
+              <p className="font-body-md text-on-surface-variant">
+                Staff self-registration is closed right now. Please contact the school office, or try again once it's
+                been reopened.
+              </p>
+            </div>
           ) : (
             <form onSubmit={handleSubmit} className="bg-surface-container-lowest border border-outline/10 rounded-lg shadow-sm p-lg md:p-xl space-y-lg">
               {errors.__all__ && (
@@ -174,8 +190,29 @@ export default function StaffOnboarding() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
                         <FormField field={{ key: 'sex', id: 'sex', label: 'Sex', type: 'select', options: [{ value: 'male', label: 'Male' }, { value: 'female', label: 'Female' }] }} value={values.sex} onChange={(v) => update('sex', v)} />
                         <FormField field={{ key: 'date_of_birth', id: 'date_of_birth', label: 'Date of Birth', type: 'date' }} value={values.date_of_birth} onChange={(v) => update('date_of_birth', v)} />
-                        <FormField field={{ key: 'nin', id: 'nin', label: 'NIN', type: 'text', required: true }} value={values.nin} onChange={(v) => update('nin', v)} error={fieldError('nin')} />
-                        <FormField field={{ key: 'qualification', id: 'qualification', label: 'Qualification', type: 'text', required: true, placeholder: 'e.g. B.Sc Mathematics' }} value={values.qualification} onChange={(v) => update('qualification', v)} error={fieldError('qualification')} />
+                      </div>
+
+                      <div className="border-t border-outline/10 pt-lg space-y-lg">
+                        <div>
+                          <h3 className="font-label-md text-label-md font-bold text-primary">Account Details</h3>
+                          <p className="font-label-sm text-label-sm text-on-surface-variant">
+                            Set by the school — whatever's defined here is what's needed for your records and payroll.
+                          </p>
+                        </div>
+                        {fieldError('custom_field_values') && <p className="font-label-sm text-label-sm text-error">{fieldError('custom_field_values')}</p>}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                          {config.custom_fields.map((f) => (
+                            <FormField
+                              key={f.field_id}
+                              field={{
+                                key: f.field_id, id: `custom_${f.field_id}`, label: f.label, type: f.field_type,
+                                required: f.required, options: (f.options || []).map((o) => ({ value: o, label: o })),
+                              }}
+                              value={customFieldValues[f.field_id] ?? ''}
+                              onChange={(v) => updateCustomField(f.field_id, v)}
+                            />
+                          ))}
+                        </div>
                       </div>
 
                       {isTeacher && (

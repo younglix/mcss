@@ -21,15 +21,6 @@ _ROLE_SLUG_BY_STAFF_TYPE = {
 }
 
 
-def _write_custom_field(user, key, value):
-    from apps.custom_fields.models import CustomField, CustomFieldValue
-
-    field = CustomField.objects.filter(entity=CustomField.Entity.STAFF, key=key, is_active=True).first()
-    if not field or not value:
-        return
-    CustomFieldValue.objects.update_or_create(field=field, entity_id=user.id, defaults={"value": value})
-
-
 def _provision_academic_staff(application, reviewer):
     from apps.rbac.models import Role, UserRole
 
@@ -52,8 +43,9 @@ def _provision_academic_staff(application, reviewer):
     if role:
         UserRole.objects.get_or_create(user=user, role=role)
 
-    _write_custom_field(user, "nin", application.nin)
-    _write_custom_field(user, "qualification", application.qualification)
+    from apps.custom_fields.services import promote_pending_values
+
+    promote_pending_values(user.id, application.field_values.select_related("field").all())
 
     conflict_notes = []
     if application.staff_type == StaffApplication.StaffType.TEACHER:

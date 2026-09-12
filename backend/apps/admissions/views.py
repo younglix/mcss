@@ -89,14 +89,14 @@ class ApplicationsListView(ListAPIView):
     def get_queryset(self):
         return Application.objects.select_related(
             "class_applying_for", "reviewed_by", "enrolled_student__user",
-        ).prefetch_related("documents")
+        ).prefetch_related("documents", "field_values__field")
 
 
 class ApplicationDetailView(RetrieveUpdateAPIView):
     serializer_class = ApplicationSerializer
     queryset = Application.objects.select_related(
         "class_applying_for", "reviewed_by", "enrolled_student__user",
-    ).prefetch_related("documents")
+    ).prefetch_related("documents", "field_values__field")
     lookup_url_kwarg = "application_id"
 
     def get_permissions(self):
@@ -130,7 +130,7 @@ class ApplicationReviewView(APIView):
             application.save(update_fields=["status", "review_notes"])
 
         log(actor=request.user, action=f"admissions.application_{application.status}", target=application, request=request)
-        return success(message=f"Application {application.status}.", data=ApplicationSerializer(application).data)
+        return success(message=f"Application {application.status}.", data=ApplicationSerializer(application, context={"request": request}).data)
 
 
 class ApplicationAcceptView(APIView):
@@ -145,4 +145,7 @@ class ApplicationAcceptView(APIView):
 
         services.approve_application(application, request.user)
         log(actor=request.user, action="admissions.application_accepted", target=application, request=request)
-        return success(message="Application accepted. Student and guardian portals provisioned.", data=ApplicationSerializer(application).data)
+        return success(
+            message="Application accepted. Student and guardian portals provisioned.",
+            data=ApplicationSerializer(application, context={"request": request}).data,
+        )

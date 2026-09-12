@@ -1,6 +1,10 @@
 from rest_framework import serializers
 
-from .models import Application, ApplicationDocument
+from apps.custom_fields.models import CustomField
+from apps.custom_fields.serializers import CustomFieldValueItemSerializer
+from apps.custom_fields.services import mask_if_sensitive, missing_required_fields
+
+from .models import Application, ApplicationDocument, ApplicationFieldValue
 
 
 class ApplicationDocumentSerializer(serializers.ModelSerializer):
@@ -23,7 +27,12 @@ _SECONDARY_REQUIRED_FIELDS = [
 
 class PublicApplicationSubmitSerializer(serializers.ModelSerializer):
     """What an applicant fills in — status/reference/review fields are all
-    server-controlled, never client input."""
+    server-controlled, never client input. `custom_field_values` carries
+    every Super-Admin-defined "student" AND "parent" custom field — the
+    same dynamic set the ongoing profile-edit screens render — so a field
+    added later never needs an admissions-specific code change."""
+
+    custom_field_values = CustomFieldValueItemSerializer(many=True, required=False, write_only=True)
 
     class Meta:
         model = Application
@@ -38,7 +47,7 @@ class PublicApplicationSubmitSerializer(serializers.ModelSerializer):
             "mother_name", "mother_occupation", "mother_phone", "mother_place_of_work",
             "mother_home_address", "mother_office_address", "mother_email",
             "siblings_in_school", "guardian_signature_name",
-            "class_applying_for", "previous_school",
+            "class_applying_for", "previous_school", "custom_field_values",
         ]
         read_only_fields = ["id", "reference_number"]
 
@@ -66,7 +75,29 @@ class PublicApplicationSubmitSerializer(serializers.ModelSerializer):
             if missing:
                 raise serializers.ValidationError({"required": f"The following fields are required for a secondary application: {', '.join(missing)}."})
 
+        submitted_by_field_id = {str(v["field_id"]): v.get("value") for v in attrs.get("custom_field_values") or []}
+        missing_dynamic = missing_required_fields(CustomField.Entity.STUDENT, submitted_by_field_id)
+        # Parent-entity fields only apply when a guardian account will
+        # actually be created — has_guardian=False means there's no parent
+        # for them to attach to.
+        if attrs.get("has_guardian", True):
+            missing_dynamic += missing_required_fields(CustomField.Entity.PARENT, submitted_by_field_id)
+        if missing_dynamic:
+            raise serializers.ValidationError({"custom_field_values": f"These fields are required: {', '.join(missing_dynamic)}."})
+
         return attrs
+
+    def create(self, validated_data):
+        field_values_data = validated_data.pop("custom_field_values", [])
+        application = Application.objects.create(**validated_data)
+        for item in field_values_data:
+            field = CustomField.objects.filter(
+                id=item["field_id"], entity__in=[CustomField.Entity.STUDENT, CustomField.Entity.PARENT], is_active=True,
+            ).first()
+            if not field:
+                continue
+            ApplicationFieldValue.objects.create(application=application, field=field, value=item.get("value"))
+        return application
 
 
 class PublicApplicationConfigSerializer(serializers.Serializer):
@@ -76,6 +107,27 @@ class PublicApplicationConfigSerializer(serializers.Serializer):
     opens_at = serializers.CharField(allow_null=True)
     closes_at = serializers.CharField(allow_null=True)
     session_name = serializers.CharField(allow_null=True)
+    # Every active Super-Admin-defined "student"/"parent" custom field —
+    # definitions only (no values; nothing exists to attach a value to yet)
+    # — so the public form can render them dynamically. A field added later
+    # shows up here with no admissions-specific code change.
+    student_custom_fields = serializers.SerializerMethodField()
+    parent_custom_fields = serializers.SerializerMethodField()
+
+    def _field_list(self, entity):
+        return [
+            {
+                "field_id": str(f.id), "key": f.key, "label": f.label, "field_type": f.field_type,
+                "options": f.options, "required": f.required, "is_sensitive": f.is_sensitive,
+            }
+            for f in CustomField.objects.filter(entity=entity, is_active=True)
+        ]
+
+    def get_student_custom_fields(self, obj):
+        return self._field_list(CustomField.Entity.STUDENT)
+
+    def get_parent_custom_fields(self, obj):
+        return self._field_list(CustomField.Entity.PARENT)
 
 
 class PublicApplicationStatusSerializer(serializers.ModelSerializer):
@@ -101,6 +153,35 @@ class PublicApplicationStatusSerializer(serializers.ModelSerializer):
         return {"status": invoice.status, "amount": str(invoice.amount), "balance": str(invoice.balance)}
 
 
+class ApplicationFieldValueSerializer(serializers.ModelSerializer):
+    field_key = serializers.CharField(source="field.key", read_only=True)
+    field_label = serializers.CharField(source="field.label", read_only=True)
+    field_type = serializers.CharField(source="field.field_type", read_only=True)
+    field_entity = serializers.CharField(source="field.entity", read_only=True)
+    is_sensitive = serializers.BooleanField(source="field.is_sensitive", read_only=True)
+    is_masked = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ApplicationFieldValue
+        fields = ["id", "field", "field_key", "field_label", "field_type", "field_entity", "is_sensitive", "is_masked", "value"]
+        read_only_fields = fields
+
+    def get_value(self, obj):
+        viewer = self.context.get("request").user if self.context.get("request") else None
+        if viewer is None:
+            return obj.value
+        shown, _ = mask_if_sensitive(obj.field, obj.value, viewer)
+        return shown
+
+    def get_is_masked(self, obj):
+        viewer = self.context.get("request").user if self.context.get("request") else None
+        if viewer is None:
+            return False
+        _, is_masked = mask_if_sensitive(obj.field, obj.value, viewer)
+        return is_masked
+
+
 class ApplicationSerializer(serializers.ModelSerializer):
     """Full record for Super Admin review."""
 
@@ -108,6 +189,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
     reviewed_by_name = serializers.CharField(source="reviewed_by.full_name", read_only=True, default=None)
     full_name = serializers.CharField(read_only=True)
     documents = ApplicationDocumentSerializer(many=True, read_only=True)
+    field_values = ApplicationFieldValueSerializer(many=True, read_only=True)
     student_identifier = serializers.CharField(source="enrolled_student.user.identifier", read_only=True, default=None)
     registration_number = serializers.CharField(source="enrolled_student.registration_number", read_only=True, default=None)
 
@@ -124,13 +206,13 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "mother_name", "mother_occupation", "mother_phone", "mother_place_of_work",
             "mother_home_address", "mother_office_address", "mother_email",
             "siblings_in_school", "guardian_signature_name",
-            "class_applying_for", "class_applying_for_name", "previous_school",
+            "class_applying_for", "class_applying_for_name", "previous_school", "field_values",
             "status", "submitted_at", "reviewed_by", "reviewed_by_name", "reviewed_at",
             "review_notes", "documents", "student_identifier", "registration_number",
         ]
         read_only_fields = [
             "id", "reference_number", "submitted_at", "reviewed_by", "reviewed_by_name", "reviewed_at",
-            "documents", "student_identifier", "registration_number",
+            "documents", "field_values", "student_identifier", "registration_number",
         ]
 
 

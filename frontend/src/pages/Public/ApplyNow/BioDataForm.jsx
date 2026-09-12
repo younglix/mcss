@@ -30,7 +30,16 @@ export default function ApplyBioData() {
   const navigate = useNavigate();
   const [values, setValues] = useState({ ...emptyBioData, ...getDraft() });
   const [classOptions, setClassOptions] = useState([]);
-  const [customFields, setCustomFields] = useState([]);
+  // Every active Super-Admin-defined "student"/"parent" custom field —
+  // the same dynamic set the ongoing profile-edit screens render, so a
+  // field added later (e.g. "Blood Group") appears here automatically with
+  // no admissions-specific code change. Both types are collected on this
+  // one form since a single application produces both accounts; the
+  // backend routes each answer to the right one (by field.entity) at
+  // approval. Values are kept in one flat map since field ids are unique
+  // regardless of entity.
+  const [studentCustomFields, setStudentCustomFields] = useState([]);
+  const [parentCustomFields, setParentCustomFields] = useState([]);
   const [customFieldValues, setCustomFieldValues] = useState(getDraft().customFieldValues || {});
   const [error, setError] = useState('');
 
@@ -39,7 +48,10 @@ export default function ApplyBioData() {
   useEffect(() => {
     document.title = 'Apply: Bio-Data | MCSS Portal';
     api.get('/config/public-classes', { auth: false }).then(setClassOptions).catch(() => {});
-    api.get('/custom-fields/values?entity=application', { auth: false }).then(setCustomFields).catch(() => setCustomFields([]));
+    api.get('/admissions/apply/config', { auth: false }).then((cfg) => {
+      setStudentCustomFields(cfg.student_custom_fields || []);
+      setParentCustomFields(cfg.parent_custom_fields || []);
+    }).catch(() => {});
   }, []);
 
   const set = (key) => (v) => setValues((prev) => ({ ...prev, [key]: v }));
@@ -66,6 +78,15 @@ export default function ApplyBioData() {
       if (values.has_guardian && !values.guardian_phone && !values.guardian_email) missing.push('guardian_phone_or_email');
       if (missing.length > 0) {
         setError(`Please complete all required fields before continuing (${missing.length} remaining).`);
+        return;
+      }
+      const requiredDynamic = [
+        ...studentCustomFields.filter((f) => f.required),
+        ...(values.has_guardian ? parentCustomFields.filter((f) => f.required) : []),
+      ];
+      const missingDynamic = requiredDynamic.filter((f) => !customFieldValues[f.field_id]);
+      if (missingDynamic.length > 0) {
+        setError(`Please complete all required fields before continuing: ${missingDynamic.map((f) => f.label).join(', ')}.`);
         return;
       }
     }
@@ -141,6 +162,14 @@ export default function ApplyBioData() {
                   </div>
                   <FormField field={{ key: 'guardian_phone', label: 'Guardian Phone', type: 'text' }} value={values.guardian_phone} onChange={set('guardian_phone')} />
                   <FormField field={{ key: 'guardian_email', label: 'Guardian Email', type: 'text' }} value={values.guardian_email} onChange={set('guardian_email')} />
+                  {parentCustomFields.map((f) => (
+                    <FormField
+                      key={f.field_id}
+                      field={{ key: f.field_id, label: f.label, type: f.field_type, required: f.required, options: (f.options || []).map((o) => ({ value: o, label: o })) }}
+                      value={customFieldValues[f.field_id] ?? ''}
+                      onChange={(v) => setCustomFieldValues((prev) => ({ ...prev, [f.field_id]: v }))}
+                    />
+                  ))}
                 </div>
               )}
             </section>
@@ -178,7 +207,7 @@ export default function ApplyBioData() {
               <SectionHeading icon="groups" title="Additional Information" />
               <div className="grid grid-cols-1 gap-lg">
                 <FormField field={{ key: 'siblings_in_school', label: 'Any sibling(s)/relative(s) already at Mount Carmel School?', type: 'text', placeholder: 'Name(s), or leave blank if none' }} value={values.siblings_in_school} onChange={set('siblings_in_school')} />
-                {customFields.length > 0 && customFields.map((f) => (
+                {studentCustomFields.map((f) => (
                   <FormField
                     key={f.field_id}
                     field={{ key: f.field_id, label: f.label, type: f.field_type, required: f.required, options: (f.options || []).map((o) => ({ value: o, label: o })) }}

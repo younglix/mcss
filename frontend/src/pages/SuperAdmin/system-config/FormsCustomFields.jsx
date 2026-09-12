@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Card from '../../../components/ui/Card.jsx';
 import Badge from '../../../components/ui/Badge.jsx';
 import Button from '../../../components/ui/Button.jsx';
@@ -26,6 +26,48 @@ function slugify(label) {
 }
 
 const emptyForm = { label: '', key: '', field_type: 'text', options: '', required: false, order: 0, is_sensitive: false };
+
+/** Requirement 9 — "view existing users with incomplete/newly added
+ * fields." Read-only: adding a required field here immediately surfaces
+ * every existing user who hasn't filled it in yet, with no re-registration
+ * or migration step of any kind — they just show up in this list. */
+function ProfileCompleteness({ entity }) {
+  const [rows, setRows] = useState(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    setRows(null);
+    setError('');
+    api.get(`/custom-fields/completeness?entity=${entity}`)
+      .then(setRows)
+      .catch(() => setError('Could not load the completeness report.'));
+  }, [entity]);
+
+  return (
+    <Card padding="lg" className="mt-lg">
+      <h3 className="font-headline-md text-headline-sm text-on-surface mb-xs">Profile Completeness</h3>
+      <p className="font-body-md text-body-md text-on-surface-variant mb-md">
+        {ENTITY_LABEL[entity]} accounts still missing a required field — including anyone whose account predates that
+        field being added.
+      </p>
+      {error && <p className="font-label-sm text-label-sm text-error">{error}</p>}
+      {!error && rows === null && <p className="font-label-sm text-label-sm text-on-surface-variant">Loading…</p>}
+      {!error && rows && rows.length === 0 && (
+        <p className="font-label-sm text-label-sm text-secondary">Everyone has every required field filled in.</p>
+      )}
+      {!error && rows && rows.length > 0 && (
+        <div className="space-y-xs">
+          {rows.map((r) => (
+            <div key={r.entity_id} className="flex flex-wrap items-center justify-between gap-sm p-sm rounded-lg border border-outline/10">
+              <span className="font-label-md text-label-md font-bold text-on-surface">{r.name}</span>
+              <span className="font-label-sm text-label-sm text-on-surface-variant">Missing: {r.missing_fields.join(', ')}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
 
 export default function SuperAdminFormsCustomFields() {
   const [entity, setEntity] = useState('student');
@@ -214,6 +256,8 @@ export default function SuperAdminFormsCustomFields() {
               </div>
             )}
           </Card>
+
+          <ProfileCompleteness entity={entity} />
         </div>
       )}
 

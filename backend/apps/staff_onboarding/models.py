@@ -40,13 +40,6 @@ class StaffApplication(BaseModel):
     sex = models.CharField(max_length=10, choices=Sex.choices, blank=True, default="")
     date_of_birth = models.DateField(null=True, blank=True)
 
-    # Academic staff types only (principal/teacher/exam_officer/accountant/
-    # hr) — copied into a custom_fields.CustomFieldValue for the real User
-    # at approval (nin masked, qualification plain), reusing the exact same
-    # masking system that already covers bank account numbers elsewhere.
-    nin = models.CharField(max_length=20, blank=True, default="")
-    qualification = models.CharField(max_length=150, blank=True, default="")
-
     # Teacher-only: the form/class-teacher claim. Validated against
     # ClassTeacherAssignment's one-teacher-per-class-arm-per-session rule at
     # approval time, not here — a public submission can claim anything; a
@@ -98,3 +91,28 @@ class StaffApplicationSubjectClaim(BaseModel):
 
     def __str__(self):
         return f"{self.subject.name} — {self.class_arm}"
+
+
+class StaffApplicationFieldValue(BaseModel):
+    """One Super-Admin-defined custom field's answer on a pending
+    application — NIN, Qualification, Account Number, or anything else the
+    Super Admin has added for the "staff" entity in Forms & Custom Fields.
+    There's no accounts.User yet to attach a real custom_fields.CustomFieldValue
+    to, so answers live here until approval, when
+    custom_fields.services.promote_pending_values() copies every row into a
+    real CustomFieldValue for the newly created user — the exact same
+    dynamic-field set the profile-edit screen renders, automatically,
+    with no onboarding-specific field list to keep in sync by hand."""
+
+    application = models.ForeignKey(StaffApplication, on_delete=models.CASCADE, related_name="field_values")
+    field = models.ForeignKey("custom_fields.CustomField", on_delete=models.CASCADE, related_name="+")
+    value = models.JSONField(null=True, blank=True)
+
+    class Meta(BaseModel.Meta):
+        ordering = ["field__order", "field__label"]
+        constraints = [
+            models.UniqueConstraint(fields=["application", "field"], condition=models.Q(is_deleted=False), name="unique_active_application_field"),
+        ]
+
+    def __str__(self):
+        return f"{self.field.label} @ {self.application_id}"

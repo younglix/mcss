@@ -125,6 +125,20 @@ function DetailDrawer({ application, onClose, reload }) {
           </div>
         </div>
 
+        {application.field_values && application.field_values.length > 0 && (
+          <div className="border-t border-outline/10 pt-md">
+            <h4 className="font-label-md text-label-md font-bold text-primary mb-sm">Additional Information</h4>
+            <div className="grid grid-cols-2 gap-md">
+              {application.field_values.map((f) => (
+                <div key={f.id}>
+                  <p className="font-label-sm text-label-sm text-on-surface-variant">{f.field_label}</p>
+                  <p className="font-label-md text-label-md">{f.value || '—'}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="border-t border-outline/10 pt-md">
           <h4 className="font-label-md text-label-md font-bold text-primary mb-sm">Documents</h4>
           {application.documents.length === 0 ? (

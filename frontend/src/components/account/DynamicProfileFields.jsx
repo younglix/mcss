@@ -5,16 +5,20 @@ import Badge from '../ui/Badge.jsx';
 import FormField from '../ui/FormField.jsx';
 import { api, ApiError } from '../../lib/api.js';
 
-/** Self-service "Edit Profile" (Requirement 1) — whatever extra fields the
- * Super Admin has defined for this user's own account type (staff, parent,
- * or student), fetched from /custom-fields/my-values. A sensitive field
+/** "Complete Profile Setup" — whatever extra fields the Super Admin has
+ * defined for this user's own account type (staff, parent, or student),
+ * fetched from /custom-fields/my-values. A field added later shows up here
+ * automatically, including for accounts that existed long before it did —
+ * nothing about this list is hardcoded per account type. A sensitive field
  * (NIN, bank account, ...) that's already saved comes back masked — even to
  * the person who entered it — and resaving the form leaves a masked field
  * untouched rather than overwriting it with the placeholder text.
  *
  * Locked (the Super Admin's global switch is closed) means read-only: the
  * fields still render so the user can see what's on file, but there's no
- * Save button. Mount this inside any portal's profile/account page. */
+ * Save button — this is a single switch for everyone, not a per-user
+ * one-time-then-locked state. Mount this inside any portal's profile/account
+ * page. */
 export default function DynamicProfileFields() {
   const [entity, setEntity] = useState(null);
   const [locked, setLocked] = useState(false);
@@ -62,11 +66,23 @@ export default function DynamicProfileFields() {
   // extra fields for yet (or applicants, who have no self-service profile).
   if (!loading && (entity === null || fields.length === 0)) return null;
 
+  // Purely informational — a completeness READOUT, not a lock state of its
+  // own. Whether the user can actually edit is governed entirely by
+  // `locked` (the Super Admin's single global switch); this just tells them
+  // (and nudges them) whether anything required is still missing.
+  const incompleteCount = fields.filter((f) => f.required && !values[f.field_id]).length;
+
   return (
     <Card padding="lg">
       <div className="flex items-center justify-between mb-md">
-        <h3 className="font-label-md text-primary uppercase border-b border-outline/10 pb-xs flex-1">Additional Information</h3>
-        {!loading && locked && <Badge tone="secondary">Locked</Badge>}
+        <div className="flex-1">
+          <h3 className="font-label-md text-primary uppercase border-b border-outline/10 pb-xs">Complete Profile Setup</h3>
+        </div>
+        <div className="flex items-center gap-xs shrink-0">
+          {!loading && incompleteCount > 0 && <Badge tone="warning">Incomplete</Badge>}
+          {!loading && incompleteCount === 0 && <Badge tone="success">Complete</Badge>}
+          {!loading && locked && <Badge tone="secondary">Locked</Badge>}
+        </div>
       </div>
 
       {error && <p className="font-label-md text-label-md text-error bg-error-container/20 border border-error/20 rounded-lg px-md py-sm mb-md">{error}</p>}

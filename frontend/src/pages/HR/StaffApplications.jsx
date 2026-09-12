@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AppShell from '../../components/layout/AppShell.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import Card from '../../components/ui/Card.jsx';
@@ -15,6 +15,74 @@ const ENDPOINTS = { applications: '/staff-applications/' };
 
 const STATUS_TONE = { submitted: 'secondary', under_review: 'warning', approved: 'success', rejected: 'error' };
 const STATUS_LABEL = { submitted: 'Submitted', under_review: 'Under Review', approved: 'Approved', rejected: 'Rejected' };
+
+/** HR's activate/deactivate control over the public registration link
+ * (Requirement 2/3) — a plain wrapper around its own narrowly-scoped
+ * endpoint, not the generic settings route (which would also hand HR every
+ * other system setting). Deactivating takes effect immediately: the same
+ * link stops accepting new submissions, it isn't rotated/regenerated. */
+function RegistrationToggle() {
+  const [state, setState] = useState(null); // { is_open, registration_path } | null while loading
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    api.get('/staff-applications/registration-toggle')
+      .then(setState)
+      .catch(() => setError('Could not load the current registration status.'));
+  }, []);
+
+  const toggle = async () => {
+    setSaving(true);
+    setError('');
+    try {
+      const next = await api.post('/staff-applications/registration-toggle', { is_open: !state.is_open });
+      setState(next);
+    } catch (err) {
+      setError(err.message || 'Could not change the registration status.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const copyLink = async () => {
+    const url = `${window.location.origin}${state.registration_path}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setError('Could not copy the link — copy it from the address bar instead.');
+    }
+  };
+
+  return (
+    <Card padding="lg">
+      <div className="flex items-center justify-between flex-wrap gap-md">
+        <div>
+          <h3 className="font-headline-md text-headline-sm text-on-surface">Staff Registration Link</h3>
+          <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+            While open, anyone with the link can submit a request to create their own staff account — nothing goes
+            live until you or Super Admin approve it. Closing it stops new submissions immediately.
+          </p>
+          {error && <p className="font-label-sm text-label-sm text-error mt-xs">{error}</p>}
+        </div>
+        {!state ? (
+          <span className="font-label-sm text-label-sm text-on-surface-variant">Loading…</span>
+        ) : (
+          <div className="flex items-center gap-sm shrink-0">
+            <Button variant="secondary" iconLeft="content_copy" onClick={copyLink}>{copied ? 'Copied!' : 'Copy Registration Link'}</Button>
+            <Button variant={state.is_open ? 'secondary' : 'primary'} onClick={toggle} disabled={saving}>
+              {saving ? 'Working…' : state.is_open ? 'Deactivate' : 'Activate'}
+            </Button>
+            <Badge tone={state.is_open ? 'success' : 'secondary'}>{state.is_open ? 'Open' : 'Closed'}</Badge>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
 
 function DetailDrawer({ application, onClose, reload }) {
   const [notes, setNotes] = useState(application?.review_notes || '');
@@ -80,20 +148,10 @@ function DetailDrawer({ application, onClose, reload }) {
             <p className="font-label-md text-label-md">{application.email || '—'} · {application.phone || '—'}</p>
           </div>
           {!isNonAcademic && (
-            <>
-              <div>
-                <p className="font-label-sm text-label-sm text-on-surface-variant">Sex / Date of Birth</p>
-                <p className="font-label-md text-label-md capitalize">{application.sex || '—'} · {application.date_of_birth || '—'}</p>
-              </div>
-              <div>
-                <p className="font-label-sm text-label-sm text-on-surface-variant">Qualification</p>
-                <p className="font-label-md text-label-md">{application.qualification || '—'}</p>
-              </div>
-              <div>
-                <p className="font-label-sm text-label-sm text-on-surface-variant">NIN</p>
-                <p className="font-label-md text-label-md">{application.nin || '—'}</p>
-              </div>
-            </>
+            <div>
+              <p className="font-label-sm text-label-sm text-on-surface-variant">Sex / Date of Birth</p>
+              <p className="font-label-md text-label-md capitalize">{application.sex || '—'} · {application.date_of_birth || '—'}</p>
+            </div>
           )}
           {isNonAcademic && (
             <div>
@@ -102,6 +160,20 @@ function DetailDrawer({ application, onClose, reload }) {
             </div>
           )}
         </div>
+
+        {!isNonAcademic && application.field_values.length > 0 && (
+          <div className="border-t border-outline/10 pt-md">
+            <h4 className="font-label-md text-label-md font-bold text-primary mb-sm">Account Details</h4>
+            <div className="grid grid-cols-2 gap-md">
+              {application.field_values.map((f) => (
+                <div key={f.id}>
+                  <p className="font-label-sm text-label-sm text-on-surface-variant">{f.field_label}</p>
+                  <p className="font-label-md text-label-md">{f.value || '—'}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {application.staff_type === 'teacher' && (
           <div className="border-t border-outline/10 pt-md">
@@ -165,6 +237,8 @@ export default function HRStaffApplications() {
           title="Staff Application Queue"
           subtitle="Review self-service account requests submitted through the public staff registration link."
         />
+
+        <RegistrationToggle />
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-md">
           {Object.entries(STATUS_LABEL).map(([key, label]) => (

@@ -1,6 +1,10 @@
 from rest_framework import serializers
 
-from .models import StaffApplication, StaffApplicationSubjectClaim
+from apps.custom_fields.models import CustomField
+from apps.custom_fields.serializers import CustomFieldValueItemSerializer
+from apps.custom_fields.services import mask_if_sensitive, missing_required_fields
+
+from .models import StaffApplication, StaffApplicationFieldValue, StaffApplicationSubjectClaim
 
 
 class _SubjectClaimInputSerializer(serializers.Serializer):
@@ -10,16 +14,21 @@ class _SubjectClaimInputSerializer(serializers.Serializer):
 
 class PublicStaffApplicationSubmitSerializer(serializers.ModelSerializer):
     """What a staff member fills in through the public link. staff_type
-    drives which other fields are actually required — see validate()."""
+    drives which other fields are actually required — see validate().
+    `custom_field_values` carries every Super-Admin-defined staff field
+    (NIN, Qualification, Account Number, ... whatever exists right now) —
+    the same dynamic field set the profile-edit screen renders, so adding a
+    new staff field never needs an onboarding-specific code change."""
 
+    custom_field_values = CustomFieldValueItemSerializer(many=True, required=False, write_only=True)
     subject_claims = _SubjectClaimInputSerializer(many=True, required=False, write_only=True)
 
     class Meta:
         model = StaffApplication
         fields = [
             "id", "staff_type", "full_name", "email", "phone", "sex", "date_of_birth",
-            "nin", "qualification", "is_form_teacher", "form_teacher_class_arm",
-            "non_academic_role_title", "subject_claims",
+            "is_form_teacher", "form_teacher_class_arm",
+            "non_academic_role_title", "custom_field_values", "subject_claims",
         ]
         read_only_fields = ["id"]
 
@@ -34,10 +43,10 @@ class PublicStaffApplicationSubmitSerializer(serializers.ModelSerializer):
             if not attrs.get("non_academic_role_title"):
                 raise serializers.ValidationError({"non_academic_role_title": "Enter your role (e.g. Cleaner, Driver)."})
         else:
-            if not attrs.get("nin"):
-                raise serializers.ValidationError({"nin": "NIN is required."})
-            if not attrs.get("qualification"):
-                raise serializers.ValidationError({"qualification": "Qualification is required."})
+            submitted_by_field_id = {str(v["field_id"]): v.get("value") for v in attrs.get("custom_field_values") or []}
+            missing = missing_required_fields(CustomField.Entity.STAFF, submitted_by_field_id)
+            if missing:
+                raise serializers.ValidationError({"custom_field_values": f"These fields are required: {', '.join(missing)}."})
             if staff_type == StaffApplication.StaffType.TEACHER:
                 if not attrs.get("subject_claims"):
                     raise serializers.ValidationError({"subject_claims": "Add at least one subject and class you teach."})
@@ -47,11 +56,17 @@ class PublicStaffApplicationSubmitSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         claims_data = validated_data.pop("subject_claims", [])
+        field_values_data = validated_data.pop("custom_field_values", [])
         application = StaffApplication.objects.create(**validated_data)
         for claim in claims_data:
             StaffApplicationSubjectClaim.objects.create(
                 application=application, subject_id=claim["subject"], class_arm_id=claim["class_arm"],
             )
+        for item in field_values_data:
+            field = CustomField.objects.filter(id=item["field_id"], entity=CustomField.Entity.STAFF, is_active=True).first()
+            if not field:
+                continue
+            StaffApplicationFieldValue.objects.create(application=application, field=field, value=item.get("value"))
         return application
 
 
@@ -68,6 +83,34 @@ class SubjectClaimSerializer(serializers.ModelSerializer):
         return f"{obj.class_arm.school_class.name} {obj.class_arm.name}"
 
 
+class StaffApplicationFieldValueSerializer(serializers.ModelSerializer):
+    field_key = serializers.CharField(source="field.key", read_only=True)
+    field_label = serializers.CharField(source="field.label", read_only=True)
+    field_type = serializers.CharField(source="field.field_type", read_only=True)
+    is_sensitive = serializers.BooleanField(source="field.is_sensitive", read_only=True)
+    is_masked = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+
+    class Meta:
+        model = StaffApplicationFieldValue
+        fields = ["id", "field", "field_key", "field_label", "field_type", "is_sensitive", "is_masked", "value"]
+        read_only_fields = fields
+
+    def get_value(self, obj):
+        viewer = self.context.get("request").user if self.context.get("request") else None
+        if viewer is None:
+            return obj.value
+        shown, _ = mask_if_sensitive(obj.field, obj.value, viewer)
+        return shown
+
+    def get_is_masked(self, obj):
+        viewer = self.context.get("request").user if self.context.get("request") else None
+        if viewer is None:
+            return False
+        _, is_masked = mask_if_sensitive(obj.field, obj.value, viewer)
+        return is_masked
+
+
 class StaffApplicationSerializer(serializers.ModelSerializer):
     """Full record for HR/Super Admin review."""
 
@@ -75,19 +118,20 @@ class StaffApplicationSerializer(serializers.ModelSerializer):
     reviewed_by_name = serializers.CharField(source="reviewed_by.full_name", read_only=True, default=None)
     form_teacher_class_arm_name = serializers.SerializerMethodField()
     subject_claims = SubjectClaimSerializer(many=True, read_only=True)
+    field_values = StaffApplicationFieldValueSerializer(many=True, read_only=True)
     created_user_identifier = serializers.CharField(source="created_user.identifier", read_only=True, default=None)
 
     class Meta:
         model = StaffApplication
         fields = [
             "id", "staff_type", "staff_type_label", "full_name", "email", "phone", "sex", "date_of_birth",
-            "nin", "qualification", "is_form_teacher", "form_teacher_class_arm", "form_teacher_class_arm_name",
-            "non_academic_role_title", "subject_claims",
+            "is_form_teacher", "form_teacher_class_arm", "form_teacher_class_arm_name",
+            "non_academic_role_title", "subject_claims", "field_values",
             "status", "submitted_at", "reviewed_by", "reviewed_by_name", "reviewed_at", "review_notes",
             "created_user", "created_user_identifier", "created_payout",
         ]
         read_only_fields = [
-            "id", "staff_type_label", "reviewed_by_name", "form_teacher_class_arm_name", "subject_claims",
+            "id", "staff_type_label", "reviewed_by_name", "form_teacher_class_arm_name", "subject_claims", "field_values",
             "status", "submitted_at", "reviewed_by", "reviewed_at",
             "created_user", "created_user_identifier", "created_payout",
         ]

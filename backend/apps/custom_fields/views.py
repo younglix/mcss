@@ -10,22 +10,9 @@ from common.responses import failure, success
 
 from .models import CustomField, CustomFieldValue
 from .serializers import CustomFieldSerializer, CustomFieldValueBulkUpsertSerializer
+from .services import MASKED_VALUE, mask_if_sensitive as _mask_if_sensitive
 
 User = get_user_model()
-
-# Shown in place of a saved sensitive value (NIN, bank account, ...) for
-# anyone who isn't the Super Admin — see Requirement 1: "masked once saved
-# and only fully visible to the Super Admin." Stored as plain text (no
-# encryption asked for); this is a display-time redaction only.
-MASKED_VALUE = "••••••"
-
-
-def _mask_if_sensitive(field, value, viewer):
-    """Whether `value` should be hidden from `viewer`, and what to show
-    instead. Only the Super Admin ever sees a saved sensitive value in full —
-    not even the staff/student/parent who entered it, and not HR."""
-    is_masked = bool(field.is_sensitive and value not in (None, "") and not viewer.is_superadmin)
-    return (MASKED_VALUE if is_masked else value), is_masked
 
 
 class CustomFieldsPermissionMixin:
@@ -109,6 +96,51 @@ class CustomFieldValuesView(PublicApplicationValuesMixin, CustomFieldsPermission
                 "value": shown, "is_masked": is_masked,
             })
         return success(data=data)
+
+
+class ProfileCompletenessView(CustomFieldsPermissionMixin, APIView):
+    """Requirement 9 — "View existing users with incomplete/newly added
+    fields." Read-only: with only the global self-edit switch (no per-user
+    lock state), this is a report to work from, not something with its own
+    unlock action — Super Admin corrects a gap the same way as any other
+    edit, via the existing admin custom-fields endpoints, or the affected
+    person fills it in themselves once self-editing is next open."""
+
+    def get(self, request):
+        entity = request.query_params.get("entity")
+        if entity not in CustomField.Entity.values:
+            return failure(message="A valid entity is required.", status=400)
+
+        required_fields = list(CustomField.objects.filter(entity=entity, is_active=True, required=True))
+        if not required_fields:
+            return success(data=[])
+
+        entities = _entities_for(entity)
+        values_by_entity = {}
+        for v in CustomFieldValue.objects.filter(field__in=required_fields, entity_id__in=[e["id"] for e in entities]):
+            values_by_entity.setdefault(str(v.entity_id), set()).add(str(v.field_id))
+
+        report = []
+        for e in entities:
+            have = values_by_entity.get(str(e["id"]), set())
+            missing = [f.label for f in required_fields if str(f.id) not in have]
+            if missing:
+                report.append({"entity_id": str(e["id"]), "name": e["name"], "missing_fields": missing})
+        return success(data=report)
+
+
+def _entities_for(entity):
+    """[{id, name}] for every real record of this custom-field entity type —
+    the same (entity, entity_id) shape CustomFieldValue rows key against."""
+    if entity == CustomField.Entity.STAFF:
+        return [{"id": u.id, "name": u.full_name} for u in User.objects.filter(user_type="staff", is_deleted=False, is_active=True)]
+    if entity == CustomField.Entity.PARENT:
+        return [{"id": u.id, "name": u.full_name} for u in User.objects.filter(user_type="parent", is_deleted=False, is_active=True)]
+    if entity == CustomField.Entity.STUDENT:
+        from apps.academics.models import Student
+
+        return [{"id": s.id, "name": s.user.full_name} for s in Student.objects.filter(is_deleted=False).select_related("user")]
+    return []
 
 
 class CustomFieldValuesBulkUpsertView(PublicApplicationValuesMixin, CustomFieldsPermissionMixin, APIView):

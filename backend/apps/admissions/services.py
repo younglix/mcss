@@ -143,6 +143,14 @@ def approve_application(application, reviewer):
         status=Student.Status.PENDING,
     )
 
+    from apps.custom_fields.models import CustomField
+    from apps.custom_fields.services import promote_pending_values
+
+    pending = list(application.field_values.select_related("field").all())
+    promote_pending_values(student.id, (p for p in pending if p.field.entity == CustomField.Entity.STUDENT))
+    if guardian_user:
+        promote_pending_values(guardian_user.id, (p for p in pending if p.field.entity == CustomField.Entity.PARENT))
+
     application.status = application.Status.ACCEPTED
     application.reviewed_by = reviewer
     application.reviewed_at = timezone.now()

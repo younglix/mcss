@@ -123,3 +123,29 @@ class ApplicationDocument(BaseModel):
 
     def __str__(self):
         return f"{self.title} — {self.application.reference_number}"
+
+
+class ApplicationFieldValue(BaseModel):
+    """One Super-Admin-defined custom field's answer on a pending
+    application — for entity="student" fields (about the applicant) and
+    entity="parent" fields (about the guardian) alike, collected on the
+    SAME public form since one application produces both accounts. There's
+    no Student/Parent User yet to attach a real custom_fields.CustomFieldValue
+    to, so answers live here until approval, when
+    custom_fields.services.promote_pending_values() copies each one into a
+    real CustomFieldValue for the new Student or guardian User (routed by
+    `field.entity`) — the exact same dynamic-field set the profile-edit
+    screens render. Mirrors apps.staff_onboarding.StaffApplicationFieldValue."""
+
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name="field_values")
+    field = models.ForeignKey("custom_fields.CustomField", on_delete=models.CASCADE, related_name="+")
+    value = models.JSONField(null=True, blank=True)
+
+    class Meta(BaseModel.Meta):
+        ordering = ["field__order", "field__label"]
+        constraints = [
+            models.UniqueConstraint(fields=["application", "field"], condition=models.Q(is_deleted=False), name="unique_active_application_custom_field"),
+        ]
+
+    def __str__(self):
+        return f"{self.field.label} @ {self.application_id}"

@@ -1,7 +1,9 @@
-"""Self-service "create my staff account" onboarding: public submit,
-HR/Super Admin review queue, and approval provisioning (real User + role +
-class/subject assignments for academic staff, or a plain
-NonAcademicStaffPayout row for non-academic staff — never both)."""
+"""Self-service "create my staff account" onboarding: an HR-toggled public
+link, a dynamic custom-field set shared with the profile-edit screens (no
+onboarding-specific field list to keep in sync), the HR/Super Admin review
+queue, and approval provisioning (real User + role + class/subject
+assignments for academic staff, or a plain NonAcademicStaffPayout row for
+non-academic staff — never both)."""
 
 from datetime import date
 
@@ -12,12 +14,13 @@ from rest_framework.test import APIClient
 from apps.academics.models import ClassSubjectAssignment, ClassTeacherAssignment, Subject
 from apps.configuration.models import AcademicSession, ClassArm, SchoolClass
 from apps.custom_fields.models import CustomField, CustomFieldValue
-from apps.custom_fields.views import MASKED_VALUE
+from apps.custom_fields.services import MASKED_VALUE
 from apps.finance.models import NonAcademicStaffPayout
 from apps.rbac.models import Permission, Role, RolePermission, UserRole
+from apps.settings_app.models import SystemSetting
 
 from . import services
-from .models import StaffApplication, StaffApplicationSubjectClaim
+from .models import StaffApplication, StaffApplicationFieldValue, StaffApplicationSubjectClaim
 
 User = get_user_model()
 
@@ -33,16 +36,20 @@ class StaffOnboardingTestBase(TestCase):
         self.maths = Subject.objects.create(name="Mathematics", code="MTH")
         self.physics = Subject.objects.create(name="Physics", code="PHY")
 
-        CustomField.objects.create(entity="staff", key="nin", label="NIN", field_type="text", is_sensitive=True)
-        CustomField.objects.create(entity="staff", key="qualification", label="Qualification", field_type="text")
+        self.nin_field = CustomField.objects.create(entity="staff", key="nin", label="NIN", field_type="text", required=True, is_sensitive=True)
+        self.qual_field = CustomField.objects.create(entity="staff", key="qualification", label="Qualification", field_type="text", required=True)
+
+        SystemSetting.objects.create(key="staff_onboarding.is_open", group="staff_onboarding", value=True)
 
         self.teacher_role = Role.objects.create(name="Teacher", slug="teacher")
         self.hr_role = Role.objects.create(name="HR", slug="hr")
         review_perm = Permission.objects.create(code="staff_applications.review", module="staff_applications", action="review")
         view_perm = Permission.objects.create(code="staff_applications.view", module="staff_applications", action="view")
+        edit_perm = Permission.objects.create(code="staff_applications.edit", module="staff_applications", action="edit")
         custom_fields_view_perm = Permission.objects.create(code="custom_fields.view", module="custom_fields", action="view")
         RolePermission.objects.create(role=self.hr_role, permission=review_perm)
         RolePermission.objects.create(role=self.hr_role, permission=view_perm)
+        RolePermission.objects.create(role=self.hr_role, permission=edit_perm)
         RolePermission.objects.create(role=self.hr_role, permission=custom_fields_view_perm)
 
         self.hr_user = User.objects.create(full_name="HR One", email="hr@x.io", user_type="staff", is_active=True)
@@ -52,14 +59,18 @@ class StaffOnboardingTestBase(TestCase):
         )
         self.client = APIClient()
 
-    def submit_teacher_application(self, **overrides):
+    def submit_teacher_application(self, nin="12345678901", qualification="B.Sc Mathematics", **overrides):
         fields = {
             "staff_type": StaffApplication.StaffType.TEACHER,
             "full_name": "Jane Teacher", "email": "jane@x.io", "phone": "08011112222",
-            "nin": "12345678901", "qualification": "B.Sc Mathematics",
         }
         fields.update(overrides)
-        return StaffApplication.objects.create(**fields)
+        application = StaffApplication.objects.create(**fields)
+        if nin is not None:
+            StaffApplicationFieldValue.objects.create(application=application, field=self.nin_field, value=nin)
+        if qualification is not None:
+            StaffApplicationFieldValue.objects.create(application=application, field=self.qual_field, value=qualification)
+        return application
 
 
 class PublicConfigAndSubmitTests(StaffOnboardingTestBase):
@@ -67,18 +78,34 @@ class PublicConfigAndSubmitTests(StaffOnboardingTestBase):
         res = self.client.get("/api/v1/staff-applications/config")
         body = res.json()["data"]
         self.assertEqual(res.status_code, 200)
+        self.assertTrue(body["is_open"])
         self.assertIn({"value": "teacher", "label": "Teacher"}, body["staff_types"])
         self.assertIn({"value": "non_academic", "label": "Non-Academic Staff"}, body["staff_types"])
         self.assertTrue(any(s["name"] == "Mathematics" for s in body["subjects"]))
         self.assertTrue(any(a["name"] == "SS-1 A" for a in body["class_arms"]))
+        self.assertTrue(any(f["key"] == "nin" for f in body["custom_fields"]))
+        self.assertTrue(any(f["key"] == "qualification" for f in body["custom_fields"]))
 
-    def test_teacher_submission_requires_nin_and_subject_claims(self):
+    def test_config_reflects_closed_registration(self):
+        SystemSetting.objects.filter(key="staff_onboarding.is_open").update(value=False)
+        res = self.client.get("/api/v1/staff-applications/config")
+        self.assertFalse(res.json()["data"]["is_open"])
+
+    def test_submit_rejected_when_registration_closed(self):
+        SystemSetting.objects.filter(key="staff_onboarding.is_open").update(value=False)
+        res = self.client.post("/api/v1/staff-applications/submit", {
+            "staff_type": "non_academic", "full_name": "Late Comer", "phone": "08000000000",
+            "non_academic_role_title": "Cleaner",
+        }, format="json")
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(StaffApplication.objects.count(), 0)
+
+    def test_teacher_submission_requires_dynamic_required_fields(self):
         res = self.client.post("/api/v1/staff-applications/submit", {
             "staff_type": "teacher", "full_name": "No NIN Guy", "email": "nonin@x.io",
         }, format="json")
         self.assertEqual(res.status_code, 400)
-        errors = res.json()["errors"]
-        self.assertIn("nin", errors)
+        self.assertIn("custom_field_values", res.json()["errors"])
 
     def test_non_academic_submission_only_needs_name_and_role_title(self):
         res = self.client.post("/api/v1/staff-applications/submit", {
@@ -89,10 +116,13 @@ class PublicConfigAndSubmitTests(StaffOnboardingTestBase):
         application = StaffApplication.objects.get(id=res.json()["data"]["id"])
         self.assertEqual(application.status, StaffApplication.Status.SUBMITTED)
 
-    def test_teacher_submission_with_claims_succeeds(self):
+    def test_teacher_submission_with_claims_and_dynamic_fields_succeeds(self):
         res = self.client.post("/api/v1/staff-applications/submit", {
             "staff_type": "teacher", "full_name": "Jane Teacher", "email": "jane2@x.io",
-            "nin": "12345678901", "qualification": "B.Sc Mathematics",
+            "custom_field_values": [
+                {"field_id": str(self.nin_field.id), "value": "12345678901"},
+                {"field_id": str(self.qual_field.id), "value": "B.Sc Mathematics"},
+            ],
             "is_form_teacher": True, "form_teacher_class_arm": str(self.ss1a.id),
             "subject_claims": [
                 {"subject": str(self.maths.id), "class_arm": str(self.ss1a.id)},
@@ -102,12 +132,65 @@ class PublicConfigAndSubmitTests(StaffOnboardingTestBase):
         self.assertEqual(res.status_code, 201, res.json())
         application = StaffApplication.objects.get(id=res.json()["data"]["id"])
         self.assertEqual(application.subject_claims.count(), 2)
+        self.assertEqual(application.field_values.count(), 2)
 
     def test_no_email_or_phone_is_rejected(self):
         res = self.client.post("/api/v1/staff-applications/submit", {
             "staff_type": "non_academic", "full_name": "No Contact", "non_academic_role_title": "Driver",
         }, format="json")
         self.assertEqual(res.status_code, 400)
+
+    def test_a_newly_added_field_is_immediately_required_with_no_code_change(self):
+        """The exact scenario point 6/7 of the spec describes: Super Admin
+        adds a new staff field, and it shows up in onboarding automatically."""
+        CustomField.objects.create(entity="staff", key="bvn", label="Bank Verification Number", field_type="text", required=True)
+        res = self.client.get("/api/v1/staff-applications/config")
+        self.assertTrue(any(f["key"] == "bvn" for f in res.json()["data"]["custom_fields"]))
+
+        res = self.client.post("/api/v1/staff-applications/submit", {
+            "staff_type": "teacher", "full_name": "Missing BVN", "email": "nobvn@x.io",
+            "custom_field_values": [
+                {"field_id": str(self.nin_field.id), "value": "12345678901"},
+                {"field_id": str(self.qual_field.id), "value": "B.Sc Mathematics"},
+            ],
+            "subject_claims": [{"subject": str(self.maths.id), "class_arm": str(self.ss1a.id)}],
+        }, format="json")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("Bank Verification Number", res.json()["errors"]["custom_field_values"][0])
+
+
+class RegistrationToggleTests(StaffOnboardingTestBase):
+    def test_anonymous_cannot_view_toggle_state(self):
+        res = self.client.get("/api/v1/staff-applications/registration-toggle")
+        self.assertEqual(res.status_code, 401)
+
+    def test_hr_can_view_and_change_toggle_state(self):
+        self.client.force_authenticate(self.hr_user)
+        res = self.client.get("/api/v1/staff-applications/registration-toggle")
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(res.json()["data"]["is_open"])
+
+        res = self.client.post("/api/v1/staff-applications/registration-toggle", {"is_open": False}, format="json")
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse(res.json()["data"]["is_open"])
+        self.assertFalse(bool(SystemSetting.objects.get(key="staff_onboarding.is_open").value))
+
+    def test_hr_closing_the_form_blocks_new_submissions(self):
+        self.client.force_authenticate(self.hr_user)
+        self.client.post("/api/v1/staff-applications/registration-toggle", {"is_open": False}, format="json")
+        self.client.logout()
+
+        res = self.client.post("/api/v1/staff-applications/submit", {
+            "staff_type": "non_academic", "full_name": "Too Late", "phone": "08000000000",
+            "non_academic_role_title": "Cleaner",
+        }, format="json")
+        self.assertEqual(res.status_code, 403)
+
+    def test_user_without_permission_cannot_toggle(self):
+        plain_staff = User.objects.create(full_name="Plain Staff", email="plain@x.io", user_type="staff", is_active=True)
+        self.client.force_authenticate(plain_staff)
+        res = self.client.post("/api/v1/staff-applications/registration-toggle", {"is_open": False}, format="json")
+        self.assertEqual(res.status_code, 403)
 
 
 class ReviewQueuePermissionTests(StaffOnboardingTestBase):
@@ -169,13 +252,11 @@ class TeacherApprovalTests(StaffOnboardingTestBase):
         application = self._make_and_approve(is_form_teacher=False)
         self.assertFalse(ClassTeacherAssignment.objects.filter(class_arm=self.ss1a, session=self.session).exists())
 
-    def test_nin_lands_masked_and_qualification_lands_plain(self):
+    def test_dynamic_fields_land_in_real_custom_field_values_masked_correctly(self):
         application = self._make_and_approve()
         user = application.created_user
-        nin_field = CustomField.objects.get(entity="staff", key="nin")
-        qual_field = CustomField.objects.get(entity="staff", key="qualification")
-        self.assertEqual(CustomFieldValue.objects.get(field=nin_field, entity_id=user.id).value, "12345678901")
-        self.assertEqual(CustomFieldValue.objects.get(field=qual_field, entity_id=user.id).value, "B.Sc Mathematics")
+        self.assertEqual(CustomFieldValue.objects.get(field=self.nin_field, entity_id=user.id).value, "12345678901")
+        self.assertEqual(CustomFieldValue.objects.get(field=self.qual_field, entity_id=user.id).value, "B.Sc Mathematics")
 
         # And the masking system that already covers bank account numbers
         # covers this too — a non-superadmin never sees it in full.
@@ -184,6 +265,23 @@ class TeacherApprovalTests(StaffOnboardingTestBase):
         self.assertEqual(res.status_code, 200, res.json())
         nin_entry = next(f for f in res.json()["data"] if f["key"] == "nin")
         self.assertEqual(nin_entry["value"], MASKED_VALUE)
+
+    def test_sensitive_field_is_masked_on_the_pending_application_itself(self):
+        application = self.submit_teacher_application()
+        self.client.force_authenticate(self.hr_user)  # HR, not Super Admin
+        res = self.client.get(f"/api/v1/staff-applications/{application.id}")
+        # RetrieveUpdateAPIView (unlike this app's plain APIViews) returns
+        # the serializer data unwrapped, matching admissions.ApplicationDetailView.
+        nin_entry = next(f for f in res.json()["field_values"] if f["field_key"] == "nin")
+        self.assertEqual(nin_entry["value"], MASKED_VALUE)
+        self.assertTrue(nin_entry["is_masked"])
+
+    def test_super_admin_sees_the_pending_nin_in_full(self):
+        application = self.submit_teacher_application()
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.get(f"/api/v1/staff-applications/{application.id}")
+        nin_entry = next(f for f in res.json()["field_values"] if f["field_key"] == "nin")
+        self.assertEqual(nin_entry["value"], "12345678901")
 
     def test_second_teacher_cannot_silently_steal_an_already_claimed_slot(self):
         first = self._make_and_approve()
