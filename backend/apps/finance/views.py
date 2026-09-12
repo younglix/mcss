@@ -16,7 +16,8 @@ from xhtml2pdf import pisa
 from apps.academics.models import Student
 from apps.admissions import paystack
 from apps.audit.services import log
-from apps.configuration.models import AcademicSession, SchoolProfile
+from apps.configuration.models import AcademicSession, FeeCategory, SchoolProfile
+from apps.configuration.serializers import FeeCategorySerializer
 from apps.notifications.services import dispatch
 from apps.rbac.permissions import HasPermission
 from apps.settings_app.models import SystemSetting
@@ -279,6 +280,72 @@ class MyPaymentsView(APIView):
             return failure(message="No student profile on this account.", status=403)
         qs = Payment.objects.filter(invoice__student=student).select_related("invoice__student__user")
         return success(data=PaymentSerializer(qs, many=True).data)
+
+
+class MyAvailableFeeItemsView(APIView):
+    """The catalog a student can browse in Fees & Receipts to self-create a
+    ticket for an optional/add-on fee (Sportswear, Textbooks, ID Card, ...) —
+    whatever the Super Admin has added to Fee Items. Only non-recurring
+    categories: a recurring one (Tuition, PTA Levy, ...) is priced and
+    scoped per class/session through FeeStructure and bulk-generated from
+    there, not something a student can bypass by clicking a button here."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = getattr(request.user, "student_profile", None)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        qs = FeeCategory.objects.filter(is_deleted=False, is_recurring=False, amount__isnull=False)
+        return success(data=FeeCategorySerializer(qs, many=True).data)
+
+
+class PurchaseFeeItemView(APIView):
+    """Turns a student's "I want to pay for this" click into a real
+    Invoice — the same record type staff create manually from Fee Items on
+    the Invoices admin page, just self-service and narrowly scoped to the
+    caller's own profile. Reuses InvoicePayView unmodified for the actual
+    payment once this ticket exists — one payment-initiation mechanism
+    either way. Idempotent: re-clicking while an unsettled ticket for this
+    exact fee item already exists in the current session returns that one
+    instead of creating a duplicate."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, fee_category_id):
+        student = getattr(request.user, "student_profile", None)
+        if student is None:
+            return failure(message="Only a student can create a fee ticket for themselves.", status=403)
+        category = get_object_or_404(FeeCategory, id=fee_category_id, is_deleted=False)
+        if category.is_recurring or category.amount is None:
+            return failure(message="This fee item isn't available for direct purchase.", status=400)
+
+        session = AcademicSession.objects.filter(is_current=True).first() or AcademicSession.objects.first()
+        if session is None:
+            return failure(message="No academic session is configured yet. Please contact the school.", status=503)
+
+        existing = Invoice.objects.filter(
+            student=student, session=session, description=category.name,
+        ).exclude(status__in=[Invoice.Status.PAID, Invoice.Status.WAIVED]).first()
+        if existing:
+            # `created` rides in the response body itself, not just the
+            # envelope `message` — api.js's request() only ever returns
+            # `payload.data` to callers, so a frontend can't otherwise tell
+            # "just created" apart from "already had one" here.
+            return success(
+                message="You already have an open ticket for this fee item.",
+                data={**InvoiceSerializer(existing).data, "created": False},
+            )
+
+        invoice = Invoice.objects.create(
+            student=student, session=session, description=category.name, amount=category.amount,
+        )
+        log(actor=request.user, action="finance.fee_item_ticket_created", target=invoice,
+            changes={"fee_category": str(category.id), "amount": str(category.amount)}, request=request)
+        return success(
+            message="Ticket created. Proceed to payment when you're ready.",
+            data={**InvoiceSerializer(invoice).data, "created": True}, status=201,
+        )
 
 
 def _child_or_403(request, student_id):

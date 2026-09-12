@@ -16,6 +16,9 @@ urlpatterns = [
     path("invoices/<uuid:invoice_id>/waive", views.InvoiceWaiveView.as_view(), name="finance-invoice-waive"),
     path("invoices/<uuid:invoice_id>/pay", views.InvoicePayView.as_view(), name="finance-invoice-pay"),
 
+    path("fee-items/mine", views.MyAvailableFeeItemsView.as_view(), name="finance-my-fee-items"),
+    path("fee-items/<uuid:fee_category_id>/purchase", views.PurchaseFeeItemView.as_view(), name="finance-fee-item-purchase"),
+
     path("payments", views.PaymentsView.as_view(), name="finance-payments"),
     path("payments/mine", views.MyPaymentsView.as_view(), name="finance-my-payments"),
     path("payments/child/<uuid:student_id>", views.ChildPaymentsView.as_view(), name="finance-child-payments"),

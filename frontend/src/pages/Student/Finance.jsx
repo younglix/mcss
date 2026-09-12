@@ -9,7 +9,7 @@ import { useDashboardData } from '../SuperAdmin/dashboard/useDashboardData.js';
 import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
 import { api, ApiError, getAccessToken } from '../../lib/api.js';
 
-const ENDPOINTS = { invoices: '/finance/invoices/mine', payments: '/finance/payments/mine' };
+const ENDPOINTS = { invoices: '/finance/invoices/mine', payments: '/finance/payments/mine', feeItems: '/finance/fee-items/mine' };
 
 const PURPOSE_LABEL = { acceptance_fee: 'Acceptance Fee', first_school_fee: 'First School Fee' };
 const STATUS_TONE = { unpaid: 'error', partial: 'warning', paid: 'success', waived: 'secondary' };
@@ -21,9 +21,31 @@ export default function StudentFinance() {
   const [payingId, setPayingId] = useState(null);
   const [payError, setPayError] = useState('');
   const [downloadingId, setDownloadingId] = useState(null);
+  const [purchasingId, setPurchasingId] = useState(null);
+  const [purchaseMessage, setPurchaseMessage] = useState('');
 
   const invoices = data?.invoices || [];
   const payments = data?.payments || [];
+  const feeItems = data?.feeItems || [];
+
+  const handlePurchase = async (item) => {
+    setPayError('');
+    setPurchaseMessage('');
+    setPurchasingId(item.id);
+    try {
+      const result = await api.post(`/finance/fee-items/${item.id}/purchase`, {});
+      setPurchaseMessage(
+        result.created
+          ? `Ticket created for ${item.name} — pay it below whenever you're ready.`
+          : `You already have an open ticket for ${item.name} — pay it below whenever you're ready.`,
+      );
+      reload();
+    } catch (err) {
+      setPayError(err instanceof ApiError ? err.message : 'Could not create a ticket for this fee item.');
+    } finally {
+      setPurchasingId(null);
+    }
+  };
 
   const handlePay = async (invoice) => {
     setPayError('');
@@ -70,6 +92,33 @@ export default function StudentFinance() {
           <Card padding="lg" className="border border-error/30 bg-error-container/10">
             <p className="font-body-md text-body-md text-on-surface">{error || payError}</p>
           </Card>
+        )}
+        {purchaseMessage && (
+          <Card padding="lg" className="border border-secondary/30 bg-secondary-container/10">
+            <p className="font-body-md text-body-md text-on-surface">{purchaseMessage}</p>
+          </Card>
+        )}
+
+        {!loading && feeItems.length > 0 && (
+          <div>
+            <h2 className="font-headline-md text-headline-sm text-primary mb-md">Available Fee Items</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
+              {feeItems.map((item) => (
+                <Card key={item.id} padding="lg" className="flex flex-col gap-sm">
+                  <p className="font-label-md text-label-md font-bold text-on-surface">{item.name}</p>
+                  <p className="font-headline-md text-headline-sm text-primary">₦{Number(item.amount).toLocaleString()}</p>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={purchasingId === item.id}
+                    onClick={() => handlePurchase(item)}
+                  >
+                    {purchasingId === item.id ? 'Creating…' : 'Create Ticket'}
+                  </Button>
+                </Card>
+              ))}
+            </div>
+          </div>
         )}
 
         {loading ? (

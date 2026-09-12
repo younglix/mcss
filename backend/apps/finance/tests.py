@@ -202,3 +202,99 @@ class PermissionGateTests(PayoutSheetTestBase):
         self.client.force_authenticate(self.hr_user)
         res = self.client.get(f"/api/v1/finance/payroll/payout-sheet?run={self.run.id}")
         self.assertEqual(res.status_code, 400)
+
+
+class FeeItemSelfServiceTests(TestCase):
+    """A student browsing Fee Items and self-creating a ticket (Invoice) for
+    an optional one-off fee — the flow InvoicePayView's own docstring already
+    anticipated ("later optional/add-on fees"), now wired up end to end."""
+
+    def setUp(self):
+        from datetime import date
+
+        from apps.academics.models import Student
+        from apps.configuration.models import AcademicSession, FeeCategory
+
+        self.session = AcademicSession.objects.create(
+            name="2026/2027", start_date=date(2026, 9, 1), end_date=date(2027, 7, 31), is_current=True,
+        )
+        self.sportswear = FeeCategory.objects.create(name="Sportswear", amount=Decimal("15000"), is_recurring=False)
+        self.tuition = FeeCategory.objects.create(name="Tuition", amount=Decimal("100000"), is_recurring=True)
+
+        self.student_user = User.objects.create(full_name="Student One", email="student1@x.io", user_type="student", is_active=True)
+        self.student = Student.objects.create(user=self.student_user, date_of_birth=date(2012, 1, 1))
+        self.other_staff = User.objects.create(full_name="Plain Staff", email="staff1@x.io", user_type="staff", is_active=True)
+        self.client = APIClient()
+
+    def test_student_sees_only_non_recurring_items(self):
+        self.client.force_authenticate(self.student_user)
+        res = self.client.get("/api/v1/finance/fee-items/mine")
+        self.assertEqual(res.status_code, 200)
+        names = [f["name"] for f in res.json()["data"]]
+        self.assertIn("Sportswear", names)
+        self.assertNotIn("Tuition", names)
+
+    def test_non_student_cannot_see_the_catalog(self):
+        self.client.force_authenticate(self.other_staff)
+        res = self.client.get("/api/v1/finance/fee-items/mine")
+        self.assertEqual(res.status_code, 403)
+
+    def test_anonymous_is_rejected(self):
+        res = self.client.get("/api/v1/finance/fee-items/mine")
+        self.assertEqual(res.status_code, 401)
+
+    def test_purchase_creates_a_real_invoice_owned_by_the_student(self):
+        self.client.force_authenticate(self.student_user)
+        res = self.client.post(f"/api/v1/finance/fee-items/{self.sportswear.id}/purchase", {}, format="json")
+        self.assertEqual(res.status_code, 201, res.json())
+        body = res.json()["data"]
+        self.assertEqual(body["description"], "Sportswear")
+        self.assertEqual(Decimal(body["amount"]), Decimal("15000"))
+        self.assertEqual(body["status"], "unpaid")
+
+        from .models import Invoice
+        invoice = Invoice.objects.get(id=body["id"])
+        self.assertEqual(invoice.student_id, self.student.id)
+        self.assertEqual(invoice.session_id, self.session.id)
+
+    def test_recurring_item_cannot_be_self_purchased(self):
+        self.client.force_authenticate(self.student_user)
+        res = self.client.post(f"/api/v1/finance/fee-items/{self.tuition.id}/purchase", {}, format="json")
+        self.assertEqual(res.status_code, 400)
+
+    def test_clicking_twice_does_not_create_a_duplicate_open_ticket(self):
+        self.client.force_authenticate(self.student_user)
+        first = self.client.post(f"/api/v1/finance/fee-items/{self.sportswear.id}/purchase", {}, format="json")
+        second = self.client.post(f"/api/v1/finance/fee-items/{self.sportswear.id}/purchase", {}, format="json")
+        self.assertEqual(first.json()["data"]["id"], second.json()["data"]["id"])
+        self.assertTrue(first.json()["data"]["created"])
+        self.assertFalse(second.json()["data"]["created"])
+
+        from .models import Invoice
+        self.assertEqual(Invoice.objects.filter(student=self.student, description="Sportswear").count(), 1)
+
+    def test_a_new_ticket_can_be_created_after_the_first_is_paid(self):
+        from .models import Invoice, Payment
+
+        self.client.force_authenticate(self.student_user)
+        first = self.client.post(f"/api/v1/finance/fee-items/{self.sportswear.id}/purchase", {}, format="json")
+        invoice = Invoice.objects.get(id=first.json()["data"]["id"])
+        Payment.objects.create(invoice=invoice, amount=Decimal("15000"))
+        invoice.refresh_status()
+        self.assertEqual(invoice.status, Invoice.Status.PAID)
+
+        second = self.client.post(f"/api/v1/finance/fee-items/{self.sportswear.id}/purchase", {}, format="json")
+        self.assertEqual(second.status_code, 201)
+        self.assertNotEqual(second.json()["data"]["id"], first.json()["data"]["id"])
+
+    def test_purchased_ticket_appears_in_the_students_own_invoice_list(self):
+        self.client.force_authenticate(self.student_user)
+        self.client.post(f"/api/v1/finance/fee-items/{self.sportswear.id}/purchase", {}, format="json")
+        res = self.client.get("/api/v1/finance/invoices/mine")
+        descriptions = [i["description"] for i in res.json()["data"]]
+        self.assertIn("Sportswear", descriptions)
+
+    def test_non_student_cannot_purchase(self):
+        self.client.force_authenticate(self.other_staff)
+        res = self.client.post(f"/api/v1/finance/fee-items/{self.sportswear.id}/purchase", {}, format="json")
+        self.assertEqual(res.status_code, 403)
