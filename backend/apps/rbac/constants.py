@@ -47,6 +47,7 @@ PERMISSIONS = {
     "inventory":    ["view", "create", "edit", "delete"],
     "assets":       ["view", "create", "edit", "delete", "assign"],
     "admissions":   ["view", "edit", "review"],
+    "staff_applications": ["view", "edit", "review"],
     "custom_fields": ["view", "edit"],
     "exam": ["view", "questions_submit", "bank_approve", "config_edit", "activate", "attempt_reset", "grading_edit", "monitor"],
     # ...expands per module as later phases land
@@ -119,6 +120,7 @@ DEFAULT_ROLES = {
             "users.view", "users.create", "users.edit", "users.delete", "users.reset_password",
             "roles.view", "roles.assign",
             "custom_fields.view", "custom_fields.edit",
+            "staff_applications.view", "staff_applications.edit", "staff_applications.review",
             "hr.view", "hr.create", "hr.edit", "hr.delete", "hr.approve",
             "staff_attendance.view", "staff_attendance.create", "staff_attendance.edit",
             "contracts.view", "contracts.create", "contracts.edit", "contracts.delete",

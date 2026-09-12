@@ -1,6 +1,7 @@
 import Landing from './pages/Public/Landing.jsx';
 import LandingDesktop from './pages/Public/LandingDesktop.jsx';
 import Login from './pages/Public/Login.jsx';
+import StaffOnboarding from './pages/Public/StaffOnboarding.jsx';
 import ApplyIntro from './pages/Public/ApplyNow/Intro.jsx';
 import ApplyBioData from './pages/Public/ApplyNow/BioDataForm.jsx';
 import ApplyDocumentUpload from './pages/Public/ApplyNow/DocumentUpload.jsx';
@@ -118,6 +119,7 @@ import BursaryFinancialReports from './pages/Bursary/FinancialReports.jsx';
 import BursaryCommunication from './pages/Bursary/Communication.jsx';
 import HRDashboard from './pages/HR/Dashboard.jsx';
 import HREmployeeRecords from './pages/HR/EmployeeRecords.jsx';
+import HRStaffApplications from './pages/HR/StaffApplications.jsx';
 import HRRecruitment from './pages/HR/Recruitment.jsx';
 import HRAttendance from './pages/HR/Attendance.jsx';
 import HRLeave from './pages/HR/Leave.jsx';
@@ -177,6 +179,7 @@ export const routes = [
   { path: "/", label: "Public Landing", source: "mcss_landing_page_mobile_elite", element: <Landing /> },
   { path: "/landing-desktop", label: "Public Desktop Landing", source: "mcss_landing_page", element: <LandingDesktop /> },
   { path: "/login", label: "Portal Login", source: "portal_login_mcss", element: <Login /> },
+  { path: "/staff/register", label: "Staff Registration", source: "staff_onboarding_public_form", element: <StaffOnboarding /> },
   { path: "/apply", label: "Apply Intro", source: "admission_application_intro", element: <ApplyIntro /> },
   { path: "/apply/bio-data", label: "Apply Bio Data", source: "admission_application_bio_data", element: <ApplyBioData /> },
   { path: "/apply/documents", label: "Apply Documents", source: "admission_application_document_upload", element: <ApplyDocumentUpload /> },
@@ -295,6 +298,7 @@ export const routes = [
   { path: "/bursary/communication", label: "Bursary Communication", source: "bursary_communication", element: <BursaryCommunication /> },
   { path: "/hr", label: "HR Dashboard", source: "hr_dashboard", element: <HRDashboard /> },
   { path: "/hr/employees", label: "HR Employee Records", source: "hr_employees", element: <HREmployeeRecords /> },
+  { path: "/hr/staff-applications", label: "HR Staff Applications", source: "hr_staff_applications", element: <HRStaffApplications /> },
   { path: "/hr/recruitment", label: "HR Recruitment", source: "hr_recruitment", element: <HRRecruitment /> },
   { path: "/hr/attendance", label: "HR Staff Attendance", source: "hr_attendance", element: <HRAttendance /> },
   { path: "/hr/leave", label: "HR Leave", source: "hr_leave", element: <HRLeave /> },

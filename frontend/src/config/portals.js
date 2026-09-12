@@ -300,6 +300,7 @@ export const portals = {
     sidebarNav: [
       { key: 'dashboard', label: 'Dashboard', icon: 'dashboard', path: '/hr', status: 'active' },
       { key: 'employees', label: 'Employee Records', icon: 'badge', path: '/hr/employees', status: 'active' },
+      { key: 'staff-applications', label: 'Staff Applications', icon: 'how_to_reg', path: '/hr/staff-applications', status: 'active' },
       { key: 'recruitment', label: 'Recruitment', icon: 'person_search', path: '/hr/recruitment', status: 'active' },
       { key: 'attendance', label: 'Staff Attendance', icon: 'fingerprint', path: '/hr/attendance', status: 'active' },
       { key: 'leave', label: 'Leave', icon: 'event_busy', path: '/hr/leave', status: 'active' },
