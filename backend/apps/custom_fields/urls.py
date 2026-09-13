@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path("attachments/upload", views.CustomFieldAttachmentUploadView.as_view(), name="custom-fields-attachment-upload"),
     path("values", views.CustomFieldValuesView.as_view(), name="custom-fields-values"),
     path("values/bulk", views.CustomFieldValuesBulkUpsertView.as_view(), name="custom-fields-values-bulk"),
     path("my-values", views.MyProfileFieldsView.as_view(), name="custom-fields-my-values"),

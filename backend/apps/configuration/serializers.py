@@ -8,6 +8,7 @@ from .models import (
     GradeScale,
     SchoolClass,
     SchoolProfile,
+    SiteMedia,
     Term,
 )
 
@@ -72,3 +73,10 @@ class FeeCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = FeeCategory
         fields = ["id", "name", "is_recurring", "amount"]
+
+
+class SiteMediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteMedia
+        fields = ["id", "placement", "media_type", "url", "caption", "order"]
+        read_only_fields = ["id"]

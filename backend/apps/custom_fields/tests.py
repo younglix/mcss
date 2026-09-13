@@ -4,7 +4,8 @@ over everyone's self-editing.
 """
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 
 from apps.academics.models import Student
@@ -281,3 +282,80 @@ class ProfileCompletenessTests(ProfileFieldsTestBase):
     def test_requires_permission(self):
         res = self.client.get("/api/v1/custom-fields/completeness?entity=staff")
         self.assertEqual(res.status_code, 401)
+
+
+class AttachmentUploadTests(TestCase):
+    """The 'attachment' field type's backing upload endpoint — the one
+    upload endpoint in the app that must work unauthenticated, since custom
+    fields render on public forms (Admissions Apply, Staff Onboarding) too.
+    Storage is redirected to a throwaway temp directory so these tests
+    don't leave real files behind in the project's media/ folder."""
+
+    def setUp(self):
+        import shutil
+        import tempfile
+
+        self.tmp_media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp_media, ignore_errors=True)
+        self.client = APIClient()
+
+    def test_storage_not_configured_outside_debug_refuses_upload(self):
+        # No override_settings here — real test settings (DEBUG=False, no
+        # S3 creds) — the upload must be refused, not silently accepted.
+        pdf = SimpleUploadedFile("doc.pdf", b"%PDF-1.4 fake", content_type="application/pdf")
+        res = self.client.post("/api/v1/custom-fields/attachments/upload", {"file": pdf}, format="multipart")
+        self.assertEqual(res.status_code, 503)
+
+    @override_settings(DEBUG=True)
+    def test_unauthenticated_upload_of_an_allowed_type_succeeds(self):
+        with override_settings(MEDIA_ROOT=self.tmp_media):
+            pdf = SimpleUploadedFile("birth-certificate.pdf", b"%PDF-1.4 fake pdf bytes", content_type="application/pdf")
+            res = self.client.post("/api/v1/custom-fields/attachments/upload", {"file": pdf}, format="multipart")
+        self.assertEqual(res.status_code, 200, res.json())
+        data = res.json()["data"]
+        self.assertTrue(data["url"])
+        self.assertEqual(data["file_name"], "birth-certificate.pdf")
+
+    @override_settings(DEBUG=True)
+    def test_rejects_a_disallowed_extension(self):
+        with override_settings(MEDIA_ROOT=self.tmp_media):
+            exe = SimpleUploadedFile("virus.exe", b"MZ fake exe bytes", content_type="application/octet-stream")
+            res = self.client.post("/api/v1/custom-fields/attachments/upload", {"file": exe}, format="multipart")
+        self.assertEqual(res.status_code, 400)
+
+    @override_settings(DEBUG=True)
+    def test_rejects_a_file_over_the_size_limit(self):
+        with override_settings(MEDIA_ROOT=self.tmp_media):
+            big = SimpleUploadedFile("big.pdf", b"x" * (10 * 1024 * 1024 + 1), content_type="application/pdf")
+            res = self.client.post("/api/v1/custom-fields/attachments/upload", {"file": big}, format="multipart")
+        self.assertEqual(res.status_code, 400)
+
+    @override_settings(DEBUG=True)
+    def test_no_file_is_rejected(self):
+        with override_settings(MEDIA_ROOT=self.tmp_media):
+            res = self.client.post("/api/v1/custom-fields/attachments/upload", {}, format="multipart")
+        self.assertEqual(res.status_code, 400)
+
+    @override_settings(DEBUG=True)
+    def test_uploaded_url_can_be_saved_as_an_attachment_field_value_end_to_end(self):
+        field = CustomField.objects.create(
+            entity=CustomField.Entity.STUDENT, key="birth_cert", label="Birth Certificate",
+            field_type=CustomField.FieldType.ATTACHMENT,
+        )
+        student_user = User.objects.create(full_name="Attach Kid", email="attachkid@x.io", user_type="student", is_active=True)
+        student = Student.objects.create(user=student_user)
+
+        with override_settings(MEDIA_ROOT=self.tmp_media):
+            pdf = SimpleUploadedFile("cert.pdf", b"%PDF-1.4 fake", content_type="application/pdf")
+            upload_res = self.client.post("/api/v1/custom-fields/attachments/upload", {"file": pdf}, format="multipart")
+        self.assertEqual(upload_res.status_code, 200, upload_res.json())
+        url = upload_res.json()["data"]["url"]
+
+        self.client.force_authenticate(student_user)
+        save_res = self.client.put("/api/v1/custom-fields/my-values", {
+            "values": [{"field_id": str(field.id), "value": url}],
+        }, format="json")
+        self.assertEqual(save_res.status_code, 200, save_res.json())
+
+        stored = CustomFieldValue.objects.get(field=field, entity_id=student.id)
+        self.assertEqual(stored.value, url)

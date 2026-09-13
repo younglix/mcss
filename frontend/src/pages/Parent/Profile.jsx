@@ -2,6 +2,7 @@ import AppShell from '../../components/layout/AppShell.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import Card from '../../components/ui/Card.jsx';
 import DynamicProfileFields from '../../components/account/DynamicProfileFields.jsx';
+import ProfilePictureField from '../../components/account/ProfilePictureField.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 function Field({ label, value }) {
@@ -22,10 +23,8 @@ export default function ParentProfile() {
         <PageHeader title="My Profile" subtitle="Your own account details. For your children's records, see Children's Profiles." />
 
         <Card padding="lg">
-          <div className="flex items-center gap-lg mb-lg">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-primary text-[32px]">person</span>
-            </div>
+          <div className="flex items-center justify-between gap-lg mb-lg flex-wrap">
+            <ProfilePictureField />
             <h2 className="font-headline-sm text-headline-sm text-primary">{user?.full_name}</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-lg">

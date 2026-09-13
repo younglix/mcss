@@ -113,6 +113,43 @@ class GradeScale(BaseModel):
         return f"{self.name} ({self.min_score}-{self.max_score})"
 
 
+class SiteMedia(BaseModel):
+    """One Super-Admin-uploaded image or video for a named spot on a public
+    page — the login page's desktop slider, a landing-page section (hero,
+    about, a feature card), or the school album. One shared model/CRUD
+    instead of a separate one-off system per spot: every one of these is
+    the same shape (an ordered list of media for a named placement), they
+    just differ in which `placement` they're filtered to and how the
+    frontend renders that placement's list."""
+
+    class Placement(models.TextChoices):
+        LOGIN_SLIDER = "login_slider", "Login Page Slider"
+        HERO = "hero", "Landing Hero"
+        ABOUT_1 = "about_1", "About Image 1"
+        ABOUT_2 = "about_2", "About Image 2"
+        CARD = "card", "Feature Card"
+        GALLERY_1 = "gallery_1", "Gallery 1"
+        GALLERY_2 = "gallery_2", "Gallery 2"
+        GALLERY_3 = "gallery_3", "Gallery 3"
+        ALBUM = "album", "School Album"
+
+    class MediaType(models.TextChoices):
+        IMAGE = "image", "Image"
+        VIDEO = "video", "Video"
+
+    placement = models.CharField(max_length=20, choices=Placement.choices)
+    media_type = models.CharField(max_length=10, choices=MediaType.choices, default=MediaType.IMAGE)
+    url = models.CharField(max_length=500)
+    caption = models.CharField(max_length=200, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta(BaseModel.Meta):
+        ordering = ["placement", "order"]
+
+    def __str__(self):
+        return f"{self.get_placement_display()} — {self.url}"
+
+
 class FeeCategory(BaseModel):
     name = models.CharField(max_length=100, unique=True)   # "Tuition", "ICT", "Development"
     is_recurring = models.BooleanField(default=True)

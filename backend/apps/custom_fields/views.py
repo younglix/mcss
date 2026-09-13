@@ -1,7 +1,13 @@
+import uuid
+from pathlib import Path
+
+from django.conf import settings as django_settings
 from django.contrib.auth import get_user_model
+from django.core.files.storage import default_storage
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from apps.audit.services import log
@@ -63,6 +69,44 @@ class CustomFieldDetailView(CustomFieldsPermissionMixin, RetrieveUpdateDestroyAP
     def perform_destroy(self, instance):
         log(actor=self.request.user, action="custom_fields.field_deleted", target=instance, request=self.request)
         instance.delete()
+
+
+class CustomFieldAttachmentUploadView(APIView):
+    """Raw file upload backing the 'attachment' custom-field type — same
+    storage plumbing as every other upload endpoint in the app (S3 when
+    configured, local disk only in DEBUG). Deliberately public: custom
+    fields render on unauthenticated forms too (the Admissions Apply
+    wizard, Staff Onboarding registration — see PublicApplicationValuesMixin
+    above and apps.staff_onboarding's own public config view), and a
+    field's value has to already be a real URL by the time that form is
+    submitted, same as every other field type's value already works. This
+    is the one upload endpoint in the app that doesn't require login, so
+    unlike its siblings (HRFileUploadView, MyTeachingResourceUploadView,
+    AssetUploadView) it's rate-limited and restricted to a fixed set of
+    document/image extensions rather than "any file"."""
+
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "public_upload"
+    MAX_BYTES = 10 * 1024 * 1024
+    ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"}
+
+    def post(self, request):
+        if not django_settings.DEBUG and not django_settings.S3_CONFIGURED:
+            return failure(message="File storage isn't configured yet.", status=503)
+        file = request.FILES.get("file")
+        if not file:
+            return failure(message="No file provided.", status=400)
+        if file.size > self.MAX_BYTES:
+            return failure(message="File must be smaller than 10MB.", status=400)
+        ext = Path(file.name).suffix.lower()
+        if ext not in self.ALLOWED_EXTENSIONS:
+            return failure(message="Only PDF, JPG, PNG, DOC, or DOCX files are allowed.", status=400)
+        saved_path = default_storage.save(f"custom-field-attachments/{uuid.uuid4().hex}{ext}", file)
+        url = default_storage.url(saved_path)
+        actor = request.user if request.user.is_authenticated else None
+        log(actor=actor, action="custom_fields.attachment_uploaded", changes={"path": saved_path}, request=request)
+        return success(data={"url": url, "file_name": file.name})
 
 
 class CustomFieldValuesView(PublicApplicationValuesMixin, CustomFieldsPermissionMixin, APIView):

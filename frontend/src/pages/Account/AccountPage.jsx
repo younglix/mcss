@@ -5,6 +5,7 @@ import Card from '../../components/ui/Card.jsx';
 import Button from '../../components/ui/Button.jsx';
 import FormField from '../../components/ui/FormField.jsx';
 import DynamicProfileFields from '../../components/account/DynamicProfileFields.jsx';
+import ProfilePictureField from '../../components/account/ProfilePictureField.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useDashboardData } from '../SuperAdmin/dashboard/useDashboardData.js';
 import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
@@ -66,10 +67,8 @@ export default function AccountPage({ portalId }) {
         <PageHeader title="My Account" subtitle="Your identity, password, and active sign-ins." />
 
         <Card padding="lg">
-          <div className="flex items-center gap-lg mb-lg">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-primary text-[32px]">person</span>
-            </div>
+          <div className="flex items-center justify-between gap-lg mb-lg flex-wrap">
+            <ProfilePictureField />
             <div>
               <h2 className="font-headline-sm text-headline-sm text-primary">{user?.full_name}</h2>
               {roles?.length > 0 && <p className="font-label-sm text-label-sm text-on-surface-variant capitalize">{roles.join(', ')}</p>}

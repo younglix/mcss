@@ -5,6 +5,7 @@ import PageHeader from '../../../components/ui/PageHeader.jsx';
 import { useAuth } from '../../../context/AuthContext.jsx';
 import SuperAdminGeneralSettings from './General.jsx';
 import SuperAdminAppearanceSettings from './Appearance.jsx';
+import SuperAdminLoginPageSettings from './LoginPage.jsx';
 import SuperAdminAcademicSettings from './Academic.jsx';
 import SuperAdminStudentAdmissionSettings from './StudentAdmission.jsx';
 import SuperAdminStaffHRSettings from './StaffHR.jsx';
@@ -25,6 +26,7 @@ import SuperAdminIntegrations from './Integrations.jsx';
 const SECTIONS = [
   { key: 'general', label: 'General', icon: 'domain', Component: SuperAdminGeneralSettings },
   { key: 'appearance', label: 'Appearance', icon: 'palette', Component: SuperAdminAppearanceSettings },
+  { key: 'login-page', label: 'Login Page', icon: 'wallpaper', Component: SuperAdminLoginPageSettings },
   { key: 'academic', label: 'Academic', icon: 'grading', Component: SuperAdminAcademicSettings },
   { key: 'student-admission', label: 'Student & Admission', icon: 'school', Component: SuperAdminStudentAdmissionSettings },
   { key: 'staff-hr', label: 'Staff & HR', icon: 'badge', Component: SuperAdminStaffHRSettings },

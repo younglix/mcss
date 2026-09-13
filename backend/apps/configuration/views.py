@@ -9,7 +9,7 @@ from apps.rbac.permissions import HasPermission
 from common.responses import failure, success
 
 from . import services
-from .models import AcademicSession, ClassArm, Department, FeeCategory, GradeScale, SchoolClass, SchoolProfile, Term
+from .models import AcademicSession, ClassArm, Department, FeeCategory, GradeScale, SchoolClass, SchoolProfile, SiteMedia, Term
 from .serializers import (
     AcademicSessionSerializer,
     ClassArmSerializer,
@@ -18,6 +18,7 @@ from .serializers import (
     GradeScaleSerializer,
     SchoolClassSerializer,
     SchoolProfileSerializer,
+    SiteMediaSerializer,
     TermSerializer,
 )
 
@@ -211,6 +212,57 @@ class GradeScaleDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         log(actor=self.request.user, action="config.grade_scale_deleted", target=instance, request=self.request)
         instance.delete()
+
+
+class SiteMediaView(ConfigPermissionMixin, ListCreateAPIView):
+    """Super Admin's manager for a named placement's ordered media list —
+    the login page slider, a landing-page section, or the album. `?placement=`
+    is required on GET/POST since every caller only ever wants one spot's
+    list at a time (the frontend page for that spot), never the whole table."""
+
+    serializer_class = SiteMediaSerializer
+
+    def get_queryset(self):
+        qs = SiteMedia.objects.all()
+        placement = self.request.query_params.get("placement")
+        if placement:
+            qs = qs.filter(placement=placement)
+        return qs
+
+    def perform_create(self, serializer):
+        placement = serializer.validated_data.get("placement")
+        next_order = (SiteMedia.objects.filter(placement=placement).order_by("-order").values_list("order", flat=True).first() or 0) + 1
+        media = serializer.save(order=next_order)
+        log(actor=self.request.user, action="config.site_media_created", target=media, request=self.request)
+
+
+class SiteMediaDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = SiteMediaSerializer
+    queryset = SiteMedia.objects.all()
+    lookup_url_kwarg = "media_id"
+
+    def perform_update(self, serializer):
+        media = serializer.save()
+        log(actor=self.request.user, action="config.site_media_updated", target=media, request=self.request)
+
+    def perform_destroy(self, instance):
+        log(actor=self.request.user, action="config.site_media_deleted", target=instance, request=self.request)
+        instance.delete()
+
+
+class PublicSiteMediaView(APIView):
+    """Unauthenticated — every page that shows Super-Admin-managed media
+    (login slider, landing sections, album) is public. Same `?placement=`
+    filter as the admin view, just no auth/edit capability."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        placement = request.query_params.get("placement")
+        if not placement:
+            return failure(message="placement is required.", status=400)
+        qs = SiteMedia.objects.filter(placement=placement)
+        return success(data=SiteMediaSerializer(qs, many=True).data)
 
 
 class FeeCategoriesView(ConfigPermissionMixin, ListCreateAPIView):

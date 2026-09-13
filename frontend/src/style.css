@@ -950,3 +950,14 @@ textarea {
     display: none !important;
   }
 }
+
+/* LoginImageSlider's "ken_burns" transition style — a slow continuous
+   pan/zoom while an image is active, distinct from every other style
+   (which is purely an enter/exit transition). Every other style is
+   expressed entirely via inline transform/opacity/filter, so this is the
+   one transition that needs an actual @keyframes rule (React inline
+   styles can't declare one). */
+@keyframes kenBurnsPan {
+  from { transform: scale(1); }
+  to { transform: scale(1.12) translate(-1.5%, -1.5%); }
+}

@@ -43,7 +43,7 @@ export default function PublicHeader() {
           <div className="flex items-center gap-md">
             <PreferenceControls className="hidden sm:flex" />
             <Link to="/login" className="hidden sm:inline-flex bg-primary text-on-primary px-lg py-2 font-label-md rounded-sm hover:opacity-90 transition-all">
-              Staff Login
+              Portal Login
             </Link>
             <button className="md:hidden text-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu">
               <span className="material-symbols-outlined text-3xl">menu</span>
@@ -76,7 +76,7 @@ export default function PublicHeader() {
             onClick={() => setMenuOpen(false)}
             className="w-full block text-center bg-tertiary-container text-on-tertiary-container py-4 font-label-md font-bold tracking-widest uppercase rounded"
           >
-            Staff Login
+            Portal Login
           </Link>
         </div>
       </div>

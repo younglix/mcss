@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useBranding } from '../../context/BrandingContext.jsx';
+import { api } from '../../lib/api.js';
+import LoginImageSlider from '../../components/public/LoginImageSlider.jsx';
 
 const inputClasses = 'mcss-field w-full pl-11 pr-md hover:border-primary';
 
@@ -40,9 +42,16 @@ export default function Login() {
   const [formError, setFormError] = useState('');
   const [otpChallenge, setOtpChallenge] = useState(null); // { challengeId } once 2FA is required
   const [otpCode, setOtpCode] = useState('');
+  const [sliderImages, setSliderImages] = useState([]);
 
   useEffect(() => {
     document.title = 'Portal Login | MCSS Portal';
+  }, []);
+
+  useEffect(() => {
+    api.get('/config/site-media/public?placement=login_slider', { auth: false })
+      .then(setSliderImages)
+      .catch(() => setSliderImages([]));
   }, []);
 
   const canSubmit = identifier.trim().length > 0 && password.length > 0;
@@ -85,6 +94,12 @@ export default function Login() {
   return (
     <main className="flex min-h-screen w-full bg-surface-container-lowest">
       <section className="hidden lg:flex flex-col justify-between w-[45%] bg-nav p-xl relative overflow-hidden">
+        <LoginImageSlider
+          images={sliderImages}
+          transitionStyle={branding.login_transition_style}
+          durationSeconds={branding.login_transition_duration}
+        />
+        {sliderImages.length > 0 && <div className="absolute inset-0 bg-nav/70" />}
         <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-primary-container rounded-full blur-[100px] opacity-30" />
         <div className="relative z-10 flex flex-col h-full">
           <Link to="/" className="flex items-center gap-md">
@@ -166,14 +181,9 @@ export default function Login() {
             </div>
 
             <div className="flex flex-col gap-xs">
-              <div className="flex justify-between items-end">
-                <label className="font-label-md text-on-surface-variant" htmlFor="password">
-                  Password
-                </label>
-                <a className="font-label-sm text-secondary hover:underline" href="#">
-                  Reset access?
-                </a>
-              </div>
+              <label className="font-label-md text-on-surface-variant" htmlFor="password">
+                Password
+              </label>
               <div className="relative">
                 <span className="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">lock</span>
                 <input
@@ -257,12 +267,6 @@ export default function Login() {
           )}
 
           <footer className="flex flex-col gap-md pt-lg border-t border-outline/10">
-            <div className="flex justify-between items-center text-on-surface-variant font-label-sm">
-              <span>Need account activation?</span>
-              <a className="text-primary font-label-md underline" href="#">
-                Request Access
-              </a>
-            </div>
             <div className="bg-surface-container-high p-md rounded-lg flex gap-md items-start">
               <span className="material-symbols-outlined text-secondary">info</span>
               <p className="font-label-sm text-on-surface-variant">

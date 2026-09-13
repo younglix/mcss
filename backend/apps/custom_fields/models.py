@@ -21,6 +21,7 @@ class CustomField(BaseModel):
         DATE = "date", "Date"
         SELECT = "select", "Dropdown"
         CHECKBOX = "checkbox", "Yes/No"
+        ATTACHMENT = "attachment", "Attachment"
 
     entity = models.CharField(max_length=20, choices=Entity.choices)
     key = models.SlugField(max_length=60)

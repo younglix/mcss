@@ -1,8 +1,11 @@
 import logging
+import uuid
 from datetime import timedelta
+from pathlib import Path
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -240,6 +243,44 @@ class MeView(APIView):
             ),
             "permissions": sorted(get_effective_permissions(request.user)),
         })
+
+
+class MyAvatarView(APIView):
+    """Self-service profile picture — applies uniformly to every account
+    type (student/parent/staff all share accounts.User), so this is one
+    endpoint rather than one per portal. Deliberately strict compared to
+    every other image/file upload in the app (40KB, not 5-15MB): this is
+    the one explicit size limit the spec calls for, not a mistake. Upload
+    sets accounts.User.avatar directly (never trusts a client-supplied
+    URL) so there's no separate 'save the profile' step."""
+
+    permission_classes = [IsAuthenticated]
+    MAX_BYTES = 40 * 1024
+
+    def post(self, request):
+        if not settings.DEBUG and not settings.S3_CONFIGURED:
+            return failure(message="File storage isn't configured yet.", status=503)
+        file = request.FILES.get("file")
+        if not file:
+            return failure(message="No file provided.", status=400)
+        if not (file.content_type or "").startswith("image/"):
+            return failure(message="Only image files are allowed.", status=400)
+        if file.size > self.MAX_BYTES:
+            return failure(message="Profile picture must be smaller than 40KB.", status=400)
+
+        ext = Path(file.name).suffix.lower() or ".jpg"
+        saved_path = default_storage.save(f"avatars/{uuid.uuid4().hex}{ext}", file)
+        url = default_storage.url(saved_path)
+        request.user.avatar = url
+        request.user.save(update_fields=["avatar"])
+        log(actor=request.user, action="accounts.avatar_updated", target=request.user, request=request)
+        return success(message="Profile picture updated.", data={"avatar": url})
+
+    def delete(self, request):
+        request.user.avatar = None
+        request.user.save(update_fields=["avatar"])
+        log(actor=request.user, action="accounts.avatar_removed", target=request.user, request=request)
+        return success(message="Profile picture removed.")
 
 
 class PasswordForgotView(APIView):

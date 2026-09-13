@@ -3,6 +3,7 @@ import PageHeader from '../../components/ui/PageHeader.jsx';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
 import DynamicProfileFields from '../../components/account/DynamicProfileFields.jsx';
+import ProfilePictureField from '../../components/account/ProfilePictureField.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useDashboardData } from '../SuperAdmin/dashboard/useDashboardData.js';
 import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
@@ -42,10 +43,8 @@ export default function StudentProfile() {
         ) : (
           <>
             <Card padding="lg">
-              <div className="flex items-center gap-lg mb-lg">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-primary text-[32px]">person</span>
-                </div>
+              <div className="flex items-center justify-between gap-lg mb-lg flex-wrap">
+                <ProfilePictureField />
                 <div>
                   <h2 className="font-headline-sm text-headline-sm text-primary">{identity?.full_name}</h2>
                   {profile && <Badge tone={STATUS_TONE[profile.status]}>{profile.status}</Badge>}

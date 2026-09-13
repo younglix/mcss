@@ -32,6 +32,7 @@ class PublicBrandingView(APIView):
     def get(self, request):
         profile = SchoolProfile.objects.first()
         appearance = {s.key: s.value for s in SystemSetting.objects.filter(group="appearance", is_secret=False)}
+        login = {s.key: s.value for s in SystemSetting.objects.filter(group="login", is_secret=False)}
         return success(data={
             "name": profile.name if profile else "",
             "short_name": profile.short_name if profile else "",
@@ -46,6 +47,8 @@ class PublicBrandingView(APIView):
             "address": profile.address if profile else "",
             "phone": profile.phone if profile else "",
             "email": profile.email if profile else "",
+            "login_transition_style": login.get("login.transition_style", "fade"),
+            "login_transition_duration": login.get("login.transition_duration", 5),
         })
 
 

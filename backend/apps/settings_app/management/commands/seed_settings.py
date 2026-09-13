@@ -77,6 +77,12 @@ DEFAULT_SETTINGS = [
     ("appearance.report_branding_enabled", "appearance", True, False),
     ("appearance.invoice_branding_enabled", "appearance", True, False),
     ("appearance.certificate_branding_enabled", "appearance", True, False),
+    # Login page desktop slider — see configuration.SiteMedia (placement=
+    # login_slider) for the actual images; these two just control how the
+    # rotation plays. transition_style is validated against a fixed list on
+    # the frontend (see LoginImageSlider.jsx), not enforced here.
+    ("login.transition_style", "login", "fade", False),
+    ("login.transition_duration", "login", 5, False),
     # More numbering formats (genuinely consumed — see settings_app/numbering.py
     # and its call sites in academics.StudentCreateSerializer, the new
     # apps.admissions app, and apps.finance's Invoice/Payment/Expense .save()).

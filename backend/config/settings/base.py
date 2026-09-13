@@ -141,6 +141,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "auth": "10/min",
         "otp": "5/min",
+        "public_upload": "20/hour",
     },
 }
 

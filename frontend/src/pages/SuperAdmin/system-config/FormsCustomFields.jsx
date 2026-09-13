@@ -19,6 +19,7 @@ const ENTITY_LABEL = Object.fromEntries(ENTITY_TABS.map((t) => [t.key, t.label])
 
 const TYPE_LABELS = {
   text: 'Text', textarea: 'Paragraph', number: 'Number', date: 'Date', select: 'Dropdown', checkbox: 'Yes/No',
+  attachment: 'Attachment',
 };
 
 function slugify(label) {

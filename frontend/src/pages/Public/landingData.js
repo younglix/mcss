@@ -3,11 +3,13 @@
 // /settings/public-website-content and /settings/public-branding; see
 // LandingContent.jsx and PublicFooter.jsx. These link labels stay static
 // since they're plain in-page anchors/placeholders, not editable settings.
+// The Portal Login button in PublicHeader is the one login entry point —
+// no separate role-labeled nav link ("Student Portal", "Staff Login", ...)
+// duplicating it here.
 export const navLinks = [
   { label: 'Home', path: '/' },
   { label: 'Admissions', path: '/apply' },
   { label: 'Academics', path: '/#academics' },
-  { label: 'Student Portal', path: '/login' },
 ];
 
 export const footerLinks = {

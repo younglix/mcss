@@ -21,4 +21,7 @@ urlpatterns = [
     path("grade-scales/<uuid:grade_scale_id>", views.GradeScaleDetailView.as_view(), name="config-grade-scale-detail"),
     path("fee-categories", views.FeeCategoriesView.as_view(), name="config-fee-categories"),
     path("fee-categories/<uuid:fee_category_id>", views.FeeCategoryDetailView.as_view(), name="config-fee-category-detail"),
+    path("site-media", views.SiteMediaView.as_view(), name="config-site-media"),
+    path("site-media/public", views.PublicSiteMediaView.as_view(), name="config-site-media-public"),
+    path("site-media/<uuid:media_id>", views.SiteMediaDetailView.as_view(), name="config-site-media-detail"),
 ]

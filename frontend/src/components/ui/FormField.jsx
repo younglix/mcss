@@ -1,3 +1,5 @@
+import AttachmentUploadField from './AttachmentUploadField.jsx';
+
 const fieldClasses = 'mcss-field w-full px-md';
 
 export default function FormField({ field, value, onChange, error }) {
@@ -38,6 +40,10 @@ export default function FormField({ field, value, onChange, error }) {
           </option>
         ))}
       </select>
+    );
+  } else if (field.type === 'attachment') {
+    return (
+      <AttachmentUploadField label={field.label} required={field.required} value={value} onChange={onChange} />
     );
   } else if (field.type === 'checkbox') {
     return (

@@ -83,6 +83,7 @@ export function AuthProvider({ children }) {
     verifyOtp,
     logout,
     hasPermission,
+    refresh: hydrate,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

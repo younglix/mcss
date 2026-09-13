@@ -66,7 +66,7 @@ export default function ProfileMenu({ portalId }) {
   return (
     <div className="relative" ref={containerRef}>
       <button type="button" onClick={() => setOpen((v) => !v)} aria-label="Account menu" className="rounded-full">
-        <Avatar alt={user?.full_name} fallbackInitials={initials} size="sm" className="ml-xs" />
+        <Avatar src={user?.avatar} alt={user?.full_name} fallbackInitials={initials} size="sm" className="ml-xs" />
       </button>
       {open && (
         <div className="absolute right-0 mt-sm w-64 bg-surface-container-lowest border border-outline/10 rounded-lg shadow-lg z-40 overflow-hidden">
