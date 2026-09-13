@@ -9,6 +9,7 @@ import DashboardPageShell from '../../SuperAdmin/dashboard/DashboardPageShell.js
 import { useDashboardData } from '../../SuperAdmin/dashboard/useDashboardData.js';
 import { EmptyState } from '../../SuperAdmin/dashboard/dashboardHelpers.jsx';
 import { api, ApiError } from '../../../lib/api.js';
+import { copyText } from '../../../lib/clipboard.js';
 
 const ENDPOINTS = {
   exams: '/exam/exams', banks: '/exam/banks', classes: '/config/classes',
@@ -43,11 +44,11 @@ export default function ExamOfficerExams() {
   const examLinkFor = (code) => `${window.location.origin}/exam-access?code=${code}`;
 
   const copyToClipboard = async (text, field) => {
-    try {
-      await navigator.clipboard.writeText(text);
+    const ok = await copyText(text);
+    if (ok) {
       setCopiedField(field);
       setTimeout(() => setCopiedField(''), 2000);
-    } catch {
+    } else {
       setActionError('Could not copy — copy it manually instead.');
     }
   };

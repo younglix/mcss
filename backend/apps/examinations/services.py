@@ -93,9 +93,10 @@ def sync_scores_to_academic_exam(exam):
     synced = 0
     for attempt in graded:
         existing = ExamScore.objects.filter(exam=exam.academic_exam, student=attempt.student, subject=exam.subject).first()
-        ca_score = existing.ca_score if existing else None
+        ca1_score = existing.ca1_score if existing else None
+        ca2_score = existing.ca2_score if existing else None
         exam_score = attempt.raw_score
-        score = (float(ca_score) + float(exam_score)) if ca_score is not None else exam_score
+        score = (float(ca1_score) + float(ca2_score or 0) + float(exam_score)) if ca1_score is not None else exam_score
         # max_score is the subject's whole-exam scale (CA + exam combined,
         # typically 100 — see ExamScoreBulkEntrySerializer's own default),
         # not this CBE sitting's own total_marks — only set it when there's
@@ -106,7 +107,7 @@ def sync_scores_to_academic_exam(exam):
             exam=exam.academic_exam, student=attempt.student, subject=exam.subject,
             defaults={
                 "score": score, "max_score": max_score, "exam_score": exam_score,
-                "ca_score": ca_score, "remark": existing.remark if existing else "",
+                "ca1_score": ca1_score, "ca2_score": ca2_score, "remark": existing.remark if existing else "",
             },
         )
         synced += 1

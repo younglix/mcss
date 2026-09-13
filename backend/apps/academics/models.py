@@ -207,11 +207,15 @@ class ExamScore(BaseModel):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name="exam_scores")
     score = models.DecimalField(max_digits=5, decimal_places=2)
     max_score = models.DecimalField(max_digits=5, decimal_places=2, default=100)
-    # Optional CA/Exam breakdown for the compiled report card. When both are
-    # supplied, `score` is server-computed as their sum (see ExamScoresView)
-    # rather than trusted as independently entered — a subject not split
-    # into components just leaves these null and keeps using `score` as-is.
-    ca_score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    # Optional CA1/CA2/Exam breakdown for the compiled report card. When
+    # ca1_score and exam_score are both supplied, `score` is server-computed
+    # as their sum (plus ca2_score, if also given) — see ExamScoresView —
+    # rather than trusted as independently entered. ca2_score is optional
+    # even when split scoring is used: a subject with only one continuous
+    # assessment this term just leaves it null. A subject not split into
+    # components at all leaves all three null and keeps using `score` as-is.
+    ca1_score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    ca2_score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     exam_score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     remark = models.CharField(max_length=100, blank=True)
     entered_by = models.ForeignKey(
@@ -244,14 +248,22 @@ class ReportCardRemark(BaseModel):
 
 
 class SkillRating(BaseModel):
-    """Psychomotor & affective skills block on the report card (punctuality,
-    neatness, etc.), rated 1-5, one row per skill per student per exam."""
+    """Affective & psychomotor skills block on the report card, rated 0-5,
+    one row per skill per student per exam. The official report card
+    template splits these into two separate tables (see AFFECTIVE_SKILLS /
+    PSYCHOMOTOR_SKILLS below) rather than one combined list."""
 
     class Skill(models.TextChoices):
-        PUNCTUALITY = "punctuality", "Punctuality"
-        NEATNESS = "neatness", "Neatness"
-        LEADERSHIP = "leadership", "Leadership"
+        # Affective
         HONESTY = "honesty", "Honesty"
+        NEATNESS = "neatness", "Neatness"
+        PUNCTUALITY = "punctuality", "Punctuality"
+        TEAMWORK = "teamwork", "Teamwork"
+        # Psychomotor
+        GAMES_SPORT = "games_sport", "Games/Sport"
+        HANDWRITING = "handwriting", "Handwriting"
+        INTEREST_IN_ARTS = "interest_in_arts", "Interest in Arts"
+        MUSIC = "music", "Music"
 
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name="skill_ratings")
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="skill_ratings")
@@ -263,6 +275,10 @@ class SkillRating(BaseModel):
 
     def __str__(self):
         return f"{self.student} — {self.get_skill_display()}: {self.rating}"
+
+
+AFFECTIVE_SKILLS = [SkillRating.Skill.HONESTY, SkillRating.Skill.NEATNESS, SkillRating.Skill.PUNCTUALITY, SkillRating.Skill.TEAMWORK]
+PSYCHOMOTOR_SKILLS = [SkillRating.Skill.GAMES_SPORT, SkillRating.Skill.HANDWRITING, SkillRating.Skill.INTEREST_IN_ARTS, SkillRating.Skill.MUSIC]
 
 
 class ResultSubmission(BaseModel):

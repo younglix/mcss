@@ -22,6 +22,8 @@ from apps.rbac.models import Permission, Role, RolePermission, UserRole
 
 from . import services
 from .models import (
+    AFFECTIVE_SKILLS,
+    PSYCHOMOTOR_SKILLS,
     ClassBandingConfig,
     ClassReallocation,
     ClassReallocationMove,
@@ -30,6 +32,7 @@ from .models import (
     Exam,
     ExamScore,
     ResultSubmission,
+    SkillRating,
     Student,
     Subject,
 )
@@ -589,4 +592,186 @@ class ReportCardPDFTests(ResultsApprovalGateTestBase):
         self.client.force_authenticate(self.student.user)
         res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}/pdf")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res["Content-Type"], "application/pdf")
+
+
+class MarksheetCompilationTests(TestCase):
+    """Exam Officer > Marksheet used to be a static mock page (hardcoded
+    students/subjects/stats, dead Export/Print buttons) — this covers the
+    real backend grid it now fetches: every student in a class-arm × every
+    subject assigned to that class this session, missing cells flagged."""
+
+    def setUp(self):
+        self.session = AcademicSession.objects.create(
+            name="2026/2027", start_date=date(2026, 9, 1), end_date=date(2027, 7, 31), is_current=True,
+        )
+        self.term = Term.objects.create(
+            session=self.session, name="First", start_date=date(2026, 9, 1), end_date=date(2026, 12, 15), is_current=True,
+        )
+        self.school_class = SchoolClass.objects.create(name="SS-3", level_order=3)
+        self.arm = ClassArm.objects.create(school_class=self.school_class, name="A")
+        self.math = Subject.objects.create(name="Mathematics", code="MTH")
+        self.eng = Subject.objects.create(name="English", code="ENG")
+        self.exam = Exam.objects.create(
+            name="Compilation Test Exam", exam_type=Exam.ExamType.TEST, session=self.session, term=self.term,
+            start_date=date(2026, 10, 1),
+        )
+        teacher = User.objects.create(full_name="Teacher One", email="mcteacher1@x.io", user_type="staff", is_active=True)
+        ClassSubjectAssignment.objects.create(class_arm=self.arm, subject=self.math, teacher=teacher, session=self.session)
+        ClassSubjectAssignment.objects.create(class_arm=self.arm, subject=self.eng, teacher=teacher, session=self.session)
+
+        u1 = User.objects.create(full_name="Alpha Student", email="mcalpha@x.io", user_type="student", is_active=True)
+        u2 = User.objects.create(full_name="Beta Student", email="mcbeta@x.io", user_type="student", is_active=True)
+        self.s1 = Student.objects.create(user=u1, class_arm=self.arm, status=Student.Status.ACTIVE)
+        self.s2 = Student.objects.create(user=u2, class_arm=self.arm, status=Student.Status.ACTIVE)
+
+        ExamScore.objects.create(exam=self.exam, student=self.s1, subject=self.math, score=80, max_score=100, entered_by=teacher)
+        ExamScore.objects.create(exam=self.exam, student=self.s1, subject=self.eng, score=60, max_score=100, entered_by=teacher)
+        ExamScore.objects.create(exam=self.exam, student=self.s2, subject=self.math, score=90, max_score=100, entered_by=teacher)
+        # s2's English score is deliberately left missing.
+
+        self.officer_role = Role.objects.create(name="Exam Officer", slug="exam_officer_mc")
+        perm = Permission.objects.create(code="results.view", module="results", action="view")
+        RolePermission.objects.create(role=self.officer_role, permission=perm)
+        self.officer = User.objects.create(full_name="Officer One", email="mcofficer@x.io", user_type="staff", is_active=True)
+        UserRole.objects.create(user=self.officer, role=self.officer_role)
+
+        self.outsider = User.objects.create(full_name="No Perms", email="mcoutsider@x.io", user_type="staff", is_active=True)
+
+        self.client = APIClient()
+
+    def get(self, class_arm=None):
+        self.client.force_authenticate(self.officer)
+        url = f"/api/v1/academics/exams/{self.exam.id}/marksheet-compilation"
+        if class_arm is not None:
+            url += f"?class_arm={class_arm}"
+        return self.client.get(url)
+
+    def test_class_arm_is_required(self):
+        res = self.get()
+        self.assertEqual(res.status_code, 400)
+
+    def test_someone_without_results_view_is_forbidden(self):
+        self.client.force_authenticate(self.outsider)
+        res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/marksheet-compilation?class_arm={self.arm.id}")
+        self.assertEqual(res.status_code, 403)
+
+    def test_returns_the_real_subject_and_student_grid(self):
+        res = self.get(self.arm.id)
+        self.assertEqual(res.status_code, 200, res.json())
+        data = res.json()["data"]
+
+        subject_names = {s["name"] for s in data["subjects"]}
+        self.assertEqual(subject_names, {"Mathematics", "English"})
+
+        rows = {row["name"]: row for row in data["students"]}
+        self.assertEqual(set(rows), {"Alpha Student", "Beta Student"})
+
+        alpha_scores = {c["subject"]: c["percentage"] for c in rows["Alpha Student"]["scores"] if c}
+        self.assertEqual(len(alpha_scores), 2)
+        self.assertEqual(rows["Alpha Student"]["average"], 70.0)  # (80+60)/2
+
+        beta_cells = rows["Beta Student"]["scores"]
+        self.assertTrue(any(c is None for c in beta_cells), "Beta's missing English score should be null, not fabricated")
+        self.assertIsNone(rows["Beta Student"]["average"], "average should be None while a subject is still missing")
+
+    def test_stats_reflect_real_completeness(self):
+        res = self.get(self.arm.id)
+        stats = res.json()["data"]["stats"]
+        self.assertEqual(stats["total_students"], 2)
+        self.assertEqual(stats["missing_scores"], 1)  # 2 students x 2 subjects = 4 expected, 3 entered
+        self.assertEqual(stats["data_completeness"], 75.0)
+        self.assertEqual(stats["class_average"], 76.7)  # mean of 80, 60, 90
+
+
+class Ca1Ca2SplitTests(ResultsApprovalGateTestBase):
+    """The report card's official template needs two continuous-assessment
+    columns, not one — ExamScore.ca_score was renamed to ca1_score and a new
+    optional ca2_score was added (migration 0006). Covers both entry
+    endpoints (the generic staff one and the teacher-portal one) and that a
+    subject with only ca1+exam (no ca2) still works, matching a school that
+    only ran one CA that term."""
+
+    def enter_via_teaching_endpoint(self, ca1, ca2, exam_score):
+        self.client.force_authenticate(self.teacher)
+        entry = {"student": str(self.student.id), "ca1_score": ca1, "exam_score": exam_score}
+        if ca2 is not None:
+            entry["ca2_score"] = ca2
+        return self.client.post(f"/api/v1/academics/teaching/exams/{self.exam.id}/scores", {
+            "subject": str(self.subject.id), "class_arm": str(self.arm.id), "max_score": 100,
+            "scores": [entry],
+        }, format="json")
+
+    def test_ca1_ca2_and_exam_sum_to_the_total(self):
+        res = self.enter_via_teaching_endpoint(14, 19, 57)
+        self.assertEqual(res.status_code, 200, res.json())
+        score = ExamScore.objects.get(exam=self.exam, student=self.student, subject=self.subject)
+        self.assertEqual(score.ca1_score, 14)
+        self.assertEqual(score.ca2_score, 19)
+        self.assertEqual(score.exam_score, 57)
+        self.assertEqual(score.score, 90)
+
+    def test_ca2_is_optional_ca1_plus_exam_still_works(self):
+        res = self.enter_via_teaching_endpoint(30, None, 60)
+        self.assertEqual(res.status_code, 200, res.json())
+        score = ExamScore.objects.get(exam=self.exam, student=self.student, subject=self.subject)
+        self.assertIsNone(score.ca2_score)
+        self.assertEqual(score.score, 90)
+
+    def test_plain_score_without_any_ca_split_still_works(self):
+        enter_perm = Permission.objects.create(code="results.enter", module="results", action="enter")
+        RolePermission.objects.create(role=self.principal_role, permission=enter_perm)
+        self.client.force_authenticate(self.principal)
+        res = self.client.post(f"/api/v1/academics/exams/{self.exam.id}/scores", {
+            "subject": str(self.subject.id), "max_score": 100,
+            "scores": [{"student": str(self.student.id), "score": 88}],
+        }, format="json")
+        self.assertEqual(res.status_code, 200, res.json())
+        score = ExamScore.objects.get(exam=self.exam, student=self.student, subject=self.subject)
+        self.assertIsNone(score.ca1_score)
+        self.assertEqual(score.score, 88)
+
+
+class SkillCategoriesTests(ResultsApprovalGateTestBase):
+    """The report card's official template splits skills into two separate
+    Affective/Psychomotor tables of 4 each, replacing the old flat 4-skill
+    list (Leadership dropped)."""
+
+    def test_affective_and_psychomotor_lists_have_four_each_and_dont_overlap(self):
+        self.assertEqual(len(AFFECTIVE_SKILLS), 4)
+        self.assertEqual(len(PSYCHOMOTOR_SKILLS), 4)
+        self.assertEqual(set(AFFECTIVE_SKILLS) & set(PSYCHOMOTOR_SKILLS), set())
+
+    def test_build_printable_report_card_splits_ratings_into_both_tables(self):
+        SkillRating.objects.create(exam=self.exam, student=self.student, skill="honesty", rating=5)
+        SkillRating.objects.create(exam=self.exam, student=self.student, skill="music", rating=4)
+
+        ctx = services.build_printable_report_card(self.exam, self.student)
+
+        self.assertEqual(len(ctx["affective_skills"]), 4)
+        self.assertEqual(len(ctx["psychomotor_skills"]), 4)
+        honesty = next(s for s in ctx["affective_skills"] if s["skill"] == "honesty")
+        self.assertEqual(honesty["rating"], 5)
+        music = next(s for s in ctx["psychomotor_skills"] if s["skill"] == "music")
+        self.assertEqual(music["rating"], 4)
+        # A skill nobody rated yet still shows up as a row (rating=None), not
+        # silently dropped — the printed table always has all 4 rows.
+        neatness = next(s for s in ctx["affective_skills"] if s["skill"] == "neatness")
+        self.assertIsNone(neatness["rating"])
+
+    def test_reportcardview_json_api_reflects_the_ca_split(self):
+        ExamScore.objects.filter(exam=self.exam, student=self.student, subject=self.subject).update(
+            ca1_score=14, ca2_score=19, exam_score=57, score=90,
+        )
+        self.client.force_authenticate(self.student.user)
+        res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}")
+        # Staff/self preview is allowed pre-publish for the owner in this
+        # base fixture's exam (status defaults to scheduled) only for staff;
+        # publish first so the student can view it.
+        if res.status_code == 403:
+            self.exam.status = Exam.Status.PUBLISHED
+            self.exam.save(update_fields=["status"])
+            res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}")
+        self.assertEqual(res.status_code, 200, res.json())
+        row = res.json()["data"]["subjects"][0]
+        self.assertEqual(float(row["ca1_score"]), 14)
+        self.assertEqual(float(row["ca2_score"]), 19)

@@ -939,3 +939,14 @@ textarea {
     font-size: 16px;
   }
 }
+
+/* AppShell already applies this class to its sidebar/topbar chrome (and
+   Tailwind's print: variants elsewhere) expecting it to hide them on
+   print, but the rule itself was never migrated out of the unused
+   stitch-exported.css — every portal's "Print" button was printing the
+   full app chrome alongside the content until this was added. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

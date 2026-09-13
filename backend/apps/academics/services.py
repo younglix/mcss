@@ -645,7 +645,7 @@ def build_printable_report_card(exam, student):
     from apps.configuration.models import GradeScale, SchoolProfile
     from apps.settings_app.models import SystemSetting
 
-    from .models import AttendanceRecord, ReportCardRemark, SkillRating
+    from .models import AFFECTIVE_SKILLS, PSYCHOMOTOR_SKILLS, AttendanceRecord, ReportCardRemark, SkillRating
 
     scales = list(GradeScale.objects.all())
 
@@ -699,7 +699,7 @@ def build_printable_report_card(exam, student):
         else:
             failed += 1
         subject_rows.append({
-            "subject": s.subject.name, "ca_score": s.ca_score, "exam_score": s.exam_score,
+            "subject": s.subject.name, "ca1_score": s.ca1_score, "ca2_score": s.ca2_score, "exam_score": s.exam_score,
             "total": s.score, "max_score": s.max_score, "percentage": pct,
             "class_avg": round(sum(peer_pcts) / len(peer_pcts), 1) if peer_pcts else None,
             "class_max": round(max(peer_pcts), 1) if peer_pcts else None,
@@ -739,10 +739,22 @@ def build_printable_report_card(exam, student):
 
     remark_row = ReportCardRemark.objects.filter(exam=exam, student=student).first()
     skill_labels = dict(SkillRating.Skill.choices)
-    skills = [
-        {"skill": r["skill"], "label": skill_labels.get(r["skill"], r["skill"]), "rating": r["rating"]}
+    ratings_by_skill = {
+        r["skill"]: r["rating"]
         for r in SkillRating.objects.filter(exam=exam, student=student).values("skill", "rating")
-    ]
+    }
+
+    def skill_rows(skill_list):
+        # Always all 4 rows, even unrated ones (rating=None -> no column
+        # gets an X), so the table's shape matches the printed template
+        # regardless of how much of this student's skills block was filled in.
+        return [
+            {"skill": sk.value, "label": skill_labels.get(sk.value, sk.value), "rating": ratings_by_skill.get(sk.value)}
+            for sk in skill_list
+        ]
+
+    affective_skills = skill_rows(AFFECTIVE_SKILLS)
+    psychomotor_skills = skill_rows(PSYCHOMOTOR_SKILLS)
 
     age = None
     if student.date_of_birth:
@@ -775,7 +787,8 @@ def build_printable_report_card(exam, student):
         "class_size": class_size,
         "class_teacher_remark": remark_row.class_teacher_remark if remark_row else "",
         "principal_remark": remark_row.principal_remark if remark_row else "",
-        "skills": skills,
+        "affective_skills": affective_skills,
+        "psychomotor_skills": psychomotor_skills,
         "attendance_present": attendance_present,
         "attendance_total": attendance_total,
         "term_ended": exam.term.end_date,

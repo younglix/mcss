@@ -15,6 +15,7 @@ const IDENTITY_FIELDS = [
   { key: 'motto', label: 'Slogan / Tagline', type: 'text' },
   { key: 'logo', label: 'Logo URL', type: 'text' },
   { key: 'favicon', label: 'Favicon URL', type: 'text' },
+  { key: 'principal_signature', label: "Principal's Signature Image URL", type: 'text' },
   { key: 'address', label: 'School Address', type: 'textarea' },
   { key: 'phone', label: 'Phone', type: 'text' },
   { key: 'email', label: 'Email', type: 'text' },

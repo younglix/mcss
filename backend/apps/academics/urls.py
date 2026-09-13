@@ -36,6 +36,7 @@ urlpatterns = [
     path("exams/<uuid:exam_id>/publish", views.ExamPublishView.as_view(), name="academics-exam-publish"),
     path("exams/<uuid:exam_id>/scores", views.ExamScoresView.as_view(), name="academics-exam-scores"),
     path("exams/<uuid:exam_id>/marksheet/<uuid:student_id>", views.MarksheetView.as_view(), name="academics-marksheet"),
+    path("exams/<uuid:exam_id>/marksheet-compilation", views.ExamMarksheetCompilationView.as_view(), name="academics-marksheet-compilation"),
     path("exams/<uuid:exam_id>/report-card/<uuid:student_id>", views.ReportCardView.as_view(), name="academics-report-card"),
     path("exams/<uuid:exam_id>/report-card/<uuid:student_id>/pdf", views.ReportCardPDFView.as_view(), name="academics-report-card-pdf"),
     path("exams/<uuid:exam_id>/report-card/<uuid:student_id>/remarks", views.ReportCardRemarkView.as_view(), name="academics-report-card-remarks"),

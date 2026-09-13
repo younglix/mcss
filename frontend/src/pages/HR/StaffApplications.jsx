@@ -10,6 +10,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { useDashboardData } from '../SuperAdmin/dashboard/useDashboardData.js';
 import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
 import { api } from '../../lib/api.js';
+import { copyText } from '../../lib/clipboard.js';
 
 const ENDPOINTS = { applications: '/staff-applications/' };
 
@@ -48,11 +49,11 @@ function RegistrationToggle() {
 
   const copyLink = async () => {
     const url = `${window.location.origin}${state.registration_path}`;
-    try {
-      await navigator.clipboard.writeText(url);
+    const ok = await copyText(url);
+    if (ok) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
+    } else {
       setError('Could not copy the link — copy it from the address bar instead.');
     }
   };

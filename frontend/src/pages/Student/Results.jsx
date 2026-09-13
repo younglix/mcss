@@ -11,7 +11,10 @@ import { api, ApiError } from '../../lib/api.js';
 
 const ENDPOINTS = { exams: '/academics/exams/published', profile: '/academics/students/mine' };
 
-const SKILL_LABEL = { punctuality: 'Punctuality', neatness: 'Neatness', leadership: 'Leadership', honesty: 'Honesty' };
+const SKILL_LABEL = {
+  honesty: 'Honesty', neatness: 'Neatness', punctuality: 'Punctuality', teamwork: 'Teamwork',
+  games_sport: 'Games/Sport', handwriting: 'Handwriting', interest_in_arts: 'Interest in Arts', music: 'Music',
+};
 
 function SkillRating({ rating }) {
   return (
@@ -125,7 +128,8 @@ export default function StudentResults() {
                   <thead>
                     <tr className="bg-primary text-on-primary">
                       <th className="p-sm font-label-md">Subject</th>
-                      <th className="p-sm font-label-md text-center">CA</th>
+                      <th className="p-sm font-label-md text-center">CA1</th>
+                      <th className="p-sm font-label-md text-center">CA2</th>
                       <th className="p-sm font-label-md text-center">Exam</th>
                       <th className="p-sm font-label-md text-center">Total</th>
                       <th className="p-sm font-label-md text-center">Grade</th>
@@ -134,11 +138,12 @@ export default function StudentResults() {
                   </thead>
                   <tbody className="divide-y divide-outline/10">
                     {report.subjects.length === 0 ? (
-                      <tr><td colSpan={6} className="px-lg py-6"><EmptyState icon="description" text="No scores entered yet." /></td></tr>
+                      <tr><td colSpan={7} className="px-lg py-6"><EmptyState icon="description" text="No scores entered yet." /></td></tr>
                     ) : report.subjects.map((s) => (
                       <tr key={s.subject}>
                         <td className="p-sm font-bold text-on-surface">{s.subject}</td>
-                        <td className="p-sm text-center text-on-surface">{s.ca_score ?? '—'}</td>
+                        <td className="p-sm text-center text-on-surface">{s.ca1_score ?? '—'}</td>
+                        <td className="p-sm text-center text-on-surface">{s.ca2_score ?? '—'}</td>
                         <td className="p-sm text-center text-on-surface">{s.exam_score ?? '—'}</td>
                         <td className="p-sm text-center font-bold text-on-surface">{s.total}/{s.max_score}</td>
                         <td className="p-sm text-center text-secondary font-bold">{s.grade || '—'}</td>

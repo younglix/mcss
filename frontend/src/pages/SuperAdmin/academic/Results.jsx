@@ -10,8 +10,12 @@ import { api, ApiError } from '../../../lib/api.js';
 
 const ENDPOINTS = { exams: '/academics/exams', classes: '/academics/classes', subjects: '/academics/subjects' };
 const NIL_UUID = '00000000-0000-0000-0000-000000000000';
-const SKILLS = ['punctuality', 'neatness', 'leadership', 'honesty'];
-const SKILL_LABEL = { punctuality: 'Punctuality', neatness: 'Neatness', leadership: 'Leadership', honesty: 'Honesty' };
+const AFFECTIVE_SKILLS = ['honesty', 'neatness', 'punctuality', 'teamwork'];
+const PSYCHOMOTOR_SKILLS = ['games_sport', 'handwriting', 'interest_in_arts', 'music'];
+const SKILL_LABEL = {
+  honesty: 'Honesty', neatness: 'Neatness', punctuality: 'Punctuality', teamwork: 'Teamwork',
+  games_sport: 'Games/Sport', handwriting: 'Handwriting', interest_in_arts: 'Interest in Arts', music: 'Music',
+};
 
 export default function SuperAdminResults() {
   const [searchParams] = useSearchParams();
@@ -46,7 +50,9 @@ export default function SuperAdminResults() {
 
   useEffect(() => {
     const next = {};
-    for (const s of existingScores) next[s.student] = { score: s.score, ca_score: s.ca_score ?? '', exam_score: s.exam_score ?? '' };
+    for (const s of existingScores) {
+      next[s.student] = { score: s.score, ca1_score: s.ca1_score ?? '', ca2_score: s.ca2_score ?? '', exam_score: s.exam_score ?? '' };
+    }
     setRowsByStudent(next);
     if (existingScores.length) setMaxScore(existingScores[0].max_score);
   }, [existingScores]);
@@ -60,12 +66,15 @@ export default function SuperAdminResults() {
     setSaveError('');
     setSaveMessage('');
     try {
+      const hasSplit = (row) => row.ca1_score !== '' && row.ca1_score !== undefined && row.exam_score !== '' && row.exam_score !== undefined;
       const scores = roster
         .map((s) => ({ student: s.id, row: rowsByStudent[s.id] || {} }))
-        .filter(({ row }) => (row.ca_score !== '' && row.ca_score !== undefined && row.exam_score !== '' && row.exam_score !== undefined) || (row.score !== '' && row.score !== undefined))
+        .filter(({ row }) => hasSplit(row) || (row.score !== '' && row.score !== undefined))
         .map(({ student, row }) => {
-          if (row.ca_score !== '' && row.ca_score !== undefined && row.exam_score !== '' && row.exam_score !== undefined) {
-            return { student, ca_score: row.ca_score, exam_score: row.exam_score };
+          if (hasSplit(row)) {
+            const entry = { student, ca1_score: row.ca1_score, exam_score: row.exam_score };
+            if (row.ca2_score !== '' && row.ca2_score !== undefined) entry.ca2_score = row.ca2_score;
+            return entry;
           }
           return { student, score: row.score };
         });
@@ -152,7 +161,8 @@ export default function SuperAdminResults() {
                     <thead>
                       <tr className="bg-primary text-on-primary">
                         <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Student</th>
-                        <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">CA</th>
+                        <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">CA1</th>
+                        <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">CA2 (optional)</th>
                         <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Exam</th>
                         <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Total (if not using CA/Exam)</th>
                         <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider text-right">Marksheet</th>
@@ -162,12 +172,16 @@ export default function SuperAdminResults() {
                     <tbody className="divide-y divide-outline/10">
                       {roster.map((s) => {
                         const row = rowsByStudent[s.id] || {};
-                        const splitActive = row.ca_score !== '' && row.ca_score !== undefined && row.exam_score !== '' && row.exam_score !== undefined;
+                        const splitActive = row.ca1_score !== '' && row.ca1_score !== undefined && row.exam_score !== '' && row.exam_score !== undefined;
+                        const splitTotal = Number(row.ca1_score || 0) + Number(row.ca2_score || 0) + Number(row.exam_score || 0);
                         return (
                           <tr key={s.id}>
                             <td className="px-lg py-3 font-body-md text-body-md text-on-surface">{s.full_name}</td>
                             <td className="px-lg py-3">
-                              <input type="number" min="0" value={row.ca_score ?? ''} onChange={(e) => updateRow(s.id, 'ca_score', e.target.value)} className="mcss-field px-sm py-1 w-20" />
+                              <input type="number" min="0" value={row.ca1_score ?? ''} onChange={(e) => updateRow(s.id, 'ca1_score', e.target.value)} className="mcss-field px-sm py-1 w-20" />
+                            </td>
+                            <td className="px-lg py-3">
+                              <input type="number" min="0" value={row.ca2_score ?? ''} onChange={(e) => updateRow(s.id, 'ca2_score', e.target.value)} className="mcss-field px-sm py-1 w-20" />
                             </td>
                             <td className="px-lg py-3">
                               <input type="number" min="0" value={row.exam_score ?? ''} onChange={(e) => updateRow(s.id, 'exam_score', e.target.value)} className="mcss-field px-sm py-1 w-20" />
@@ -175,7 +189,7 @@ export default function SuperAdminResults() {
                             <td className="px-lg py-3">
                               <input
                                 type="number" min="0" max={maxScore} disabled={splitActive}
-                                value={splitActive ? Number(row.ca_score) + Number(row.exam_score) : row.score ?? ''}
+                                value={splitActive ? splitTotal : row.score ?? ''}
                                 onChange={(e) => updateRow(s.id, 'score', e.target.value)}
                                 className="mcss-field px-sm py-1 w-24 disabled:opacity-50"
                               />
@@ -255,9 +269,9 @@ export default function SuperAdminResults() {
         <div className="space-y-lg">
           {remarksMessage && <p className="font-label-md text-label-md text-secondary bg-secondary-container/20 border border-secondary/20 rounded-lg px-md py-sm">{remarksMessage}</p>}
           <div>
-            <h3 className="font-label-md text-primary uppercase border-b border-outline/10 pb-xs mb-md">Psychomotor &amp; Affective Skills</h3>
+            <h3 className="font-label-md text-primary uppercase border-b border-outline/10 pb-xs mb-md">Affective Assessment</h3>
             <div className="space-y-sm">
-              {SKILLS.map((skill) => (
+              {AFFECTIVE_SKILLS.map((skill) => (
                 <div key={skill} className="flex items-center justify-between gap-md">
                   <span className="font-body-sm text-body-sm text-on-surface">{SKILL_LABEL[skill]}</span>
                   <select
@@ -265,7 +279,24 @@ export default function SuperAdminResults() {
                     onChange={(e) => setRemarks((prev) => ({ ...prev, skills: { ...prev.skills, [skill]: Number(e.target.value) } }))}
                     className="mcss-field px-sm py-1 w-20"
                   >
-                    {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
+                    {[5, 4, 3, 2, 1, 0].map((n) => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 className="font-label-md text-primary uppercase border-b border-outline/10 pb-xs mb-md">Psychomotor Assessment</h3>
+            <div className="space-y-sm">
+              {PSYCHOMOTOR_SKILLS.map((skill) => (
+                <div key={skill} className="flex items-center justify-between gap-md">
+                  <span className="font-body-sm text-body-sm text-on-surface">{SKILL_LABEL[skill]}</span>
+                  <select
+                    value={remarks.skills[skill] ?? 3}
+                    onChange={(e) => setRemarks((prev) => ({ ...prev, skills: { ...prev.skills, [skill]: Number(e.target.value) } }))}
+                    className="mcss-field px-sm py-1 w-20"
+                  >
+                    {[5, 4, 3, 2, 1, 0].map((n) => <option key={n} value={n}>{n}</option>)}
                   </select>
                 </div>
               ))}

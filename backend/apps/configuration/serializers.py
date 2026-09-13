@@ -17,7 +17,7 @@ class SchoolProfileSerializer(serializers.ModelSerializer):
         model = SchoolProfile
         fields = [
             "id", "name", "short_name", "logo", "favicon", "address", "phone", "email",
-            "website", "country", "state", "city", "motto",
+            "website", "country", "state", "city", "motto", "principal_signature",
         ]
 
 

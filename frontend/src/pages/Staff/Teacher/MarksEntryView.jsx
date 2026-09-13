@@ -55,7 +55,9 @@ export default function MarksEntryView({ title, subtitle, examTypeFilter }) {
 
   useEffect(() => {
     const next = {};
-    for (const s of existingScores) next[s.student] = { ca_score: s.ca_score ?? '', exam_score: s.exam_score ?? '', score: s.score };
+    for (const s of existingScores) {
+      next[s.student] = { ca1_score: s.ca1_score ?? '', ca2_score: s.ca2_score ?? '', exam_score: s.exam_score ?? '', score: s.score };
+    }
     setRowsByStudent(next);
     if (existingScores.length) setMaxScore(existingScores[0].max_score);
   }, [existingScores]);
@@ -79,12 +81,15 @@ export default function MarksEntryView({ title, subtitle, examTypeFilter }) {
     setSaveError('');
     setSaveMessage('');
     try {
+      const hasSplit = (row) => row.ca1_score !== '' && row.ca1_score !== undefined && row.exam_score !== '' && row.exam_score !== undefined;
       const scores = roster
         .map((s) => ({ student: s.id, row: rowsByStudent[s.id] || {} }))
-        .filter(({ row }) => (row.ca_score !== '' && row.ca_score !== undefined && row.exam_score !== '' && row.exam_score !== undefined) || (row.score !== '' && row.score !== undefined))
+        .filter(({ row }) => hasSplit(row) || (row.score !== '' && row.score !== undefined))
         .map(({ student, row }) => {
-          if (row.ca_score !== '' && row.ca_score !== undefined && row.exam_score !== '' && row.exam_score !== undefined) {
-            return { student, ca_score: row.ca_score, exam_score: row.exam_score };
+          if (hasSplit(row)) {
+            const entry = { student, ca1_score: row.ca1_score, exam_score: row.exam_score };
+            if (row.ca2_score !== '' && row.ca2_score !== undefined) entry.ca2_score = row.ca2_score;
+            return entry;
           }
           return { student, score: row.score };
         });
@@ -171,7 +176,8 @@ export default function MarksEntryView({ title, subtitle, examTypeFilter }) {
                 <thead>
                   <tr className="bg-primary text-on-primary">
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Student</th>
-                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">CA</th>
+                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">CA1</th>
+                    <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">CA2 (optional)</th>
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Exam</th>
                     <th className="px-lg py-3 font-label-md text-label-md uppercase tracking-wider">Total (if not using CA/Exam)</th>
                   </tr>
@@ -179,12 +185,16 @@ export default function MarksEntryView({ title, subtitle, examTypeFilter }) {
                 <tbody className="divide-y divide-outline/10">
                   {roster.map((s) => {
                     const row = rowsByStudent[s.id] || {};
-                    const splitActive = row.ca_score !== '' && row.ca_score !== undefined && row.exam_score !== '' && row.exam_score !== undefined;
+                    const splitActive = row.ca1_score !== '' && row.ca1_score !== undefined && row.exam_score !== '' && row.exam_score !== undefined;
+                    const splitTotal = Number(row.ca1_score || 0) + Number(row.ca2_score || 0) + Number(row.exam_score || 0);
                     return (
                       <tr key={s.id}>
                         <td className="px-lg py-3 font-body-md text-body-md text-on-surface">{s.full_name}</td>
                         <td className="px-lg py-3">
-                          <input type="number" min="0" disabled={locked} value={row.ca_score ?? ''} onChange={(e) => updateRow(s.id, 'ca_score', e.target.value)} className="mcss-field px-sm py-1 w-20 disabled:opacity-50" />
+                          <input type="number" min="0" disabled={locked} value={row.ca1_score ?? ''} onChange={(e) => updateRow(s.id, 'ca1_score', e.target.value)} className="mcss-field px-sm py-1 w-20 disabled:opacity-50" />
+                        </td>
+                        <td className="px-lg py-3">
+                          <input type="number" min="0" disabled={locked} value={row.ca2_score ?? ''} onChange={(e) => updateRow(s.id, 'ca2_score', e.target.value)} className="mcss-field px-sm py-1 w-20 disabled:opacity-50" />
                         </td>
                         <td className="px-lg py-3">
                           <input type="number" min="0" disabled={locked} value={row.exam_score ?? ''} onChange={(e) => updateRow(s.id, 'exam_score', e.target.value)} className="mcss-field px-sm py-1 w-20 disabled:opacity-50" />
@@ -192,7 +202,7 @@ export default function MarksEntryView({ title, subtitle, examTypeFilter }) {
                         <td className="px-lg py-3">
                           <input
                             type="number" min="0" max={maxScore} disabled={locked || splitActive}
-                            value={splitActive ? Number(row.ca_score) + Number(row.exam_score) : row.score ?? ''}
+                            value={splitActive ? splitTotal : row.score ?? ''}
                             onChange={(e) => updateRow(s.id, 'score', e.target.value)}
                             className="mcss-field px-sm py-1 w-24 disabled:opacity-50"
                           />

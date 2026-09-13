@@ -617,16 +617,19 @@ class ExamScoresView(APIView):
         v = serializer.validated_data
         count = 0
         for s in v["scores"]:
-            ca_score = s.get("ca_score")
+            ca1_score = s.get("ca1_score")
+            ca2_score = s.get("ca2_score")
             exam_score = s.get("exam_score")
-            # A CA/Exam split, when both parts are given, is the source of
+            # A CA1/Exam split, when both parts are given, is the source of
             # truth for the total — entering them separately shouldn't also
-            # require reconciling a matching "score" value by hand.
-            score = (float(ca_score) + float(exam_score)) if (ca_score is not None and exam_score is not None) else s["score"]
+            # require reconciling a matching "score" value by hand. ca2_score
+            # is optional even then: a subject with only one CA this term
+            # just contributes 0.
+            score = (float(ca1_score) + float(ca2_score or 0) + float(exam_score)) if (ca1_score is not None and exam_score is not None) else s["score"]
             ExamScore.objects.update_or_create(
                 exam_id=exam_id, student_id=s["student"], subject=v["subject"],
                 defaults={
-                    "score": score, "max_score": v["max_score"], "ca_score": ca_score, "exam_score": exam_score,
+                    "score": score, "max_score": v["max_score"], "ca1_score": ca1_score, "ca2_score": ca2_score, "exam_score": exam_score,
                     "remark": s.get("remark", ""), "entered_by": request.user,
                 },
             )
@@ -685,6 +688,75 @@ class MarksheetView(APIView):
             "exam": {"id": str(exam.id), "name": exam.name},
             "subjects": rows,
             "average": round(sum(r["percentage"] for r in rows) / len(rows), 1) if rows else None,
+        })
+
+
+class ExamMarksheetCompilationView(APIView):
+    """Exam Officer Portal > Marksheet: one class-arm's whole subject grid
+    for one exam — every student × every subject assigned to that class
+    this session, missing cells flagged, so the officer can see at a glance
+    what's still outstanding before publish. Distinct from MarksheetView
+    (one student's own compiled sheet) and ExamScoresView (one subject's
+    score list) — this is the class-wide compilation those two don't
+    provide on their own."""
+
+    permission_classes = [HasPermission("results.view")]
+
+    def get(self, request, exam_id):
+        exam = get_object_or_404(Exam, id=exam_id)
+        class_arm_id = request.query_params.get("class_arm")
+        if not class_arm_id:
+            return failure(message="class_arm is required.", status=400)
+        class_arm = get_object_or_404(ClassArm.objects.select_related("school_class"), id=class_arm_id)
+
+        subjects = list(
+            Subject.objects.filter(class_assignments__class_arm=class_arm, class_assignments__session=exam.session)
+            .distinct().order_by("name")
+        )
+        students = list(
+            Student.objects.filter(class_arm=class_arm, user__is_deleted=False)
+            .select_related("user").order_by("user__full_name")
+        )
+
+        scores = ExamScore.objects.filter(exam=exam, student__class_arm=class_arm, subject__in=subjects)
+        by_student_subject = {(s.student_id, s.subject_id): s for s in scores}
+
+        student_rows = []
+        entered_percentages = []
+        for student in students:
+            cells = []
+            percentages = []
+            for subject in subjects:
+                score = by_student_subject.get((student.id, subject.id))
+                if score is None:
+                    cells.append(None)
+                else:
+                    pct = round(float(score.score) / float(score.max_score) * 100, 1) if score.max_score else 0
+                    cells.append({"subject": str(subject.id), "score": score.score, "max_score": score.max_score, "percentage": pct})
+                    percentages.append(pct)
+                    entered_percentages.append(pct)
+            complete = len(percentages) == len(subjects) and len(subjects) > 0
+            student_rows.append({
+                "id": str(student.id),
+                "name": student.user.full_name,
+                "identifier": student.user.identifier or "",
+                "scores": cells,
+                "average": round(sum(percentages) / len(percentages), 1) if complete else None,
+            })
+
+        expected = len(students) * len(subjects)
+        entered = len(entered_percentages)
+        return success(data={
+            "exam": {"id": str(exam.id), "name": exam.name},
+            "class_arm": {"id": str(class_arm.id), "label": str(class_arm)},
+            "subjects": [{"id": str(s.id), "name": s.name} for s in subjects],
+            "students": student_rows,
+            "stats": {
+                "total_students": len(students),
+                "missing_scores": expected - entered,
+                "data_completeness": round(entered / expected * 100, 1) if expected else 0,
+                "class_average": round(sum(entered_percentages) / len(entered_percentages), 1) if entered_percentages else None,
+            },
         })
 
 
@@ -751,7 +823,7 @@ class ReportCardView(APIView):
         for s in scores:
             pct = round(float(s.score) / float(s.max_score) * 100, 1) if s.max_score else 0
             subject_rows.append({
-                "subject": s.subject.name, "ca_score": s.ca_score, "exam_score": s.exam_score,
+                "subject": s.subject.name, "ca1_score": s.ca1_score, "ca2_score": s.ca2_score, "exam_score": s.exam_score,
                 "total": s.score, "max_score": s.max_score, "percentage": pct,
                 "grade": grade_for(pct), "remark": s.remark,
             })
@@ -824,16 +896,19 @@ class ReportCardPDFView(APIView):
 
         ctx = services.build_printable_report_card(exam, student)
         profile = ctx["profile"]
-        contact_parts = [p for p in [profile.phone if profile else "", profile.email if profile else ""] if p]
+        contact_parts = [p for p in [profile.website if profile else "", profile.email if profile else "", profile.phone if profile else ""] if p]
+
+        from apps.settings_app.models import SystemSetting
+        appearance = {s.key: s.value for s in SystemSetting.objects.filter(group="appearance", is_secret=False)}
 
         html = render_to_string("academics/report_card.html", {
-            "primary_color": "#ff1a8c",
-            "secondary_color": "#1a237e",
+            "primary_color": appearance.get("appearance.primary_color") or "#1a237e",
+            "secondary_color": appearance.get("appearance.secondary_color") or "#37474f",
             "logo_url": profile.logo if profile else "",
             "photo_url": student.user.avatar or "",
             "school_name": profile.name if profile else "School",
             "school_address": profile.address if profile else "",
-            "school_contact": " · ".join(contact_parts),
+            "school_contact": " | ".join(contact_parts),
             "student_name": student.user.full_name,
             "student_identifier": student.user.identifier or "—",
             "class_arm_label": ctx["class_arm_label"],
@@ -854,9 +929,11 @@ class ReportCardPDFView(APIView):
             "position": ctx["position"],
             "class_teacher_remark": ctx["class_teacher_remark"],
             "principal_remark": ctx["principal_remark"],
+            "principal_signature_url": profile.principal_signature if profile else "",
             "term_ended": ctx["term_ended"].strftime("%d %B %Y") if ctx["term_ended"] else None,
             "next_term_begins": ctx["next_term_begins"].strftime("%d %B %Y") if ctx["next_term_begins"] else None,
-            "skills": ctx["skills"],
+            "affective_skills": ctx["affective_skills"],
+            "psychomotor_skills": ctx["psychomotor_skills"],
             "grading_key": ctx["grading_key"],
             "generated_at": timezone.now().strftime("%d %b %Y, %I:%M %p"),
         })
@@ -1403,13 +1480,14 @@ class MyTeachingScoresView(APIView):
         v = serializer.validated_data
         count = 0
         for s in v["scores"]:
-            ca_score = s.get("ca_score")
+            ca1_score = s.get("ca1_score")
+            ca2_score = s.get("ca2_score")
             exam_score = s.get("exam_score")
-            score = (float(ca_score) + float(exam_score)) if (ca_score is not None and exam_score is not None) else s["score"]
+            score = (float(ca1_score) + float(ca2_score or 0) + float(exam_score)) if (ca1_score is not None and exam_score is not None) else s["score"]
             ExamScore.objects.update_or_create(
                 exam_id=exam_id, student_id=s["student"], subject=v["subject"],
                 defaults={
-                    "score": score, "max_score": v["max_score"], "ca_score": ca_score, "exam_score": exam_score,
+                    "score": score, "max_score": v["max_score"], "ca1_score": ca1_score, "ca2_score": ca2_score, "exam_score": exam_score,
                     "remark": s.get("remark", ""), "entered_by": request.user,
                 },
             )

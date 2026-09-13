@@ -19,6 +19,10 @@ class SchoolProfile(BaseModel):
     state = models.CharField(max_length=100, blank=True)
     city = models.CharField(max_length=100, blank=True)
     motto = models.CharField(max_length=200, blank=True)
+    # Scanned principal's signature, shown on the printable/PDF report card
+    # next to PRINCIPAL'S SIGNATURE — same locally-stored-upload convention
+    # as `logo` above (a relative /media/... path, not a URLField).
+    principal_signature = models.CharField(max_length=500, blank=True)
 
     class Meta(BaseModel.Meta):
         pass
