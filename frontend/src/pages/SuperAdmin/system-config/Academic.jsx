@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
@@ -138,6 +138,74 @@ function GradeScalesCard({ grades, reload }) {
   );
 }
 
+function ExamSettingsCard() {
+  const [minBankSize, setMinBankSize] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saveMessage, setSaveMessage] = useState('');
+
+  useEffect(() => {
+    api.get('/exam/settings')
+      .then((data) => setMinBankSize(String(data.min_bank_size)))
+      .catch(() => setLoadError('Could not load exam settings.'))
+      .finally(() => setLoaded(true));
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError('');
+    setSaveMessage('');
+    try {
+      const result = await api.post('/exam/settings', { min_bank_size: minBankSize });
+      setMinBankSize(String(result.min_bank_size));
+      setSaveMessage('Saved.');
+    } catch (err) {
+      setSaveError(err instanceof ApiError ? err.message : 'Could not save.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card padding="lg" className="max-w-3xl">
+      <h2 className="font-headline-md text-headline-md text-primary mb-md">Exam &amp; CBE Settings</h2>
+      {!loaded ? (
+        <p className="font-body-md text-body-md text-on-surface-variant">Loading…</p>
+      ) : loadError ? (
+        <p className="font-label-md text-label-md text-error">{loadError}</p>
+      ) : (
+        <div className="space-y-md">
+          <div>
+            <label className="font-label-md text-label-md text-on-surface-variant" htmlFor="minBankSize">
+              Minimum Question Bank Size
+            </label>
+            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 mb-sm">
+              A question bank can't be approved for use in a CBE exam until it has at least this many questions. Also editable by the Exam Officer.
+            </p>
+            <input
+              id="minBankSize"
+              type="number"
+              min="1"
+              value={minBankSize}
+              onChange={(e) => setMinBankSize(e.target.value)}
+              className="mcss-field px-md w-40"
+            />
+          </div>
+          {saveError && <p className="font-label-md text-label-md text-error bg-error-container/20 border border-error/20 rounded-lg px-md py-sm">{saveError}</p>}
+          {saveMessage && <p className="font-label-md text-label-md text-secondary bg-secondary-container/20 border border-secondary/20 rounded-lg px-md py-sm">{saveMessage}</p>}
+          <div className="flex justify-end">
+            <Button type="button" variant="primary" onClick={handleSave} disabled={saving || !minBankSize}>
+              {saving ? 'Saving…' : 'Save Changes'}
+            </Button>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
 export default function SuperAdminAcademicSettings() {
   const endpoints = useMemo(() => ENDPOINTS, []);
   const { data, loading, error, reload } = useDashboardData(endpoints);
@@ -181,6 +249,8 @@ export default function SuperAdminAcademicSettings() {
           </Card>
 
           <GradeScalesCard grades={data.grades} reload={reload} />
+
+          <ExamSettingsCard />
 
           <form onSubmit={handleSubmit} className="space-y-lg">
             {saveError && <p className="font-label-md text-label-md text-error bg-error-container/20 border border-error/20 rounded-lg px-md py-sm max-w-3xl">{saveError}</p>}

@@ -43,7 +43,8 @@ export default function MarksEntryView({ title, subtitle, examTypeFilter }) {
   // update depth exceeded" console error, not by inspection).
   const existingScores = useMemo(() => rosterData.data?.scoresPayload?.scores || [], [rosterData.data]);
   const submission = rosterData.data?.scoresPayload?.submission;
-  const locked = !!submission;
+  const rejected = submission?.status === 'rejected';
+  const locked = !!submission && !rejected;
 
   const [rowsByStudent, setRowsByStudent] = useState({});
   const [maxScore, setMaxScore] = useState(100);
@@ -150,6 +151,12 @@ export default function MarksEntryView({ title, subtitle, examTypeFilter }) {
             <p className="font-label-md text-label-md text-tertiary bg-tertiary-container/20 border border-tertiary/20 rounded-lg px-md py-sm mb-md flex items-center gap-xs">
               <span className="material-symbols-outlined text-[18px]">lock</span>
               Submitted for approval on {new Date(submission.submitted_at).toLocaleDateString()}. Ask an admin to reopen it before editing further.
+            </p>
+          )}
+          {rejected && (
+            <p className="font-label-md text-label-md text-error bg-error-container/20 border border-error/20 rounded-lg px-md py-sm mb-md flex items-center gap-xs">
+              <span className="material-symbols-outlined text-[18px]">error</span>
+              Rejected by {submission.reviewed_by_name || 'an admin'}{submission.review_note ? `: “${submission.review_note}”` : '.'} Fix the scores below and submit again.
             </p>
           )}
           {saveError && <p className="font-label-md text-label-md text-error bg-error-container/20 border border-error/20 rounded-lg px-md py-sm mb-md">{saveError}</p>}

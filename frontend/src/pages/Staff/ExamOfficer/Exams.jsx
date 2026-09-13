@@ -38,6 +38,19 @@ export default function ExamOfficerExams() {
   const [endTarget, setEndTarget] = useState(null);
   const [ending, setEnding] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [copiedField, setCopiedField] = useState('');
+
+  const examLinkFor = (code) => `${window.location.origin}/exam-access?code=${code}`;
+
+  const copyToClipboard = async (text, field) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(''), 2000);
+    } catch {
+      setActionError('Could not copy — copy it manually instead.');
+    }
+  };
 
   const approvedBanksFor = (subjectId, schoolClassId) =>
     banks.filter((b) => b.is_approved && b.subject === subjectId && b.school_class === schoolClassId);
@@ -187,15 +200,31 @@ export default function ExamOfficerExams() {
         </div>
       </Drawer>
 
-      <ConfirmDialog
-        open={!!activatedExam}
-        title="Exam is Live"
-        message={`Access code: ${activatedExam?.access_code} — share this verbally in the hall. It expires the moment you end this exam.`}
-        confirmLabel="Got it"
-        danger={false}
-        onConfirm={() => setActivatedExam(null)}
-        onCancel={() => setActivatedExam(null)}
-      />
+      {activatedExam && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-lg">
+          <div className="absolute inset-0 bg-nav/40" onClick={() => setActivatedExam(null)} />
+          <div className="relative z-10 w-full max-w-sm bg-surface-container-lowest rounded-lg shadow-xl p-lg">
+            <h3 className="font-headline-md text-headline-sm text-on-surface mb-xs">Exam is Live</h3>
+            <p className="font-body-md text-body-md text-on-surface-variant mb-md">
+              Share the access code verbally in the hall, or send the exam link to students who'll type in their own Student ID. Both expire the moment you end this exam.
+            </p>
+            <div className="flex items-center justify-between gap-sm bg-surface-container rounded-lg px-md py-sm mb-sm">
+              <span className="font-label-lg text-label-lg tracking-[0.2em] text-on-surface">{activatedExam.access_code}</span>
+              <Button variant="ghost" size="sm" iconLeft="content_copy" onClick={() => copyToClipboard(activatedExam.access_code, 'code')}>
+                {copiedField === 'code' ? 'Copied!' : 'Copy Code'}
+              </Button>
+            </div>
+            <div className="flex justify-end mb-lg">
+              <Button variant="secondary" size="sm" iconLeft="link" onClick={() => copyToClipboard(examLinkFor(activatedExam.access_code), 'link')}>
+                {copiedField === 'link' ? 'Copied!' : 'Copy Exam Link'}
+              </Button>
+            </div>
+            <div className="flex justify-end">
+              <Button variant="primary" onClick={() => setActivatedExam(null)}>Got it</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmDialog
         open={!!endTarget}

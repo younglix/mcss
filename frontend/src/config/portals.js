@@ -237,6 +237,7 @@ export const portals = {
       { key: 'exams', label: 'CBE Exams', icon: 'laptop_chromebook', path: '/staff/exam-officer/exams', status: 'active' },
       { key: 'monitor', label: 'Live Monitor', icon: 'monitoring', path: '/staff/exam-officer/monitor', status: 'active' },
       { key: 'marksheets', label: 'Marksheets', icon: 'description', path: '/staff/exam-officer', status: 'active' },
+      { key: 'settings', label: 'Exam Settings', icon: 'settings', path: '/staff/exam-officer/settings', status: 'active' },
     ],
     bottomNav: [
       { key: 'dashboard', label: 'Home', icon: 'dashboard', path: '/staff/exam-officer/dashboard', status: 'active' },

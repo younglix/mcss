@@ -137,6 +137,7 @@
     </tr>
   </table>
 
+  {% if grading_key %}
   <table class="grading-table">
     <tr>
       <td class="grading-cell" rowspan="2">GRADING</td>
@@ -150,6 +151,7 @@
       {% endfor %}
     </tr>
   </table>
+  {% endif %}
 
   <div class="footer-note">Generated on {{ generated_at }} · {{ school_name }} Report Card System</div>
 

@@ -163,6 +163,36 @@ class QuestionDetailView(EnvelopeMixin, BankSubmitPermissionMixin, RetrieveUpdat
         bank.revoke_approval()
 
 
+class ExamSettingsView(ConfigPermissionMixin, APIView):
+    """Super Admin/Exam Officer > Exam Settings: the exam.* SystemSetting
+    group (currently just the minimum question-bank size QuestionBankApproveView
+    enforces via services.can_approve_bank). Its own narrowly-scoped endpoint
+    rather than the generic /settings/<key> route, which is gated by the
+    blanket settings.edit permission the Exam Officer role doesn't hold —
+    see StaffOnboardingToggleView for the same reasoning."""
+
+    def get(self, request):
+        return success(data={"min_bank_size": services.get_min_bank_size()})
+
+    def post(self, request):
+        from apps.settings_app.models import SystemSetting
+
+        raw = request.data.get("min_bank_size")
+        try:
+            min_bank_size = int(raw)
+        except (TypeError, ValueError):
+            return failure(message="min_bank_size must be a whole number.", status=400)
+        if min_bank_size < 1:
+            return failure(message="min_bank_size must be at least 1.", status=400)
+
+        SystemSetting.objects.update_or_create(
+            key="exam.min_bank_size", defaults={"group": "exam", "value": min_bank_size},
+        )
+        log(actor=request.user, action="examinations.settings_updated",
+            changes={"min_bank_size": min_bank_size}, request=request)
+        return success(message="Exam settings updated.", data={"min_bank_size": min_bank_size})
+
+
 class QuestionBankApproveView(APIView):
     permission_classes = [HasPermission("exam.bank_approve")]
 

@@ -170,6 +170,7 @@ import ExamOfficerDashboard from './pages/Staff/ExamOfficer/Dashboard.jsx';
 import ExamOfficerBanks from './pages/Staff/ExamOfficer/Banks.jsx';
 import ExamOfficerExams from './pages/Staff/ExamOfficer/Exams.jsx';
 import ExamOfficerMonitor from './pages/Staff/ExamOfficer/Monitor.jsx';
+import ExamOfficerSettings from './pages/Staff/ExamOfficer/Settings.jsx';
 import TeacherCbeQuestions from './pages/Staff/Teacher/CbeQuestions.jsx';
 import ExamAccessLogin from './pages/Exam/AccessLogin.jsx';
 import ExamTake from './pages/Exam/Take.jsx';
@@ -354,6 +355,7 @@ export const routes = [
   { path: "/staff/exam-officer/banks", label: "Exam Officer Question Banks", source: "exam_officer_banks", element: <ExamOfficerBanks /> },
   { path: "/staff/exam-officer/exams", label: "Exam Officer CBE Exams", source: "exam_officer_exams", element: <ExamOfficerExams /> },
   { path: "/staff/exam-officer/monitor", label: "Exam Officer Live Monitor", source: "exam_officer_monitor", element: <ExamOfficerMonitor /> },
+  { path: "/staff/exam-officer/settings", label: "Exam Officer Settings", source: "exam_officer_settings", element: <ExamOfficerSettings /> },
   { path: "/staff/exam-officer/account", label: "Exam Officer My Account", source: "exam_officer_account_mcss", element: <AccountPage portalId="examOfficer" /> },
   { path: "/staff/teacher/cbe-questions", label: "Teacher CBE Questions", source: "teacher_cbe_questions", element: <TeacherCbeQuestions /> },
   { path: "/exam-access", label: "Exam Access Login", source: "exam_access_login", element: <ExamAccessLogin /> },

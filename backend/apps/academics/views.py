@@ -570,6 +570,20 @@ class ExamPublishView(APIView):
 
     def post(self, request, exam_id):
         exam = get_object_or_404(Exam, id=exam_id)
+        # The actual approval gate: a submission still SUBMITTED means no
+        # one has reviewed it yet, and REJECTED means someone explicitly
+        # said it isn't right — either way, publishing now would show
+        # students scores nobody has signed off on. A class+subject that
+        # never went through the submit-for-approval flow at all (scores
+        # entered directly by staff) doesn't block publish; only a
+        # submission that exists and isn't APPROVED does.
+        unresolved = exam.result_submissions.exclude(status=ResultSubmission.Status.APPROVED)
+        if unresolved.exists():
+            count = unresolved.count()
+            return failure(
+                message=f"{count} result submission(s) for this exam still need admin approval before it can be published.",
+                status=400,
+            )
         exam.status = Exam.Status.PUBLISHED
         exam.save(update_fields=["status"])
         log(actor=request.user, action="academics.exam_published", target=exam, request=request)
@@ -1379,7 +1393,9 @@ class MyTeachingScoresView(APIView):
         class_arm = request.data.get("class_arm")
         if not _teaches_subject_in_arm(request.user, session, class_arm, subject):
             return failure(message="You don't teach that subject in that class.", status=403)
-        submitted = ResultSubmission.objects.filter(exam_id=exam_id, class_arm_id=class_arm, subject_id=subject).exists()
+        submitted = ResultSubmission.objects.filter(
+            exam_id=exam_id, class_arm_id=class_arm, subject_id=subject,
+        ).exclude(status=ResultSubmission.Status.REJECTED).exists()
         if submitted:
             return failure(message="These scores were already submitted for approval — ask an admin to reopen them before editing.", status=409)
         serializer = ExamScoreBulkEntrySerializer(data=request.data)
@@ -1405,10 +1421,13 @@ class MyTeachingScoresView(APIView):
 
 class MyTeachingResultSubmitView(APIView):
     """Teacher Portal > Results: lock in one class+subject's scores for
-    this exam and send them to the HOD/principal for approval — the
-    counterpart admins act on via results.approve, once that review queue
-    exists. Submitting doesn't publish results to students; it only stops
-    the teacher (and this endpoint) from editing further."""
+    this exam and send them to the HOD/principal for approval. Submitting
+    doesn't publish results to students; it only stops the teacher (and
+    this endpoint) from editing further. If a prior submission for this
+    exact class+subject was rejected, resubmitting reopens the SAME row
+    (unique_together on exam/class_arm/subject means there's only ever one)
+    rather than getting permanently stuck behind the old "Already
+    submitted" — a rejection is meant to be fixable, not final."""
 
     permission_classes = [IsAuthenticated]
 
@@ -1425,7 +1444,15 @@ class MyTeachingResultSubmitView(APIView):
             defaults={"teacher": request.user, "status": ResultSubmission.Status.SUBMITTED},
         )
         if not created:
-            return failure(message="Already submitted.", status=409)
+            if submission.status != ResultSubmission.Status.REJECTED:
+                return failure(message="Already submitted.", status=409)
+            submission.status = ResultSubmission.Status.SUBMITTED
+            submission.teacher = request.user
+            submission.submitted_at = timezone.now()
+            submission.reviewed_by = None
+            submission.reviewed_at = None
+            submission.review_note = ""
+            submission.save(update_fields=["status", "teacher", "submitted_at", "reviewed_by", "reviewed_at", "review_note"])
         log(actor=request.user, action="academics.results_submitted", target=submission, request=request)
         return success(message="Results submitted for approval.", data=ResultSubmissionSerializer(submission).data)
 
@@ -1483,8 +1510,13 @@ class PendingResultSubmissionsView(APIView):
 
 class ResultSubmissionReviewView(APIView):
     """Approve or reject one teacher's submitted class+subject results.
-    Rejecting unlocks that slice for the teacher to edit and resubmit —
-    approving doesn't publish results to students by itself; publishing
+    Rejecting keeps the row (status=rejected) rather than deleting it —
+    ExamPublishView needs to still see it as "not approved yet" so a
+    rejected slice can't slip through unpublished-but-uncaught, and the
+    teacher's MarksEntryView needs the row to unlock editing and to show
+    why it was rejected. MyTeachingResultSubmitView.post is what reopens
+    this same row (get_or_create finds it) when the teacher resubmits.
+    Approving doesn't publish results to students by itself; publishing
     the exam as a whole stays ExamPublishView's job, once every submission
     for it looks good."""
 
@@ -1503,14 +1535,6 @@ class ResultSubmissionReviewView(APIView):
         submission.reviewed_at = timezone.now()
         submission.review_note = request.data.get("review_note", "")
         submission.save(update_fields=["status", "reviewed_by", "reviewed_at", "review_note"])
-
-        # Rejecting hands the slice back to the teacher — deleting the
-        # ResultSubmission row (rather than just flipping its status) is
-        # what MyTeachingScoresView.post checks to decide whether the
-        # teacher can edit again, matching "resubmit" being a fresh
-        # get_or_create rather than a status transition on this same row.
-        if outcome == ResultSubmission.Status.REJECTED:
-            submission.delete()
 
         log(actor=request.user, action=f"academics.results_{outcome}", target=submission, request=request)
         return success(message=f"Results {outcome}.", data=ResultSubmissionSerializer(submission).data)

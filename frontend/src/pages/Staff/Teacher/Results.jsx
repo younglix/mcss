@@ -78,7 +78,9 @@ export default function TeacherResults() {
         ) : (
           <div>
             <div className="flex items-center gap-md flex-wrap mb-md">
-              {submission ? (
+              {submission?.status === 'rejected' ? (
+                <Badge tone="error">Rejected — fix and resubmit in Marks Entry</Badge>
+              ) : submission ? (
                 <Badge tone="tertiary">Submitted for approval — {new Date(submission.submitted_at).toLocaleDateString()}</Badge>
               ) : (
                 <Badge tone="secondary">Not yet submitted</Badge>

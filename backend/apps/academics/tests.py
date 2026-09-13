@@ -1,9 +1,13 @@
-"""Class-arm performance-based reallocation.
+"""Class-arm performance-based reallocation, plus the results submit ->
+approve -> publish workflow: a teacher's submission must actually be
+approved (not just submitted, and not stuck rejected) before an exam can be
+published to students.
 
-Covers the spec's required cases: pure re-rank/swap (capacities unchanged),
-N_S additive absorption (capacity grows, nobody displaced), the gap
-tie-break, first-ever all-N_S banding, and the compute -> release -> apply
-gate (nothing touches live records before release/apply).
+Covers the reallocation spec's required cases: pure re-rank/swap
+(capacities unchanged), N_S additive absorption (capacity grows, nobody
+displaced), the gap tie-break, first-ever all-N_S banding, and the
+compute -> release -> apply gate (nothing touches live records before
+release/apply).
 """
 
 from datetime import date, timedelta
@@ -13,7 +17,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from apps.configuration.models import AcademicSession, ClassArm, SchoolClass, Term
+from apps.configuration.models import AcademicSession, ClassArm, GradeScale, SchoolClass, Term
 from apps.rbac.models import Permission, Role, RolePermission, UserRole
 
 from . import services
@@ -21,8 +25,11 @@ from .models import (
     ClassBandingConfig,
     ClassReallocation,
     ClassReallocationMove,
+    ClassSubjectAssignment,
+    ClassTeacherAssignment,
     Exam,
     ExamScore,
+    ResultSubmission,
     Student,
     Subject,
 )
@@ -430,3 +437,156 @@ class ApiGateTests(ReallocationTestBase):
         self.arm_a.refresh_from_db()
         self.assertEqual(self.arm_a.capacity, 5)
         self.assertTrue(AuditLog.objects.filter(action="academics.arm_capacity_edited", target_id=str(self.arm_a.id)).exists())
+
+
+class ResultsApprovalGateTestBase(TestCase):
+    """A teacher submits one class+subject's scores; a principal must
+    actually approve it before the whole exam can be published."""
+
+    def setUp(self):
+        self.session = AcademicSession.objects.create(
+            name="2026/2027", start_date=date(2026, 9, 1), end_date=date(2027, 7, 31), is_current=True,
+        )
+        self.term = Term.objects.create(
+            session=self.session, name="First", start_date=date(2026, 9, 1), end_date=date(2026, 12, 15), is_current=True,
+        )
+        self.school_class = SchoolClass.objects.create(name="SS-1", level_order=1)
+        self.arm = ClassArm.objects.create(school_class=self.school_class, name="A")
+        self.subject = Subject.objects.create(name="Mathematics", code="MTH")
+        self.exam = Exam.objects.create(
+            name="First CA Test", exam_type=Exam.ExamType.TEST, session=self.session, term=self.term,
+            start_date=date(2026, 10, 1),
+        )
+
+        self.teacher = User.objects.create(full_name="Teacher One", email="teacher1@x.io", user_type="staff", is_active=True)
+        ClassSubjectAssignment.objects.create(class_arm=self.arm, subject=self.subject, teacher=self.teacher, session=self.session)
+
+        student_user = User.objects.create(full_name="Student One", email="student1@x.io", user_type="student", is_active=True)
+        self.student = Student.objects.create(user=student_user, class_arm=self.arm, status=Student.Status.ACTIVE)
+        ExamScore.objects.create(exam=self.exam, student=self.student, subject=self.subject, score=70, max_score=100, entered_by=self.teacher)
+
+        self.principal_role = Role.objects.create(name="Principal", slug="principal")
+        for code in ["results.approve", "results.publish", "results.view"]:
+            perm = Permission.objects.create(code=code, module="results", action=code.split(".")[1])
+            RolePermission.objects.create(role=self.principal_role, permission=perm)
+        self.principal = User.objects.create(full_name="Principal One", email="principal1@x.io", user_type="staff", is_active=True)
+        UserRole.objects.create(user=self.principal, role=self.principal_role)
+
+        self.client = APIClient()
+
+    def submit(self):
+        self.client.force_authenticate(self.teacher)
+        return self.client.post(f"/api/v1/academics/teaching/exams/{self.exam.id}/submit", {
+            "subject": str(self.subject.id), "class_arm": str(self.arm.id),
+        }, format="json")
+
+    def review(self, submission_id, status):
+        self.client.force_authenticate(self.principal)
+        return self.client.post(f"/api/v1/academics/result-submissions/{submission_id}/review", {"status": status}, format="json")
+
+    def publish(self):
+        self.client.force_authenticate(self.principal)
+        return self.client.post(f"/api/v1/academics/exams/{self.exam.id}/publish", {}, format="json")
+
+
+class PublishRequiresApprovalTests(ResultsApprovalGateTestBase):
+    def test_publish_is_blocked_while_a_submission_is_only_submitted_not_approved(self):
+        self.submit()
+        res = self.publish()
+        self.assertEqual(res.status_code, 400)
+        self.exam.refresh_from_db()
+        self.assertNotEqual(self.exam.status, Exam.Status.PUBLISHED)
+
+    def test_publish_succeeds_once_every_submission_is_approved(self):
+        submit_res = self.submit()
+        submission_id = submit_res.json()["data"]["id"]
+        self.review(submission_id, "approved")
+
+        res = self.publish()
+        self.assertEqual(res.status_code, 200, res.json())
+        self.exam.refresh_from_db()
+        self.assertEqual(self.exam.status, Exam.Status.PUBLISHED)
+
+    def test_publish_is_blocked_while_a_submission_is_rejected(self):
+        submit_res = self.submit()
+        submission_id = submit_res.json()["data"]["id"]
+        self.review(submission_id, "rejected")
+        submission = ResultSubmission.objects.get(id=submission_id)
+        self.assertEqual(submission.status, "rejected")
+
+        res = self.publish()
+        self.assertEqual(res.status_code, 400)
+
+    def test_publish_with_no_submissions_at_all_is_unaffected(self):
+        """A class+subject whose scores were entered directly by staff,
+        never routed through the submit-for-approval flow, shouldn't block
+        publish — only an existing, unresolved submission does."""
+        res = self.publish()
+        self.assertEqual(res.status_code, 200, res.json())
+
+    def test_a_published_exams_results_are_now_visible_to_the_student(self):
+        submit_res = self.submit()
+        self.review(submit_res.json()["data"]["id"], "approved")
+        self.publish()
+
+        self.client.force_authenticate(self.student.user)
+        res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}")
+        self.assertEqual(res.status_code, 200)
+
+
+class ResubmitAfterRejectionTests(ResultsApprovalGateTestBase):
+    def test_rejected_submission_can_be_resubmitted_not_permanently_stuck(self):
+        submit_res = self.submit()
+        submission_id = submit_res.json()["data"]["id"]
+        self.review(submission_id, "rejected")
+
+        res = self.submit()  # teacher fixes the scores and resubmits
+        self.assertEqual(res.status_code, 200, res.json())
+        self.assertEqual(res.json()["data"]["id"], submission_id)  # same row, not a new one — unique_together
+        self.assertEqual(res.json()["data"]["status"], "submitted")
+
+        submission = ResultSubmission.objects.get(id=submission_id)
+        self.assertIsNone(submission.reviewed_by_id)
+        self.assertIsNone(submission.reviewed_at)
+        self.assertEqual(submission.review_note, "")
+
+    def test_resubmitting_an_already_pending_submission_still_conflicts(self):
+        self.submit()
+        res = self.submit()
+        self.assertEqual(res.status_code, 409)
+
+    def test_resubmitting_an_approved_submission_still_conflicts(self):
+        submit_res = self.submit()
+        self.review(submit_res.json()["data"]["id"], "approved")
+        res = self.submit()
+        self.assertEqual(res.status_code, 409)
+
+
+class ReportCardPDFTests(ResultsApprovalGateTestBase):
+    """The PDF download crashed in production with a ReportLab data error —
+    root-caused to zero GradeScale rows existing there, which made the
+    grading-key table's second <tr> render as a literally empty row while
+    its first cell still carried rowspan="2" from row one. Reproduced
+    exactly here by leaving GradeScale empty (the setUp default) instead of
+    guessing at the traceback."""
+
+    def _publish(self):
+        submit_res = self.submit()
+        self.review(submit_res.json()["data"]["id"], "approved")
+        self.publish()
+
+    def test_pdf_downloads_with_no_grade_scales_configured(self):
+        self._publish()
+        self.client.force_authenticate(self.student.user)
+        res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}/pdf")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res["Content-Type"], "application/pdf")
+
+    def test_pdf_downloads_with_grade_scales_configured(self):
+        GradeScale.objects.create(name="A", min_score=70, max_score=100, remark="Excellent")
+        GradeScale.objects.create(name="F", min_score=0, max_score=69, remark="Fail")
+        self._publish()
+        self.client.force_authenticate(self.student.user)
+        res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}/pdf")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res["Content-Type"], "application/pdf")

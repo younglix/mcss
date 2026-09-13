@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBranding } from '../../context/BrandingContext.jsx';
 import { examApi, ExamApiError, setExamSession } from '../../lib/examApi.js';
 
@@ -7,12 +7,16 @@ const inputClasses = 'mcss-field w-full pl-11 pr-md hover:border-primary';
 
 /** Standalone, public — reached by a student typing a URL into an exam-hall
  * computer, not through the normal portal login. Student ID + the exam's
- * live access code only; nothing here touches a student's real password. */
+ * live access code only; nothing here touches a student's real password.
+ * A shared "Copy Exam Link" (see Staff/ExamOfficer/Exams.jsx) carries the
+ * code as ?code= so it's pre-filled here — the student still has to type
+ * their own Student ID, so the link alone can't get anyone in. */
 export default function ExamAccessLogin() {
   const navigate = useNavigate();
   const { branding } = useBranding();
+  const [searchParams] = useSearchParams();
   const [studentId, setStudentId] = useState('');
-  const [accessCode, setAccessCode] = useState('');
+  const [accessCode, setAccessCode] = useState((searchParams.get('code') || '').toUpperCase());
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
 

@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Card from '../../components/ui/Card.jsx';
 import Badge from '../../components/ui/Badge.jsx';
 import Button from '../../components/ui/Button.jsx';
 import DashboardPageShell from '../SuperAdmin/dashboard/DashboardPageShell.jsx';
 import { useDashboardData } from '../SuperAdmin/dashboard/useDashboardData.js';
 import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
-import { api } from '../../lib/api.js';
+import { api, ApiError } from '../../lib/api.js';
 
 const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 const STATUS_TONE = { scheduled: 'secondary', ongoing: 'warning', completed: 'primary', published: 'success' };
@@ -56,12 +57,16 @@ export default function PrincipalResults() {
 
   const [expandedId, setExpandedId] = useState(null);
   const [publishingId, setPublishingId] = useState(null);
+  const [publishError, setPublishError] = useState('');
 
   const handlePublish = async (exam) => {
     setPublishingId(exam.id);
+    setPublishError('');
     try {
       await api.post(`/academics/exams/${exam.id}/publish`, {});
       reload();
+    } catch (err) {
+      setPublishError(err instanceof ApiError ? err.message : 'Could not publish this exam.');
     } finally {
       setPublishingId(null);
     }
@@ -78,6 +83,13 @@ export default function PrincipalResults() {
       onReload={reload}
       skeletonCount={1}
     >
+      {publishError && (
+        <Card padding="lg" className="border border-error/30 bg-error-container/10 mb-md">
+          <p className="font-body-md text-body-md text-on-surface">
+            {publishError} <Link to="/principal/approvals" className="text-primary hover:underline font-bold">Review pending submissions →</Link>
+          </p>
+        </Card>
+      )}
       {data && (
         exams.length === 0 ? (
           <Card padding="lg"><EmptyState icon="quiz" text="No exams set up yet." /></Card>

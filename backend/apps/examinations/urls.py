@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("terms", views.ExamTermsView.as_view(), name="exam-terms"),
+    path("settings", views.ExamSettingsView.as_view(), name="exam-settings"),
 
     # Question banks (teacher authoring + officer approval)
     path("banks", views.QuestionBanksView.as_view(), name="exam-banks"),
