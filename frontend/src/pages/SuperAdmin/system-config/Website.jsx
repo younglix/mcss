@@ -4,6 +4,8 @@ import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
 import ImageUploadField from '../../../components/ui/ImageUploadField.jsx';
+import SiteMediaManager from '../../../components/ui/SiteMediaManager.jsx';
+import AlbumManager from '../../../components/ui/AlbumManager.jsx';
 import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
 import { api, ApiError } from '../../../lib/api.js';
@@ -153,6 +155,7 @@ export default function SuperAdminWebsiteSettings() {
               <h2 className="font-headline-md text-headline-md text-primary mb-md">Hero</h2>
               <div className="space-y-lg">
                 <ImageUploadField label="Hero Image" value={values['website.hero_image']} onChange={(v) => update('website.hero_image', v)} />
+                <SiteMediaManager placement="hero" />
                 <FieldGrid fields={HERO_TEXT_FIELDS} values={values} update={update} cols={2} />
               </div>
             </Card>
@@ -161,8 +164,14 @@ export default function SuperAdminWebsiteSettings() {
               <h2 className="font-headline-md text-headline-md text-primary mb-md">About</h2>
               <div className="space-y-lg">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                  <ImageUploadField label="Image 1" value={values['website.about_image1']} onChange={(v) => update('website.about_image1', v)} />
-                  <ImageUploadField label="Image 2" value={values['website.about_image2']} onChange={(v) => update('website.about_image2', v)} />
+                  <div className="space-y-sm">
+                    <ImageUploadField label="Image 1" value={values['website.about_image1']} onChange={(v) => update('website.about_image1', v)} />
+                    <SiteMediaManager placement="about_1" />
+                  </div>
+                  <div className="space-y-sm">
+                    <ImageUploadField label="Image 2" value={values['website.about_image2']} onChange={(v) => update('website.about_image2', v)} />
+                    <SiteMediaManager placement="about_2" />
+                  </div>
                 </div>
                 <FieldGrid fields={ABOUT_TEXT_FIELDS} values={values} update={update} cols={2} />
                 <div>
@@ -219,9 +228,13 @@ export default function SuperAdminWebsiteSettings() {
                       <div key={i} className="p-md bg-surface-container-low rounded-lg space-y-md">
                         <ImageUploadField label={`Image ${i + 1}`} value={image.url} onChange={(v) => updateArrayItem('website.gallery_images', i, 'url', v)} />
                         <FormField field={{ key: 'label', label: 'Caption', type: 'text' }} value={image.label} onChange={(v) => updateArrayItem('website.gallery_images', i, 'label', v)} />
+                        {i < 3 && <SiteMediaManager placement={`gallery_${i + 1}`} />}
                       </div>
                     ))}
                   </div>
+                </div>
+                <div className="border-t border-outline/10 pt-lg">
+                  <AlbumManager />
                 </div>
               </div>
             </Card>

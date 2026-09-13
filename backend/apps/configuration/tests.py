@@ -73,6 +73,26 @@ class SiteMediaAdminCrudTests(SiteMediaTestBase):
         self.assertEqual(del_res.status_code, 204)
         self.assertFalse(SiteMedia.objects.filter(id=media.id).exists())
 
+    def test_album_placement_supports_mixed_image_and_video_items(self):
+        # The School Album (item 9) is the one placement that mixes
+        # media_type=video (a pasted YouTube/Vimeo/direct-file URL, not an
+        # uploaded file — see AlbumManager.jsx) alongside ordinary images.
+        self.client.force_authenticate(self.admin)
+        img_res = self.client.post("/api/v1/config/site-media", {
+            "placement": "album", "media_type": "image", "url": "/media/album/photo.jpg",
+        }, format="json")
+        vid_res = self.client.post("/api/v1/config/site-media", {
+            "placement": "album", "media_type": "video", "url": "https://www.youtube.com/watch?v=abc123",
+        }, format="json")
+        self.assertEqual(img_res.status_code, 201, img_res.json())
+        self.assertEqual(vid_res.status_code, 201, vid_res.json())
+        self.assertEqual(img_res.json()["media_type"], "image")
+        self.assertEqual(vid_res.json()["media_type"], "video")
+
+        list_res = self.client.get("/api/v1/config/site-media?placement=album")
+        types = {row["media_type"] for row in list_res.json()["data"]}
+        self.assertEqual(types, {"image", "video"})
+
     def test_requires_config_edit_to_write(self):
         self.client.force_authenticate(self.outsider)
         res = self.client.post("/api/v1/config/site-media", {"placement": "login_slider", "url": "/a.jpg"}, format="json")

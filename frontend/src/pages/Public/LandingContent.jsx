@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PublicHeader from '../../components/public/PublicHeader.jsx';
 import PublicFooter from '../../components/public/PublicFooter.jsx';
+import LandingImageSpot from '../../components/public/LandingImageSpot.jsx';
 import { api } from '../../lib/api.js';
 
 const toneClasses = ['primary', 'secondary'];
@@ -94,7 +95,7 @@ export default function LandingContent() {
           <div className="lg:col-span-6 relative mt-xl lg:mt-0">
             <div className="relative w-full aspect-[4/5] lg:aspect-square">
               <div className="absolute inset-0 border-8 lg:border-[12px] border-surface-container-lowest shadow-2xl overflow-hidden rounded-lg lg:rounded-none z-10">
-                {content.hero_image && <img src={content.hero_image} alt="Mount Carmel campus" className="w-full h-full object-cover" />}
+                <LandingImageSpot placement="hero" fallbackUrl={content.hero_image} alt="Mount Carmel campus" />
               </div>
               {(content.hero_stat_value || content.hero_stat_label) && (
                 <div className="absolute -bottom-6 -right-2 lg:right-0 lg:translate-x-1/4 z-20 bg-secondary p-lg shadow-xl text-on-secondary max-w-40">
@@ -112,8 +113,8 @@ export default function LandingContent() {
         <div className="max-w-container-max mx-auto px-gutter grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
           <div className="grid grid-cols-2 gap-md order-2 lg:order-1">
             <div className="space-y-md lg:pt-12">
-              <div className="aspect-[3/4] rounded-lg overflow-hidden border-t-8 border-primary bg-surface-container-low">
-                {content.about_image1 && <img src={content.about_image1} alt="Students at Mount Carmel" className="w-full h-full object-cover" />}
+              <div className="aspect-[3/4] rounded-lg overflow-hidden border-t-8 border-primary bg-surface-container-low relative">
+                <LandingImageSpot placement="about_1" fallbackUrl={content.about_image1} alt="Students at Mount Carmel" />
               </div>
               <div className="aspect-square bg-secondary/10 flex items-center justify-center p-lg rounded-lg">
                 <span className="material-symbols-outlined text-5xl text-secondary">history_edu</span>
@@ -125,8 +126,8 @@ export default function LandingContent() {
                 <p className="font-headline-md text-lg italic">Our Vision</p>
                 <p className="text-xs opacity-80 leading-relaxed mt-xs">Beacon of integral education in Africa.</p>
               </div>
-              <div className="aspect-3/4 rounded-lg overflow-hidden border-b-8 border-tertiary-container bg-surface-container-low">
-                {content.about_image2 && <img src={content.about_image2} alt="Mount Carmel architecture" className="w-full h-full object-cover" />}
+              <div className="aspect-3/4 rounded-lg overflow-hidden border-b-8 border-tertiary-container bg-surface-container-low relative">
+                <LandingImageSpot placement="about_2" fallbackUrl={content.about_image2} alt="Mount Carmel architecture" />
               </div>
             </div>
           </div>
@@ -205,12 +206,19 @@ export default function LandingContent() {
               <h3 className="font-headline-lg text-headline-md lg:text-headline-lg text-primary">{content.gallery_title}</h3>
               <p className="text-on-surface-variant mt-sm italic max-w-md">{content.gallery_body}</p>
             </div>
+            <Link
+              to="/album"
+              className="flex items-center gap-xs font-label-md text-label-md font-bold text-primary hover:underline shrink-0"
+            >
+              View Full Album
+              <span className="material-symbols-outlined text-body-md">arrow_forward</span>
+            </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
             {galleryImages.map((image, i) => (
               <div key={image.label} className={`${i === 0 ? 'md:row-span-2 aspect-video md:aspect-square' : 'aspect-square'} rounded-lg overflow-hidden shadow-lg group relative bg-surface-container-low`}>
-                {image.url && <img src={image.url} alt={image.label} className="w-full h-full object-cover" />}
-                <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                {i < 3 && <LandingImageSpot placement={`gallery_${i + 1}`} fallbackUrl={image.url} alt={image.label} />}
+                <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none z-10">
                   <p className="font-headline-md text-on-primary">{image.label}</p>
                 </div>
               </div>

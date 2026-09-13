@@ -1,6 +1,7 @@
 import Landing from './pages/Public/Landing.jsx';
 import LandingDesktop from './pages/Public/LandingDesktop.jsx';
 import Login from './pages/Public/Login.jsx';
+import Album from './pages/Public/Album.jsx';
 import StaffOnboarding from './pages/Public/StaffOnboarding.jsx';
 import ApplyIntro from './pages/Public/ApplyNow/Intro.jsx';
 import ApplyBioData from './pages/Public/ApplyNow/BioDataForm.jsx';
@@ -180,6 +181,7 @@ export const routes = [
   { path: "/", label: "Public Landing", source: "mcss_landing_page_mobile_elite", element: <Landing /> },
   { path: "/landing-desktop", label: "Public Desktop Landing", source: "mcss_landing_page", element: <LandingDesktop /> },
   { path: "/login", label: "Portal Login", source: "portal_login_mcss", element: <Login /> },
+  { path: "/album", label: "School Album", source: "mcss_school_album", element: <Album /> },
   { path: "/staff/register", label: "Staff Registration", source: "staff_onboarding_public_form", element: <StaffOnboarding /> },
   { path: "/apply", label: "Apply Intro", source: "admission_application_intro", element: <ApplyIntro /> },
   { path: "/apply/bio-data", label: "Apply Bio Data", source: "admission_application_bio_data", element: <ApplyBioData /> },
