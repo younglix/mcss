@@ -8,7 +8,7 @@ import { GOOGLE_FONTS, loadGoogleFonts } from '../../lib/fonts.js';
  * immediately) independent of whether the surrounding form has been saved —
  * Appearance.jsx's save handler is what commits it as the app-wide font via
  * applyTypographyOverrides, this is purely "make it visible while picking." */
-export default function FontPicker({ id, label, value, onChange }) {
+export default function FontPicker({ id, label, hint, value, onChange }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const containerRef = useRef(null);
@@ -109,6 +109,7 @@ export default function FontPicker({ id, label, value, onChange }) {
           </div>
         )}
       </div>
+      {hint && <p className="font-label-sm text-label-sm text-on-surface-variant mt-1">{hint}</p>}
     </div>
   );
 }

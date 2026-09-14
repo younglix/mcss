@@ -116,6 +116,22 @@ export function applyColorOverrides({ primary, secondary, isDark = false } = {})
   }
 }
 
+// Every actual `font-*` Tailwind utility the app uses is one of these three
+// families' *size-suffixed* variants (font-headline-md, font-body-sm,
+// font-label-lg, ...) — grepping the whole app found zero uses of the bare
+// font-headline/font-body/font-label class names, and zero uses of
+// font-display at all. Setting only the bare --font-headline/-display/-body
+// tokens (as this used to) therefore changed no visible text anywhere:
+// every heading, label, badge, nav item, and button reads one of the
+// variables listed here instead. Label has no dedicated admin field, so
+// "Primary Font" — otherwise only feeding the unused --font-display —
+// drives it too, since labels/buttons/nav are the app's dominant, most
+// visible typographic role (by far the most common font-* class in the
+// codebase).
+const HEADLINE_VARS = ['--font-headline', '--font-headline-lg', '--font-headline-md', '--font-headline-sm', '--font-headline-xl', '--font-headline-lg-mobile'];
+const BODY_VARS = ['--font-body', '--font-body-lg', '--font-body-md', '--font-body-sm'];
+const LABEL_VARS = ['--font-display', '--font-label', '--font-label-lg', '--font-label-md', '--font-label-sm'];
+
 export function applyTypographyOverrides({ primaryFont, bodyFont, headingFont, baseFontSize } = {}) {
   const root = document.documentElement.style;
   // Setting the CSS variable alone isn't enough — a font name nothing has
@@ -125,9 +141,18 @@ export function applyTypographyOverrides({ primaryFont, bodyFont, headingFont, b
   // variable is read, not just on the settings page that happens to have
   // already fetched it via FontPicker's own preview.
   loadGoogleFonts([headingFont, primaryFont, bodyFont]);
-  if (headingFont) root.setProperty('--font-headline', `"${headingFont}", sans-serif`);
-  if (primaryFont) root.setProperty('--font-display', `"${primaryFont}", sans-serif`);
-  if (bodyFont) root.setProperty('--font-body', `"${bodyFont}", sans-serif`);
+  if (headingFont) {
+    const family = `"${headingFont}", sans-serif`;
+    HEADLINE_VARS.forEach((v) => root.setProperty(v, family));
+  }
+  if (primaryFont) {
+    const family = `"${primaryFont}", sans-serif`;
+    LABEL_VARS.forEach((v) => root.setProperty(v, family));
+  }
+  if (bodyFont) {
+    const family = `"${bodyFont}", sans-serif`;
+    BODY_VARS.forEach((v) => root.setProperty(v, family));
+  }
   if (baseFontSize) document.documentElement.style.fontSize = `${baseFontSize}px`;
 }
 

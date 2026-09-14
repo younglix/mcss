@@ -22,9 +22,9 @@ const THEME_FIELDS = [
 ];
 
 const FONT_FIELDS = [
-  { key: 'appearance.heading_font', label: 'Heading Font' },
-  { key: 'appearance.primary_font', label: 'Primary Font' },
-  { key: 'appearance.body_font', label: 'Body Font' },
+  { key: 'appearance.heading_font', label: 'Heading Font', hint: 'Page titles and section headings.' },
+  { key: 'appearance.primary_font', label: 'Primary Font', hint: 'Labels, buttons, nav, badges, table headers — the most-used typeface in the app.' },
+  { key: 'appearance.body_font', label: 'Body Font', hint: 'Paragraph text and form inputs.' },
 ];
 const BASE_FONT_SIZE_FIELD = { key: 'appearance.base_font_size', label: 'Base Font Size (px)', type: 'number' };
 
@@ -118,7 +118,7 @@ export default function SuperAdminAppearanceSettings() {
             <h2 className="font-headline-md text-headline-md text-primary mb-md">Typography</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
               {FONT_FIELDS.map((field) => (
-                <FontPicker key={field.key} id={field.key} label={field.label} value={values[field.key]} onChange={(v) => update(field.key, v)} />
+                <FontPicker key={field.key} id={field.key} label={field.label} hint={field.hint} value={values[field.key]} onChange={(v) => update(field.key, v)} />
               ))}
               <FormField
                 field={{ ...BASE_FONT_SIZE_FIELD, id: BASE_FONT_SIZE_FIELD.key }}
