@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.custom_fields.models import CustomField
 from apps.custom_fields.serializers import CustomFieldValueItemSerializer
-from apps.custom_fields.services import mask_if_sensitive, missing_required_fields
+from apps.custom_fields.services import field_summary, mask_if_sensitive, missing_required_fields, ordered_active_fields
 
 from .models import Application, ApplicationDocument, ApplicationFieldValue
 
@@ -115,13 +115,7 @@ class PublicApplicationConfigSerializer(serializers.Serializer):
     parent_custom_fields = serializers.SerializerMethodField()
 
     def _field_list(self, entity):
-        return [
-            {
-                "field_id": str(f.id), "key": f.key, "label": f.label, "field_type": f.field_type,
-                "options": f.options, "required": f.required, "is_sensitive": f.is_sensitive,
-            }
-            for f in CustomField.objects.filter(entity=entity, is_active=True)
-        ]
+        return [field_summary(f) for f in ordered_active_fields(entity)]
 
     def get_student_custom_fields(self, obj):
         return self._field_list(CustomField.Entity.STUDENT)

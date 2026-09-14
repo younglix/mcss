@@ -1,18 +1,35 @@
 from rest_framework import serializers
 
-from .models import CustomField, CustomFieldValue
+from .models import CustomField, CustomFieldGroup, CustomFieldValue
+
+
+class CustomFieldGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomFieldGroup
+        fields = ["id", "entity", "name", "order", "is_active", "created_at"]
+        read_only_fields = ["id", "created_at"]
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomField
-        fields = ["id", "entity", "key", "label", "field_type", "options", "required", "order", "is_active", "is_sensitive", "created_at"]
+        fields = [
+            "id", "entity", "group", "key", "label", "field_type", "options", "placeholder",
+            "required", "order", "is_active", "is_sensitive", "created_at",
+        ]
         read_only_fields = ["id", "created_at"]
 
     def validate_options(self, value):
         if value and not isinstance(value, list):
             raise serializers.ValidationError("Options must be a list of strings.")
         return value
+
+    def validate(self, attrs):
+        group = attrs.get("group", getattr(self.instance, "group", None))
+        entity = attrs.get("entity", getattr(self.instance, "entity", None))
+        if group and entity and group.entity != entity:
+            raise serializers.ValidationError({"group": "That Data Title belongs to a different entity."})
+        return attrs
 
 
 class CustomFieldValueSerializer(serializers.ModelSerializer):

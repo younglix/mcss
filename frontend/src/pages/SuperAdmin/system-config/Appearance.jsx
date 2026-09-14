@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import Card from '../../../components/ui/Card.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import FormField from '../../../components/ui/FormField.jsx';
+import FontPicker from '../../../components/ui/FontPicker.jsx';
 import ImageUploadField from '../../../components/ui/ImageUploadField.jsx';
 import SectionShell from './SectionShell.jsx';
 import { useDashboardData } from '../dashboard/useDashboardData.js';
@@ -20,12 +21,12 @@ const THEME_FIELDS = [
   },
 ];
 
-const TYPOGRAPHY_FIELDS = [
-  { key: 'appearance.heading_font', label: 'Heading Font', type: 'text' },
-  { key: 'appearance.primary_font', label: 'Primary Font', type: 'text' },
-  { key: 'appearance.body_font', label: 'Body Font', type: 'text' },
-  { key: 'appearance.base_font_size', label: 'Base Font Size (px)', type: 'number' },
+const FONT_FIELDS = [
+  { key: 'appearance.heading_font', label: 'Heading Font' },
+  { key: 'appearance.primary_font', label: 'Primary Font' },
+  { key: 'appearance.body_font', label: 'Body Font' },
 ];
+const BASE_FONT_SIZE_FIELD = { key: 'appearance.base_font_size', label: 'Base Font Size (px)', type: 'number' };
 
 const LOGO_UPLOAD_FIELDS = [
   { key: 'appearance.light_logo', label: 'Light Mode Logo', hint: 'Shown across the app when light mode is active.' },
@@ -116,9 +117,14 @@ export default function SuperAdminAppearanceSettings() {
           <Card padding="lg" className="max-w-3xl">
             <h2 className="font-headline-md text-headline-md text-primary mb-md">Typography</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-              {TYPOGRAPHY_FIELDS.map((field) => (
-                <FormField key={field.key} field={{ ...field, id: field.key }} value={values[field.key]} onChange={(v) => update(field.key, v)} />
+              {FONT_FIELDS.map((field) => (
+                <FontPicker key={field.key} id={field.key} label={field.label} value={values[field.key]} onChange={(v) => update(field.key, v)} />
               ))}
+              <FormField
+                field={{ ...BASE_FONT_SIZE_FIELD, id: BASE_FONT_SIZE_FIELD.key }}
+                value={values[BASE_FONT_SIZE_FIELD.key]}
+                onChange={(v) => update(BASE_FONT_SIZE_FIELD.key, v)}
+              />
             </div>
           </Card>
 

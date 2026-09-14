@@ -11,7 +11,7 @@ from rest_framework.test import APIClient
 from apps.academics.models import Student
 from apps.settings_app.models import SystemSetting
 
-from .models import CustomField, CustomFieldValue
+from .models import CustomField, CustomFieldGroup, CustomFieldValue
 from .views import MASKED_VALUE
 
 User = get_user_model()
@@ -359,3 +359,104 @@ class AttachmentUploadTests(TestCase):
 
         stored = CustomFieldValue.objects.get(field=field, entity_id=student.id)
         self.assertEqual(stored.value, url)
+
+
+class DataTitleGroupTests(ProfileFieldsTestBase):
+    """"Data Title" grouping — a Super Admin can create a named group per
+    entity, organize fields under it, and every consumer that lists field
+    definitions (admin, self-service, public forms) reflects the grouping
+    and the field's placeholder."""
+
+    def test_superadmin_can_create_a_group(self):
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.post("/api/v1/custom-fields/groups", {"entity": "staff", "name": "Biodata"}, format="json")
+        self.assertEqual(res.status_code, 201, res.json())
+        self.assertTrue(CustomFieldGroup.objects.filter(entity="staff", name="Biodata").exists())
+
+    def test_requires_permission(self):
+        res = self.client.post("/api/v1/custom-fields/groups", {"entity": "staff", "name": "Biodata"}, format="json")
+        self.assertEqual(res.status_code, 401)
+
+    def test_list_is_scoped_by_entity(self):
+        CustomFieldGroup.objects.create(entity="staff", name="Biodata")
+        CustomFieldGroup.objects.create(entity="student", name="Medical")
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.get("/api/v1/custom-fields/groups?entity=staff")
+        names = [g["name"] for g in res.json()["data"]]
+        self.assertEqual(names, ["Biodata"])
+
+    def test_rename_a_group(self):
+        group = CustomFieldGroup.objects.create(entity="staff", name="Biodata")
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.patch(f"/api/v1/custom-fields/groups/{group.id}", {"name": "Bio Data"}, format="json")
+        self.assertEqual(res.status_code, 200, res.json())
+        group.refresh_from_db()
+        self.assertEqual(group.name, "Bio Data")
+
+    def test_deleting_a_group_ungroups_its_fields_without_deleting_them(self):
+        """SET_NULL, not CASCADE — removing a Data Title must never destroy
+        the field definitions (or the values already saved for them) that
+        were organized under it."""
+        group = CustomFieldGroup.objects.create(entity="staff", name="Biodata")
+        field = CustomField.objects.create(entity="staff", key="phone", label="Phone", group=group)
+        CustomFieldValue.objects.create(field=field, entity_id=self.staff.id, value="0800000000")
+
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.delete(f"/api/v1/custom-fields/groups/{group.id}")
+        self.assertEqual(res.status_code, 204)
+
+        field.refresh_from_db()
+        self.assertIsNone(field.group_id)
+        self.assertTrue(CustomFieldValue.objects.filter(field=field, entity_id=self.staff.id).exists())
+
+    def test_field_can_be_created_under_a_group_with_a_placeholder(self):
+        group = CustomFieldGroup.objects.create(entity="staff", name="Biodata")
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.post("/api/v1/custom-fields/", {
+            "entity": "staff", "key": "phone_number", "label": "Phone Number", "field_type": "text",
+            "group": str(group.id), "placeholder": "Enter your phone number",
+        }, format="json")
+        self.assertEqual(res.status_code, 201, res.json())
+        field = CustomField.objects.get(key="phone_number")
+        self.assertEqual(field.group_id, group.id)
+        self.assertEqual(field.placeholder, "Enter your phone number")
+
+    def test_a_field_cannot_be_assigned_to_a_group_from_a_different_entity(self):
+        student_group = CustomFieldGroup.objects.create(entity="student", name="Medical")
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.post("/api/v1/custom-fields/", {
+            "entity": "staff", "key": "x", "label": "X", "field_type": "text", "group": str(student_group.id),
+        }, format="json")
+        self.assertEqual(res.status_code, 400)
+
+    def test_placeholder_and_group_surface_on_my_values(self):
+        group = CustomFieldGroup.objects.create(entity="staff", name="Biodata", order=0)
+        self.title_field.group = group
+        self.title_field.placeholder = "Enter your title"
+        self.title_field.save()
+
+        self.client.force_authenticate(self.staff)
+        res = self.client.get("/api/v1/custom-fields/my-values")
+        row = next(f for f in res.json()["data"]["fields"] if f["key"] == "title")
+        self.assertEqual(row["placeholder"], "Enter your title")
+        self.assertEqual(row["group_id"], str(group.id))
+        self.assertEqual(row["group_label"], "Biodata")
+
+    def test_ungrouped_fields_keep_their_original_relative_order_and_lead_grouped_ones(self):
+        """Backward compatibility: fields that existed before Data Titles
+        were introduced (group=None) must keep rendering exactly where they
+        always did — first, in their existing order — with grouped fields
+        following, clustered by their group's own order."""
+        bio = CustomFieldGroup.objects.create(entity="staff", name="Biodata", order=0)
+        medical = CustomFieldGroup.objects.create(entity="staff", name="Medical", order=1)
+        CustomField.objects.filter(entity="staff").delete()
+        f_ungrouped_2 = CustomField.objects.create(entity="staff", key="z_field", label="Z Field", order=2)
+        f_ungrouped_1 = CustomField.objects.create(entity="staff", key="a_field", label="A Field", order=1)
+        f_medical = CustomField.objects.create(entity="staff", key="allergy", label="Allergy", group=medical, order=0)
+        f_bio_2 = CustomField.objects.create(entity="staff", key="dob", label="DOB", group=bio, order=1)
+        f_bio_1 = CustomField.objects.create(entity="staff", key="phone", label="Phone", group=bio, order=0)
+
+        self.client.force_authenticate(self.superadmin)
+        res = self.client.get(f"/api/v1/custom-fields/values?entity=staff&entity_id={self.staff.id}")
+        keys = [f["key"] for f in res.json()["data"]]
+        self.assertEqual(keys, ["a_field", "z_field", "phone", "dob", "allergy"])

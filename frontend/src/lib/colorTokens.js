@@ -4,6 +4,8 @@
 // (HCT color space etc.), good enough to keep contrast sane without pulling
 // in a color-science dependency.
 
+import { loadGoogleFonts } from './fonts.js';
+
 function hexToHsl(hex) {
   const clean = hex.replace('#', '');
   const r = parseInt(clean.slice(0, 2), 16) / 255;
@@ -99,13 +101,33 @@ export function applyColorOverrides({ primary, secondary, isDark = false } = {})
     root.setProperty('--color-secondary-container', secondaryRole.container);
     root.setProperty('--color-on-secondary-container', secondaryRole.onContainer);
   }
+  // The sidebar/bottom-nav/public-header "nav" surface (bg-nav/text-on-nav)
+  // is deliberately always a dark, brand-colored bar regardless of the
+  // active light/dark theme — that's why its built-in default (#2e004a /
+  // white) exactly matches the light-mode primary role rather than flipping
+  // with isDark like every other role here. Always deriving it from the
+  // *light* role (not the current theme's role) keeps that "always dark
+  // brand bar" look while still tracking whatever primary color an admin
+  // picks — this is what makes a color change actually reach the sidebar.
+  const navRole = deriveColorRole(primary, false);
+  if (navRole) {
+    root.setProperty('--color-nav', navRole.base);
+    root.setProperty('--color-on-nav', navRole.onBase);
+  }
 }
 
 export function applyTypographyOverrides({ primaryFont, bodyFont, headingFont, baseFontSize } = {}) {
   const root = document.documentElement.style;
-  if (headingFont) root.setProperty('--font-headline', `${headingFont}, sans-serif`);
-  if (primaryFont) root.setProperty('--font-display', `${primaryFont}, sans-serif`);
-  if (bodyFont) root.setProperty('--font-body', `${bodyFont}, sans-serif`);
+  // Setting the CSS variable alone isn't enough — a font name nothing has
+  // ever loaded just falls back to the generic sans-serif silently. Loading
+  // it here (idempotent, see lib/fonts.js) is what makes "pick a font in
+  // Appearance settings" actually render as that font everywhere the
+  // variable is read, not just on the settings page that happens to have
+  // already fetched it via FontPicker's own preview.
+  loadGoogleFonts([headingFont, primaryFont, bodyFont]);
+  if (headingFont) root.setProperty('--font-headline', `"${headingFont}", sans-serif`);
+  if (primaryFont) root.setProperty('--font-display', `"${primaryFont}", sans-serif`);
+  if (bodyFont) root.setProperty('--font-body', `"${bodyFont}", sans-serif`);
   if (baseFontSize) document.documentElement.style.fontSize = `${baseFontSize}px`;
 }
 

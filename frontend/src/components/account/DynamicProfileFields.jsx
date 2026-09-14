@@ -97,11 +97,17 @@ export default function DynamicProfileFields() {
               Editing is currently closed. Contact the school administrator if something here needs correcting.
             </p>
           )}
-          {fields.map((f) => (
+          {fields.map((f, i) => (
             <div key={f.field_id}>
+              {f.group_label && f.group_label !== fields[i - 1]?.group_label && (
+                <h4 className="font-label-sm text-label-sm font-bold text-on-surface-variant uppercase tracking-wide mt-md mb-xs first:mt-0">
+                  {f.group_label}
+                </h4>
+              )}
               <FormField
                 field={{
                   key: f.field_id, label: f.label, type: f.field_type, required: f.required,
+                  placeholder: f.placeholder,
                   options: (f.options || []).map((o) => ({ value: o, label: o })),
                 }}
                 value={values[f.field_id] ?? ''}

@@ -14,9 +14,14 @@ from apps.audit.services import log
 from apps.rbac.permissions import HasPermission
 from common.responses import failure, success
 
-from .models import CustomField, CustomFieldValue
-from .serializers import CustomFieldSerializer, CustomFieldValueBulkUpsertSerializer
-from .services import MASKED_VALUE, mask_if_sensitive as _mask_if_sensitive
+from .models import CustomField, CustomFieldGroup, CustomFieldValue
+from .serializers import CustomFieldGroupSerializer, CustomFieldSerializer, CustomFieldValueBulkUpsertSerializer
+from .services import (
+    MASKED_VALUE,
+    field_summary as _field_summary,
+    mask_if_sensitive as _mask_if_sensitive,
+    ordered_active_fields as _ordered_active_fields,
+)
 
 User = get_user_model()
 
@@ -68,6 +73,40 @@ class CustomFieldDetailView(CustomFieldsPermissionMixin, RetrieveUpdateDestroyAP
 
     def perform_destroy(self, instance):
         log(actor=self.request.user, action="custom_fields.field_deleted", target=instance, request=self.request)
+        instance.delete()
+
+
+class CustomFieldGroupsView(CustomFieldsPermissionMixin, ListCreateAPIView):
+    """"Data Title" groups a Super Admin defines to organize fields under,
+    e.g. "Biodata". Scoped to one entity at a time, same as CustomFieldsView."""
+
+    serializer_class = CustomFieldGroupSerializer
+
+    def get_queryset(self):
+        qs = CustomFieldGroup.objects.all()
+        entity = self.request.query_params.get("entity")
+        if entity:
+            qs = qs.filter(entity=entity)
+        return qs
+
+    def perform_create(self, serializer):
+        group = serializer.save()
+        log(actor=self.request.user, action="custom_fields.group_created", target=group, request=self.request)
+
+
+class CustomFieldGroupDetailView(CustomFieldsPermissionMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = CustomFieldGroupSerializer
+    queryset = CustomFieldGroup.objects.all()
+    lookup_url_kwarg = "group_id"
+
+    def perform_update(self, serializer):
+        group = serializer.save()
+        log(actor=self.request.user, action="custom_fields.group_updated", target=group, request=self.request)
+
+    def perform_destroy(self, instance):
+        # SET_NULL on CustomField.group — deleting a Data Title only ungroups
+        # its fields, never deletes the fields or their saved values.
+        log(actor=self.request.user, action="custom_fields.group_deleted", target=instance, request=self.request)
         instance.delete()
 
 
@@ -123,7 +162,7 @@ class CustomFieldValuesView(PublicApplicationValuesMixin, CustomFieldsPermission
         if not entity:
             return failure(message="entity is required.", status=400)
 
-        fields = CustomField.objects.filter(entity=entity, is_active=True)
+        fields = _ordered_active_fields(entity)
         values_by_field_id = {}
         if entity_id:
             values_by_field_id = {
@@ -134,11 +173,7 @@ class CustomFieldValuesView(PublicApplicationValuesMixin, CustomFieldsPermission
         for f in fields:
             raw = values_by_field_id.get(str(f.id))
             shown, is_masked = _mask_if_sensitive(f, raw, request.user)
-            data.append({
-                "field_id": str(f.id), "key": f.key, "label": f.label, "field_type": f.field_type,
-                "options": f.options, "required": f.required, "is_sensitive": f.is_sensitive,
-                "value": shown, "is_masked": is_masked,
-            })
+            data.append({**_field_summary(f), "value": shown, "is_masked": is_masked})
         return success(data=data)
 
 
@@ -260,7 +295,7 @@ class MyProfileFieldsView(APIView):
         if entity is None:
             return success(data={"entity": None, "locked": True, "fields": []})
 
-        fields = CustomField.objects.filter(entity=entity, is_active=True)
+        fields = _ordered_active_fields(entity)
         values_by_field_id = {
             str(v.field_id): v.value
             for v in CustomFieldValue.objects.filter(field__entity=entity, entity_id=entity_id)
@@ -269,11 +304,7 @@ class MyProfileFieldsView(APIView):
         for f in fields:
             raw = values_by_field_id.get(str(f.id))
             shown, is_masked = _mask_if_sensitive(f, raw, request.user)
-            data.append({
-                "field_id": str(f.id), "key": f.key, "label": f.label, "field_type": f.field_type,
-                "options": f.options, "required": f.required, "is_sensitive": f.is_sensitive,
-                "value": shown, "is_masked": is_masked,
-            })
+            data.append({**_field_summary(f), "value": shown, "is_masked": is_masked})
         locked = not (_self_edit_open() or request.user.is_superadmin)
         return success(data={"entity": entity, "locked": locked, "fields": data})
 

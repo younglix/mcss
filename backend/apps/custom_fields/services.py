@@ -27,6 +27,27 @@ def active_fields(entity):
     return CustomField.objects.filter(entity=entity, is_active=True)
 
 
+def ordered_active_fields(entity):
+    """Active fields for an entity, sorted so same-Data-Title fields sit
+    together in their group's own order, with ungrouped fields first
+    (unchanged position from before Data Titles existed) — the order every
+    renderer of dynamic fields (admin views, the public Apply/Staff forms)
+    shows fields in."""
+    fields = list(active_fields(entity).select_related("group"))
+    return sorted(fields, key=lambda f: (1, f.group.order, f.group_id.hex) if f.group_id else (0, 0, ""))
+
+
+def field_summary(f):
+    """The definition shape every dynamic-field consumer (admin, public
+    Apply/Staff forms) sends to its frontend — no value, just what the field
+    is and how to render it."""
+    return {
+        "field_id": str(f.id), "key": f.key, "label": f.label, "field_type": f.field_type,
+        "options": f.options, "placeholder": f.placeholder, "required": f.required, "is_sensitive": f.is_sensitive,
+        "group_id": str(f.group_id) if f.group_id else None, "group_label": f.group.name if f.group_id else None,
+    }
+
+
 def missing_required_fields(entity, submitted_by_field_id):
     """Active required fields for `entity` that have no truthy entry in
     `submitted_by_field_id` ({field_id (str): value}) — used by a public

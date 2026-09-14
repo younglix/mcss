@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import PublicHeader from '../../components/public/PublicHeader.jsx';
 import PublicFooter from '../../components/public/PublicFooter.jsx';
 import FormField from '../../components/ui/FormField.jsx';
@@ -201,16 +201,23 @@ export default function StaffOnboarding() {
                         </div>
                         {fieldError('custom_field_values') && <p className="font-label-sm text-label-sm text-error">{fieldError('custom_field_values')}</p>}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                          {config.custom_fields.map((f) => (
-                            <FormField
-                              key={f.field_id}
-                              field={{
-                                key: f.field_id, id: `custom_${f.field_id}`, label: f.label, type: f.field_type,
-                                required: f.required, options: (f.options || []).map((o) => ({ value: o, label: o })),
-                              }}
-                              value={customFieldValues[f.field_id] ?? ''}
-                              onChange={(v) => updateCustomField(f.field_id, v)}
-                            />
+                          {config.custom_fields.map((f, i) => (
+                            <Fragment key={f.field_id}>
+                              {f.group_label && f.group_label !== config.custom_fields[i - 1]?.group_label && (
+                                <h4 className="md:col-span-2 font-label-sm text-label-sm font-bold text-on-surface-variant uppercase tracking-wide">
+                                  {f.group_label}
+                                </h4>
+                              )}
+                              <FormField
+                                field={{
+                                  key: f.field_id, id: `custom_${f.field_id}`, label: f.label, type: f.field_type,
+                                  required: f.required, placeholder: f.placeholder,
+                                  options: (f.options || []).map((o) => ({ value: o, label: o })),
+                                }}
+                                value={customFieldValues[f.field_id] ?? ''}
+                                onChange={(v) => updateCustomField(f.field_id, v)}
+                              />
+                            </Fragment>
                           ))}
                         </div>
                       </div>

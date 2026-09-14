@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PublicHeader from '../../../components/public/PublicHeader.jsx';
 import PublicFooter from '../../../components/public/PublicFooter.jsx';
@@ -162,13 +162,19 @@ export default function ApplyBioData() {
                   </div>
                   <FormField field={{ key: 'guardian_phone', label: 'Guardian Phone', type: 'text' }} value={values.guardian_phone} onChange={set('guardian_phone')} />
                   <FormField field={{ key: 'guardian_email', label: 'Guardian Email', type: 'text' }} value={values.guardian_email} onChange={set('guardian_email')} />
-                  {parentCustomFields.map((f) => (
-                    <FormField
-                      key={f.field_id}
-                      field={{ key: f.field_id, label: f.label, type: f.field_type, required: f.required, options: (f.options || []).map((o) => ({ value: o, label: o })) }}
-                      value={customFieldValues[f.field_id] ?? ''}
-                      onChange={(v) => setCustomFieldValues((prev) => ({ ...prev, [f.field_id]: v }))}
-                    />
+                  {parentCustomFields.map((f, i) => (
+                    <Fragment key={f.field_id}>
+                      {f.group_label && f.group_label !== parentCustomFields[i - 1]?.group_label && (
+                        <h4 className="md:col-span-2 font-label-sm text-label-sm font-bold text-on-surface-variant uppercase tracking-wide">
+                          {f.group_label}
+                        </h4>
+                      )}
+                      <FormField
+                        field={{ key: f.field_id, label: f.label, type: f.field_type, required: f.required, placeholder: f.placeholder, options: (f.options || []).map((o) => ({ value: o, label: o })) }}
+                        value={customFieldValues[f.field_id] ?? ''}
+                        onChange={(v) => setCustomFieldValues((prev) => ({ ...prev, [f.field_id]: v }))}
+                      />
+                    </Fragment>
                   ))}
                 </div>
               )}
@@ -207,13 +213,19 @@ export default function ApplyBioData() {
               <SectionHeading icon="groups" title="Additional Information" />
               <div className="grid grid-cols-1 gap-lg">
                 <FormField field={{ key: 'siblings_in_school', label: 'Any sibling(s)/relative(s) already at Mount Carmel School?', type: 'text', placeholder: 'Name(s), or leave blank if none' }} value={values.siblings_in_school} onChange={set('siblings_in_school')} />
-                {studentCustomFields.map((f) => (
-                  <FormField
-                    key={f.field_id}
-                    field={{ key: f.field_id, label: f.label, type: f.field_type, required: f.required, options: (f.options || []).map((o) => ({ value: o, label: o })) }}
-                    value={customFieldValues[f.field_id] ?? ''}
-                    onChange={(v) => setCustomFieldValues((prev) => ({ ...prev, [f.field_id]: v }))}
-                  />
+                {studentCustomFields.map((f, i) => (
+                  <Fragment key={f.field_id}>
+                    {f.group_label && f.group_label !== studentCustomFields[i - 1]?.group_label && (
+                      <h4 className="font-label-sm text-label-sm font-bold text-on-surface-variant uppercase tracking-wide">
+                        {f.group_label}
+                      </h4>
+                    )}
+                    <FormField
+                      field={{ key: f.field_id, label: f.label, type: f.field_type, required: f.required, placeholder: f.placeholder, options: (f.options || []).map((o) => ({ value: o, label: o })) }}
+                      value={customFieldValues[f.field_id] ?? ''}
+                      onChange={(v) => setCustomFieldValues((prev) => ({ ...prev, [f.field_id]: v }))}
+                    />
+                  </Fragment>
                 ))}
               </div>
             </section>

@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from apps.audit.services import log
 from apps.custom_fields.models import CustomField
+from apps.custom_fields.services import field_summary, ordered_active_fields
 from apps.rbac.permissions import HasPermission
 from common.responses import failure, success
 
@@ -53,13 +54,7 @@ class StaffApplicationConfigView(APIView):
             for a in ClassArm.objects.filter(is_deleted=False).select_related("school_class")
             .order_by("school_class__level_order", "name")
         ]
-        custom_fields = [
-            {
-                "field_id": str(f.id), "key": f.key, "label": f.label, "field_type": f.field_type,
-                "options": f.options, "required": f.required, "is_sensitive": f.is_sensitive,
-            }
-            for f in CustomField.objects.filter(entity=CustomField.Entity.STAFF, is_active=True)
-        ]
+        custom_fields = [field_summary(f) for f in ordered_active_fields(CustomField.Entity.STAFF)]
         return success(data={
             "is_open": is_open, "staff_types": staff_types, "subjects": subjects,
             "class_arms": class_arms, "custom_fields": custom_fields,

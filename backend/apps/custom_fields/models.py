@@ -24,10 +24,21 @@ class CustomField(BaseModel):
         ATTACHMENT = "attachment", "Attachment"
 
     entity = models.CharField(max_length=20, choices=Entity.choices)
+    # Optional "Data Title" grouping (e.g. "Biodata", "Medical Info") a Super
+    # Admin defines per entity to organize related fields together, both in
+    # the admin's own field list and as a section heading wherever the field
+    # renders on a real form. SET_NULL (not CASCADE) so deleting a group only
+    # ungroups its fields — never silently destroys field definitions or the
+    # values already saved against them.
+    group = models.ForeignKey("CustomFieldGroup", on_delete=models.SET_NULL, null=True, blank=True, related_name="fields")
     key = models.SlugField(max_length=60)
     label = models.CharField(max_length=100)
     field_type = models.CharField(max_length=20, choices=FieldType.choices, default=FieldType.TEXT)
     options = models.JSONField(default=list, blank=True)  # ["Option A", "Option B"] — only used when field_type=select
+    # Shown inside the input on the actual form (e.g. "Enter your phone
+    # number") — purely a UI hint for whoever fills the field in, never
+    # validated against or stored as part of the value.
+    placeholder = models.CharField(max_length=200, blank=True, default="")
     required = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -44,6 +55,22 @@ class CustomField(BaseModel):
 
     def __str__(self):
         return f"{self.get_entity_display()}: {self.label}"
+
+
+class CustomFieldGroup(BaseModel):
+    """A Super Admin-defined "Data Title" (e.g. "Biodata") that CustomFields
+    are organized under, scoped to the same entity as the fields it groups."""
+
+    entity = models.CharField(max_length=20, choices=CustomField.Entity.choices)
+    name = models.CharField(max_length=100)
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta(BaseModel.Meta):
+        ordering = ["entity", "order", "name"]
+
+    def __str__(self):
+        return f"{self.get_entity_display()}: {self.name}"
 
 
 class CustomFieldValue(BaseModel):

@@ -286,16 +286,23 @@ export default function UserManagementPage({ portalId = 'superAdmin', pageTitle,
           )}
           {customFields.length > 0 && (
             <div className="space-y-lg pt-md border-t border-outline/10">
-              {customFields.map((f) => (
-                <FormField
-                  key={f.field_id}
-                  field={{
-                    key: f.field_id, label: f.label, type: f.field_type, required: f.required,
-                    options: (f.options || []).map((o) => ({ value: o, label: o })),
-                  }}
-                  value={customFieldValues[f.field_id] ?? ''}
-                  onChange={(v) => setCustomFieldValues((prev) => ({ ...prev, [f.field_id]: v }))}
-                />
+              {customFields.map((f, i) => (
+                <div key={f.field_id}>
+                  {f.group_label && f.group_label !== customFields[i - 1]?.group_label && (
+                    <h4 className="font-label-sm text-label-sm font-bold text-on-surface-variant uppercase tracking-wide mb-sm">
+                      {f.group_label}
+                    </h4>
+                  )}
+                  <FormField
+                    field={{
+                      key: f.field_id, label: f.label, type: f.field_type, required: f.required,
+                      placeholder: f.placeholder,
+                      options: (f.options || []).map((o) => ({ value: o, label: o })),
+                    }}
+                    value={customFieldValues[f.field_id] ?? ''}
+                    onChange={(v) => setCustomFieldValues((prev) => ({ ...prev, [f.field_id]: v }))}
+                  />
+                </div>
               ))}
             </div>
           )}
