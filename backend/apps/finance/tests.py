@@ -4,7 +4,11 @@ plain pay figure (non-academic staff), active-only filtering, and the
 export permission gate.
 """
 
+import hashlib
+import hmac
+import json
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -13,6 +17,7 @@ from rest_framework.test import APIClient
 
 from apps.custom_fields.models import CustomField, CustomFieldValue
 from apps.rbac.models import Permission, Role, RolePermission, UserRole
+from apps.settings_app.models import SystemSetting
 
 from . import services
 from .models import NonAcademicStaffPayout, PayrollRun, Payslip
@@ -298,3 +303,232 @@ class FeeItemSelfServiceTests(TestCase):
         self.client.force_authenticate(self.other_staff)
         res = self.client.post(f"/api/v1/finance/fee-items/{self.sportswear.id}/purchase", {}, format="json")
         self.assertEqual(res.status_code, 403)
+
+
+class PaystackPaymentTestBase(TestCase):
+    """Covers the actual bug report: a real successful Paystack payment
+    left the ticket unpaid and no Payment record behind, because nothing
+    ever verified the transaction server-side — the webhook needs a URL
+    registered in the Paystack dashboard and reachable from Paystack's
+    servers (neither guaranteed, especially with no domain/HTTPS yet), and
+    nothing else called verify_transaction() at all. Fixed with a shared
+    services.record_paystack_payment(), called from both the webhook
+    (PaystackWebhookView) and a new client-triggered endpoint
+    (PaystackVerifyReturnView) the student's browser hits the moment it
+    lands back on /student/finance."""
+
+    def setUp(self):
+        from datetime import date
+
+        from apps.academics.models import Student
+        from apps.configuration.models import AcademicSession
+
+        self.session = AcademicSession.objects.create(
+            name="2026/2027", start_date=date(2026, 9, 1), end_date=date(2027, 7, 31), is_current=True,
+        )
+        secret_setting = SystemSetting(key="payments.paystack.secret_key", group="payments", is_secret=True)
+        secret_setting.set_value("sk_test_fakefakefake")
+        secret_setting.save()
+
+        self.student_user = User.objects.create(full_name="Student One", email="student1@x.io", user_type="student", is_active=True)
+        self.student = Student.objects.create(user=self.student_user, date_of_birth=date(2012, 1, 1))
+        self.other_student_user = User.objects.create(full_name="Student Two", email="student2@x.io", user_type="student", is_active=True)
+        self.other_student = Student.objects.create(user=self.other_student_user, date_of_birth=date(2012, 1, 1))
+        self.staff_user = User.objects.create(full_name="Staff One", email="staff1@x.io", user_type="staff", is_active=True)
+
+        from .models import Invoice
+
+        self.invoice = Invoice.objects.create(
+            student=self.student, description="Sportswear", session=self.session, amount=Decimal("15000"),
+        )
+        self.reference = f"MCSS-{self.invoice.id.hex}-abcd1234"
+        self.client = APIClient()
+
+    def paystack_success_payload(self, amount_naira="15000"):
+        return {"status": "success", "amount": int(Decimal(amount_naira) * 100), "reference": self.reference}
+
+
+class RecordPaystackPaymentServiceTests(PaystackPaymentTestBase):
+    @patch("apps.admissions.paystack.verify_transaction")
+    def test_creates_a_completed_payment_and_marks_the_invoice_paid(self, mock_verify):
+        mock_verify.return_value = self.paystack_success_payload()
+
+        from .models import Invoice, Payment
+
+        payment, created, error = services.record_paystack_payment(self.reference)
+        self.assertIsNone(error)
+        self.assertTrue(created)
+        self.assertEqual(payment.status, Payment.Status.COMPLETED)
+        self.assertEqual(payment.method, Payment.Method.ONLINE)
+        self.assertEqual(payment.amount, Decimal("15000"))
+
+        self.invoice.refresh_from_db()
+        self.assertEqual(self.invoice.status, Invoice.Status.PAID)
+
+    @patch("apps.admissions.paystack.verify_transaction")
+    def test_is_idempotent_across_repeated_calls(self, mock_verify):
+        mock_verify.return_value = self.paystack_success_payload()
+
+        from .models import Payment
+
+        first_payment, first_created, _ = services.record_paystack_payment(self.reference)
+        second_payment, second_created, _ = services.record_paystack_payment(self.reference)
+
+        self.assertTrue(first_created)
+        self.assertFalse(second_created)
+        self.assertEqual(first_payment.id, second_payment.id)
+        self.assertEqual(Payment.objects.filter(reference=self.reference).count(), 1)
+
+    @patch("apps.admissions.paystack.verify_transaction")
+    def test_rejects_a_transaction_paystack_does_not_confirm_as_successful(self, mock_verify):
+        mock_verify.return_value = {"status": "failed", "amount": 1500000}
+
+        from .models import Payment
+
+        payment, created, error = services.record_paystack_payment(self.reference)
+        self.assertIsNone(payment)
+        self.assertFalse(created)
+        self.assertIsNotNone(error)
+        self.assertFalse(Payment.objects.filter(reference=self.reference).exists())
+
+    @patch("apps.admissions.paystack.verify_transaction")
+    def test_rejects_when_paystack_verification_itself_fails(self, mock_verify):
+        mock_verify.return_value = None  # network error / bad reference, see paystack.verify_transaction
+        payment, created, error = services.record_paystack_payment(self.reference)
+        self.assertIsNone(payment)
+        self.assertFalse(created)
+        self.assertIsNotNone(error)
+
+    def test_rejects_a_missing_reference(self):
+        payment, created, error = services.record_paystack_payment("")
+        self.assertIsNone(payment)
+        self.assertFalse(created)
+        self.assertIsNotNone(error)
+
+    @patch("apps.admissions.paystack.verify_transaction")
+    def test_the_webhook_path_and_the_client_verify_path_converge_on_one_payment(self, mock_verify):
+        """The exact scenario the bug report describes, proven from both
+        directions: whichever path (webhook or the browser's own
+        return-from-checkout call) reaches the server first, the other is
+        a safe no-op — never a duplicate Payment, never a missed one."""
+        mock_verify.return_value = self.paystack_success_payload()
+
+        from .models import Invoice, Payment
+
+        # Simulate the client-triggered path winning the race.
+        services.record_paystack_payment(self.reference)
+        # The webhook redelivers moments later — same underlying call.
+        payment, created, error = services.record_paystack_payment(self.reference)
+
+        self.assertIsNone(error)
+        self.assertFalse(created)
+        self.assertEqual(Payment.objects.filter(reference=self.reference).count(), 1)
+        self.invoice.refresh_from_db()
+        self.assertEqual(self.invoice.status, Invoice.Status.PAID)
+
+
+class PaystackWebhookViewTests(PaystackPaymentTestBase):
+    def post_webhook(self, payload):
+        raw_body = json.dumps(payload).encode("utf-8")
+        signature = hmac.new(b"sk_test_fakefakefake", raw_body, hashlib.sha512).hexdigest()
+        return self.client.post(
+            "/api/v1/finance/payments/paystack/webhook", data=raw_body,
+            content_type="application/json", HTTP_X_PAYSTACK_SIGNATURE=signature,
+        )
+
+    @patch("apps.admissions.paystack.verify_transaction")
+    def test_valid_webhook_creates_the_payment_and_updates_the_invoice(self, mock_verify):
+        mock_verify.return_value = self.paystack_success_payload()
+
+        from .models import Invoice, Payment
+
+        res = self.post_webhook({"event": "charge.success", "data": {"reference": self.reference}})
+        self.assertEqual(res.status_code, 200, res.json())
+        self.assertTrue(Payment.objects.filter(reference=self.reference).exists())
+        self.invoice.refresh_from_db()
+        self.assertEqual(self.invoice.status, Invoice.Status.PAID)
+
+    def test_an_invalid_signature_is_rejected_without_touching_anything(self):
+        from .models import Payment
+
+        raw_body = json.dumps({"event": "charge.success", "data": {"reference": self.reference}}).encode("utf-8")
+        res = self.client.post(
+            "/api/v1/finance/payments/paystack/webhook", data=raw_body,
+            content_type="application/json", HTTP_X_PAYSTACK_SIGNATURE="not-the-real-signature",
+        )
+        self.assertEqual(res.status_code, 401)
+        self.assertFalse(Payment.objects.filter(reference=self.reference).exists())
+
+    def test_a_non_charge_success_event_is_ignored(self):
+        res = self.post_webhook({"event": "transfer.success", "data": {"reference": self.reference}})
+        self.assertEqual(res.status_code, 200)
+
+        from .models import Payment
+        self.assertFalse(Payment.objects.filter(reference=self.reference).exists())
+
+    @patch("apps.admissions.paystack.verify_transaction")
+    def test_a_redelivered_webhook_does_not_double_record(self, mock_verify):
+        mock_verify.return_value = self.paystack_success_payload()
+
+        from .models import Payment
+
+        self.post_webhook({"event": "charge.success", "data": {"reference": self.reference}})
+        second = self.post_webhook({"event": "charge.success", "data": {"reference": self.reference}})
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(Payment.objects.filter(reference=self.reference).count(), 1)
+
+
+class PaystackVerifyReturnViewTests(PaystackPaymentTestBase):
+    @patch("apps.admissions.paystack.verify_transaction")
+    def test_student_verifying_their_own_reference_marks_the_ticket_paid(self, mock_verify):
+        mock_verify.return_value = self.paystack_success_payload()
+
+        from .models import Invoice, Payment
+
+        self.client.force_authenticate(self.student_user)
+        res = self.client.post("/api/v1/finance/payments/paystack/verify", {"reference": self.reference}, format="json")
+        self.assertEqual(res.status_code, 200, res.json())
+        self.assertEqual(res.json()["data"]["status"], "paid")
+        self.assertTrue(Payment.objects.filter(reference=self.reference).exists())
+
+    @patch("apps.admissions.paystack.verify_transaction")
+    def test_calling_it_twice_is_a_harmless_no_op_the_second_time(self, mock_verify):
+        mock_verify.return_value = self.paystack_success_payload()
+
+        from .models import Payment
+
+        self.client.force_authenticate(self.student_user)
+        self.client.post("/api/v1/finance/payments/paystack/verify", {"reference": self.reference}, format="json")
+        second = self.client.post("/api/v1/finance/payments/paystack/verify", {"reference": self.reference}, format="json")
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(Payment.objects.filter(reference=self.reference).count(), 1)
+
+    @patch("apps.admissions.paystack.verify_transaction")
+    def test_a_different_students_reference_is_refused_but_the_payment_still_records(self, mock_verify):
+        """The payment is real money that actually moved — it still has to
+        be recorded against the correct invoice — but the response to the
+        wrong caller must not hand back someone else's invoice data."""
+        mock_verify.return_value = self.paystack_success_payload()
+
+        from .models import Invoice, Payment
+
+        self.client.force_authenticate(self.other_student_user)
+        res = self.client.post("/api/v1/finance/payments/paystack/verify", {"reference": self.reference}, format="json")
+        self.assertEqual(res.status_code, 403)
+        self.assertTrue(Payment.objects.filter(reference=self.reference).exists())
+        self.invoice.refresh_from_db()
+        self.assertEqual(self.invoice.status, Invoice.Status.PAID)
+
+    def test_requires_authentication(self):
+        res = self.client.post("/api/v1/finance/payments/paystack/verify", {"reference": self.reference}, format="json")
+        self.assertEqual(res.status_code, 401)
+
+    def test_a_staff_member_is_rejected_not_just_a_wrong_student(self):
+        self.client.force_authenticate(self.staff_user)
+        res = self.client.post("/api/v1/finance/payments/paystack/verify", {"reference": self.reference}, format="json")
+        self.assertEqual(res.status_code, 403)
+
+    def test_a_missing_reference_is_a_clean_400_not_a_500(self):
+        self.client.force_authenticate(self.student_user)
+        res = self.client.post("/api/v1/finance/payments/paystack/verify", {}, format="json")
+        self.assertEqual(res.status_code, 400)

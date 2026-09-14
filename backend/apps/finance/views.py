@@ -1,7 +1,6 @@
 import secrets
 
 from django.contrib.auth import get_user_model
-from django.db import transaction
 from django.db.models import Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -530,7 +529,9 @@ class PaystackWebhookView(APIView):
     """Paystack's server-to-server callback on a successful charge. Public
     by necessity (Paystack, not a logged-in user, calls this), so trust is
     entirely in the verified signature + the secondary verify_transaction()
-    check — never in the request body alone."""
+    check — never in the request body alone. This is the authoritative path,
+    but not the only one: see PaystackVerifyReturnView for why a student's
+    ticket can't depend on this alone actually reaching the server."""
 
     permission_classes = [AllowAny]
 
@@ -544,47 +545,52 @@ class PaystackWebhookView(APIView):
             return success(message="Ignored.")  # not an event we act on
 
         reference = payload.get("data", {}).get("reference", "")
-        # Idempotency: a redelivered webhook for an already-recorded
-        # reference is a safe no-op — backed by the DB partial-unique
-        # constraint on Payment.reference too, so a race can't double-insert.
-        if not reference or Payment.objects.filter(reference=reference).exists():
-            return success(message="Already processed.")
+        payment, created, error = services.record_paystack_payment(reference)
+        if error:
+            return failure(message=error, status=400)
 
-        # Verified server-to-server against Paystack itself before trusting
-        # the webhook body at all — done outside the lock below, since it's
-        # a network call and shouldn't extend how long the invoice row stays
-        # locked.
-        verified = paystack.verify_transaction(reference)
-        if not verified or verified.get("status") != "success":
-            return failure(message="Transaction could not be verified.", status=400)
+        if created:
+            log(actor=None, action="finance.payment_recorded_online", target=payment.invoice,
+                changes={"reference": reference, "amount": str(payment.amount)}, request=request)
+            _notify_payment_received(payment)
+        return success(message="Payment recorded." if created else "Already processed.")
 
-        try:
-            invoice_id_hex = reference.split("-")[1]
-        except IndexError:
-            return failure(message="Malformed reference.", status=400)
 
-        amount_naira = verified.get("amount", 0) / 100  # Paystack amounts are in kobo
-        with transaction.atomic():
-            # select_for_update() only actually locks inside an open
-            # transaction — and the existence re-check must happen after
-            # acquiring the lock, or two near-simultaneous redeliveries could
-            # both pass the earlier check and both attempt to create a Payment.
-            try:
-                invoice = Invoice.objects.select_for_update().get(id=invoice_id_hex)
-            except (ValueError, Invoice.DoesNotExist):
-                return failure(message="Invoice not found for this reference.", status=404)
-            if Payment.objects.filter(reference=reference).exists():
-                return success(message="Already processed.")
-            payment = Payment.objects.create(
-                invoice=invoice, amount=amount_naira, method=Payment.Method.ONLINE,
-                reference=reference, status=Payment.Status.COMPLETED,
-            )
-            invoice.refresh_status()
+class PaystackVerifyReturnView(APIView):
+    """Client-triggered counterpart to the webhook above — called by the
+    student's own browser the moment it lands back on /student/finance after
+    Paystack's hosted checkout, reference in the query string Paystack
+    appended to the callback_url. The webhook needs a URL registered in the
+    Paystack dashboard AND reachable from Paystack's servers; neither is
+    guaranteed (and in particular isn't yet, on a plain-HTTP deployment with
+    no domain — see the Copy Link fix's investigation), so without this, a
+    genuinely successful payment could leave the ticket looking unpaid
+    indefinitely from the student's own point of view. Same
+    services.record_paystack_payment() either way — safe to call both for
+    the same reference, whichever gets there first wins."""
 
-        log(actor=None, action="finance.payment_recorded_online", target=invoice,
-            changes={"reference": reference, "amount": str(amount_naira)}, request=request)
-        _notify_payment_received(payment)
-        return success(message="Payment recorded.")
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        student = getattr(request.user, "student_profile", None)
+        if student is None:
+            return failure(message="Only a student can verify their own payment.", status=403)
+
+        reference = request.data.get("reference") or request.data.get("trxref")
+        payment, created, error = services.record_paystack_payment(reference)
+        if error:
+            return failure(message=error, status=400)
+        if payment.invoice.student_id != student.id:
+            return failure(message="This payment reference doesn't belong to you.", status=403)
+
+        if created:
+            log(actor=request.user, action="finance.payment_recorded_online", target=payment.invoice,
+                changes={"reference": reference, "amount": str(payment.amount)}, request=request)
+            _notify_payment_received(payment)
+        return success(
+            message="Payment verified." if created else "Already recorded.",
+            data=InvoiceSerializer(payment.invoice).data,
+        )
 
 
 class PaymentRefundView(APIView):

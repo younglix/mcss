@@ -27,6 +27,7 @@ urlpatterns = [
     path("payments/<uuid:payment_id>/reconcile", views.PaymentReconcileView.as_view(), name="finance-payment-reconcile"),
     path("payments/<uuid:payment_id>/receipt.pdf", views.PaymentReceiptPDFView.as_view(), name="finance-payment-receipt-pdf"),
     path("payments/paystack/webhook", views.PaystackWebhookView.as_view(), name="finance-paystack-webhook"),
+    path("payments/paystack/verify", views.PaystackVerifyReturnView.as_view(), name="finance-paystack-verify-return"),
 
     path("expenses", views.ExpensesView.as_view(), name="finance-expenses"),
     path("expenses/<uuid:expense_id>", views.ExpenseDetailView.as_view(), name="finance-expense-detail"),

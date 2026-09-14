@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AppShell from '../../components/layout/AppShell.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import Card from '../../components/ui/Card.jsx';
@@ -23,10 +23,50 @@ export default function StudentFinance() {
   const [downloadingId, setDownloadingId] = useState(null);
   const [purchasingId, setPurchasingId] = useState(null);
   const [purchaseMessage, setPurchaseMessage] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [verifyMessage, setVerifyMessage] = useState('');
+  const [verifyError, setVerifyError] = useState('');
 
   const invoices = data?.invoices || [];
   const payments = data?.payments || [];
   const feeItems = data?.feeItems || [];
+
+  // Paystack's hosted checkout redirects the browser straight back here
+  // with ?reference=...&trxref=... once the payment is done — the webhook
+  // (server-to-server) is the authoritative record, but it needs a URL
+  // registered in the Paystack dashboard and reachable from Paystack's
+  // servers, neither of which is guaranteed. This call is what actually
+  // makes the ticket update reliably: it verifies the same reference
+  // directly against Paystack from this same request, independent of
+  // whether the webhook ever arrives. Safe to run even if the webhook
+  // already did its job — both converge on the same idempotent record.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const reference = params.get('reference') || params.get('trxref');
+    if (!reference) return;
+
+    // Strip the query string immediately so a refresh (or a second mount
+    // in StrictMode) doesn't re-trigger this against an already-settled
+    // reference.
+    window.history.replaceState(null, '', window.location.pathname);
+
+    setVerifying(true);
+    setVerifyError('');
+    api.post('/finance/payments/paystack/verify', { reference })
+      .then(() => {
+        setVerifyMessage('Payment confirmed — your ticket has been updated.');
+        reload();
+      })
+      .catch((err) => {
+        setVerifyError(
+          err instanceof ApiError
+            ? err.message
+            : "We couldn't confirm that payment automatically. If you were charged, it will still be applied shortly — contact the school if it isn't reflected soon.",
+        );
+      })
+      .finally(() => setVerifying(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handlePurchase = async (item) => {
     setPayError('');
@@ -87,6 +127,23 @@ export default function StudentFinance() {
     <AppShell portalId="student" pageTitle="Fees & Receipts" user={{ name: user?.full_name || 'Student' }}>
       <div className="space-y-lg sm:space-y-xl">
         <PageHeader title="Fees & Receipts" subtitle="Every fee ticket you owe, and every payment you've made — pay online whenever a ticket is outstanding, and download the receipt once it's paid." />
+
+        {verifying && (
+          <Card padding="lg" className="border border-secondary/30 bg-secondary-container/10 flex items-center gap-sm">
+            <span className="material-symbols-outlined text-secondary animate-spin">progress_activity</span>
+            <p className="font-body-md text-body-md text-on-surface">Confirming your payment…</p>
+          </Card>
+        )}
+        {!verifying && verifyMessage && (
+          <Card padding="lg" className="border border-secondary/30 bg-secondary-container/10">
+            <p className="font-body-md text-body-md text-on-surface">{verifyMessage}</p>
+          </Card>
+        )}
+        {!verifying && verifyError && (
+          <Card padding="lg" className="border border-error/30 bg-error-container/10">
+            <p className="font-body-md text-body-md text-on-surface">{verifyError}</p>
+          </Card>
+        )}
 
         {(error || payError) && (
           <Card padding="lg" className="border border-error/30 bg-error-container/10">

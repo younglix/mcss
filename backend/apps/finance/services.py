@@ -1,6 +1,63 @@
 from decimal import Decimal
 
-from .models import Discount, Invoice, NonAcademicStaffPayout, Payslip, Scholarship
+from django.db import transaction
+
+from .models import Discount, Invoice, NonAcademicStaffPayout, Payment, Payslip, Scholarship
+
+
+def record_paystack_payment(reference):
+    """Verifies `reference` against Paystack itself and creates the matching
+    Payment record — the one place a Paystack transaction actually becomes
+    a real, credited payment and the invoice's status gets recomputed.
+    Called from two places with equal standing:
+    - PaystackWebhookView: server-to-server, the authoritative path, but it
+      only works if a webhook URL is registered in the Paystack dashboard
+      and reachable from Paystack's servers — neither is guaranteed, and
+      when it isn't, nothing else in the app ever finds out a payment
+      succeeded.
+    - The student's own browser landing back on /student/finance after
+      Paystack's hosted checkout redirects it there, reference in the query
+      string. This is the reliable fallback: it runs synchronously in the
+      same request the student is already looking at, independent of
+      whether the webhook is configured at all.
+    Both call this exact function, so there's one idempotency story, not
+    two: Payment.reference has a DB-level unique constraint, and
+    get_or_create below is safe under a genuine race between the two paths
+    firing for the same reference within moments of each other.
+
+    Returns (payment, created, error_message) — on success `error_message`
+    is None; on failure `payment` is None and `created` is False.
+    """
+    from apps.admissions import paystack
+
+    if not reference:
+        return None, False, "No payment reference given."
+
+    verified = paystack.verify_transaction(reference)
+    if not verified or verified.get("status") != "success":
+        return None, False, "Transaction could not be verified."
+
+    try:
+        invoice_id_hex = reference.split("-")[1]
+    except IndexError:
+        return None, False, "Malformed reference."
+
+    amount_naira = verified.get("amount", 0) / 100  # Paystack amounts are in kobo
+    with transaction.atomic():
+        try:
+            invoice = Invoice.objects.select_for_update().get(id=invoice_id_hex)
+        except (ValueError, Invoice.DoesNotExist):
+            return None, False, "Invoice not found for this reference."
+        payment, created = Payment.objects.get_or_create(
+            reference=reference,
+            defaults={
+                "invoice": invoice, "amount": amount_naira,
+                "method": Payment.Method.ONLINE, "status": Payment.Status.COMPLETED,
+            },
+        )
+        if created:
+            invoice.refresh_status()
+    return payment, created, None
 
 # Exact column order the bank's own reference template uses, with "Title"
 # inserted right after "Names" per spec. Getting this list right is
