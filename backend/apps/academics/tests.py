@@ -442,6 +442,99 @@ class ApiGateTests(ReallocationTestBase):
         self.assertTrue(AuditLog.objects.filter(action="academics.arm_capacity_edited", target_id=str(self.arm_a.id)).exists())
 
 
+class PublishTriggersReallocationEndToEndTests(ReallocationTestBase):
+    """Closes the one real gap in this feature's own test coverage: every
+    other reallocation test calls services.compute_reallocation /
+    compute_reallocations_for_published_exam directly, bypassing the actual
+    approval-gated /publish endpoint entirely — so nothing ever proved the
+    real HTTP flow (submit -> approve -> publish) actually triggers
+    reallocation end-to-end, all the way through to what the student and
+    parent portals display. This test drives the real endpoints."""
+
+    def setUp(self):
+        super().setUp()
+        self.teacher = User.objects.create(full_name="Teacher One", email="teacher1@x.io", user_type="staff", is_active=True)
+        ClassSubjectAssignment.objects.create(class_arm=self.arm_ns, subject=self.maths, teacher=self.teacher, session=self.session)
+
+        principal_role = Role.objects.create(name="Principal", slug="principal-e2e")
+        for code in ("results.approve", "results.publish", "results.view", "reallocation.release", "reallocation.apply", "reallocation.view"):
+            perm, _ = Permission.objects.get_or_create(code=code, defaults={"module": code.split(".")[0], "action": code.split(".")[1]})
+            RolePermission.objects.create(role=principal_role, permission=perm)
+        self.principal = User.objects.create(full_name="Principal One", email="principal1@x.io", user_type="staff", is_active=True)
+        UserRole.objects.create(user=self.principal, role=principal_role)
+
+        self.client = APIClient()
+
+        # An already-banded population (so the compute has a real re-rank
+        # baseline) plus one brand-new N_S student — exactly what the fixed
+        # onboarding flow now produces: active, seated in the holding arm,
+        # no average yet until this exam's scores land.
+        self.make_student(self.arm_a, {self.exam1: 85})
+        self.make_student(self.arm_b, {self.exam1: 60})
+        guardian = User.objects.create(full_name="Guardian One", email="guardian1@x.io", user_type="parent", is_active=True)
+        self.new_student = self.make_student(self.arm_ns, name="New Student")
+        self.new_student.guardian_user = guardian
+        self.new_student.save(update_fields=["guardian_user"])
+        for subj in (self.maths, self.english):
+            ExamScore.objects.create(exam=self.exam1, student=self.new_student, subject=subj, score=90, max_score=100, entered_by=self.teacher)
+
+    def _publish(self):
+        self.client.force_authenticate(self.principal)
+        return self.client.post(f"/api/v1/academics/exams/{self.exam1.id}/publish", {}, format="json")
+
+    def test_publish_is_blocked_until_approved_and_only_then_computes_a_reallocation(self):
+        self.client.force_authenticate(self.teacher)
+        submit_res = self.client.post(f"/api/v1/academics/teaching/exams/{self.exam1.id}/submit", {
+            "subject": str(self.maths.id), "class_arm": str(self.arm_ns.id),
+        }, format="json")
+        self.assertEqual(submit_res.status_code, 200, submit_res.json())
+
+        blocked = self._publish()
+        self.assertEqual(blocked.status_code, 400)
+        self.assertEqual(ClassReallocation.objects.count(), 0)
+
+        self.client.force_authenticate(self.principal)
+        self.client.post(
+            f"/api/v1/academics/result-submissions/{submit_res.json()['data']['id']}/review",
+            {"status": "approved"}, format="json",
+        )
+
+        ok = self._publish()
+        self.assertEqual(ok.status_code, 200, ok.json())
+        self.assertEqual(ClassReallocation.objects.filter(status=ClassReallocation.Status.PENDING).count(), 1)
+        move = ClassReallocationMove.objects.get(reallocation__school_class=self.klass, student=self.new_student)
+        self.assertEqual(move.mechanism, ClassReallocationMove.Mechanism.NS_ABSORPTION)
+        self.assertEqual(move.to_arm_id, self.arm_a.id)  # 90 avg -> the top band
+
+    def test_full_loop_release_apply_and_visible_on_both_portals(self):
+        self._publish()
+        realloc = ClassReallocation.objects.get(school_class=self.klass, status=ClassReallocation.Status.PENDING)
+
+        self.client.force_authenticate(self.principal)
+        r1 = self.client.post(f"/api/v1/academics/reallocations/{realloc.id}/release")
+        self.assertEqual(r1.status_code, 200, r1.json())
+
+        # Still in N_S until applied — release only previews next_class_arm.
+        self.new_student.refresh_from_db()
+        self.assertEqual(self.new_student.class_arm_id, self.arm_ns.id)
+        self.assertEqual(self.new_student.next_class_arm_id, self.arm_a.id)
+
+        r2 = self.client.post(f"/api/v1/academics/reallocations/{realloc.id}/apply")
+        self.assertEqual(r2.status_code, 200, r2.json())
+        self.new_student.refresh_from_db()
+        self.assertEqual(self.new_student.class_arm_id, self.arm_a.id)  # physically moved now
+        self.assertIsNone(self.new_student.next_class_arm_id)  # cleared once applied
+
+        self.client.force_authenticate(self.new_student.user)
+        res = self.client.get("/api/v1/academics/students/mine")
+        self.assertEqual(res.json()["data"]["class_arm_label"], str(self.arm_a))
+
+        self.client.force_authenticate(self.new_student.guardian_user)
+        res = self.client.get("/api/v1/academics/students/my-children")
+        child = next(c for c in res.json()["data"] if c["id"] == str(self.new_student.id))
+        self.assertEqual(child["class_arm_label"], str(self.arm_a))
+
+
 class ResultsApprovalGateTestBase(TestCase):
     """A teacher submits one class+subject's scores; a principal must
     actually approve it before the whole exam can be published."""
@@ -588,6 +681,114 @@ class ReportCardPDFTests(ResultsApprovalGateTestBase):
     def test_pdf_downloads_with_grade_scales_configured(self):
         GradeScale.objects.create(name="A", min_score=70, max_score=100, remark="Excellent")
         GradeScale.objects.create(name="F", min_score=0, max_score=69, remark="Fail")
+        self._publish()
+        self.client.force_authenticate(self.student.user)
+        res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}/pdf")
+        self.assertEqual(res.status_code, 200)
+
+
+class ReportCardPhotoLogoBrandingTests(ResultsApprovalGateTestBase):
+    """Student photo on the left, school logo on the right, a real fallback
+    avatar when no photo is on file, and the report_branding_enabled toggle
+    actually doing something — all fixed together since they're the same
+    header-table markup. Inspects the actual rendered HTML (pisa.CreatePDF
+    mocked out) rather than just asserting a 200, since the bug report was
+    specifically about what that HTML contains/where things sit."""
+
+    def _rendered_html(self):
+        from unittest.mock import patch
+
+        submit_res = self.submit()
+        self.review(submit_res.json()["data"]["id"], "approved")
+        self.publish()
+        self.client.force_authenticate(self.student.user)
+        with patch("apps.academics.views.pisa.CreatePDF") as mock_create:
+            mock_create.return_value.err = 0
+            self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}/pdf")
+        return mock_create.call_args[0][0]
+
+    def test_photo_cell_comes_before_logo_cell_in_the_header(self):
+        html = self._rendered_html()
+        self.assertLess(html.index('class="photo-cell"'), html.index('class="logo-cell"'))
+
+    def test_missing_avatar_falls_back_to_a_real_placeholder_image(self):
+        self.assertFalse(self.student.user.avatar)
+        html = self._rendered_html()
+        self.assertIn('class="photo-cell"><img src="data:image/png;base64,', html)
+
+    def test_real_avatar_is_used_and_made_absolute(self):
+        self.student.user.avatar = "/media/avatars/pic.jpg"
+        self.student.user.save(update_fields=["avatar"])
+        html = self._rendered_html()
+        self.assertIn('src="http://testserver/media/avatars/pic.jpg"', html)
+
+    def test_logo_is_hidden_when_report_branding_is_disabled(self):
+        from apps.configuration.models import SchoolProfile
+        from apps.settings_app.models import SystemSetting
+
+        SchoolProfile.objects.create(name="MCSS", logo="/mcss-logo.png")
+        SystemSetting.objects.create(key="appearance.report_branding_enabled", group="appearance", value=False)
+        html = self._rendered_html()
+        self.assertNotIn("mcss-logo.png", html)
+
+    def test_logo_shows_by_default_and_is_made_absolute(self):
+        from apps.configuration.models import SchoolProfile
+
+        SchoolProfile.objects.create(name="MCSS", logo="/mcss-logo.png")
+        html = self._rendered_html()
+        self.assertIn('class="logo-cell"><img src="http://testserver/mcss-logo.png"', html)
+
+
+class ReportCardCertificateFeeRestrictionTests(ResultsApprovalGateTestBase):
+    """The CERTIFICATE restriction_type: an unpaid Certificate/Result Fee
+    blocks the student (and guardian) from downloading the report card PDF —
+    staff with results.view are exempt, since the restriction is about
+    withholding the document from the family, not from school staff."""
+
+    def _publish(self):
+        submit_res = self.submit()
+        self.review(submit_res.json()["data"]["id"], "approved")
+        self.publish()
+
+    def _unpaid_certificate_invoice(self):
+        from apps.configuration.models import AcademicSession, FeeCategory
+        from apps.finance.models import Invoice
+
+        category = FeeCategory.objects.create(
+            name="Certificate/Result Fee", is_recurring=False, restriction_type=FeeCategory.RestrictionType.CERTIFICATE,
+        )
+        session = AcademicSession.objects.filter(is_current=True).first()
+        return Invoice.objects.create(
+            student=self.student, session=session, category=category, description=category.name, amount=5000,
+        )
+
+    def test_student_is_blocked_from_downloading_while_the_fee_is_unpaid(self):
+        self._unpaid_certificate_invoice()
+        self._publish()
+        self.client.force_authenticate(self.student.user)
+        res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}/pdf")
+        self.assertEqual(res.status_code, 403)
+        self.assertIn("Certificate/Result Fee", res.json()["message"])
+
+    def test_download_succeeds_once_the_fee_is_paid(self):
+        from apps.finance.models import Payment
+
+        invoice = self._unpaid_certificate_invoice()
+        Payment.objects.create(invoice=invoice, amount=invoice.amount)
+        invoice.refresh_status()
+        self._publish()
+        self.client.force_authenticate(self.student.user)
+        res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}/pdf")
+        self.assertEqual(res.status_code, 200)
+
+    def test_staff_with_results_view_is_never_blocked(self):
+        self._unpaid_certificate_invoice()
+        self._publish()
+        self.client.force_authenticate(self.principal)
+        res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}/pdf")
+        self.assertEqual(res.status_code, 200)
+
+    def test_no_restriction_when_nothing_is_unpaid(self):
         self._publish()
         self.client.force_authenticate(self.student.user)
         res = self.client.get(f"/api/v1/academics/exams/{self.exam.id}/report-card/{self.student.id}/pdf")

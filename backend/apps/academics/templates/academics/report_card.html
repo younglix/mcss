@@ -8,10 +8,10 @@
 
   .header-table { width: 100%; margin-bottom: 6px; }
   .header-table td { vertical-align: middle; }
-  .logo-cell { width: 64px; }
-  .logo-cell img { width: 58px; height: 58px; }
-  .photo-cell { width: 64px; text-align: right; }
+  .photo-cell { width: 64px; text-align: left; }
   .photo-cell img { width: 58px; height: 68px; border: 1px solid {{ secondary_color }}; }
+  .logo-cell { width: 64px; text-align: right; }
+  .logo-cell img { width: 58px; height: 58px; }
   .school-name { font-size: 15pt; font-weight: bold; text-align: center; margin: 0; color: {{ primary_color }}; letter-spacing: 0.5px; }
   .school-meta { font-size: 7.5pt; text-align: center; margin: 2px 0 0 0; color: #333; }
 
@@ -57,13 +57,13 @@
 
   <table class="header-table">
     <tr>
-      <td class="logo-cell">{% if logo_url %}<img src="{{ logo_url }}" />{% endif %}</td>
+      <td class="photo-cell"><img src="{{ photo_url }}" /></td>
       <td>
         <p class="school-name">{{ school_name }}</p>
         {% if school_address %}<p class="school-meta">{{ school_address }}</p>{% endif %}
         {% if school_contact %}<p class="school-meta">{{ school_contact }}</p>{% endif %}
       </td>
-      <td class="photo-cell">{% if photo_url %}<img src="{{ photo_url }}" />{% endif %}</td>
+      <td class="logo-cell">{% if show_branding and logo_url %}<img src="{{ logo_url }}" />{% endif %}</td>
     </tr>
   </table>
 

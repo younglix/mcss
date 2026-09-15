@@ -59,6 +59,11 @@ export default function ParentChildren() {
                   <Field label="Date of Birth" value={c.date_of_birth} />
                   <Field label="Admission Date" value={c.admission_date} />
                 </div>
+                {c.next_class_arm_label && (
+                  <p className="font-label-sm text-label-sm text-secondary bg-secondary-container/20 border border-secondary/20 rounded-lg px-md py-sm mt-md">
+                    {c.full_name} will move to {c.next_class_arm_label} next term.
+                  </p>
+                )}
               </Card>
             ))}
           </div>

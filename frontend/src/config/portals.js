@@ -91,6 +91,7 @@ export const portals = {
           { key: 'academic-results', label: 'Results / Marksheets', icon: 'grading', path: '/super-admin/academic/results', status: 'active' },
           { key: 'academic-assignments', label: 'Assignments', icon: 'assignment', path: '/super-admin/academic/assignments', status: 'active' },
           { key: 'academic-promotion', label: 'Promotion', icon: 'trending_up', path: '/super-admin/academic/promotion', status: 'active' },
+          { key: 'academic-class-banding', label: 'Class Arm Banding', icon: 'stairs', path: '/super-admin/academic/class-banding', status: 'active' },
           { key: 'academic-reports', label: 'Academic Reports', icon: 'summarize', path: '/super-admin/academic/reports', status: 'active' },
         ],
       },

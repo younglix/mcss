@@ -5,16 +5,18 @@ approval, then promote_pending_values() copies them into real
 CustomFieldValue rows for the new Student/guardian, using the exact same
 field definitions the ongoing profile-edit screens already render."""
 
-from datetime import date
+from datetime import date, timedelta
+from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from apps.academics.models import Student
-from apps.configuration.models import SchoolClass
+from apps.academics.models import ClassBandingConfig, Student
+from apps.configuration.models import AcademicSession, ClassArm, FeeCategory, SchoolClass
 from apps.custom_fields.models import CustomField, CustomFieldValue
 from apps.custom_fields.services import MASKED_VALUE
+from apps.finance.models import FeeStructure, Invoice, Payment
 from apps.rbac.models import Permission, Role, RolePermission, UserRole
 from apps.settings_app.models import SystemSetting
 
@@ -157,3 +159,107 @@ class ApprovalPromotionTests(AdmissionsDynamicFieldsTestBase):
         application, student = self._submit_and_approve()
         services.approve_application(application, self.reviewer)  # second call, safe no-op
         self.assertEqual(CustomFieldValue.objects.filter(field=self.allergy_field, entity_id=student.id).count(), 1)
+
+
+class FullOnboardingActivationTests(AdmissionsDynamicFieldsTestBase):
+    """The reconfirmed end-to-end admission chain: apply -> approve ->
+    Acceptance Fee raised & paid -> First School Fee raised & paid ->
+    registration number generated. Before this fix, that last step never
+    activated the student or placed them anywhere — they stayed
+    status=pending with class_arm=None forever, invisible to the class-arm
+    reallocation engine (which only ever considers status=ACTIVE students in
+    a real arm). See apps.finance.models._maybe_generate_registration_number
+    / _place_in_holding_arm."""
+
+    def setUp(self):
+        super().setUp()
+        self.session = AcademicSession.objects.create(
+            name="2026/2027", start_date=date(2026, 9, 1), end_date=date(2027, 7, 31), is_current=True,
+        )
+        self.tuition = FeeCategory.objects.create(name="Tuition", is_recurring=True, amount=Decimal("50000"))
+        FeeStructure.objects.create(
+            category=self.tuition, school_class=self.jss1, session=self.session, amount=Decimal("50000"),
+        )
+
+    def _approve_and_pay_through_registration(self):
+        payload = self.base_payload()
+        payload["custom_field_values"] = [
+            {"field_id": str(self.allergy_field.id), "value": "Peanuts"},
+            {"field_id": str(self.occupation_field.id), "value": "Engineer"},
+        ]
+        res = self.client.post("/api/v1/admissions/apply", payload, format="json")
+        self.assertEqual(res.status_code, 201, res.json())
+        application = Application.objects.get(reference_number=res.json()["data"]["reference_number"])
+        student = services.approve_application(application, self.reviewer)
+
+        acceptance = student.invoices.get(purpose=Invoice.Purpose.ACCEPTANCE_FEE)
+        Payment.objects.create(invoice=acceptance, amount=acceptance.amount)
+        acceptance.refresh_status()
+
+        for invoice in student.invoices.filter(purpose=Invoice.Purpose.FIRST_SCHOOL_FEE):
+            Payment.objects.create(invoice=invoice, amount=invoice.amount)
+            invoice.refresh_status()
+
+        student.refresh_from_db()
+        return student
+
+    def test_student_is_activated_and_seated_in_the_holding_arm(self):
+        holding_arm = ClassArm.objects.create(school_class=self.jss1, name="N_S")
+        ClassBandingConfig.objects.create(school_class=self.jss1, holding_arm=holding_arm, enabled=True)
+
+        student = self._approve_and_pay_through_registration()
+
+        self.assertTrue(student.registration_number)
+        self.assertEqual(student.status, Student.Status.ACTIVE)
+        self.assertEqual(student.class_arm_id, holding_arm.id)
+
+    def test_manually_set_class_arm_is_never_overwritten(self):
+        holding_arm = ClassArm.objects.create(school_class=self.jss1, name="N_S")
+        real_arm = ClassArm.objects.create(school_class=self.jss1, name="A")
+        ClassBandingConfig.objects.create(school_class=self.jss1, holding_arm=holding_arm, enabled=True)
+
+        payload = self.base_payload()
+        payload["custom_field_values"] = [
+            {"field_id": str(self.allergy_field.id), "value": "Peanuts"},
+            {"field_id": str(self.occupation_field.id), "value": "Engineer"},
+        ]
+        res = self.client.post("/api/v1/admissions/apply", payload, format="json")
+        application = Application.objects.get(reference_number=res.json()["data"]["reference_number"])
+        student = services.approve_application(application, self.reviewer)
+        # A staff member hand-assigns the real arm before registration completes.
+        student.class_arm = real_arm
+        student.save(update_fields=["class_arm"])
+
+        acceptance = student.invoices.get(purpose=Invoice.Purpose.ACCEPTANCE_FEE)
+        Payment.objects.create(invoice=acceptance, amount=acceptance.amount)
+        acceptance.refresh_status()
+        for invoice in student.invoices.filter(purpose=Invoice.Purpose.FIRST_SCHOOL_FEE):
+            Payment.objects.create(invoice=invoice, amount=invoice.amount)
+            invoice.refresh_status()
+
+        student.refresh_from_db()
+        self.assertEqual(student.status, Student.Status.ACTIVE)
+        self.assertEqual(student.class_arm_id, real_arm.id)  # untouched, not reset to N_S
+
+    def test_no_banding_config_still_activates_with_no_class_arm(self):
+        """A class with no holding arm configured (e.g. banding never set up
+        for it) must not crash registration — the student still activates,
+        just with no class_arm, exactly like before this fix (a staff member
+        assigns it by hand)."""
+        student = self._approve_and_pay_through_registration()
+        self.assertEqual(student.status, Student.Status.ACTIVE)
+        self.assertIsNone(student.class_arm_id)
+
+    def test_visible_on_self_service_profile_and_parent_portal_once_active(self):
+        holding_arm = ClassArm.objects.create(school_class=self.jss1, name="N_S")
+        ClassBandingConfig.objects.create(school_class=self.jss1, holding_arm=holding_arm, enabled=True)
+        student = self._approve_and_pay_through_registration()
+
+        self.client.force_authenticate(student.user)
+        res = self.client.get("/api/v1/academics/students/mine")
+        self.assertEqual(res.json()["data"]["class_arm_label"], str(holding_arm))
+
+        self.client.force_authenticate(student.guardian_user)
+        res = self.client.get("/api/v1/academics/students/my-children")
+        child = next(c for c in res.json()["data"] if c["id"] == str(student.id))
+        self.assertEqual(child["class_arm_label"], str(holding_arm))

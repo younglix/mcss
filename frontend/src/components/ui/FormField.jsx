@@ -75,6 +75,7 @@ export default function FormField({ field, value, onChange, error }) {
     <div>
       {commonLabel}
       {control}
+      {field.hint && !error && <p className="font-label-sm text-label-sm text-on-surface-variant mt-1">{field.hint}</p>}
       {error && <p className="font-label-sm text-label-sm text-error mt-xs">{error}</p>}
     </div>
   );

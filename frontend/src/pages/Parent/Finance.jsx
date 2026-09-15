@@ -17,6 +17,7 @@ export default function ParentFinance() {
   const [activeChildId, setActiveChildId] = useState(null);
   const [invoices, setInvoices] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [restrictions, setRestrictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [downloadingId, setDownloadingId] = useState(null);
@@ -37,8 +38,9 @@ export default function ParentFinance() {
     Promise.all([
       api.get(`/finance/invoices/child/${activeChildId}`),
       api.get(`/finance/payments/child/${activeChildId}`),
+      api.get(`/finance/restrictions/child/${activeChildId}`),
     ])
-      .then(([inv, pay]) => { setInvoices(inv); setPayments(pay); })
+      .then(([inv, pay, restr]) => { setInvoices(inv); setPayments(pay); setRestrictions(restr); })
       .catch((err) => setError(err.message || 'Could not load fees.'))
       .finally(() => setLoading(false));
   }, [activeChildId]);
@@ -82,6 +84,22 @@ export default function ParentFinance() {
         {error && (
           <Card padding="lg" className="border border-error/30 bg-error-container/10">
             <p className="font-body-md text-body-md text-on-surface">{error}</p>
+          </Card>
+        )}
+
+        {restrictions.length > 0 && (
+          <Card padding="lg" className="border border-error/30 bg-error-container/10">
+            <div className="flex items-start gap-sm">
+              <span className="material-symbols-outlined text-error">lock</span>
+              <div className="space-y-xs">
+                <p className="font-label-md text-label-md font-bold text-on-surface">
+                  {restrictions.length === 1 ? '1 restriction is currently in effect' : `${restrictions.length} restrictions are currently in effect`}
+                </p>
+                {restrictions.map((r) => (
+                  <p key={r.restriction_type} className="font-body-sm text-body-sm text-on-surface">{r.message}</p>
+                ))}
+              </div>
+            </div>
           </Card>
         )}
 

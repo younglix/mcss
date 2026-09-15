@@ -60,6 +60,11 @@ export default function StudentProfile() {
                 <Field label="Date of Birth" value={profile?.date_of_birth} />
                 <Field label="Admission Date" value={profile?.admission_date} />
               </div>
+              {profile?.next_class_arm_label && (
+                <p className="font-label-sm text-label-sm text-secondary bg-secondary-container/20 border border-secondary/20 rounded-lg px-md py-sm mt-lg">
+                  You'll move to {profile.next_class_arm_label} next term.
+                </p>
+              )}
             </Card>
 
             <Card padding="lg">

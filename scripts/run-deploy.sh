@@ -21,6 +21,7 @@ cd backend
 ./.venv/bin/python manage.py seed_subjects
 ./.venv/bin/python manage.py seed_classes_arms
 ./.venv/bin/python manage.py seed_custom_fields
+./.venv/bin/python manage.py seed_fee_categories
 cd ..
 
 echo "--- frontend ---"

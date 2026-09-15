@@ -70,9 +70,11 @@ class GradeScaleSerializer(serializers.ModelSerializer):
 
 
 class FeeCategorySerializer(serializers.ModelSerializer):
+    restriction_type_label = serializers.CharField(source="get_restriction_type_display", read_only=True)
+
     class Meta:
         model = FeeCategory
-        fields = ["id", "name", "is_recurring", "amount"]
+        fields = ["id", "name", "is_recurring", "amount", "restriction_type", "restriction_type_label"]
 
 
 class SiteMediaSerializer(serializers.ModelSerializer):

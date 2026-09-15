@@ -9,7 +9,10 @@ import { useDashboardData } from '../SuperAdmin/dashboard/useDashboardData.js';
 import { EmptyState } from '../SuperAdmin/dashboard/dashboardHelpers.jsx';
 import { api, ApiError, getAccessToken } from '../../lib/api.js';
 
-const ENDPOINTS = { invoices: '/finance/invoices/mine', payments: '/finance/payments/mine', feeItems: '/finance/fee-items/mine' };
+const ENDPOINTS = {
+  invoices: '/finance/invoices/mine', payments: '/finance/payments/mine', feeItems: '/finance/fee-items/mine',
+  restrictions: '/finance/restrictions/mine',
+};
 
 const PURPOSE_LABEL = { acceptance_fee: 'Acceptance Fee', first_school_fee: 'First School Fee' };
 const STATUS_TONE = { unpaid: 'error', partial: 'warning', paid: 'success', waived: 'secondary' };
@@ -30,6 +33,7 @@ export default function StudentFinance() {
   const invoices = data?.invoices || [];
   const payments = data?.payments || [];
   const feeItems = data?.feeItems || [];
+  const restrictions = data?.restrictions || [];
 
   // Paystack's hosted checkout redirects the browser straight back here
   // with ?reference=...&trxref=... once the payment is done — the webhook
@@ -127,6 +131,22 @@ export default function StudentFinance() {
     <AppShell portalId="student" pageTitle="Fees & Receipts" user={{ name: user?.full_name || 'Student' }}>
       <div className="space-y-lg sm:space-y-xl">
         <PageHeader title="Fees & Receipts" subtitle="Every fee ticket you owe, and every payment you've made — pay online whenever a ticket is outstanding, and download the receipt once it's paid." />
+
+        {restrictions.length > 0 && (
+          <Card padding="lg" className="border border-error/30 bg-error-container/10">
+            <div className="flex items-start gap-sm">
+              <span className="material-symbols-outlined text-error">lock</span>
+              <div className="space-y-xs">
+                <p className="font-label-md text-label-md font-bold text-on-surface">
+                  {restrictions.length === 1 ? '1 restriction is currently in effect' : `${restrictions.length} restrictions are currently in effect`}
+                </p>
+                {restrictions.map((r) => (
+                  <p key={r.restriction_type} className="font-body-sm text-body-sm text-on-surface">{r.message}</p>
+                ))}
+              </div>
+            </div>
+          </Card>
+        )}
 
         {verifying && (
           <Card padding="lg" className="border border-secondary/30 bg-secondary-container/10 flex items-center gap-sm">

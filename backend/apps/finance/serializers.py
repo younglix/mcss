@@ -55,6 +55,7 @@ class FeeStructureSerializer(serializers.ModelSerializer):
 class InvoiceSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source="student.user.full_name", read_only=True)
     class_arm_label = serializers.SerializerMethodField()
+    category_name = serializers.CharField(source="category.name", read_only=True, default=None)
     amount_paid = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     total_discount = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     net_amount = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
@@ -64,8 +65,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
         model = Invoice
         fields = [
             "id", "invoice_number", "student", "student_name", "class_arm_label", "fee_structure", "purpose",
-            "description", "session", "term", "amount", "amount_paid", "total_discount", "net_amount", "balance",
-            "due_date", "status", "created_at",
+            "category", "category_name", "description", "session", "term", "amount", "amount_paid", "total_discount",
+            "net_amount", "balance", "due_date", "status", "created_at",
         ]
         read_only_fields = ["id", "invoice_number", "amount_paid", "total_discount", "net_amount", "balance", "status", "created_at"]
 

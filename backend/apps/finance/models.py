@@ -50,6 +50,16 @@ class Invoice(BaseModel):
     fee_structure = models.ForeignKey(
         FeeStructure, on_delete=models.SET_NULL, null=True, blank=True, related_name="invoices",
     )
+    # The FeeCategory this invoice bills, independent of HOW it was raised —
+    # bulk-generated (fee_structure.category already gives this, set here too
+    # for a single consistent field every reader can use), a student's own
+    # one-off Fee Items purchase, or a staff-typed manual invoice. This is
+    # what apps.finance.services.restriction_check keys off of; an invoice
+    # with no category (e.g. a pre-existing one from before this field
+    # existed) is simply never restriction-relevant.
+    category = models.ForeignKey(
+        "configuration.FeeCategory", on_delete=models.SET_NULL, null=True, blank=True, related_name="invoices",
+    )
     purpose = models.CharField(max_length=20, choices=Purpose.choices, blank=True, default="")
     description = models.CharField(max_length=200)
     session = models.ForeignKey("configuration.AcademicSession", on_delete=models.CASCADE, related_name="invoices")
@@ -146,7 +156,11 @@ def _generate_first_school_fee_invoices(student):
         _invoice, created = Invoice.objects.get_or_create(
             student=student, fee_structure=structure, session=session, term=None,
             purpose=Invoice.Purpose.FIRST_SCHOOL_FEE,
-            defaults={"description": f"{structure.category.name} — {session.name}", "amount": structure.amount},
+            defaults={
+                "description": f"{structure.category.name} — {session.name}",
+                "amount": structure.amount,
+                "category": structure.category,
+            },
         )
         created_any = created_any or created
 
@@ -170,7 +184,30 @@ def _maybe_generate_registration_number(student):
         return  # not all first-school-fee invoices are settled yet
 
     student.registration_number = generate_number("registration")
-    student.save(update_fields=["registration_number"])
+    # Registration is now fully complete — this is the one place a student
+    # stops being "pending" and becomes a real, active enrollee. Before this
+    # fix nothing in the app ever made that transition, so a fully paid,
+    # fully onboarded student sat at status=pending with no class_arm
+    # forever. Also seats them in their target class's N_S/holding arm
+    # (never overwriting a class_arm a staff member already set by hand) so
+    # they're visible to the class-arm reallocation engine, which only ever
+    # considers status=ACTIVE students.
+    student.status = student.__class__.Status.ACTIVE
+    if student.class_arm_id is None:
+        _place_in_holding_arm(student)
+    student.save(update_fields=["registration_number", "status", "class_arm"])
+
+
+def _place_in_holding_arm(student):
+    from apps.academics.models import ClassBandingConfig
+
+    application = getattr(student, "source_application", None)
+    school_class = application.class_applying_for if application else None
+    if school_class is None:
+        return  # nothing to place against — staff can set class_arm manually
+    config = ClassBandingConfig.objects.filter(school_class=school_class).select_related("holding_arm").first()
+    if config and config.holding_arm_id:
+        student.class_arm = config.holding_arm
 
 
 class Payment(BaseModel):

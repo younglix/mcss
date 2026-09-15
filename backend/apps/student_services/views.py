@@ -12,7 +12,8 @@ from rest_framework.views import APIView
 
 from apps.academics.models import ClassSubjectAssignment, ClassTeacherAssignment, Student
 from apps.audit.services import log
-from apps.configuration.models import AcademicSession
+from apps.configuration.models import AcademicSession, FeeCategory
+from apps.finance.services import restriction_check
 from apps.rbac.permissions import HasPermission
 from common.responses import failure, success
 
@@ -123,6 +124,13 @@ class BookLoansView(LibraryPermissionMixin, ListCreateAPIView):
         return qs
 
     def perform_create(self, serializer):
+        borrower = serializer.validated_data.get("borrower")
+        student = getattr(borrower, "student_profile", None) if borrower else None
+        if student is not None:
+            blocked, _invoices, message = restriction_check(student, FeeCategory.RestrictionType.LIBRARY)
+            if blocked:
+                raise ValidationError(message)
+
         loan = serializer.save()
         book = loan.book
         book.available_copies = max(0, book.available_copies - 1)
@@ -234,6 +242,11 @@ class HostelAllocationsView(HostelPermissionMixin, ListCreateAPIView):
         session = _current_session()
         if not session:
             raise ValidationError("No current academic session is set.")
+        student = serializer.validated_data.get("student")
+        if student is not None:
+            blocked, _invoices, message = restriction_check(student, FeeCategory.RestrictionType.HOSTEL, session=session)
+            if blocked:
+                raise ValidationError(message)
         allocation = serializer.save(session=session)
         log(actor=self.request.user, action="student_services.hostel_allocated", target=allocation, request=self.request)
 
@@ -334,6 +347,11 @@ class TransportAssignmentsView(TransportPermissionMixin, ListCreateAPIView):
         return qs
 
     def perform_create(self, serializer):
+        student = serializer.validated_data.get("student")
+        if student is not None:
+            blocked, _invoices, message = restriction_check(student, FeeCategory.RestrictionType.TRANSPORT)
+            if blocked:
+                raise ValidationError(message)
         assignment = serializer.save()
         log(actor=self.request.user, action="student_services.transport_assigned", target=assignment, request=self.request)
 
@@ -429,6 +447,11 @@ class ActivityParticipantsView(ActivitiesPermissionMixin, ListCreateAPIView):
         return ActivityParticipant.objects.filter(activity_id=self.kwargs["activity_id"]).select_related("student__user")
 
     def perform_create(self, serializer):
+        student = serializer.validated_data.get("student")
+        if student is not None:
+            blocked, _invoices, message = restriction_check(student, FeeCategory.RestrictionType.ACTIVITY)
+            if blocked:
+                raise ValidationError(message)
         participant = serializer.save(activity_id=self.kwargs["activity_id"])
         log(actor=self.request.user, action="student_services.activity_enrolled", target=participant, request=self.request)
 

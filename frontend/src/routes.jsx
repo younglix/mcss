@@ -59,6 +59,7 @@ import SuperAdminStudents from './pages/SuperAdmin/academic/Students.jsx';
 import SuperAdminTeachers from './pages/SuperAdmin/academic/Teachers.jsx';
 import SuperAdminSubjects from './pages/SuperAdmin/academic/Subjects.jsx';
 import SuperAdminClasses from './pages/SuperAdmin/academic/Classes.jsx';
+import SuperAdminClassBanding from './pages/SuperAdmin/academic/ClassBanding.jsx';
 import SuperAdminTimetable from './pages/SuperAdmin/academic/Timetable.jsx';
 import SuperAdminAttendance from './pages/SuperAdmin/academic/Attendance.jsx';
 import SuperAdminExams from './pages/SuperAdmin/academic/Exams.jsx';
@@ -217,6 +218,7 @@ export const routes = [
   { path: "/super-admin/academic/results", label: "Results / Marksheets", source: "super_admin_academic_results", element: <SuperAdminResults /> },
   { path: "/super-admin/academic/assignments", label: "Assignments", source: "super_admin_academic_assignments", element: <SuperAdminAssignments /> },
   { path: "/super-admin/academic/promotion", label: "Promotion", source: "super_admin_academic_promotion", element: <SuperAdminPromotion /> },
+  { path: "/super-admin/academic/class-banding", label: "Class Arm Banding", source: "super_admin_academic_class_banding", element: <SuperAdminClassBanding /> },
   { path: "/super-admin/academic/reports", label: "Academic Reports", source: "super_admin_academic_reports", element: <SuperAdminAcademicReports /> },
   { path: "/super-admin/student-services/library", label: "Library", source: "super_admin_student_services_library", element: <SuperAdminLibrary /> },
   { path: "/super-admin/student-services/hostel", label: "Hostel", source: "super_admin_student_services_hostel", element: <SuperAdminHostel /> },

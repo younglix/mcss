@@ -189,6 +189,7 @@ class SchoolFeesGenerateView(FeesPermissionMixin, APIView):
                     defaults={
                         "description": f"{structure.category.name} — {session.name}",
                         "amount": structure.amount,
+                        "category": structure.category,
                     },
                 )
                 if was_created:
@@ -337,7 +338,7 @@ class PurchaseFeeItemView(APIView):
             )
 
         invoice = Invoice.objects.create(
-            student=student, session=session, description=category.name, amount=category.amount,
+            student=student, session=session, description=category.name, amount=category.amount, category=category,
         )
         log(actor=request.user, action="finance.fee_item_ticket_created", target=invoice,
             changes={"fee_category": str(category.id), "amount": str(category.amount)}, request=request)
@@ -378,6 +379,48 @@ class ChildPaymentsView(APIView):
             return failure(message="Not your child's record.", status=403)
         qs = Payment.objects.filter(invoice__student=student).select_related("invoice__student__user")
         return success(data=PaymentSerializer(qs, many=True).data)
+
+
+def _restriction_summary(student):
+    """Every restriction_type currently blocking `student`, in one call —
+    what the Fees & Receipts page (and its Parent Portal equivalent) shows
+    as a "you're currently restricted from..." banner, so a family sees
+    exactly why and what to pay before they hit the block itself somewhere
+    else (the library desk, hostel office, ...)."""
+    out = []
+    for value, label in FeeCategory.RestrictionType.choices:
+        if value == FeeCategory.RestrictionType.NONE:
+            continue
+        blocked, invoices, message = services.restriction_check(student, value)
+        if blocked:
+            out.append({
+                "restriction_type": value, "label": label, "message": message,
+                "invoice_ids": [str(inv.id) for inv in invoices],
+            })
+    return out
+
+
+class MyRestrictionsView(APIView):
+    """Student Portal > Fees & Receipts: which restrictions (if any) are
+    currently in effect against the logged-in student, and why."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        student = getattr(request.user, "student_profile", None)
+        if student is None:
+            return failure(message="No student profile on this account.", status=403)
+        return success(data=_restriction_summary(student))
+
+
+class ChildRestrictionsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, student_id):
+        student = _child_or_403(request, student_id)
+        if student is None:
+            return failure(message="Not your child's record.", status=403)
+        return success(data=_restriction_summary(student))
 
 
 # ---------------------------------------------------------------- Payments / Receipts
@@ -458,9 +501,11 @@ class PaymentReceiptPDFView(APIView):
         except UnicodeEncodeError:
             currency_symbol = (settings_by_key.get("general.currency") or "") + " "
 
+        from common.pdf import absolute_media_url
+
         html = render_to_string("finance/receipt.html", {
             "show_branding": bool(settings_by_key.get("appearance.invoice_branding_enabled", True)),
-            "logo_url": profile.logo if profile else "",
+            "logo_url": absolute_media_url(request, profile.logo) if profile else "",
             "school_name": profile.name if profile else "School",
             "school_address": profile.address if profile else "",
             "school_contact": " · ".join(contact_parts),

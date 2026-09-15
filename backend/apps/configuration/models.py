@@ -151,6 +151,22 @@ class SiteMedia(BaseModel):
 
 
 class FeeCategory(BaseModel):
+    class RestrictionType(models.TextChoices):
+        """What an unpaid/partial invoice against this category blocks —
+        "none" for the ordinary case (a plain fee item with no functional
+        consequence beyond owing money). Each of the others corresponds to a
+        real, enforceable gate somewhere in the app — see
+        apps.finance.services.restriction_check for exactly what triggers
+        each one and apps.finance.services.RESTRICTION_DESCRIPTIONS for the
+        student-facing explanation of each."""
+        NONE = "none", "No restriction"
+        ACTIVE_STUDENT = "active_student", "Active Student status (blocks broad academic activity)"
+        LIBRARY = "library", "Library (blocks new book loans)"
+        HOSTEL = "hostel", "Hostel (blocks hostel room allocation)"
+        TRANSPORT = "transport", "Transport (blocks school bus/route assignment)"
+        CERTIFICATE = "certificate", "Certificate/Result (blocks report card & result downloads)"
+        ACTIVITY = "activity", "Activity Participation (blocks joining school activities/events)"
+
     name = models.CharField(max_length=100, unique=True)   # "Tuition", "ICT", "Development"
     is_recurring = models.BooleanField(default=True)
     # The standard/default price for this fee item — e.g. "Sportswear" =
@@ -159,6 +175,7 @@ class FeeCategory(BaseModel):
     # price used when a staff member charges a one-off ticket to a student
     # directly from the catalog, no session/class scoping required.
     amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    restriction_type = models.CharField(max_length=20, choices=RestrictionType.choices, default=RestrictionType.NONE, blank=True)
 
     class Meta(BaseModel.Meta):
         ordering = ["name"]

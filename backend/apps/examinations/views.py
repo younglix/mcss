@@ -398,6 +398,13 @@ class AttemptStartView(APIView):
         if exam.status != Exam.Status.ACTIVE:
             return failure(message="This exam is no longer open.", status=403)
 
+        from apps.configuration.models import FeeCategory
+        from apps.finance.services import restriction_check
+
+        blocked, _invoices, message = restriction_check(student, FeeCategory.RestrictionType.ACTIVE_STUDENT)
+        if blocked:
+            return failure(message=message, status=403)
+
         existing = Attempt.objects.filter(exam=exam, student=student).exclude(status=Attempt.Status.RESET).first()
         if existing:
             if existing.status != Attempt.Status.IN_PROGRESS:

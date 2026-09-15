@@ -261,6 +261,7 @@ class FeeItemSelfServiceTests(TestCase):
         invoice = Invoice.objects.get(id=body["id"])
         self.assertEqual(invoice.student_id, self.student.id)
         self.assertEqual(invoice.session_id, self.session.id)
+        self.assertEqual(invoice.category_id, self.sportswear.id)
 
     def test_recurring_item_cannot_be_self_purchased(self):
         self.client.force_authenticate(self.student_user)
@@ -302,6 +303,164 @@ class FeeItemSelfServiceTests(TestCase):
     def test_non_student_cannot_purchase(self):
         self.client.force_authenticate(self.other_staff)
         res = self.client.post(f"/api/v1/finance/fee-items/{self.sportswear.id}/purchase", {}, format="json")
+        self.assertEqual(res.status_code, 403)
+
+
+class RestrictionCheckServiceTests(TestCase):
+    """apps.finance.services.restriction_check is the one shared definition
+    of "is this student blocked from X" every gated endpoint (library,
+    hostel, transport, activities, report-card downloads, exam attempts)
+    calls — covered here in isolation from any of those call sites."""
+
+    def setUp(self):
+        from datetime import date
+
+        from apps.academics.models import Student
+        from apps.configuration.models import AcademicSession, FeeCategory
+
+        self.session = AcademicSession.objects.create(
+            name="2026/2027", start_date=date(2026, 9, 1), end_date=date(2027, 7, 31), is_current=True,
+        )
+        self.other_session = AcademicSession.objects.create(
+            name="2025/2026", start_date=date(2025, 9, 1), end_date=date(2026, 7, 31), is_current=False,
+        )
+        self.library_fee = FeeCategory.objects.create(name="Library Fee", is_recurring=True, restriction_type=FeeCategory.RestrictionType.LIBRARY)
+        self.plain_fee = FeeCategory.objects.create(name="Textbooks", is_recurring=False, amount=Decimal("5000"))
+        student_user = User.objects.create(full_name="Student One", email="stu1@x.io", user_type="student", is_active=True)
+        self.student = Student.objects.create(user=student_user)
+
+    def _invoice(self, category, session=None, amount=Decimal("3000")):
+        from .models import Invoice
+
+        return Invoice.objects.create(
+            student=self.student, session=session or self.session, category=category,
+            description=category.name, amount=amount,
+        )
+
+    def test_no_outstanding_invoice_means_not_blocked(self):
+        from apps.configuration.models import FeeCategory
+        from . import services
+
+        blocked, invoices, message = services.restriction_check(self.student, FeeCategory.RestrictionType.LIBRARY)
+        self.assertFalse(blocked)
+        self.assertEqual(invoices, [])
+        self.assertEqual(message, "")
+
+    def test_unpaid_invoice_against_a_restricted_category_blocks(self):
+        from apps.configuration.models import FeeCategory
+        from . import services
+
+        self._invoice(self.library_fee)
+        blocked, invoices, message = services.restriction_check(self.student, FeeCategory.RestrictionType.LIBRARY)
+        self.assertTrue(blocked)
+        self.assertEqual(len(invoices), 1)
+        self.assertIn("Library Fee", message)
+
+    def test_paying_it_off_clears_the_restriction(self):
+        from apps.configuration.models import FeeCategory
+        from . import services
+        from .models import Payment
+
+        invoice = self._invoice(self.library_fee)
+        Payment.objects.create(invoice=invoice, amount=invoice.amount)
+        invoice.refresh_status()
+
+        blocked, _invoices, _message = services.restriction_check(self.student, FeeCategory.RestrictionType.LIBRARY)
+        self.assertFalse(blocked)
+
+    def test_a_waived_invoice_does_not_block(self):
+        from apps.configuration.models import FeeCategory
+        from . import services
+        from .models import Invoice
+
+        invoice = self._invoice(self.library_fee)
+        invoice.status = Invoice.Status.WAIVED
+        invoice.save(update_fields=["status"])
+
+        blocked, _invoices, _message = services.restriction_check(self.student, FeeCategory.RestrictionType.LIBRARY)
+        self.assertFalse(blocked)
+
+    def test_a_category_with_no_restriction_type_never_blocks_anything(self):
+        from apps.configuration.models import FeeCategory
+        from . import services
+
+        self._invoice(self.plain_fee)
+        blocked, _invoices, _message = services.restriction_check(self.student, FeeCategory.RestrictionType.LIBRARY)
+        self.assertFalse(blocked)
+
+    def test_an_outstanding_invoice_of_a_different_restriction_type_does_not_block(self):
+        from apps.configuration.models import FeeCategory
+        from . import services
+
+        hostel_fee = FeeCategory.objects.create(name="Hostel Accommodation Fee", is_recurring=True, restriction_type=FeeCategory.RestrictionType.HOSTEL)
+        self._invoice(hostel_fee)
+        blocked, _invoices, _message = services.restriction_check(self.student, FeeCategory.RestrictionType.LIBRARY)
+        self.assertFalse(blocked)
+
+    def test_a_prior_sessions_unpaid_invoice_does_not_reach_forward(self):
+        from apps.configuration.models import FeeCategory
+        from . import services
+
+        self._invoice(self.library_fee, session=self.other_session)
+        blocked, _invoices, _message = services.restriction_check(self.student, FeeCategory.RestrictionType.LIBRARY)
+        self.assertFalse(blocked)
+
+
+class RestrictionSummaryViewTests(TestCase):
+    """MyRestrictionsView / ChildRestrictionsView — the Fees & Receipts
+    banner data for the student and parent portals."""
+
+    def setUp(self):
+        from datetime import date
+
+        from apps.academics.models import Student
+        from apps.configuration.models import AcademicSession, FeeCategory
+
+        self.session = AcademicSession.objects.create(
+            name="2026/2027", start_date=date(2026, 9, 1), end_date=date(2027, 7, 31), is_current=True,
+        )
+        self.library_fee = FeeCategory.objects.create(name="Library Fee", is_recurring=True, restriction_type=FeeCategory.RestrictionType.LIBRARY)
+        student_user = User.objects.create(full_name="Student One", email="stu1@x.io", user_type="student", is_active=True)
+        guardian_user = User.objects.create(full_name="Guardian One", email="guardian1@x.io", user_type="parent", is_active=True)
+        self.student = Student.objects.create(user=student_user, guardian_user=guardian_user)
+        self.guardian_user = guardian_user
+        self.client = APIClient()
+
+    def test_no_restrictions_when_nothing_is_outstanding(self):
+        self.client.force_authenticate(self.student.user)
+        res = self.client.get("/api/v1/finance/restrictions/mine")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()["data"], [])
+
+    def test_lists_an_active_restriction_with_its_reason(self):
+        from .models import Invoice
+
+        Invoice.objects.create(
+            student=self.student, session=self.session, category=self.library_fee,
+            description="Library Fee", amount=Decimal("3000"),
+        )
+        self.client.force_authenticate(self.student.user)
+        res = self.client.get("/api/v1/finance/restrictions/mine")
+        data = res.json()["data"]
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["restriction_type"], "library")
+        self.assertIn("Library Fee", data[0]["message"])
+
+    def test_guardian_sees_the_same_restriction_for_their_child(self):
+        from .models import Invoice
+
+        Invoice.objects.create(
+            student=self.student, session=self.session, category=self.library_fee,
+            description="Library Fee", amount=Decimal("3000"),
+        )
+        self.client.force_authenticate(self.guardian_user)
+        res = self.client.get(f"/api/v1/finance/restrictions/child/{self.student.id}")
+        self.assertEqual(len(res.json()["data"]), 1)
+
+    def test_a_stranger_cannot_see_another_students_restrictions(self):
+        outsider = User.objects.create(full_name="Outsider", email="outsider@x.io", user_type="parent", is_active=True)
+        self.client.force_authenticate(outsider)
+        res = self.client.get(f"/api/v1/finance/restrictions/child/{self.student.id}")
         self.assertEqual(res.status_code, 403)
 
 

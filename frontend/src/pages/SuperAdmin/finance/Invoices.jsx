@@ -27,7 +27,10 @@ function buildFields(extra) {
   }));
   return [
     { key: 'student', label: 'Student', type: 'select', required: true, options: studentOptions },
-    { key: 'fee_item', label: 'Fee Item (optional — fills in description & amount)', type: 'select', options: feeItemOptions },
+    {
+      key: 'category', label: 'Fee Item (optional — fills in description & amount, and carries any restriction it enforces)',
+      type: 'select', options: feeItemOptions,
+    },
     { key: 'description', label: 'Description', type: 'text', required: true, placeholder: 'e.g. Tuition — First Term' },
     { key: 'session', label: 'Session', type: 'select', required: true, options: sessionOptions },
     { key: 'term', label: 'Term (optional)', type: 'select', options: termOptions },
@@ -37,7 +40,10 @@ function buildFields(extra) {
 }
 
 function handleFieldChange(key, value, _formValues, setFormValues, extra) {
-  if (key !== 'fee_item') return;
+  // `category` is a real, backend-writable field (Invoice.category) — this
+  // just additionally auto-fills description/amount as a convenience once
+  // one's picked, the same way it always has.
+  if (key !== 'category') return;
   const item = (extra.feeItems || []).find((c) => c.id === value);
   if (!item) return;
   setFormValues((prev) => ({
@@ -83,7 +89,7 @@ export default function SuperAdminInvoices() {
       columns={COLUMNS}
       formFields={buildFields}
       onFieldChange={handleFieldChange}
-      initialFormValues={{ student: '', fee_item: '', description: '', session: '', term: '', amount: '', due_date: '' }}
+      initialFormValues={{ student: '', category: '', description: '', session: '', term: '', amount: '', due_date: '' }}
       emptyIcon="receipt_long"
       renderExtraActions={(item, reload) => <WaiveAction item={item} reload={reload} />}
     />

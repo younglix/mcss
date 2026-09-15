@@ -233,3 +233,49 @@ def build_payout_sheet(run, narration):
         "missing_payslip": missing_payslip_count,
     }
     return wb, stats
+
+
+# ---------------------------------------------------------------------------
+# Fee-item restrictions — a student with an outstanding (unpaid/partial)
+# invoice against a FeeCategory tagged with a given restriction_type is
+# blocked from the matching activity until it's paid or waived. One shared
+# check, called from every gated endpoint (library/hostel/transport/
+# activities in apps.student_services, report-card downloads in
+# apps.academics, exam attempts in apps.examinations) so "what counts as
+# restricted" has exactly one definition.
+RESTRICTION_DESCRIPTIONS = {
+    "active_student": "Your school fees are not fully paid, so academic activities are currently restricted.",
+    "library": "A library-related fee is unpaid, so new book loans are currently restricted.",
+    "hostel": "The hostel accommodation fee is unpaid, so hostel allocation is currently restricted.",
+    "transport": "The transport fee is unpaid, so bus/route assignment is currently restricted.",
+    "certificate": "A certificate/result fee is unpaid, so report card and result downloads are currently restricted.",
+    "activity": "An activity fee is unpaid, so joining school activities is currently restricted.",
+}
+
+
+def restriction_check(student, restriction_type, session=None):
+    """(is_blocked, invoices, message) for `student` against one
+    restriction_type. `invoices` is every outstanding (unpaid/partial, not
+    waived) Invoice against a FeeCategory of that type, scoped to the
+    current academic session when one isn't passed explicitly — a prior
+    session's unpaid fee item doesn't reach forward and block a student
+    forever once the school has moved on."""
+    from apps.configuration.models import AcademicSession, FeeCategory
+
+    if session is None:
+        session = AcademicSession.objects.filter(is_current=True).first()
+
+    qs = Invoice.objects.filter(
+        student=student, category__restriction_type=restriction_type,
+    ).exclude(status__in=[Invoice.Status.PAID, Invoice.Status.WAIVED]).select_related("category")
+    if session:
+        qs = qs.filter(session=session)
+
+    invoices = list(qs)
+    if not invoices:
+        return False, [], ""
+
+    names = ", ".join(sorted({inv.category.name for inv in invoices if inv.category}))
+    base = RESTRICTION_DESCRIPTIONS.get(restriction_type, "A required fee is unpaid.")
+    message = f"{base} Outstanding: {names}." if names else base
+    return True, invoices, message
