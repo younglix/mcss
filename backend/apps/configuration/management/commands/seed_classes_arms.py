@@ -9,32 +9,39 @@ from apps.configuration.models import ClassArm, SchoolClass
 # and this app already has a proper home for that concept
 # (Student.status: withdrawn / pending), so importing them as fake
 # SchoolClass rows would just pollute the real list.
-# (name, level_order, [arm names])
+#
+# Senior Secondary's arms are NOT performance bands — by school convention
+# A = Science, B = Arts, C = Commercial, a manually-assigned subject stream
+# (see Category.SENIOR_SECONDARY). All three get a C arm for exactly that
+# reason, including SS-3 (previously only had A/B).
+# (name, level_order, category, [arm names])
+Category = SchoolClass.Category
 CLASSES = [
-    ("KG-1", 1, ["A", "B", "C"]),
-    ("KG-2", 2, ["A", "B", "C"]),
-    ("Basic-1", 3, ["A", "B", "C"]),
-    ("Basic-2", 4, ["A", "B", "C"]),
-    ("Basic-3", 5, ["A", "B", "C"]),
-    ("Basic-4", 6, ["A", "B", "C"]),
-    ("Basic-5", 7, ["A", "B", "C"]),
-    ("Basic-6", 8, ["A", "B", "C"]),
-    ("Basic-7", 9, ["A", "B", "C"]),
-    ("Basic-8", 10, ["A", "B", "C"]),
-    ("Basic-9", 11, ["A", "B", "C"]),
-    ("SS-1", 12, ["A", "B", "C"]),
-    ("SS-2", 13, ["A", "B", "C"]),
-    ("SS-3", 14, ["A", "B"]),
+    ("KG-1", 1, Category.PRE_PRIMARY, ["A", "B", "C"]),
+    ("KG-2", 2, Category.PRE_PRIMARY, ["A", "B", "C"]),
+    ("Basic-1", 3, Category.PRIMARY, ["A", "B", "C"]),
+    ("Basic-2", 4, Category.PRIMARY, ["A", "B", "C"]),
+    ("Basic-3", 5, Category.PRIMARY, ["A", "B", "C"]),
+    ("Basic-4", 6, Category.PRIMARY, ["A", "B", "C"]),
+    ("Basic-5", 7, Category.PRIMARY, ["A", "B", "C"]),
+    ("Basic-6", 8, Category.PRIMARY, ["A", "B", "C"]),
+    ("Basic-7", 9, Category.JUNIOR_SECONDARY, ["A", "B", "C"]),
+    ("Basic-8", 10, Category.JUNIOR_SECONDARY, ["A", "B", "C"]),
+    ("Basic-9", 11, Category.JUNIOR_SECONDARY, ["A", "B", "C"]),
+    ("SS-1", 12, Category.SENIOR_SECONDARY, ["A", "B", "C"]),
+    ("SS-2", 13, Category.SENIOR_SECONDARY, ["A", "B", "C"]),
+    ("SS-3", 14, Category.SENIOR_SECONDARY, ["A", "B", "C"]),
 ]
 
 # Every class not on this list still gets an N_S holding arm (so new intake
 # always has somewhere to land, see apps.finance.models._place_in_holding_arm)
 # and a ClassBandingConfig row — just with `enabled=False`, matching this
-# engine's own "nursery/KG classes have no config" default-off design. Only
-# the unambiguous senior-secondary classes are turned on out of the box;
-# a Super Admin can flip banding on for any other class (JSS/Basic) from the
-# new Class-Arm Banding admin screen.
-BANDING_ENABLED_BY_DEFAULT = {"SS-1", "SS-2", "SS-3"}
+# engine's own "nursery/KG classes have no config" default-off design.
+# Banding is Junior-Secondary-only, hard-enforced (ClassBandingConfigSerializer
+# rejects enabling it for anything else) — so only Basic-7/8/9 default on;
+# Senior Secondary's arms are manually-assigned streams, not performance
+# bands, and can never be turned on here.
+BANDING_ENABLED_BY_DEFAULT = {"Basic-7", "Basic-8", "Basic-9"}
 HOLDING_ARM_NAME = "N_S"
 
 
@@ -47,8 +54,10 @@ class Command(BaseCommand):
         classes_created = 0
         arms_created = 0
         configs_created = 0
-        for name, level_order, arms in CLASSES:
-            school_class, was_created = SchoolClass.objects.get_or_create(name=name, defaults={"level_order": level_order})
+        for name, level_order, category, arms in CLASSES:
+            school_class, was_created = SchoolClass.objects.get_or_create(
+                name=name, defaults={"level_order": level_order, "category": category},
+            )
             classes_created += int(was_created)
             for arm_name in arms:
                 _, arm_created = ClassArm.objects.get_or_create(school_class=school_class, name=arm_name)

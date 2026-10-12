@@ -52,6 +52,7 @@ export default function ExamTake() {
   const [now, setNow] = useState(() => Date.now());
   const [submitting, setSubmitting] = useState(false);
   const [endedMessage, setEndedMessage] = useState('');
+  const [submitResult, setSubmitResult] = useState(null); // { score, total, percentage, penalty_applied }
 
   const statusRef = useRef('warning');
   useEffect(() => { statusRef.current = phase; }, [phase]);
@@ -138,7 +139,8 @@ export default function ExamTake() {
     if (statusRef.current !== 'exam') return;
     setSubmitting(true);
     try {
-      await examApi.post(`/exam/attempts/${attemptId}/submit`, {});
+      const result = await examApi.post(`/exam/attempts/${attemptId}/submit`, {});
+      setSubmitResult(result);
       setPhase('done');
     } catch (err) {
       if (err instanceof ExamApiError && err.status === 409) {
@@ -223,6 +225,20 @@ export default function ExamTake() {
         <div className="max-w-md w-full text-center flex flex-col items-center gap-md bg-surface-container-lowest border border-outline/10 rounded-xl shadow-sm p-xl">
           <span className="material-symbols-outlined text-secondary text-5xl">check_circle</span>
           <h1 className="font-headline-lg text-headline-md text-on-surface">Exam Submitted</h1>
+          {submitResult && (
+            <div className="w-full bg-primary-container/20 border border-primary/20 rounded-lg p-lg">
+              <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wide">Your Score</p>
+              <p className="font-headline-lg text-headline-lg text-primary mt-xs">
+                {submitResult.score} / {submitResult.total}
+                <span className="font-headline-md text-headline-sm text-on-surface-variant ml-sm">({submitResult.percentage}%)</span>
+              </p>
+              {submitResult.penalty_applied > 0 && (
+                <p className="font-label-sm text-label-sm text-error mt-xs">
+                  Includes a {submitResult.penalty_applied}-point penalty for an automatic (non-manual) submission.
+                </p>
+              )}
+            </div>
+          )}
           <p className="font-body-md text-on-surface-variant">
             {meta?.completionMessage || 'Your answers have been recorded. You may now close this window and return your device to the invigilator.'}
           </p>

@@ -1,7 +1,22 @@
-"""Class-arm performance-based reallocation.
+"""Class-arm performance-based reallocation — Junior Secondary only (hard
+rule enforced in ClassBandingConfigSerializer; see apps.configuration's
+SchoolClass.category). Senior Secondary's arms are manually-assigned
+subject streams (A = Science, B = Arts, C = Commercial, by school
+convention), never performance bands.
 
-The one subtle thing to hold onto: there are TWO mechanisms, and they must
-never be mixed.
+Banding is a ONCE-A-YEAR pass, tied to the session's 3rd/final term — not
+something that fires at every term boundary. See
+compute_annual_promotion_banding and compute_reallocations_for_published_exam.
+It ranks students on their CUMULATIVE average across all three terms
+(student_session_averages), not any single term's result, and proposes
+which arm they land in at the class they're about to be promoted into — the
+Promotion screen reads this as a suggested default; actually moving
+class_arm is still PromotionActionView's own explicit decision.
+
+rerank_existing_students / absorb_new_students (the within-year mechanisms
+below) and compute_reallocation still exist and are fully functional, for
+manual, administrative mid-year correction only (reallocation.configure) —
+neither one auto-fires any more:
 
   1. rerank_existing_students — for students already in a band (A/B/C). A pure
      SWAP. Re-rank everyone by term average, refill the SAME fixed slots
@@ -19,12 +34,16 @@ never be mixed.
   correction through the reallocation.configure endpoint, which audit-logs
   every change so a hand-edit can't quietly break the rule.
 
-  initial_banding is the cold-start path: a class where nobody is banded yet
-  — a brand-new class, or a cohort that just arrived via promotion. Rank
-  everyone with a result, fill A -> B -> C top-down by configured capacity,
-  or an even split when capacities are unset.
+  initial_banding is the cold-start path: a class (or a cohort's destination
+  class) where nobody is banded yet. Rank everyone with a result, fill
+  A -> B -> C top-down by configured capacity, or an even split when
+  capacities are unset. Shared by compute_initial_banding (manual, bands
+  INTO the same school_class passed in) and compute_annual_promotion_banding
+  (automatic, bands into the NEXT school_class).
 
-Lifecycle — three steps, deliberately not collapsed:
+Lifecycle — three steps, deliberately not collapsed (compute_reallocation /
+compute_initial_banding only; the annual pass only ever computes — see its
+own docstring for why release/apply don't apply there):
 
   compute_reallocation  builds a PENDING ClassReallocation of proposed moves.
                         Writes NOTHING to Student or ClassArm.
@@ -40,10 +59,11 @@ from datetime import date
 from decimal import Decimal
 
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from apps.audit.services import log
-from apps.configuration.models import ClassArm, Term
+from apps.configuration.models import ClassArm, SchoolClass, Term
 
 from .models import (
     ClassBandingConfig,
@@ -101,6 +121,20 @@ def _avg_or_neg(averages, student_id):
 # ---------------------------------------------------------------------------
 # Arm helpers
 # ---------------------------------------------------------------------------
+def _enabled_config(school_class):
+    """This class's banding config — but only if it's switched on AND the
+    class is Junior Secondary. ClassBandingConfigSerializer already refuses
+    to enable banding anywhere else; this is the engine's own check, so a
+    class re-categorised after banding was switched on is still never
+    touched."""
+    if school_class.category != SchoolClass.Category.JUNIOR_SECONDARY:
+        return None
+    return (
+        ClassBandingConfig.objects.filter(school_class=school_class, enabled=True)
+        .select_related("holding_arm").first()
+    )
+
+
 def banded_arms(school_class, config):
     """The ranked bands of a class, best -> worst. Every arm of the class
     except the N_S holding arm, ordered by name (A, B, C, ...)."""
@@ -325,7 +359,7 @@ def compute_reallocation(school_class, source_exam, *, actor=None):
     Returns the ClassReallocation, or None if the class isn't opted in or this
     is a 3rd-term result (no next term in the session).
     """
-    config = ClassBandingConfig.objects.filter(school_class=school_class, enabled=True).select_related("holding_arm").first()
+    config = _enabled_config(school_class)
     if not config or config.holding_arm_id is None:
         return None
 
@@ -336,19 +370,18 @@ def compute_reallocation(school_class, source_exam, *, actor=None):
         # cohort happens afterwards via compute_initial_banding().
         return None
 
-    if ClassReallocation.objects.filter(
-        school_class=school_class, session=session, term=term,
-        status=ClassReallocation.Status.RELEASED,
-    ).exists():
+    within_class = ClassReallocation.objects.filter(
+        school_class=school_class, session=session, term=term, target_class__isnull=True,
+    )
+    if within_class.filter(status=ClassReallocation.Status.RELEASED).exists():
         raise ReallocationError(
             "A released reallocation for this class and term is still awaiting apply. "
             "Apply or supersede it before recomputing."
         )
 
-    ClassReallocation.objects.filter(
-        school_class=school_class, session=session, term=term,
-        status=ClassReallocation.Status.PENDING,
-    ).update(status=ClassReallocation.Status.SUPERSEDED, updated_at=timezone.now())
+    within_class.filter(status=ClassReallocation.Status.PENDING).update(
+        status=ClassReallocation.Status.SUPERSEDED, updated_at=timezone.now(),
+    )
 
     bands = banded_arms(school_class, config)
     students = list(
@@ -405,24 +438,23 @@ def compute_initial_banding(school_class, source_exam, *, actor=None):
     brand-new class's first-ever term. Same PENDING -> release -> apply gate
     as compute_reallocation; every move is mechanism=initial_banding.
     """
-    config = ClassBandingConfig.objects.filter(school_class=school_class, enabled=True).select_related("holding_arm").first()
+    config = _enabled_config(school_class)
     if not config:
         return None
 
     term = source_exam.term
     session = source_exam.session
 
-    if ClassReallocation.objects.filter(
-        school_class=school_class, session=session, term=term,
-        status__in=[ClassReallocation.Status.RELEASED],
-    ).exists():
+    within_class = ClassReallocation.objects.filter(
+        school_class=school_class, session=session, term=term, target_class__isnull=True,
+    )
+    if within_class.filter(status=ClassReallocation.Status.RELEASED).exists():
         raise ReallocationError(
             "A released reallocation for this class and term is still awaiting apply."
         )
-    ClassReallocation.objects.filter(
-        school_class=school_class, session=session, term=term,
-        status=ClassReallocation.Status.PENDING,
-    ).update(status=ClassReallocation.Status.SUPERSEDED, updated_at=timezone.now())
+    within_class.filter(status=ClassReallocation.Status.PENDING).update(
+        status=ClassReallocation.Status.SUPERSEDED, updated_at=timezone.now(),
+    )
 
     bands = banded_arms(school_class, config)
     students = list(
@@ -446,6 +478,118 @@ def compute_initial_banding(school_class, source_exam, *, actor=None):
     return reallocation
 
 
+def student_session_averages(source_exam, student_ids=None):
+    """{student_id: Decimal average} — the once-a-year banding metric: the
+    simple average of a student's per-term averages across the session.
+
+    Each term contributes that student's term average (student_term_averages)
+    off the term's `_trigger_exam_type()` exam — only PUBLISHED ones count
+    (an unpublished exam's scores haven't cleared results approval yet),
+    plus `source_exam` itself, the 3rd-term exam whose publish fired this.
+    Exams are school-wide (no class field); `student_ids` is what scopes
+    this to one class. A student missing a term (admitted mid-year, say) is
+    averaged over the terms they do have, not penalized for the gap.
+    """
+    exams = Exam.objects.filter(
+        Q(status=Exam.Status.PUBLISHED) | Q(id=source_exam.id),
+        session_id=source_exam.session_id, exam_type=_trigger_exam_type(),
+    )
+    by_term = {}  # {student_id: {term_id: [that term's exam averages]}}
+    for exam in exams:
+        for sid, avg in student_term_averages(exam, student_ids).items():
+            by_term.setdefault(sid, {}).setdefault(exam.term_id, []).append(avg)
+
+    out = {}
+    for sid, terms in by_term.items():
+        term_avgs = [sum(v) / len(v) for v in terms.values()]
+        out[sid] = (sum(term_avgs) / len(term_avgs)).quantize(Decimal("0.01"))
+    return out
+
+
+def _next_school_class(school_class):
+    """The class one level_order above this one — where this cohort is
+    headed once promoted. Used only to find the right arms to band
+    suggestions into; the actual move is still PromotionActionView's own,
+    explicit, human decision."""
+    return SchoolClass.objects.filter(level_order=school_class.level_order + 1).first()
+
+
+@transaction.atomic
+def compute_annual_promotion_banding(school_class, source_exam, *, actor=None):
+    """The once-a-year banding pass: fired automatically when a Junior
+    Secondary class's 3rd/final-term exam is published (see
+    compute_reallocations_for_published_exam), replacing the old within-year
+    1st-&-2nd-term reallocation entirely. Ranks every active student in
+    `school_class` by their CUMULATIVE average across all three terms this
+    session (student_session_averages) and proposes which arm they should
+    land in at the class they're about to be promoted into.
+
+    This never touches Student.class_arm or next_class_arm — it only
+    produces a PENDING ClassReallocation (same shape, and visible through
+    the same reallocation.view endpoints, as any other), which the
+    Promotion screen reads to pre-fill its own `to_class_arm` suggestion.
+    The actual move stays PromotionActionView's own explicit decision.
+
+    Returns None if the class isn't opted in, there's no next class, the
+    next class isn't ALSO opted in, or nobody in the class has a result to
+    rank on. The opt-in checks cover both edges of Junior
+    Secondary: Basic-9 -> SS-1 (Senior arms are manually-assigned subject
+    streams, nothing to suggest) and Basic-6 -> Basic-7 (Primary has no
+    banding, so JSS1 arms are picked by hand at promotion — the user's
+    explicit choice, not an oversight).
+
+    Students still in the N_S holding arm are ranked along with everyone
+    else — new intake deliberately waits in N_S until this pass rather than
+    being absorbed mid-year (also the user's explicit choice).
+    """
+    if not _enabled_config(school_class):
+        return None
+    next_class = _next_school_class(school_class)
+    next_config = _enabled_config(next_class) if next_class else None
+    if not next_config:
+        return None
+
+    session = source_exam.session
+    term = source_exam.term
+
+    # Any earlier suggestion for this cohort this session is stale now.
+    # (No RELEASED check: a suggestion can never be released — see
+    # release_reallocation.)
+    ClassReallocation.objects.filter(
+        school_class=school_class, session=session, target_class__isnull=False,
+        status=ClassReallocation.Status.PENDING,
+    ).update(status=ClassReallocation.Status.SUPERSEDED, updated_at=timezone.now())
+
+    bands = banded_arms(next_class, next_config)
+    students = list(
+        Student.objects.filter(
+            class_arm__school_class=school_class, status=Student.Status.ACTIVE,
+        ).select_related("user", "class_arm")
+    )
+    averages = student_session_averages(source_exam, [s.id for s in students])
+    if not averages:
+        # Nobody in this class has a result to rank on (an empty class, say)
+        # — nothing to suggest, so don't leave an empty proposal behind.
+        return None
+
+    reallocation = ClassReallocation.objects.create(
+        school_class=school_class, target_class=next_class, session=session, term=term,
+        source_exam=source_exam, computed_by=actor,
+        notes=f"Annual banding: suggested arm in {next_class.name} at promotion",
+    )
+    moves = initial_banding(students, averages, bands)
+    _persist_moves(reallocation, move_dicts=moves)
+
+    log(
+        actor=actor, action="academics.reallocation_computed", target=reallocation,
+        changes={
+            "class": school_class.name, "next_class": next_class.name, "session": session.name,
+            "kind": "annual_promotion_banding", "moves": len(moves),
+        },
+    )
+    return reallocation
+
+
 @transaction.atomic
 def release_reallocation(reallocation, *, actor):
     """Step 2. Make the proposal visible: set every moved student's
@@ -456,8 +600,18 @@ def release_reallocation(reallocation, *, actor):
     if reallocation.status != ClassReallocation.Status.PENDING:
         raise ReallocationError(f"Only a pending reallocation can be released (this one is {reallocation.status}).")
 
+    if reallocation.target_class_id:
+        # An annual promotion-banding suggestion (compute_annual_promotion_banding)
+        # — its `to_arm`s are deliberately the NEXT class's arms, a suggestion
+        # for PromotionActionView's own decision. Releasing/applying it here
+        # would move class_arm outside the real promotion flow, with no
+        # PromotionRecord to show for it.
+        raise ReallocationError(
+            "This is an annual promotion suggestion, not a within-class reallocation. "
+            "It pre-fills the arm choice on the Promotion screen and can't be released or applied directly."
+        )
     moves = list(reallocation.moves.select_related(
-        "student__user", "student__guardian_user", "to_arm__school_class", "from_arm",
+        "student__user", "student__guardian_user", "to_arm", "from_arm",
     ))
     for m in moves:
         if m.to_arm_id and m.to_arm_id != m.from_arm_id:
@@ -560,29 +714,46 @@ def _trigger_exam_type():
 
 
 def compute_reallocations_for_published_exam(exam, *, actor=None):
-    """Called when an exam is published. Fires reallocation for every opted-in
-    class in that exam's session — but only for the configured term-result
-    exam type, and only for 1st/2nd term (a 3rd-term result is promotion's
-    job; compute_reallocation returns None for it anyway).
+    """Called when an exam is published. Banding is a once-a-year pass tied
+    to the session's 3rd/final term, not something that fires at every term
+    boundary — 1st- and 2nd-term publishes no longer trigger anything here
+    (compute_reallocation still exists for manual, administrative
+    correction mid-year, just never auto-fires). Only the configured
+    term-result exam type (`_trigger_exam_type()`) for the session's LAST
+    term fires compute_annual_promotion_banding, using the cumulative
+    average across all three terms — see student_session_averages.
     """
     if exam.exam_type != _trigger_exam_type():
         return []
-    if _next_term_in_session(exam.term) is None:
+    if _next_term_in_session(exam.term) is not None:
+        # Not the 3rd/final term yet — no within-year auto-banding anymore.
         return []
 
     results = []
-    configs = ClassBandingConfig.objects.filter(enabled=True).select_related("school_class")
+    configs = ClassBandingConfig.objects.filter(
+        enabled=True, school_class__category=SchoolClass.Category.JUNIOR_SECONDARY,
+    ).select_related("school_class")
     for config in configs:
-        try:
-            realloc = compute_reallocation(config.school_class, exam, actor=actor)
-        except ReallocationError:
-            # A released-unapplied proposal is blocking this class — skip it,
-            # don't fail the whole publish. It'll be picked up on a manual
-            # recompute once the blocker clears.
-            continue
+        realloc = compute_annual_promotion_banding(config.school_class, exam, actor=actor)
         if realloc:
             results.append(realloc)
     return results
+
+
+def latest_promotion_suggestion(school_class, session):
+    """The current annual promotion-banding suggestion for this cohort, or
+    None — what the Promotion screen pre-fills each student's destination
+    arm from. Only PENDING counts: a superseded one was replaced by a newer
+    compute."""
+    return (
+        ClassReallocation.objects.filter(
+            school_class=school_class, session=session, target_class__isnull=False,
+            status=ClassReallocation.Status.PENDING,
+        )
+        .select_related("target_class", "source_exam")
+        .order_by("-computed_at")
+        .first()
+    )
 
 
 def apply_due_reallocations():

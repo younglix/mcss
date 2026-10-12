@@ -11,10 +11,26 @@ import { api, ApiError } from '../../../lib/api.js';
 
 const ENDPOINTS = { classes: '/config/classes' };
 
+// Mirrors SchoolClass.Category. Drives which classes can use performance
+// banding (Junior Secondary only) and flags Senior Secondary arms as
+// hand-assigned subject streams.
+const CATEGORY_OPTIONS = [
+  { value: 'pre_primary', label: 'Pre-Primary (Kindergarten)' },
+  { value: 'primary', label: 'Primary' },
+  { value: 'junior_secondary', label: 'Junior Secondary' },
+  { value: 'senior_secondary', label: 'Senior Secondary' },
+];
+
 const CLASS_FIELDS = [
   { key: 'name', id: 'class_name', label: 'Class Name', type: 'text', required: true, placeholder: 'e.g. JSS 1' },
   { key: 'level_order', id: 'class_level_order', label: 'Level Order', type: 'number', required: true, placeholder: 'e.g. 1 (drives promotion order)' },
+  {
+    key: 'category', id: 'class_category', label: 'Section', type: 'select', required: true, options: CATEGORY_OPTIONS,
+    hint: 'Only Junior Secondary classes can use performance-based A/B/C banding.',
+  },
 ];
+
+const EMPTY_CLASS = { name: '', level_order: '', category: '' };
 
 const ARM_FIELDS = [{ key: 'name', id: 'arm_name', label: 'Arm Name', type: 'text', required: true, placeholder: 'e.g. A' }];
 
@@ -22,7 +38,8 @@ export default function SuperAdminClassesArms() {
   const { data, loading, error, reload } = useDashboardData(ENDPOINTS);
 
   const [classDrawer, setClassDrawer] = useState(false);
-  const [classValues, setClassValues] = useState({ name: '', level_order: '' });
+  const [classValues, setClassValues] = useState(EMPTY_CLASS);
+  const [savingCategory, setSavingCategory] = useState(null); // classId
   const [armDrawer, setArmDrawer] = useState(null); // classId or null
   const [armValues, setArmValues] = useState({ name: '' });
   const [formErrors, setFormErrors] = useState({});
@@ -35,12 +52,16 @@ export default function SuperAdminClassesArms() {
 
   const handleCreateClass = async (e) => {
     e.preventDefault();
+    if (!classValues.category) {
+      setFormErrors({ category: ['Pick the section this class belongs to.'] });
+      return;
+    }
     setSubmitting(true);
     setFormErrors({});
     try {
       await api.post('/config/classes', classValues);
       setClassDrawer(false);
-      setClassValues({ name: '', level_order: '' });
+      setClassValues(EMPTY_CLASS);
       reload();
     } catch (err) {
       setFormErrors(err instanceof ApiError && err.errors ? err.errors : { __all__: err.message });
@@ -65,6 +86,19 @@ export default function SuperAdminClassesArms() {
     }
   };
 
+  const handleCategoryChange = async (classId, category) => {
+    setSavingCategory(classId);
+    setActionError('');
+    try {
+      await api.patch(`/config/classes/${classId}`, { category });
+      reload();
+    } catch (err) {
+      setActionError(err.message || 'Could not update the section.');
+    } finally {
+      setSavingCategory(null);
+    }
+  };
+
   const handleDelete = async () => {
     setDeleting(true);
     try {
@@ -84,7 +118,7 @@ export default function SuperAdminClassesArms() {
     <DashboardPageShell
       pageTitle="Classes & Arms"
       title="Classes & Arms"
-      subtitle="School classes and their arms/streams."
+      subtitle="School classes, their section, and their arms/streams."
       loading={loading}
       error={error}
       onReload={reload}
@@ -112,7 +146,18 @@ export default function SuperAdminClassesArms() {
               {classes.map((klass) => (
                 <Card key={klass.id} padding="lg">
                   <div className="flex items-center justify-between gap-md flex-wrap">
-                    <span className="font-label-md text-label-md font-bold text-on-surface">{klass.name}</span>
+                    <div className="flex items-center gap-sm flex-wrap">
+                      <span className="font-label-md text-label-md font-bold text-on-surface">{klass.name}</span>
+                      <select
+                        aria-label={`${klass.name} section`}
+                        value={klass.category}
+                        onChange={(e) => handleCategoryChange(klass.id, e.target.value)}
+                        disabled={savingCategory === klass.id}
+                        className="mcss-field px-sm py-1 text-label-sm w-auto"
+                      >
+                        {CATEGORY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                      </select>
+                    </div>
                     <div className="flex flex-wrap items-center gap-xs">
                       {klass.arms.map((arm) => (
                         <span key={arm.id} className="inline-flex items-center gap-1 font-label-sm text-label-sm px-sm py-0.5 rounded-full bg-surface-container text-on-surface-variant">
@@ -130,6 +175,11 @@ export default function SuperAdminClassesArms() {
                       </button>
                     </div>
                   </div>
+                  {klass.category === 'senior_secondary' && (
+                    <p className="font-label-sm text-label-sm text-on-surface-variant mt-xs">
+                      Arms are subject streams: A Science, B Arts, C Commercial. Students are placed in them by hand.
+                    </p>
+                  )}
                 </Card>
               ))}
             </div>

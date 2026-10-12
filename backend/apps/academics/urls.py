@@ -49,6 +49,7 @@ urlpatterns = [
 
     path("promotion/records", views.PromotionRecordsView.as_view(), name="academics-promotion-records"),
     path("promotion/action", views.PromotionActionView.as_view(), name="academics-promotion-action"),
+    path("promotion/suggestions", views.PromotionSuggestionsView.as_view(), name="academics-promotion-suggestions"),
 
     # Class-arm performance-based reallocation
     path("banding-config", views.BandingConfigView.as_view(), name="academics-banding-config"),

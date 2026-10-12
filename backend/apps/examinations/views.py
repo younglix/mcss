@@ -493,7 +493,13 @@ class AttemptSubmitView(APIView):
         log(actor=request.user, action="examinations.attempt_submitted", target=attempt,
             changes={"final_status": final_status}, request=request)
         message = "Submitted." if final_status == Attempt.Status.SUBMITTED else "Time was already up — this was recorded as a timeout."
-        return success(message=message)
+        total = len(attempt.question_ids)
+        return success(message=message, data={
+            "score": attempt.raw_score,
+            "total": total,
+            "percentage": round(attempt.raw_score / total * 100, 1) if total else 0,
+            "penalty_applied": attempt.penalty_applied,
+        })
 
 
 class AttemptExitView(APIView):

@@ -56,11 +56,12 @@ class ClassArmSerializer(serializers.ModelSerializer):
 
 class SchoolClassSerializer(serializers.ModelSerializer):
     arms = ClassArmSerializer(many=True, read_only=True)
+    category_label = serializers.CharField(source="get_category_display", read_only=True)
 
     class Meta:
         model = SchoolClass
-        fields = ["id", "name", "level_order", "arms"]
-        read_only_fields = ["id", "arms"]
+        fields = ["id", "name", "level_order", "category", "category_label", "arms"]
+        read_only_fields = ["id", "arms", "category_label"]
 
 
 class GradeScaleSerializer(serializers.ModelSerializer):

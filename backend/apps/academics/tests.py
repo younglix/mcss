@@ -54,7 +54,11 @@ class ReallocationTestBase(TestCase):
         self.term3 = Term.objects.create(
             session=self.session, name="Third", start_date=date(2027, 4, 25), end_date=date(2027, 7, 31),
         )
-        self.klass = SchoolClass.objects.create(name="JSS 1", level_order=1)
+        # Banding is Junior-Secondary-only (engine-enforced), so the class
+        # under test has to actually be one.
+        self.klass = SchoolClass.objects.create(
+            name="JSS 1", level_order=1, category=SchoolClass.Category.JUNIOR_SECONDARY,
+        )
         self.arm_a = ClassArm.objects.create(school_class=self.klass, name="A", capacity=2)
         self.arm_b = ClassArm.objects.create(school_class=self.klass, name="B", capacity=2)
         self.arm_c = ClassArm.objects.create(school_class=self.klass, name="C", capacity=2)
@@ -354,7 +358,10 @@ class BoundaryTests(ReallocationTestBase):
         self.make_student(self.arm_a, {self.exam1: 80})
         self.assertIsNone(services.compute_reallocation(self.klass, self.exam1))
 
-    def test_publish_trigger_fires_only_for_trigger_type_and_early_terms(self):
+    def test_publish_trigger_fires_only_for_trigger_type_and_the_final_term(self):
+        """Banding is a once-a-year pass off the 3rd/final term now — a
+        1st-term final exam (self.exam1) no longer triggers anything at
+        all, auto-trigger or not."""
         self.make_student(self.arm_a, {self.exam1: 85})
         self.make_student(self.arm_b, {self.exam1: 60})
 
@@ -366,10 +373,50 @@ class BoundaryTests(ReallocationTestBase):
         services.compute_reallocations_for_published_exam(test_exam)
         self.assertEqual(ClassReallocation.objects.count(), 0)
 
-        # the term's final exam -> one proposal
+        # the 1st term's own final exam -> still nothing; only the session's
+        # last term fires the annual pass now.
         made = services.compute_reallocations_for_published_exam(self.exam1)
+        self.assertEqual(made, [])
+        self.assertEqual(ClassReallocation.objects.count(), 0)
+
+    def test_publish_trigger_fires_on_the_final_term_when_a_next_class_is_also_opted_in(self):
+        next_klass = SchoolClass.objects.create(
+            name="JSS 2", level_order=self.klass.level_order + 1, category=SchoolClass.Category.JUNIOR_SECONDARY,
+        )
+        next_arm_a = ClassArm.objects.create(school_class=next_klass, name="A", capacity=2)
+        next_ns = ClassArm.objects.create(school_class=next_klass, name="N_S")
+        ClassBandingConfig.objects.create(school_class=next_klass, enabled=True, holding_arm=next_ns)
+
+        exam3 = Exam.objects.create(
+            name="Third Term Exam", exam_type=Exam.ExamType.FINAL, session=self.session,
+            term=self.term3, start_date=date(2027, 7, 1),
+        )
+        self.make_student(self.arm_a, {exam3: 85})
+        self.make_student(self.arm_b, {exam3: 60})
+
+        made = services.compute_reallocations_for_published_exam(exam3)
         self.assertEqual(len(made), 1)
-        self.assertEqual(ClassReallocation.objects.filter(status=ClassReallocation.Status.PENDING).count(), 1)
+        self.assertEqual(made[0].school_class_id, self.klass.id)
+        self.assertEqual(made[0].target_class_id, next_klass.id)
+        self.assertTrue(made[0].moves.filter(to_arm=next_arm_a).exists())
+
+    def test_last_junior_class_gets_no_suggestion_into_senior_secondary(self):
+        """Basic-9 -> SS-1: Senior arms are manually-assigned subject
+        streams, so there's nothing to suggest — even if someone had left an
+        old enabled config on the SS class (the engine checks category)."""
+        ss1 = SchoolClass.objects.create(
+            name="SS 1", level_order=self.klass.level_order + 1, category=SchoolClass.Category.SENIOR_SECONDARY,
+        )
+        ClassArm.objects.create(school_class=ss1, name="A")
+        ClassBandingConfig.objects.create(school_class=ss1, enabled=True)
+        exam3 = Exam.objects.create(
+            name="Third Term Exam", exam_type=Exam.ExamType.FINAL, session=self.session,
+            term=self.term3, start_date=date(2027, 7, 1),
+        )
+        self.make_student(self.arm_a, {exam3: 85})
+
+        self.assertIsNone(services.compute_annual_promotion_banding(self.klass, exam3))
+        self.assertEqual(services.compute_reallocations_for_published_exam(exam3), [])
 
 
 class ApiGateTests(ReallocationTestBase):
@@ -447,12 +494,29 @@ class PublishTriggersReallocationEndToEndTests(ReallocationTestBase):
     other reallocation test calls services.compute_reallocation /
     compute_reallocations_for_published_exam directly, bypassing the actual
     approval-gated /publish endpoint entirely — so nothing ever proved the
-    real HTTP flow (submit -> approve -> publish) actually triggers
-    reallocation end-to-end, all the way through to what the student and
-    parent portals display. This test drives the real endpoints."""
+    real HTTP flow (submit -> approve -> publish) actually triggers the
+    once-a-year banding pass end-to-end. Uses the session's 3rd/final term,
+    since that's the only one that auto-fires anything now — publishing
+    self.exam1 (1st term) triggers nothing (see BoundaryTests)."""
 
     def setUp(self):
         super().setUp()
+
+        # Where this cohort is headed at promotion — also opted into
+        # banding, same arm letters, its own fresh capacities.
+        self.next_klass = SchoolClass.objects.create(
+            name="JSS 2", level_order=self.klass.level_order + 1, category=SchoolClass.Category.JUNIOR_SECONDARY,
+        )
+        self.next_arm_a = ClassArm.objects.create(school_class=self.next_klass, name="A", capacity=2)
+        self.next_arm_b = ClassArm.objects.create(school_class=self.next_klass, name="B", capacity=2)
+        self.next_arm_ns = ClassArm.objects.create(school_class=self.next_klass, name="N_S")
+        ClassBandingConfig.objects.create(school_class=self.next_klass, enabled=True, holding_arm=self.next_arm_ns)
+
+        self.exam3 = Exam.objects.create(
+            name="Third Term Exam", exam_type=Exam.ExamType.FINAL, session=self.session,
+            term=self.term3, start_date=date(2027, 7, 1),
+        )
+
         self.teacher = User.objects.create(full_name="Teacher One", email="teacher1@x.io", user_type="staff", is_active=True)
         ClassSubjectAssignment.objects.create(class_arm=self.arm_ns, subject=self.maths, teacher=self.teacher, session=self.session)
 
@@ -469,22 +533,22 @@ class PublishTriggersReallocationEndToEndTests(ReallocationTestBase):
         # baseline) plus one brand-new N_S student — exactly what the fixed
         # onboarding flow now produces: active, seated in the holding arm,
         # no average yet until this exam's scores land.
-        self.make_student(self.arm_a, {self.exam1: 85})
-        self.make_student(self.arm_b, {self.exam1: 60})
+        self.make_student(self.arm_a, {self.exam3: 85})
+        self.make_student(self.arm_b, {self.exam3: 60})
         guardian = User.objects.create(full_name="Guardian One", email="guardian1@x.io", user_type="parent", is_active=True)
         self.new_student = self.make_student(self.arm_ns, name="New Student")
         self.new_student.guardian_user = guardian
         self.new_student.save(update_fields=["guardian_user"])
         for subj in (self.maths, self.english):
-            ExamScore.objects.create(exam=self.exam1, student=self.new_student, subject=subj, score=90, max_score=100, entered_by=self.teacher)
+            ExamScore.objects.create(exam=self.exam3, student=self.new_student, subject=subj, score=90, max_score=100, entered_by=self.teacher)
 
     def _publish(self):
         self.client.force_authenticate(self.principal)
-        return self.client.post(f"/api/v1/academics/exams/{self.exam1.id}/publish", {}, format="json")
+        return self.client.post(f"/api/v1/academics/exams/{self.exam3.id}/publish", {}, format="json")
 
-    def test_publish_is_blocked_until_approved_and_only_then_computes_a_reallocation(self):
+    def test_publish_is_blocked_until_approved_and_only_then_computes_annual_banding(self):
         self.client.force_authenticate(self.teacher)
-        submit_res = self.client.post(f"/api/v1/academics/teaching/exams/{self.exam1.id}/submit", {
+        submit_res = self.client.post(f"/api/v1/academics/teaching/exams/{self.exam3.id}/submit", {
             "subject": str(self.maths.id), "class_arm": str(self.arm_ns.id),
         }, format="json")
         self.assertEqual(submit_res.status_code, 200, submit_res.json())
@@ -503,36 +567,269 @@ class PublishTriggersReallocationEndToEndTests(ReallocationTestBase):
         self.assertEqual(ok.status_code, 200, ok.json())
         self.assertEqual(ClassReallocation.objects.filter(status=ClassReallocation.Status.PENDING).count(), 1)
         move = ClassReallocationMove.objects.get(reallocation__school_class=self.klass, student=self.new_student)
-        self.assertEqual(move.mechanism, ClassReallocationMove.Mechanism.NS_ABSORPTION)
-        self.assertEqual(move.to_arm_id, self.arm_a.id)  # 90 avg -> the top band
+        self.assertEqual(move.mechanism, ClassReallocationMove.Mechanism.INITIAL_BANDING)
+        self.assertEqual(move.to_arm_id, self.next_arm_a.id)  # 90 avg -> the top band, in NEXT year's class
+        self.assertEqual(move.to_arm.school_class_id, self.next_klass.id)
 
-    def test_full_loop_release_apply_and_visible_on_both_portals(self):
+    def test_annual_suggestion_cannot_be_released_or_applied_directly(self):
+        """It's a suggestion for Promotion's own decision, not a within-class
+        move — release/apply must refuse it rather than silently moving
+        class_arm outside the real promotion flow (no PromotionRecord)."""
         self._publish()
         realloc = ClassReallocation.objects.get(school_class=self.klass, status=ClassReallocation.Status.PENDING)
 
         self.client.force_authenticate(self.principal)
-        r1 = self.client.post(f"/api/v1/academics/reallocations/{realloc.id}/release")
-        self.assertEqual(r1.status_code, 200, r1.json())
+        res = self.client.post(f"/api/v1/academics/reallocations/{realloc.id}/release")
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("promotion", res.json()["message"].lower())
 
-        # Still in N_S until applied — release only previews next_class_arm.
         self.new_student.refresh_from_db()
-        self.assertEqual(self.new_student.class_arm_id, self.arm_ns.id)
-        self.assertEqual(self.new_student.next_class_arm_id, self.arm_a.id)
+        self.assertEqual(self.new_student.class_arm_id, self.arm_ns.id)  # untouched
+        self.assertIsNone(self.new_student.next_class_arm_id)
 
-        r2 = self.client.post(f"/api/v1/academics/reallocations/{realloc.id}/apply")
-        self.assertEqual(r2.status_code, 200, r2.json())
-        self.new_student.refresh_from_db()
-        self.assertEqual(self.new_student.class_arm_id, self.arm_a.id)  # physically moved now
-        self.assertIsNone(self.new_student.next_class_arm_id)  # cleared once applied
+    def test_suggestion_is_visible_to_staff_through_the_existing_review_endpoints(self):
+        """The Class Arm Banding review screen shows it like any other
+        reallocation, flagged as a promotion suggestion, with its per-band
+        summary drawn from the NEXT class's arms (not this class's)."""
+        self._publish()
+        realloc = ClassReallocation.objects.get(school_class=self.klass, status=ClassReallocation.Status.PENDING)
 
-        self.client.force_authenticate(self.new_student.user)
-        res = self.client.get("/api/v1/academics/students/mine")
-        self.assertEqual(res.json()["data"]["class_arm_label"], str(self.arm_a))
+        self.client.force_authenticate(self.principal)
+        res = self.client.get(f"/api/v1/academics/reallocations/{realloc.id}")
+        self.assertEqual(res.status_code, 200)
+        data = res.json()["data"]
+        self.assertTrue(data["is_promotion_suggestion"])
+        self.assertEqual(data["target_class_name"], "JSS 2")
+        suggestion = next(m for m in data["moves"] if m["student"] == str(self.new_student.id))
+        self.assertEqual(suggestion["to_arm"], str(self.next_arm_a.id))
+        self.assertEqual({s["arm_id"] for s in data["arm_summary"]}, {str(self.next_arm_a.id), str(self.next_arm_b.id)})
+        self.assertEqual(sum(s["proposed_count"] for s in data["arm_summary"]), 3)
 
-        self.client.force_authenticate(self.new_student.guardian_user)
-        res = self.client.get("/api/v1/academics/students/my-children")
-        child = next(c for c in res.json()["data"] if c["id"] == str(self.new_student.id))
-        self.assertEqual(child["class_arm_label"], str(self.arm_a))
+
+class AnnualBandingTestBase(ReallocationTestBase):
+    """A Junior Secondary cohort (self.klass) with all three terms' final
+    exams, heading into an opted-in next class (self.next_klass)."""
+
+    def setUp(self):
+        super().setUp()
+        self.next_klass = SchoolClass.objects.create(
+            name="JSS 2", level_order=self.klass.level_order + 1, category=SchoolClass.Category.JUNIOR_SECONDARY,
+        )
+        self.next_arm_a = ClassArm.objects.create(school_class=self.next_klass, name="A", capacity=1)
+        self.next_arm_b = ClassArm.objects.create(school_class=self.next_klass, name="B", capacity=1)
+        self.next_arm_ns = ClassArm.objects.create(school_class=self.next_klass, name="N_S")
+        ClassBandingConfig.objects.create(school_class=self.next_klass, enabled=True, holding_arm=self.next_arm_ns)
+
+        self.exam1.status = Exam.Status.PUBLISHED
+        self.exam1.save(update_fields=["status"])
+        self.exam2 = Exam.objects.create(
+            name="Second Term Exam", exam_type=Exam.ExamType.FINAL, session=self.session,
+            term=self.term2, start_date=date(2027, 4, 1), status=Exam.Status.PUBLISHED,
+        )
+        # The 3rd-term exam is the one being published right now.
+        self.exam3 = Exam.objects.create(
+            name="Third Term Exam", exam_type=Exam.ExamType.FINAL, session=self.session,
+            term=self.term3, start_date=date(2027, 7, 1),
+        )
+
+
+class AnnualAverageTests(AnnualBandingTestBase):
+    """The once-a-year ranking metric: a simple average of the three term
+    averages, not the 3rd term alone."""
+
+    def test_simple_average_of_the_three_term_averages(self):
+        s = self.make_student(self.arm_a, {self.exam1: 60, self.exam2: 70, self.exam3: 95})
+        self.assertEqual(services.student_session_averages(self.exam3, [s.id])[s.id], Decimal("75.00"))
+
+    def test_an_unpublished_earlier_exam_is_left_out(self):
+        s = self.make_student(self.arm_a, {self.exam1: 60, self.exam2: 70, self.exam3: 95})
+        self.exam2.status = Exam.Status.COMPLETED  # scores not yet through approval/publish
+        self.exam2.save(update_fields=["status"])
+        self.assertEqual(services.student_session_averages(self.exam3, [s.id])[s.id], Decimal("77.50"))
+
+    def test_a_missed_term_is_averaged_over_the_terms_actually_sat(self):
+        late = self.make_student(self.arm_ns, {self.exam2: 70, self.exam3: 80})  # admitted 2nd term
+        self.assertEqual(services.student_session_averages(self.exam3, [late.id])[late.id], Decimal("75.00"))
+
+    def test_other_exam_types_dont_count(self):
+        s = self.make_student(self.arm_a, {self.exam1: 60, self.exam2: 70, self.exam3: 80})
+        ca = Exam.objects.create(
+            name="Third Term CA", exam_type=Exam.ExamType.TEST, session=self.session,
+            term=self.term3, start_date=date(2027, 6, 1), status=Exam.Status.PUBLISHED,
+        )
+        for subj in (self.maths, self.english):
+            ExamScore.objects.create(exam=ca, student=s, subject=subj, score=Decimal("10"), max_score=Decimal("100"))
+        self.assertEqual(services.student_session_averages(self.exam3, [s.id])[s.id], Decimal("70.00"))
+
+    def test_ranking_uses_the_whole_year_not_just_the_last_term(self):
+        steady = self.make_student(self.arm_b, {self.exam1: 70, self.exam2: 70, self.exam3: 70}, name="Steady")
+        late_spike = self.make_student(self.arm_a, {self.exam1: 40, self.exam2: 40, self.exam3: 90}, name="Spike")
+
+        realloc = services.compute_annual_promotion_banding(self.klass, self.exam3)
+        moves = {m.student_id: m for m in realloc.moves.all()}
+        # 70 cumulative beats 56.67 cumulative, even though Spike's 3rd term was higher.
+        self.assertEqual(moves[steady.id].to_arm_id, self.next_arm_a.id)
+        self.assertEqual(moves[late_spike.id].to_arm_id, self.next_arm_b.id)
+        self.assertEqual(moves[late_spike.id].term_average, Decimal("56.67"))
+
+    def test_ns_students_are_ranked_with_everyone_else_at_year_end(self):
+        """New intake waits in N_S all year (no mid-year absorption) and is
+        placed by this annual pass like any other student."""
+        self.make_student(self.arm_a, {self.exam1: 60, self.exam2: 60, self.exam3: 60})
+        newbie = self.make_student(self.arm_ns, {self.exam2: 90, self.exam3: 90})
+
+        realloc = services.compute_annual_promotion_banding(self.klass, self.exam3)
+        self.assertEqual(realloc.moves.get(student=newbie).to_arm_id, self.next_arm_a.id)
+        newbie.refresh_from_db()
+        self.assertEqual(newbie.class_arm_id, self.arm_ns.id)  # a suggestion only; nothing moved
+
+    def test_a_class_with_no_results_leaves_no_empty_suggestion_behind(self):
+        self.make_student(self.arm_a)  # enrolled, but no scores this session
+        self.assertIsNone(services.compute_annual_promotion_banding(self.klass, self.exam3))
+        self.assertFalse(ClassReallocation.objects.exists())
+
+    def test_recompute_supersedes_the_earlier_suggestion_only(self):
+        self.make_student(self.arm_a, {self.exam1: 80, self.exam3: 80})
+        within_class = services.compute_reallocation(self.klass, self.exam1)
+        first = services.compute_annual_promotion_banding(self.klass, self.exam3)
+        second = services.compute_annual_promotion_banding(self.klass, self.exam3)
+
+        first.refresh_from_db()
+        within_class.refresh_from_db()
+        self.assertEqual(first.status, ClassReallocation.Status.SUPERSEDED)
+        self.assertEqual(second.status, ClassReallocation.Status.PENDING)
+        self.assertEqual(within_class.status, ClassReallocation.Status.PENDING)  # a different kind, left alone
+
+
+class PromotionSuggestionsApiTests(AnnualBandingTestBase):
+    """GET /promotion/suggestions: what the Promotion screen pre-fills each
+    student's destination arm from. Gated by promotion.view, not
+    reallocation.view: it's read by whoever runs promotion."""
+
+    def setUp(self):
+        super().setUp()
+        self.top = self.make_student(self.arm_a, {self.exam1: 90, self.exam2: 90, self.exam3: 90})
+        self.low = self.make_student(self.arm_a, {self.exam1: 50, self.exam2: 50, self.exam3: 50})
+        self.other_arm = self.make_student(self.arm_b, {self.exam1: 70, self.exam2: 70, self.exam3: 70})
+
+        role = Role.objects.create(name="Promoter", slug="promoter", is_system=False)
+        perm, _ = Permission.objects.get_or_create(code="promotion.view", defaults={"module": "promotion", "action": "view"})
+        RolePermission.objects.create(role=role, permission=perm)
+        self.promoter = User.objects.create(full_name="Promoter", email="p@x.io", user_type="staff", is_active=True)
+        UserRole.objects.create(user=self.promoter, role=role)
+        self.client = APIClient()
+        self.client.force_authenticate(self.promoter)
+
+    def _get(self, arm_id):
+        return self.client.get(f"/api/v1/academics/promotion/suggestions?from_class_arm={arm_id}")
+
+    def test_no_suggestion_before_the_annual_pass_has_run(self):
+        res = self._get(self.arm_a.id)
+        self.assertEqual(res.status_code, 200)
+        self.assertIsNone(res.json()["data"])
+
+    def test_returns_each_students_suggested_arm_for_just_that_arm(self):
+        services.compute_annual_promotion_banding(self.klass, self.exam3)
+        res = self._get(self.arm_a.id)
+        self.assertEqual(res.status_code, 200)
+        data = res.json()["data"]
+        self.assertEqual(data["target_class_name"], "JSS 2")
+        suggestions = data["suggestions"]
+        self.assertEqual(set(suggestions), {str(self.top.id), str(self.low.id)})  # not arm B's student
+        self.assertEqual(suggestions[str(self.top.id)]["to_arm"], str(self.next_arm_a.id))
+        self.assertEqual(suggestions[str(self.top.id)]["rank"], 1)
+        # top=90, other_arm=70, low=50; A and B hold 1 each, overflow -> last band
+        self.assertEqual(suggestions[str(self.low.id)]["to_arm"], str(self.next_arm_b.id))
+
+    def test_needs_promotion_view(self):
+        outsider = User.objects.create(full_name="Nobody", email="n@x.io", user_type="staff", is_active=True)
+        self.client.force_authenticate(outsider)
+        self.assertEqual(self._get(self.arm_a.id).status_code, 403)
+
+    def test_bad_arm_id_is_a_400_not_a_crash(self):
+        self.assertEqual(self.client.get("/api/v1/academics/promotion/suggestions?from_class_arm=nope").status_code, 400)
+
+
+class JuniorSecondaryOnlyTests(ReallocationTestBase):
+    """Hard rule: performance banding exists only for Junior Secondary.
+    Senior Secondary arms are manually-assigned subject streams (A Science,
+    B Arts, C Commercial); Primary/KG have no banding at all."""
+
+    def setUp(self):
+        super().setUp()
+        self.ss1 = SchoolClass.objects.create(name="SS 1", level_order=20, category=SchoolClass.Category.SENIOR_SECONDARY)
+        self.ss1_cfg = ClassBandingConfig.objects.create(school_class=self.ss1)
+        self.superadmin = User.objects.create(
+            full_name="Super Admin", email="sa@x.io", user_type="staff", is_active=True, is_superadmin=True,
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(self.superadmin)
+
+    def test_enabling_banding_on_a_senior_class_is_refused(self):
+        res = self.client.patch(f"/api/v1/academics/banding-config/{self.ss1.id}", {"enabled": True}, format="json")
+        self.assertEqual(res.status_code, 400)
+        self.ss1_cfg.refresh_from_db()
+        self.assertFalse(self.ss1_cfg.enabled)
+
+    def test_enabling_banding_on_a_junior_class_is_allowed(self):
+        self.config.enabled = False
+        self.config.save(update_fields=["enabled"])
+        res = self.client.patch(f"/api/v1/academics/banding-config/{self.klass.id}", {"enabled": True}, format="json")
+        self.assertEqual(res.status_code, 200, res.json())
+        self.assertTrue(res.json()["data"]["eligible"])
+
+    def test_config_list_flags_eligibility_per_class(self):
+        res = self.client.get("/api/v1/academics/banding-config")
+        rows = {r["school_class"]: r for r in res.json()["data"]}
+        self.assertTrue(rows[str(self.klass.id)]["eligible"])
+        self.assertFalse(rows[str(self.ss1.id)]["eligible"])
+        self.assertEqual(rows[str(self.ss1.id)]["category"], "senior_secondary")
+
+    def test_engine_ignores_a_class_once_it_is_no_longer_junior(self):
+        self.make_student(self.arm_a, {self.exam1: 80})
+        self.klass.category = SchoolClass.Category.SENIOR_SECONDARY
+        self.klass.save(update_fields=["category"])
+        self.assertIsNone(services.compute_reallocation(self.klass, self.exam1))
+        self.assertIsNone(services.compute_initial_banding(self.klass, self.exam1))
+
+    def test_recategorising_a_class_out_of_junior_switches_its_banding_off(self):
+        res = self.client.patch(f"/api/v1/config/classes/{self.klass.id}", {"category": "senior_secondary"}, format="json")
+        self.assertEqual(res.status_code, 200, res.json())
+        self.config.refresh_from_db()
+        self.assertFalse(self.config.enabled)
+
+    def test_migration_retires_live_non_junior_reallocations(self):
+        """configuration 0009 turned SS banding off; academics 0008 must also
+        stop any SS proposal already in flight from auto-applying."""
+        from importlib import import_module
+
+        from django.apps import apps as django_apps
+
+        migration = import_module("apps.academics.migrations.0008_classreallocation_target_class")
+
+        ss_arm_a = ClassArm.objects.create(school_class=self.ss1, name="A")
+        ss_arm_b = ClassArm.objects.create(school_class=self.ss1, name="B")
+        ss_student = self.make_student(ss_arm_b)
+        ss_student.next_class_arm = ss_arm_a
+        ss_student.save(update_fields=["next_class_arm"])
+        released = ClassReallocation.objects.create(
+            school_class=self.ss1, session=self.session, term=self.term1, status=ClassReallocation.Status.RELEASED,
+        )
+        ClassReallocationMove.objects.create(
+            reallocation=released, student=ss_student, from_arm=ss_arm_b, to_arm=ss_arm_a,
+            mechanism=ClassReallocationMove.Mechanism.RERANK,
+        )
+        jss_pending = ClassReallocation.objects.create(school_class=self.klass, session=self.session, term=self.term1)
+
+        migration.retire_non_jss_reallocations(django_apps, None)
+
+        released.refresh_from_db()
+        jss_pending.refresh_from_db()
+        ss_student.refresh_from_db()
+        self.assertEqual(released.status, ClassReallocation.Status.SUPERSEDED)
+        self.assertIsNone(ss_student.next_class_arm_id)
+        self.assertEqual(ss_student.class_arm_id, ss_arm_b.id)
+        self.assertEqual(jss_pending.status, ClassReallocation.Status.PENDING)
 
 
 class ResultsApprovalGateTestBase(TestCase):

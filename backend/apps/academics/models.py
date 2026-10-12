@@ -370,10 +370,15 @@ class ClassReallocation(BaseModel):
       applied   → at the next term's start: next_class_arm → class_arm, and
                   arm capacities ratchet up for any absorbed new students
 
-    Only runs for within-session term transitions (1st→2nd, 2nd→3rd). A
-    3rd-term / year-end result is promotion's job, not this engine's; the
-    banding of a freshly promoted cohort happens afterwards as an
-    initial_banding pass (see apps.academics.services)."""
+    Banding now runs once a year, automatically, off the session's 3rd/
+    final-term result (see services.compute_annual_promotion_banding) —
+    not at every within-session term boundary. In that annual case,
+    `school_class` is the OUTGOING class (about to be promoted out of),
+    `target_class` is the class it's headed into, and every move's `to_arm`
+    belongs to `target_class` — a suggestion the Promotion screen pre-fills,
+    never something release/apply act on. compute_reallocation (within-year
+    rerank/absorb) and compute_initial_banding (manual, cold-start) still
+    exist for administrative correction, just never auto-fire any more."""
 
     class Status(models.TextChoices):
         PENDING = "pending", "Computed (pending release)"
@@ -394,6 +399,13 @@ class ClassReallocation(BaseModel):
     )
     source_exam = models.ForeignKey(
         Exam, on_delete=models.SET_NULL, null=True, blank=True, related_name="reallocations"
+    )
+    # Set only on an annual promotion-banding suggestion: the class this
+    # cohort is being promoted INTO, whose arms the moves point at. Null for
+    # an ordinary within-class reallocation (moves stay inside school_class).
+    target_class = models.ForeignKey(
+        "configuration.SchoolClass", on_delete=models.CASCADE, null=True, blank=True,
+        related_name="incoming_reallocations",
     )
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
 

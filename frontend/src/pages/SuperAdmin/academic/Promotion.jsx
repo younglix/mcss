@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Card from '../../../components/ui/Card.jsx';
 import Badge from '../../../components/ui/Badge.jsx';
 import Button from '../../../components/ui/Button.jsx';
@@ -17,6 +17,17 @@ const OUTCOMES = [
 ];
 const OUTCOME_TONE = { promoted: 'success', repeated: 'warning', graduated: 'primary', withdrawn: 'secondary' };
 
+/** Pre-fill "Promoted, into the suggested arm" for every student the annual
+ * banding pass placed, without overwriting anything already chosen here. */
+function seedFromSuggestion(prev, suggestion) {
+  if (!suggestion?.suggestions) return prev;
+  const next = { ...prev };
+  Object.entries(suggestion.suggestions).forEach(([studentId, sg]) => {
+    if (!next[studentId]) next[studentId] = { outcome: 'promoted', to_class_arm: sg.to_arm };
+  });
+  return next;
+}
+
 export default function SuperAdminPromotion() {
   const { data, loading, error, reload } = useDashboardData(ENDPOINTS);
   const arms = data?.classes || [];
@@ -34,9 +45,27 @@ export default function SuperAdminPromotion() {
   const history = historyData.data?.records || [];
 
   const [decisions, setDecisions] = useState({}); // { studentId: { outcome, to_class_arm } }
+  // The annual banding pass's suggested arm per student (Junior Secondary
+  // only, once the 3rd-term result is published); null when there's none.
+  const [suggestion, setSuggestion] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [saveMessage, setSaveMessage] = useState('');
+
+  useEffect(() => {
+    setSuggestion(null);
+    if (!fromArm) return undefined;
+    let cancelled = false;
+    api.get(`/academics/promotion/suggestions?from_class_arm=${fromArm}`)
+      .then((data) => {
+        if (cancelled) return;
+        setSuggestion(data);
+        setDecisions((prev) => seedFromSuggestion(prev, data));
+      })
+      // A suggestion is only a convenience; promotion works fine without one.
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [fromArm]);
 
   const setDecision = (studentId, patch) =>
     setDecisions((prev) => ({ ...prev, [studentId]: { outcome: 'promoted', to_class_arm: '', ...prev[studentId], ...patch } }));
@@ -62,7 +91,7 @@ export default function SuperAdminPromotion() {
         from_class_arm: fromArm, from_session: currentSession.id, to_session: toSession, decisions: decisionList,
       });
       setSaveMessage(`Processed ${result.length} student(s).`);
-      setDecisions({});
+      setDecisions(seedFromSuggestion({}, suggestion));
       rosterData.reload();
       historyData.reload();
     } catch (err) {
@@ -90,6 +119,11 @@ export default function SuperAdminPromotion() {
             </select>
           </div>
 
+          {/* Outside the roster block: promoting a whole arm empties its
+              roster, and the confirmation must still show. */}
+          {saveError && <p className="font-label-md text-label-md text-error bg-error-container/20 border border-error/20 rounded-lg px-md py-sm">{saveError}</p>}
+          {saveMessage && <p className="font-label-md text-label-md text-secondary bg-secondary-container/20 border border-secondary/20 rounded-lg px-md py-sm">{saveMessage}</p>}
+
           {!fromArm ? (
             <Card padding="lg">
               <EmptyState icon="trending_up" text="Select a class to begin." />
@@ -100,8 +134,15 @@ export default function SuperAdminPromotion() {
             </Card>
           ) : (
             <div>
-              {saveError && <p className="font-label-md text-label-md text-error bg-error-container/20 border border-error/20 rounded-lg px-md py-sm mb-md">{saveError}</p>}
-              {saveMessage && <p className="font-label-md text-label-md text-secondary bg-secondary-container/20 border border-secondary/20 rounded-lg px-md py-sm mb-md">{saveMessage}</p>}
+              {suggestion && (
+                <div className="flex items-start gap-sm bg-primary-container/20 border border-primary/20 rounded-lg px-md py-sm mb-md">
+                  <span className="material-symbols-outlined text-primary text-[20px]">auto_awesome</span>
+                  <p className="font-label-md text-label-md text-on-surface">
+                    Arms in {suggestion.target_class_name} are pre-filled from this year&apos;s banding, which ranks each student on their average
+                    across all three terms. Review them and change any before processing.
+                  </p>
+                </div>
+              )}
               <Card padding="none">
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-175 text-left border-collapse">
@@ -115,6 +156,7 @@ export default function SuperAdminPromotion() {
                     <tbody className="divide-y divide-outline/10">
                       {roster.map((s) => {
                         const decision = decisions[s.id] || { outcome: 'promoted', to_class_arm: '' };
+                        const suggested = suggestion?.suggestions?.[s.id];
                         return (
                           <tr key={s.id}>
                             <td className="px-lg py-3 font-body-md text-body-md text-on-surface">{s.full_name}</td>
@@ -129,6 +171,12 @@ export default function SuperAdminPromotion() {
                                   <option value="">Select…</option>
                                   {arms.map((arm) => <option key={arm.id} value={arm.id}>{arm.school_class_name} {arm.name}</option>)}
                                 </select>
+                              )}
+                              {decision.outcome === 'promoted' && suggested && (
+                                <p className={`font-label-sm text-label-sm mt-1 ${decision.to_class_arm === suggested.to_arm ? 'text-on-surface-variant' : 'text-error'}`}>
+                                  {decision.to_class_arm === suggested.to_arm ? 'Suggested' : `Suggested: ${suggested.to_arm_label}`}
+                                  {suggested.average != null && ` (year avg ${Number(suggested.average).toFixed(1)}%, rank ${suggested.rank})`}
+                                </p>
                               )}
                             </td>
                           </tr>

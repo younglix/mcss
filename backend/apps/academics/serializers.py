@@ -340,12 +340,21 @@ class PromotionActionSerializer(serializers.Serializer):
 # ------------------------------------------------ Class-arm reallocation
 class ClassBandingConfigSerializer(serializers.ModelSerializer):
     school_class_name = serializers.CharField(source="school_class.name", read_only=True)
+    category = serializers.CharField(source="school_class.category", read_only=True)
+    category_label = serializers.CharField(source="school_class.get_category_display", read_only=True)
+    eligible = serializers.SerializerMethodField()
     holding_arm_label = serializers.SerializerMethodField()
 
     class Meta:
         model = ClassBandingConfig
-        fields = ["id", "school_class", "school_class_name", "enabled", "holding_arm", "holding_arm_label"]
+        fields = [
+            "id", "school_class", "school_class_name", "category", "category_label", "eligible",
+            "enabled", "holding_arm", "holding_arm_label",
+        ]
         read_only_fields = ["id", "school_class"]
+
+    def get_eligible(self, obj):
+        return obj.school_class.category == SchoolClass.Category.JUNIOR_SECONDARY
 
     def get_holding_arm_label(self, obj):
         return str(obj.holding_arm) if obj.holding_arm else None
@@ -354,6 +363,20 @@ class ClassBandingConfigSerializer(serializers.ModelSerializer):
         if arm and self.instance and arm.school_class_id != self.instance.school_class_id:
             raise serializers.ValidationError("The holding arm must belong to this class.")
         return arm
+
+    def validate_enabled(self, enabled):
+        # Hard rule: performance banding is Junior-Secondary-only. Senior
+        # Secondary's arms are manually-assigned subject streams (Science/
+        # Arts/Commercial); Primary/Pre-Primary have no concept of this at
+        # all. The only writer of `enabled` is this serializer (via
+        # BandingConfigView, behind reallocation.configure), so this is the
+        # one place that needs to hold the line.
+        school_class = self.instance.school_class if self.instance else None
+        if enabled and school_class and school_class.category != SchoolClass.Category.JUNIOR_SECONDARY:
+            raise serializers.ValidationError(
+                "Performance-based class-arm banding can only be enabled for a Junior Secondary class."
+            )
+        return enabled
 
 
 class ClassReallocationMoveSerializer(serializers.ModelSerializer):
@@ -393,17 +416,25 @@ class ClassReallocationSerializer(serializers.ModelSerializer):
     session_name = serializers.CharField(source="session.name", read_only=True)
     term_name = serializers.CharField(source="term.name", read_only=True)
     source_exam_name = serializers.CharField(source="source_exam.name", read_only=True, default=None)
+    target_class_name = serializers.CharField(source="target_class.name", read_only=True, default=None)
+    # An annual promotion-banding suggestion: moves point into target_class,
+    # and release/apply refuse it (it only pre-fills the Promotion screen).
+    is_promotion_suggestion = serializers.SerializerMethodField()
     move_count = serializers.IntegerField(source="moves.count", read_only=True)
 
     class Meta:
         model = ClassReallocation
         fields = [
-            "id", "school_class", "school_class_name", "session", "session_name",
+            "id", "school_class", "school_class_name", "target_class", "target_class_name",
+            "is_promotion_suggestion", "session", "session_name",
             "term", "term_name", "source_exam", "source_exam_name", "status",
             "computed_by", "computed_at", "released_by", "released_at",
             "applied_by", "applied_at", "notes", "move_count",
         ]
         read_only_fields = fields
+
+    def get_is_promotion_suggestion(self, obj):
+        return obj.target_class_id is not None
 
 
 class ClassReallocationDetailSerializer(ClassReallocationSerializer):
@@ -418,6 +449,9 @@ class ClassReallocationDetailSerializer(ClassReallocationSerializer):
 
     def get_arm_summary(self, obj):
         from .services import banded_arms
+
+        if obj.target_class_id:
+            return self._suggestion_arm_summary(obj, banded_arms)
 
         config = getattr(obj.school_class, "banding_config", None)
         if not config:
@@ -465,11 +499,39 @@ class ClassReallocationDetailSerializer(ClassReallocationSerializer):
             })
         return out
 
+    def _suggestion_arm_summary(self, obj, banded_arms):
+        """An annual suggestion's bands are the TARGET class's arms. There's
+        no meaningful "current" count — whoever sits in them today is the
+        cohort above, about to be promoted out — and no capacity ratchet
+        (that's N_S absorption only), so just the proposed split."""
+        config = getattr(obj.target_class, "banding_config", None)
+        if not config:
+            return []
+        bands = banded_arms(obj.target_class, config)
+        proposed = {a.id: [] for a in bands}
+        for m in obj.moves.all():
+            if m.to_arm_id in proposed:
+                proposed[m.to_arm_id].append(m.term_average)
+        out = []
+        for a in bands:
+            avgs = sorted(v for v in proposed[a.id] if v is not None)
+            out.append({
+                "arm": str(a), "arm_id": str(a.id),
+                "current_count": None,
+                "proposed_count": len(proposed[a.id]),
+                "capacity": a.capacity,
+                "capacity_after": a.capacity,
+                "proposed_score_range": [float(avgs[0]), float(avgs[-1])] if avgs else None,
+            })
+        return out
+
 
 class ReallocationComputeSerializer(serializers.Serializer):
     school_class = serializers.PrimaryKeyRelatedField(queryset=SchoolClass.objects.all())
     source_exam = serializers.PrimaryKeyRelatedField(queryset=Exam.objects.all())
-    kind = serializers.ChoiceField(choices=["reallocation", "initial_banding"], default="reallocation")
+    kind = serializers.ChoiceField(
+        choices=["reallocation", "initial_banding", "annual_promotion_banding"], default="reallocation",
+    )
 
 
 class ArmCapacitySerializer(serializers.Serializer):

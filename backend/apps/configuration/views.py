@@ -135,7 +135,14 @@ class ClassDetailView(ConfigPermissionMixin, RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = "class_id"
 
     def perform_update(self, serializer):
+        from apps.academics.models import ClassBandingConfig
+
         klass = serializer.save()
+        if klass.category != SchoolClass.Category.JUNIOR_SECONDARY:
+            # Banding is Junior-Secondary-only. The engine already ignores a
+            # non-JSS class; this keeps the Class Arm Banding screen from
+            # still showing it as switched on after a re-categorisation.
+            ClassBandingConfig.objects.filter(school_class=klass, enabled=True).update(enabled=False)
         log(actor=self.request.user, action="config.class_updated", target=klass, request=self.request)
 
     def perform_destroy(self, instance):

@@ -70,8 +70,21 @@ class Department(BaseModel):
 
 
 class SchoolClass(BaseModel):
+    class Category(models.TextChoices):
+        PRE_PRIMARY = "pre_primary", "Pre-Primary (Kindergarten)"
+        PRIMARY = "primary", "Primary"
+        JUNIOR_SECONDARY = "junior_secondary", "Junior Secondary"
+        SENIOR_SECONDARY = "senior_secondary", "Senior Secondary"
+
     name = models.CharField(max_length=50, unique=True)   # "JSS 1", "SS 2"
     level_order = models.PositiveIntegerField()             # drives promotion ordering
+    # Drives which classes the performance-banding/reallocation engine is
+    # even allowed to touch (Junior Secondary only — see
+    # apps.academics.models.ClassBandingConfig) and which arms are plain
+    # ranked bands (A/B/C by performance) versus manually-assigned subject
+    # streams (Senior Secondary: A=Science, B=Arts, C=Commercial, by
+    # school convention — not something this app auto-assigns).
+    category = models.CharField(max_length=20, choices=Category.choices, default=Category.PRIMARY)
 
     class Meta(BaseModel.Meta):
         ordering = ["level_order"]

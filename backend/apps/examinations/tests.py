@@ -1,8 +1,9 @@
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from apps.rbac.models import Permission, Role, RolePermission, UserRole
@@ -155,6 +156,87 @@ class ExamAccessLoginBiodataTests(TestCase):
         SystemSetting.objects.create(key="exam.completion_message", group="exam", value="Well done, see you outside!")
         res = self._login()
         self.assertEqual(res.json()["data"]["completion_message"], "Well done, see you outside!")
+
+
+class AttemptSubmitScoreVisibilityTests(TestCase):
+    """AttemptSubmitView used to return just a bare success message —
+    nothing let the student see how they scored on this CBE sitting right
+    away, even though grade_attempt() always finishes grading synchronously
+    before responding. The raw per-exam score is now returned immediately;
+    the separately-gated OFFICIAL combined report-card result (CA + this
+    score, needing results.approve/results.publish) is untouched."""
+
+    def setUp(self):
+        from apps.academics.models import Student
+        from apps.academics.models import Exam as AcademicExam
+        from apps.academics.models import Subject as AcademicSubject
+        from apps.configuration.models import AcademicSession, ClassArm, SchoolClass, Term
+
+        from .models import Question
+
+        session = AcademicSession.objects.create(
+            name="2026/2027", start_date=date(2026, 9, 1), end_date=date(2027, 7, 31), is_current=True,
+        )
+        term = Term.objects.create(session=session, name="First", start_date=date(2026, 9, 1), end_date=date(2026, 12, 15))
+        school_class = SchoolClass.objects.create(name="SS-2", level_order=2)
+        arm = ClassArm.objects.create(school_class=school_class, name="B")
+        subject = AcademicSubject.objects.create(name="Biology", code="BIO")
+        academic_exam = AcademicExam.objects.create(
+            name="First Term Exam", exam_type=AcademicExam.ExamType.TEST, session=session,
+            term=term, start_date=date(2026, 10, 1),
+        )
+        bank = QuestionBank.objects.create(subject=subject, school_class=school_class, term=term, is_approved=True)
+        self.exam = Exam.objects.create(
+            title="Biology CBE", academic_exam=academic_exam, subject=subject, school_class=school_class,
+            class_arm=arm, bank=bank, status=Exam.Status.ACTIVE, questions_per_student=4, auto_submit_penalty=1,
+        )
+        self.questions = [
+            Question.objects.create(
+                bank=bank, text=f"Q{i}", option_a="a", option_b="b", option_c="c", option_d="d",
+                correct_option="A",
+            )
+            for i in range(4)
+        ]
+
+        student_user = User.objects.create(full_name="Jane Student", identifier="STU555", user_type="student", is_active=True)
+        self.student = Student.objects.create(user=student_user, class_arm=arm)
+        self.client = APIClient()
+        token = issue_exam_session_token(student_user, self.exam)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+
+    def _start_attempt(self):
+        from .models import Attempt
+
+        return Attempt.objects.create(
+            exam=self.exam, student=self.student,
+            question_ids=[str(q.id) for q in self.questions],
+            answers={str(self.questions[0].id): "A", str(self.questions[1].id): "A", str(self.questions[2].id): "B"},
+            deadline=timezone.now() + timedelta(minutes=10),
+        )
+
+    def test_submit_response_includes_the_score_immediately(self):
+        attempt = self._start_attempt()
+        res = self.client.post(f"/api/v1/exam/attempts/{attempt.id}/submit")
+        self.assertEqual(res.status_code, 200, res.json())
+        data = res.json()["data"]
+        self.assertEqual(data["score"], 2)  # 2 of 4 answered correctly (Q3 wrong, Q4 unanswered)
+        self.assertEqual(data["total"], 4)
+        self.assertEqual(data["percentage"], 50.0)
+        self.assertEqual(data["penalty_applied"], 0)
+
+        attempt.refresh_from_db()
+        self.assertEqual(attempt.raw_score, 2)
+
+    def test_timeout_submit_reflects_the_penalty_in_the_returned_score(self):
+        attempt = self._start_attempt()
+        attempt.deadline = timezone.now() - timedelta(minutes=1)
+        attempt.save(update_fields=["deadline"])
+
+        res = self.client.post(f"/api/v1/exam/attempts/{attempt.id}/submit")
+        self.assertEqual(res.status_code, 200)
+        data = res.json()["data"]
+        self.assertEqual(data["score"], 1)  # 2 correct minus the 1-point penalty
+        self.assertEqual(data["penalty_applied"], 1)
 
 
 class ActiveStudentRestrictionTests(TestCase):

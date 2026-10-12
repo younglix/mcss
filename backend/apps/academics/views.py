@@ -587,9 +587,10 @@ class ExamPublishView(APIView):
         exam.status = Exam.Status.PUBLISHED
         exam.save(update_fields=["status"])
         log(actor=request.user, action="academics.exam_published", target=exam, request=request)
-        # Fire performance-based class-arm reallocation for opted-in classes.
-        # The task itself filters: only the configured term-result exam type,
-        # only a 1st/2nd-term result (3rd term is promotion's job). Runs
+        # Fire the once-a-year class-arm banding pass for opted-in (Junior
+        # Secondary) classes. The task itself filters: only the configured
+        # term-result exam type, only the session's 3rd/final term — it
+        # produces Promotion-screen arm suggestions, nothing moves. Runs
         # eagerly (synchronously) when there's no Redis broker.
         from .tasks import compute_reallocations_for_exam
         compute_reallocations_for_exam.delay(str(exam.id), str(request.user.id))
@@ -1030,6 +1031,47 @@ class PromotionRecordsView(APIView):
         return success(data=PromotionRecordSerializer(qs, many=True).data)
 
 
+class PromotionSuggestionsView(APIView):
+    """The annual banding pass's suggested destination arm for each student
+    in `from_class_arm`'s class (current session) — the Promotion screen
+    pre-fills its own "New Class" choice from this. Behind promotion.view
+    rather than reallocation.view: it's read by whoever runs promotion.
+    data is null when there's no suggestion (class not banded, Basic-9 ->
+    SS-1, or the 3rd-term result isn't published yet)."""
+
+    permission_classes = [HasPermission("promotion.view")]
+
+    def get(self, request):
+        import uuid
+
+        from . import services
+
+        try:
+            arm_id = uuid.UUID(request.query_params.get("from_class_arm", ""))
+        except ValueError:
+            return failure(message="Pass a valid from_class_arm.", status=400)
+        arm = get_object_or_404(ClassArm.objects.select_related("school_class"), id=arm_id)
+        session = _current_session()
+        realloc = services.latest_promotion_suggestion(arm.school_class, session) if session else None
+        if realloc is None:
+            return success(data=None)
+        moves = realloc.moves.filter(student__class_arm=arm).select_related("to_arm")
+        return success(data={
+            "reallocation": str(realloc.id),
+            "target_class": str(realloc.target_class_id),
+            "target_class_name": realloc.target_class.name,
+            "source_exam_name": realloc.source_exam.name if realloc.source_exam else None,
+            "computed_at": realloc.computed_at,
+            "suggestions": {
+                str(m.student_id): {
+                    "to_arm": str(m.to_arm_id), "to_arm_label": str(m.to_arm),
+                    "average": m.term_average, "rank": m.rank,
+                }
+                for m in moves if m.to_arm_id
+            },
+        })
+
+
 class PromotionActionView(APIView):
     permission_classes = [HasPermission("promotion.action")]
 
@@ -1074,7 +1116,10 @@ class BandingConfigView(APIView):
         configs = {c.school_class_id: c for c in ClassBandingConfig.objects.select_related("school_class", "holding_arm")}
         rows = []
         for klass in SchoolClass.objects.order_by("level_order"):
-            cfg = configs.get(klass.id) or ClassBandingConfig.objects.create(school_class=klass)
+            # get_or_create, not create: two concurrent first loads after a
+            # class is added would otherwise both insert and one would 500
+            # on the one-config-per-class unique constraint.
+            cfg = configs.get(klass.id) or ClassBandingConfig.objects.get_or_create(school_class=klass)[0]
             rows.append(ClassBandingConfigSerializer(cfg).data)
         return success(data=rows)
 
@@ -1113,7 +1158,7 @@ class ReallocationsView(APIView):
 
     def get(self, request):
         qs = ClassReallocation.objects.select_related(
-            "school_class", "session", "term", "source_exam", "computed_by", "released_by", "applied_by",
+            "school_class", "target_class", "session", "term", "source_exam", "computed_by", "released_by", "applied_by",
         ).prefetch_related("moves")
         for param, field in (("school_class", "school_class_id"), ("session", "session_id"),
                              ("term", "term_id"), ("status", "status")):
@@ -1128,7 +1173,9 @@ class ReallocationDetailView(APIView):
 
     def get(self, request, reallocation_id):
         realloc = get_object_or_404(
-            ClassReallocation.objects.select_related("school_class__banding_config", "session", "term", "source_exam")
+            ClassReallocation.objects.select_related(
+                "school_class__banding_config", "target_class__banding_config", "session", "term", "source_exam",
+            )
             .prefetch_related("moves__student__user", "moves__from_arm", "moves__to_arm"),
             id=reallocation_id,
         )
@@ -1136,9 +1183,11 @@ class ReallocationDetailView(APIView):
 
 
 class ReallocationComputeView(APIView):
-    """Manual (re)compute — for administrative correction, or to band a
-    freshly promoted cohort (`kind=initial_banding`). The automatic path runs
-    off exam publish and needs no permission."""
+    """Manual (re)compute — for administrative correction, to band a
+    freshly promoted cohort (`kind=initial_banding`), or to rebuild the
+    annual Promotion-screen suggestion after a late score correction
+    (`kind=annual_promotion_banding`). The automatic path runs off exam
+    publish and needs no permission."""
 
     permission_classes = [HasPermission("reallocation.configure")]
 
@@ -1151,16 +1200,21 @@ class ReallocationComputeView(APIView):
         try:
             if v["kind"] == "initial_banding":
                 realloc = services.compute_initial_banding(v["school_class"], v["source_exam"], actor=request.user)
+            elif v["kind"] == "annual_promotion_banding":
+                realloc = services.compute_annual_promotion_banding(v["school_class"], v["source_exam"], actor=request.user)
             else:
                 realloc = services.compute_reallocation(v["school_class"], v["source_exam"], actor=request.user)
         except services.ReallocationError as e:
             return failure(message=str(e), status=400)
         if realloc is None:
-            return failure(
-                message="Nothing computed — the class isn't opted in, or this is a 3rd-term result "
-                        "(that hands off to promotion).",
-                status=400,
-            )
+            if v["kind"] == "annual_promotion_banding":
+                message = ("Nothing computed. An annual promotion suggestion needs banding switched on for both "
+                           "this class and the class above it (Junior Secondary only), and at least one student "
+                           "with results this session.")
+            else:
+                message = ("Nothing computed. Banding isn't switched on for this class (Junior Secondary only), "
+                           "or this is a 3rd-term result, which feeds the annual promotion suggestion instead.")
+            return failure(message=message, status=400)
         return success(message="Reallocation computed.", data=ClassReallocationDetailSerializer(realloc).data)
 
 

@@ -75,8 +75,13 @@ def start_attempt(exam, student):
 def grade_attempt(attempt, *, final_status):
     """Scores whatever's in attempt.answers as of now, applies the
     auto-submit penalty if this isn't a clean manual submit, and marks the
-    attempt done. Never shown to the student directly — release into
-    results is a separate, later step (see sync_scores_to_academic_exam)."""
+    attempt done. This raw CBE score (an objective, deterministic count —
+    nothing here is subject to teacher moderation) is shown to the student
+    immediately at submission (see AttemptSubmitView). The OFFICIAL
+    combined result (this score merged with CA1/CA2 into academics.ExamScore)
+    is a separate, later step that still needs a teacher's results.approve/
+    results.publish review before it reaches a report card — see
+    sync_scores_to_academic_exam."""
     from .models import Question
 
     correct_by_id = {

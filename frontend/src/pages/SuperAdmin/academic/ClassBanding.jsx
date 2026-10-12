@@ -12,6 +12,16 @@ const ENDPOINTS = { classes: '/config/classes', configs: '/academics/banding-con
 
 const STATUS_TONE = { pending: 'warning', released: 'secondary', applied: 'success', superseded: 'secondary' };
 
+/** Why a class can't be banded. Banding is Junior-Secondary-only (enforced
+ * server-side too); Senior Secondary arms are subject streams by school
+ * convention, placed by hand. */
+function ineligibleNote(config) {
+  if (config?.category === 'senior_secondary') {
+    return 'Senior Secondary arms are subject streams (A Science, B Arts, C Commercial), assigned by hand.';
+  }
+  return `${config?.category_label || 'This class'}: banding is for Junior Secondary classes only.`;
+}
+
 /** One class's row: enable/disable banding, pick its N_S holding arm, and
  * see/edit each arm's capacity. Arms are fetched lazily per row (only once
  * expanded) rather than all 14 classes' arms up front. */
@@ -20,6 +30,7 @@ function ClassRow({ klass, config, onConfigSaved }) {
   const [arms, setArms] = useState(null);
   const [armsError, setArmsError] = useState('');
   const [savingEnabled, setSavingEnabled] = useState(false);
+  const [toggleError, setToggleError] = useState('');
   const [holdingArmId, setHoldingArmId] = useState(config?.holding_arm || '');
   const [savingHolding, setSavingHolding] = useState(false);
   const [capacityDrafts, setCapacityDrafts] = useState({});
@@ -41,9 +52,12 @@ function ClassRow({ klass, config, onConfigSaved }) {
 
   const toggleEnabled = async () => {
     setSavingEnabled(true);
+    setToggleError('');
     try {
       await api.patch(`/academics/banding-config/${klass.id}`, { enabled: !config.enabled });
       onConfigSaved();
+    } catch (err) {
+      setToggleError(err instanceof ApiError ? (err.errors?.enabled?.[0] || err.message) : 'Could not update banding.');
     } finally {
       setSavingEnabled(false);
     }
@@ -76,11 +90,22 @@ function ClassRow({ klass, config, onConfigSaved }) {
         <button type="button" onClick={toggleExpanded} className="flex items-center gap-sm text-left">
           <span className="material-symbols-outlined text-on-surface-variant">{expanded ? 'expand_less' : 'expand_more'}</span>
           <h3 className="font-headline-md text-headline-sm text-on-surface">{klass.name}</h3>
+          {config?.category_label && (
+            <span className="font-label-sm text-label-sm text-on-surface-variant">{config.category_label}</span>
+          )}
         </button>
-        <button type="button" onClick={toggleEnabled} disabled={savingEnabled}>
-          <Badge tone={config?.enabled ? 'success' : 'secondary'}>{config?.enabled ? 'Banding On' : 'Banding Off'}</Badge>
-        </button>
+        {config?.eligible ? (
+          <button type="button" onClick={toggleEnabled} disabled={savingEnabled}>
+            <Badge tone={config.enabled ? 'success' : 'secondary'}>{config.enabled ? 'Banding On' : 'Banding Off'}</Badge>
+          </button>
+        ) : (
+          <Badge tone="secondary">Not Eligible</Badge>
+        )}
       </div>
+      {!config?.eligible && (
+        <p className="font-label-sm text-label-sm text-on-surface-variant">{ineligibleNote(config)}</p>
+      )}
+      {toggleError && <p className="font-label-sm text-label-sm text-error">{toggleError}</p>}
 
       {expanded && (
         <div className="space-y-md pt-md border-t border-outline/10">
@@ -159,17 +184,32 @@ function ReallocationReviewDrawer({ reallocationId, onClose, onChanged }) {
     }
   };
 
+  const isSuggestion = !!detail?.is_promotion_suggestion;
+  let title = 'Reallocation';
+  if (detail) {
+    title = isSuggestion
+      ? `${detail.school_class_name} to ${detail.target_class_name}: Promotion Suggestion`
+      : `${detail.school_class_name}: ${detail.term_name}`;
+  }
+
   return (
-    <Drawer open={!!reallocationId} onClose={onClose} title={detail ? `${detail.school_class_name}: ${detail.term_name}` : 'Reallocation'}>
+    <Drawer open={!!reallocationId} onClose={onClose} title={title}>
       {error && <p className="font-label-md text-label-md text-error mb-md">{error}</p>}
       {!detail ? (
         <p className="font-body-md text-body-md text-on-surface-variant">Loading…</p>
       ) : (
         <div className="space-y-lg">
           <div className="flex items-center gap-sm">
-            <Badge tone={STATUS_TONE[detail.status]}>{detail.status}</Badge>
-            <span className="font-label-sm text-label-sm text-on-surface-variant">{detail.move_count} move(s)</span>
+            <Badge tone={isSuggestion ? 'primary' : STATUS_TONE[detail.status]}>{isSuggestion ? 'suggestion' : detail.status}</Badge>
+            <span className="font-label-sm text-label-sm text-on-surface-variant">{detail.move_count} student(s)</span>
           </div>
+
+          {isSuggestion && (
+            <p className="font-body-md text-body-md text-on-surface-variant">
+              Ranked on each student&apos;s average across all three terms of {detail.session_name}. Nothing moves from here:
+              these arms pre-fill the New Class choice on the Promotion screen, where the actual move happens.
+            </p>
+          )}
 
           <div>
             <p className="font-label-md text-label-md text-on-surface mb-xs">Per-Band Summary</p>
@@ -177,26 +217,31 @@ function ReallocationReviewDrawer({ reallocationId, onClose, onChanged }) {
               {(detail.arm_summary || []).map((s) => (
                 <div key={s.arm_id} className="flex items-center justify-between font-label-sm text-label-sm">
                   <span>{s.arm}</span>
-                  <span className="text-on-surface-variant">{s.current_count} → {s.proposed_count}</span>
+                  <span className="text-on-surface-variant">
+                    {s.current_count == null ? `${s.proposed_count} student(s)` : `${s.current_count} → ${s.proposed_count}`}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
 
           <div>
-            <p className="font-label-md text-label-md text-on-surface mb-xs">Moves</p>
+            <p className="font-label-md text-label-md text-on-surface mb-xs">{isSuggestion ? 'Suggested Arms' : 'Moves'}</p>
             <div className="max-h-64 overflow-y-auto space-y-1">
               {detail.moves.map((m) => (
-                <div key={m.id} className="flex items-center justify-between font-label-sm text-label-sm border-b border-outline/10 py-1">
+                <div key={m.id} className="flex items-center justify-between gap-sm font-label-sm text-label-sm border-b border-outline/10 py-1">
                   <span>{m.student_name}</span>
-                  <span className="text-on-surface-variant">{m.from_arm_label || 'N/A'} → {m.to_arm_label}</span>
+                  <span className="text-on-surface-variant text-right">
+                    {m.from_arm_label || 'N/A'} → {m.to_arm_label}
+                    {m.term_average != null && ` (${Number(m.term_average).toFixed(1)}%)`}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="flex justify-end gap-sm pt-md border-t border-outline/10">
-            {detail.status === 'pending' && (
+            {detail.status === 'pending' && !isSuggestion && (
               <Button variant="primary" onClick={() => act('release')} disabled={acting}>
                 {acting ? 'Releasing…' : 'Release'}
               </Button>
@@ -218,7 +263,7 @@ export default function SuperAdminClassBanding() {
   const { data, loading, error, reload } = useDashboardData(endpoints);
   const [reviewingId, setReviewingId] = useState(null);
   const [computeOpen, setComputeOpen] = useState(false);
-  const [computeForm, setComputeForm] = useState({ school_class: '', source_exam: '', kind: 'reallocation' });
+  const [computeForm, setComputeForm] = useState({ school_class: '', source_exam: '', kind: 'annual_promotion_banding' });
   const [computing, setComputing] = useState(false);
   const [computeError, setComputeError] = useState('');
 
@@ -226,6 +271,7 @@ export default function SuperAdminClassBanding() {
   const configs = data?.configs || [];
   const reallocations = data?.reallocations || [];
   const configByClass = Object.fromEntries(configs.map((c) => [c.school_class, c]));
+  const bandedClasses = classes.filter((c) => configByClass[c.id]?.eligible && configByClass[c.id]?.enabled);
   const liveReallocations = reallocations.filter((r) => r.status === 'pending' || r.status === 'released');
 
   const handleCompute = async (e) => {
@@ -247,7 +293,7 @@ export default function SuperAdminClassBanding() {
     <DashboardPageShell
       pageTitle="Class Arm Banding"
       title="Class Arm Banding"
-      subtitle="Performance-based A/B/C arm reallocation. New students start in a class's N_S arm and get placed into a band once they have a term average; turn banding on per class below."
+      subtitle="Performance-based A/B/C arms, for Junior Secondary classes only. Once a year, when the 3rd-term result is published, each class is ranked on its students' average across all three terms, and that ranking pre-fills their arm in the next class on the Promotion screen. New students wait in the N_S arm until then."
       loading={loading}
       error={error}
       onReload={reload}
@@ -268,7 +314,7 @@ export default function SuperAdminClassBanding() {
           </div>
 
           <div>
-            <h2 className="font-headline-md text-headline-md text-primary mb-md">Pending &amp; Released Reallocations</h2>
+            <h2 className="font-headline-md text-headline-md text-primary mb-md">Promotion Suggestions &amp; Reallocations</h2>
             {liveReallocations.length === 0 ? (
               <Card padding="lg"><EmptyState icon="sync_alt" text="Nothing awaiting review right now." /></Card>
             ) : (
@@ -276,11 +322,21 @@ export default function SuperAdminClassBanding() {
                 {liveReallocations.map((r) => (
                   <Card key={r.id} padding="lg" className="flex items-center justify-between flex-wrap gap-sm">
                     <div>
-                      <p className="font-label-md text-label-md font-bold text-on-surface">{r.school_class_name} · {r.term_name} ({r.session_name})</p>
-                      <p className="font-label-sm text-label-sm text-on-surface-variant">{r.move_count} move(s), from {r.source_exam_name || 'manual compute'}</p>
+                      <p className="font-label-md text-label-md font-bold text-on-surface">
+                        {r.is_promotion_suggestion
+                          ? `${r.school_class_name} to ${r.target_class_name} (${r.session_name})`
+                          : `${r.school_class_name} · ${r.term_name} (${r.session_name})`}
+                      </p>
+                      <p className="font-label-sm text-label-sm text-on-surface-variant">
+                        {r.is_promotion_suggestion
+                          ? `${r.move_count} student(s) ranked on the full year, pre-filled on the Promotion screen`
+                          : `${r.move_count} move(s), from ${r.source_exam_name || 'manual compute'}`}
+                      </p>
                     </div>
                     <div className="flex items-center gap-sm">
-                      <Badge tone={STATUS_TONE[r.status]}>{r.status}</Badge>
+                      <Badge tone={r.is_promotion_suggestion ? 'primary' : STATUS_TONE[r.status]}>
+                        {r.is_promotion_suggestion ? 'suggestion' : r.status}
+                      </Badge>
                       <Button variant="ghost" size="sm" onClick={() => setReviewingId(r.id)}>Review</Button>
                     </div>
                   </Card>
@@ -303,8 +359,11 @@ export default function SuperAdminClassBanding() {
               onChange={(e) => setComputeForm((prev) => ({ ...prev, school_class: e.target.value }))} required
             >
               <option value="" disabled>Select…</option>
-              {classes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {bandedClasses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
+            {bandedClasses.length === 0 && (
+              <p className="font-label-sm text-label-sm text-on-surface-variant mt-1">Turn banding on for a Junior Secondary class first.</p>
+            )}
           </div>
           <div>
             <label className="font-label-md text-label-md text-on-surface mb-xs block">Source Exam</label>
@@ -322,9 +381,16 @@ export default function SuperAdminClassBanding() {
               className="mcss-field w-full px-md" value={computeForm.kind}
               onChange={(e) => setComputeForm((prev) => ({ ...prev, kind: e.target.value }))}
             >
-              <option value="reallocation">Reallocation (rerank + N_S absorption)</option>
-              <option value="initial_banding">Initial Banding (cold start / promoted cohort)</option>
+              <option value="annual_promotion_banding">Annual Promotion Suggestion (3-term average)</option>
+              <option value="reallocation">Mid-Year Reallocation (manual correction only)</option>
+              <option value="initial_banding">Initial Banding (cold start, within this class)</option>
             </select>
+            {computeForm.kind === 'annual_promotion_banding' && (
+              <p className="font-label-sm text-label-sm text-on-surface-variant mt-1">
+                Pick the 3rd-term exam. Earlier terms&apos; published results are included automatically. This rebuilds the
+                arms pre-filled on the Promotion screen; it runs on its own when the 3rd-term result is published.
+              </p>
+            )}
           </div>
           <div className="flex justify-end gap-sm pt-md border-t border-outline/10">
             <Button type="button" variant="ghost" onClick={() => setComputeOpen(false)} disabled={computing}>Cancel</Button>
