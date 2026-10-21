@@ -24,8 +24,17 @@ REPO_KEYS_URL=https://github.com/younglix/mcss/settings/keys/new
     || die "No export in $EXPORT_DIR. Unpack it first: tar -xzf /root/mcss-export.tar.gz -C /root"
 # shellcheck disable=SC1091
 . /etc/os-release
-[ "${ID:-}" = ubuntu ] || die "This script is written for Ubuntu (this is ${PRETTY_NAME:-unknown})."
-[ "${VERSION_ID:-}" = "24.04" ] || warn "Written for Ubuntu 24.04; this is $PRETTY_NAME. Continuing anyway."
+# The PostgreSQL version each supported system ships with.
+case "${ID:-}-${VERSION_ID:-}" in
+    ubuntu-24.04) DISTRO_PG=16 ;;
+    debian-12)    DISTRO_PG=15 ;;
+    *) die "This script supports Ubuntu 24.04 and Debian 12 (this server runs ${PRETTY_NAME:-an unknown system})." ;;
+esac
+# C.UTF-8 exists on every system. Without this, a language setting forwarded
+# from your computer that isn't installed here makes apt and PostgreSQL's
+# setup complain, and the database cluster could end up without UTF-8.
+export LANG=C.UTF-8 LC_ALL=C.UTF-8
+unset LANGUAGE
 
 PUBLIC_HOST=${PUBLIC_HOST:-$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i = 1; i < NF; i++) if ($i == "src") print $(i + 1)}')}
 [ -n "$PUBLIC_HOST" ] || die "Couldn't detect this server's IP. Re-run as: PUBLIC_HOST=<ip> bash $0 $EXPORT_DIR"
@@ -36,14 +45,14 @@ say "1/10  Installing system packages (a few minutes)"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -q
 apt-get install -y -q git curl ca-certificates openssl build-essential pkg-config \
-    python3 python3-venv python3-dev libpq-dev libcairo2-dev \
+    python3 python3-venv python3-dev libpq-dev libcairo2-dev sudo cron \
     redis-server nginx ufw rclone certbot python3-certbot-nginx
 # PostgreSQL: at least the version the export was made with, or pg_restore
-# can't read the dump. Ubuntu 24.04 ships 16; newer versions come from the
+# can't read the dump. Versions newer than this system ships come from the
 # PostgreSQL project's own apt repository.
 DUMP_PG=$(dump_pg_major "$EXPORT_DIR/db.dump")
-PG_MAJOR=16
-if [ -n "$DUMP_PG" ] && [ "$DUMP_PG" -gt 16 ]; then
+PG_MAJOR=$DISTRO_PG
+if [ -n "$DUMP_PG" ] && [ "$DUMP_PG" -gt "$DISTRO_PG" ]; then
     PG_MAJOR=$DUMP_PG
     PGDG_KEY=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
     install -d "$(dirname "$PGDG_KEY")"
@@ -61,7 +70,8 @@ fi
 systemctl enable --now postgresql redis-server nginx >/dev/null
 
 say "2/10  Firewall: SSH, HTTP and HTTPS only"
-ufw allow OpenSSH >/dev/null
+# SSH by port number: that works whether or not an "OpenSSH" app profile exists.
+ufw allow 22/tcp >/dev/null
 ufw allow 80/tcp >/dev/null
 ufw allow 443/tcp >/dev/null
 ufw --force enable >/dev/null
@@ -124,7 +134,7 @@ else
     sudo -u postgres psql -qc "CREATE ROLE $APP_USER WITH LOGIN PASSWORD '$DB_PASS'"
 fi
 sudo -u postgres dropdb --if-exists "$DB_NAME"
-sudo -u postgres createdb -O "$APP_USER" "$DB_NAME"
+sudo -u postgres createdb -O "$APP_USER" -E UTF8 -T template0 "$DB_NAME"
 set +e
 # Root reads the dump (postgres can't see /root) and feeds it to pg_restore.
 # shellcheck disable=SC2024

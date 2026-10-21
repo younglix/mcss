@@ -93,7 +93,8 @@ sudo scp /root/mcss-export.tar.gz root@169.58.243.48:/root/
 
 ## 4. Set up the Contabo server
 
-Log in to Contabo (`ssh root@169.58.243.48`) and run:
+The server can run Ubuntu 24.04 or Debian 12. Log in to Contabo
+(`ssh root@169.58.243.48`) and run:
 
 ```bash
 tar -xzf /root/mcss-export.tar.gz -C /root
