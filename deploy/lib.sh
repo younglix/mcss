@@ -69,3 +69,45 @@ manage() {
     (cd "$APP_DIR/backend" && sudo -u "$APP_USER" -H env DJANGO_SETTINGS_MODULE=config.settings.prod \
         "$APP_DIR/backend/.venv/bin/python" manage.py "$@")
 }
+
+# dump_pg_major FILE  -> the PostgreSQL major version (e.g. 17) needed to
+# restore a custom-format pg_dump file: the newer of the server it was dumped
+# from and the pg_dump that wrote it. Prints nothing if the header can't be
+# read. It's read straight from the file, because an older pg_restore can't
+# open a newer dump at all ("unsupported version (1.16) in file header").
+dump_pg_major() {
+    python3 - "$1" <<'PY'
+import re, sys
+try:
+    f = open(sys.argv[1], "rb")
+    if f.read(5) != b"PGDMP":
+        sys.exit(0)
+    vmaj, vmin, _vrev, int_size, _off_size, _fmt = f.read(6)
+    version = (vmaj, vmin)
+
+    def read_int():  # a sign byte, then int_size bytes, least significant first
+        sign = f.read(1)[0]
+        value = int.from_bytes(f.read(int_size), "little")
+        return -value if sign else value
+
+    def read_str():
+        n = read_int()
+        return f.read(n) if n > 0 else b""
+
+    if version >= (1, 15):
+        f.read(1)          # compression algorithm
+    else:
+        read_int()         # compression level
+    for _ in range(7):     # creation time
+        read_int()
+    read_str()             # database name
+    if version >= (1, 10):
+        # The server's version, then pg_dump's, e.g. b"17.2" or b"16.4 (Ubuntu ...)"
+        majors = [re.match(rb"(\d+)", read_str()) for _ in range(2)]
+        majors = [int(m.group(1)) for m in majors if m]
+        if majors:
+            print(max(majors))
+except Exception:
+    pass
+PY
+}

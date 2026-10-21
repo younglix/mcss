@@ -24,9 +24,9 @@ finishes, usually 20 to 40 minutes, so pick a quiet time such as an evening.
    AWS server's `~/.ssh/authorized_keys` once the move is done. You won't need
    any of them.
 2. **Change the Contabo root password** the first time you log in (step 2).
-3. Make sure the latest code has deployed to the AWS server: the run for the
-   commit that added this file should be green under
-   https://github.com/younglix/mcss/actions. Step 3 uses scripts from that commit.
+3. Make sure the latest code has deployed to the AWS server: the newest run
+   under https://github.com/younglix/mcss/actions should be green. Step 3 packs
+   up the scripts that are on that server, so they need to be current.
 
 ## 1. Create the R2 bucket (Cloudflare dashboard)
 

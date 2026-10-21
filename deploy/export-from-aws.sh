@@ -1,5 +1,5 @@
 #!/bin/bash
-# STEP 1 of the move, run ON THE OLD (AWS) SERVER:
+# STEP 3 of the move (deploy/README.md), run ON THE OLD (AWS) SERVER:
 #
 #   sudo bash /srv/mcss/deploy/export-from-aws.sh               # real move: stops the app first
 #   sudo bash /srv/mcss/deploy/export-from-aws.sh --keep-running # practice run: app stays up
@@ -27,6 +27,11 @@ DB_URL=$(grep -E '^MCSS_DATABASE_URL=' "$ENV_FILE" | head -1 | cut -d= -f2- | se
 [ -n "$DB_URL" ] || { echo "MCSS_DATABASE_URL isn't set in $ENV_FILE."; exit 1; }
 PG_URL=$(echo "$DB_URL" | sed -E 's#^[a-z]+://#postgresql://#')
 
+# Prove the dump will work BEFORE stopping anything: this catches a wrong
+# password or a pg_dump older than the database server while the site is up.
+echo "--- checking the database can be dumped ---"
+pg_dump --dbname="$PG_URL" --schema-only --file=/dev/null
+
 UNITS="mcss-daphne mcss-celery-worker mcss-celery-beat"
 if [ "$KEEP_RUNNING" -eq 0 ]; then
     echo "--- stopping the app so no new data is written during the move ---"
@@ -44,6 +49,7 @@ if [ "$KEEP_RUNNING" -eq 0 ]; then
     systemctl daemon-reload
     echo "    The app here is now stopped and won't restart. To undo (only if the move fails):"
     echo "    sudo rm /etc/systemd/system/mcss-*.service.d/moved.conf && sudo systemctl daemon-reload && sudo systemctl start $UNITS"
+    trap 'echo; echo "The export FAILED and the app here is still stopped. Fix the error above and run this again, or bring the app back with:"; echo "    sudo rm /etc/systemd/system/mcss-*.service.d/moved.conf && sudo systemctl daemon-reload && sudo systemctl start $UNITS"' ERR
 else
     echo "--- practice run: the app keeps running; data written after this won't be in the copy ---"
 fi
@@ -82,5 +88,5 @@ Export complete: $OUT ($(du -h "$OUT" | cut -f1))
 Next, copy it to the new server (you'll be asked for the new server's root password):
   scp $OUT root@169.58.243.48:/root/
 
-Then continue with step 3 in deploy/README.md on the new server.
+Then continue with step 4 in deploy/README.md on the new server.
 EOF

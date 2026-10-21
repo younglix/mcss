@@ -1,6 +1,6 @@
 #!/bin/bash
-# STEP 3 of the move, run ON THE NEW (CONTABO) SERVER as root, after
-# unpacking the export from step 1:
+# STEP 4 of the move (deploy/README.md), run ON THE NEW (CONTABO) SERVER as
+# root, after unpacking the export from step 3:
 #
 #   tar -xzf /root/mcss-export.tar.gz -C /root
 #   bash /root/mcss-export/deploy-kit/setup-server.sh /root/mcss-export
@@ -13,7 +13,9 @@ set -euo pipefail
 KIT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 . "$KIT_DIR/lib.sh"
 
-EXPORT_DIR=${1:-/root/mcss-export}
+EXPORT_DIR=$(realpath -m "${1:-/root/mcss-export}")
+# Work from / so `sudo -u postgres ...` doesn't warn that it can't enter /root.
+cd /
 REPO=git@github.com:younglix/mcss.git
 REPO_KEYS_URL=https://github.com/younglix/mcss/settings/keys/new
 
@@ -35,7 +37,23 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -q
 apt-get install -y -q git curl ca-certificates openssl build-essential pkg-config \
     python3 python3-venv python3-dev libpq-dev libcairo2-dev \
-    postgresql redis-server nginx ufw rclone certbot python3-certbot-nginx
+    redis-server nginx ufw rclone certbot python3-certbot-nginx
+# PostgreSQL: at least the version the export was made with, or pg_restore
+# can't read the dump. Ubuntu 24.04 ships 16; newer versions come from the
+# PostgreSQL project's own apt repository.
+DUMP_PG=$(dump_pg_major "$EXPORT_DIR/db.dump")
+PG_MAJOR=16
+if [ -n "$DUMP_PG" ] && [ "$DUMP_PG" -gt 16 ]; then
+    PG_MAJOR=$DUMP_PG
+    PGDG_KEY=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+    install -d "$(dirname "$PGDG_KEY")"
+    curl -fsSL -o "$PGDG_KEY" https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    PGDG_REPO="https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main"
+    echo "deb [signed-by=$PGDG_KEY] $PGDG_REPO" > /etc/apt/sources.list.d/pgdg.list
+    apt-get update -q
+fi
+echo "The export was made with PostgreSQL ${DUMP_PG:-(version not recorded)}; installing PostgreSQL $PG_MAJOR."
+apt-get install -y -q "postgresql-$PG_MAJOR"
 if ! command -v node >/dev/null || [ "$(node -p 'process.versions.node.split(".")[0]')" -lt 22 ]; then
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
     apt-get install -y -q nodejs
@@ -114,7 +132,7 @@ sudo -u postgres pg_restore --no-owner --role="$APP_USER" --dbname="$DB_NAME" < 
 RESTORE_RC=$?
 set -e
 USERS=$(sudo -u postgres psql -tAd "$DB_NAME" -c "SELECT count(*) FROM accounts_user" 2>/dev/null || echo 0)
-[ "${USERS:-0}" -gt 0 ] || die "The database restore failed (no user accounts found). See the messages above."
+[ "${USERS:-0}" -gt 0 ] || die "The database restore failed (no user accounts found). See the messages above, and send me their text if they don't make sense."
 [ "$RESTORE_RC" -eq 0 ] || warn "pg_restore printed warnings above, but the data is there ($USERS user accounts), so continuing."
 echo "Restored: $USERS user accounts."
 
@@ -179,11 +197,15 @@ chmod 600 "$AUTH"
 
 # ---------------------------------------------------------------------------
 say "Checking the site"
-sleep 3
+# Daphne takes a few seconds to load Django after the deploy restarts it.
+for _ in $(seq 1 30); do
+    HEALTH=$(curl -s -o /dev/null -w '%{http_code}' -H "Host: $PUBLIC_HOST" http://127.0.0.1/api/v1/health || true)
+    [ "$HEALTH" = 200 ] && break
+    sleep 2
+done
 for unit in mcss-daphne mcss-celery-worker mcss-celery-beat nginx postgresql redis-server; do
     printf '  %-20s %s\n' "$unit" "$(systemctl is-active "$unit")"
 done
-HEALTH=$(curl -s -o /dev/null -w '%{http_code}' -H "Host: $PUBLIC_HOST" http://127.0.0.1/api/v1/health || true)
 HOME_PAGE=$(curl -s -o /dev/null -w '%{http_code}' -H "Host: $PUBLIC_HOST" http://127.0.0.1/ || true)
 echo "  API health check     HTTP $HEALTH"
 echo "  Home page            HTTP $HOME_PAGE"
@@ -209,5 +231,5 @@ $(cat "$ACTIONS_KEY")
 Then delete it from this server:   rm $ACTIONS_KEY $ACTIONS_KEY.pub
 Keep that key private. Don't paste it into any chat or email.
 
-Then carry on with deploy/README.md, step 4.
+Then carry on with deploy/README.md, step 6.
 EOF

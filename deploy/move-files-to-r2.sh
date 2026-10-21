@@ -42,7 +42,7 @@ fi
 say "Cloudflare R2 details"
 if [ -z "${R2_ACCOUNT_ID:-}" ] || [ -z "${R2_BUCKET:-}" ] || [ -z "${R2_ACCESS_KEY_ID:-}" ] \
     || [ -z "${R2_SECRET_ACCESS_KEY:-}" ] || [ -z "${R2_PUBLIC_URL:-}" ]; then
-    echo "Type in the values you noted in deploy/README.md step 2."
+    echo "Type in the values you noted in deploy/README.md step 1."
     echo "They stay on this server. Don't paste them into any chat."
     [ -n "${R2_ACCOUNT_ID:-}" ] || read -rp "Cloudflare Account ID: " R2_ACCOUNT_ID
     [ -n "${R2_BUCKET:-}" ] || read -rp "R2 bucket name: " R2_BUCKET
@@ -74,7 +74,7 @@ if curl -fsS "https://$R2_HOST/$PROBE" | grep -q ok; then
     echo "R2 keys and public URL both work."
 else
     rclone deletefile "r2:$R2_BUCKET/$PROBE" || true
-    die "Uploaded fine, but https://$R2_HOST/$PROBE isn't publicly readable. Turn on the bucket's public access (README step 2) and check the public URL."
+    die "Uploaded fine, but https://$R2_HOST/$PROBE isn't publicly readable. Turn on the bucket's public access (README step 1) and check the public URL."
 fi
 rclone deletefile "r2:$R2_BUCKET/$PROBE" || true
 
