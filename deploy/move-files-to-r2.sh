@@ -63,6 +63,10 @@ export RCLONE_CONFIG_R2_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID"
 export RCLONE_CONFIG_R2_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
 export RCLONE_CONFIG_R2_ENDPOINT="$R2_ENDPOINT"
 export RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true   # the key can't (and needn't) create buckets
+# Ubuntu 24.04's rclone (1.60) re-reads each upload with a versionId, which R2
+# answers with "501 Not Implemented" even though the upload worked. Skip that
+# re-read: the copy is still verified by `rclone check` below.
+export RCLONE_CONFIG_R2_NO_HEAD=true
 
 # One test file proves the keys can write AND that the public URL serves it.
 say "Checking the R2 keys and public access"
