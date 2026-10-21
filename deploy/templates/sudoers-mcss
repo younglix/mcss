@@ -1,0 +1,4 @@
+# Installed to /etc/sudoers.d/mcss by deploy/setup-server.sh.
+# Lets the app user restart its own services at the end of a deploy
+# (scripts/run-deploy.sh), and nothing else.
+mcss ALL=(root) NOPASSWD: /usr/bin/systemctl restart mcss-daphne mcss-celery-worker mcss-celery-beat, /usr/bin/systemctl reload nginx

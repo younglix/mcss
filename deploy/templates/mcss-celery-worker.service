@@ -1,0 +1,16 @@
+[Unit]
+Description=Mount Carmel ERP - Celery worker (background jobs)
+After=network.target postgresql.service redis-server.service
+Wants=postgresql.service redis-server.service
+
+[Service]
+User=mcss
+Group=mcss
+WorkingDirectory=/srv/mcss/backend
+Environment=DJANGO_SETTINGS_MODULE=config.settings.prod
+ExecStart=/srv/mcss/backend/.venv/bin/celery -A config worker -l info --concurrency 2
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

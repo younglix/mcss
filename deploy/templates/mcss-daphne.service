@@ -1,0 +1,17 @@
+[Unit]
+Description=Mount Carmel ERP - Daphne (HTTP + WebSocket)
+After=network.target postgresql.service redis-server.service
+Wants=postgresql.service redis-server.service
+
+[Service]
+User=mcss
+Group=mcss
+WorkingDirectory=/srv/mcss/backend
+Environment=DJANGO_SETTINGS_MODULE=config.settings.prod
+# Loopback only: nginx is the public entry point.
+ExecStart=/srv/mcss/backend/.venv/bin/daphne -b 127.0.0.1 -p 8000 --proxy-headers config.asgi:application
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

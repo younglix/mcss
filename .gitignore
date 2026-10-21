@@ -14,3 +14,7 @@ Thumbs.db
 
 # Real student/staff data extracted from the legacy school system — never commit PII
 data_migration/
+
+# Runtime files on the server (deploy/setup-server.sh)
+backend/celerybeat-schedule*
+/deploy.sh

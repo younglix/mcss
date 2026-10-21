@@ -226,9 +226,16 @@ AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", default="")
 AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", default="")
 AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME", default="")
 AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default="eu-north-1")
-# Only for S3-compatible non-AWS providers (e.g. Cloudflare R2) — leave
-# unset to talk to real AWS S3 directly.
+# Only for S3-compatible non-AWS providers (e.g. Cloudflare R2:
+# https://<ACCOUNT_ID>.r2.cloudflarestorage.com, with AWS_S3_REGION_NAME=auto)
+# — leave unset to talk to real AWS S3 directly.
 AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", default="") or None
+# The public host files are served from, when that differs from the API
+# endpoint above. R2 never serves public files from its API endpoint; they're
+# read from the bucket's r2.dev URL or a custom domain (e.g.
+# "pub-xxxx.r2.dev" or "files.example.com", no scheme). Unset = the
+# provider's own URL (what plain AWS S3 uses).
+AWS_S3_CUSTOM_DOMAIN = env("AWS_S3_CUSTOM_DOMAIN", default="") or None
 # Every bucket created since April 2023 defaults to ACLs disabled ("Bucket
 # owner enforced" Object Ownership) — sending an object ACL on upload would
 # just fail with AccessControlListNotSupported. Public read is granted via

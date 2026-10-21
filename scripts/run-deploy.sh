@@ -5,6 +5,9 @@
 # (it has to exist before there's anything to pull).
 set -euo pipefail
 
+# manage.py falls back to config.settings.dev when this is unset.
+export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.prod}"
+
 cd /srv/mcss
 
 echo "--- backend ---"

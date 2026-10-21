@@ -1,0 +1,29 @@
+#!/bin/bash
+# Installed to /usr/local/bin/mcss-deploy by deploy/setup-server.sh.
+#
+# Two ways in, same result:
+#   - GitHub Actions on every push to main: its SSH key's authorized_keys
+#     entry is forced to run this command, whatever the workflow sends.
+#   - By hand: `sudo mcss-deploy` (or the familiar `sudo /srv/mcss/deploy.sh`,
+#     a symlink to this file).
+#
+# Fetches origin/main and hands over to scripts/run-deploy.sh, which lives in
+# git so the deploy steps themselves can evolve through normal commits.
+set -euo pipefail
+
+APP_DIR=/srv/mcss
+APP_USER=mcss
+
+# Always run as the app user: the checkout is theirs, and git refuses to work
+# in a repository owned by someone else.
+if [ "$(id -un)" != "$APP_USER" ]; then
+    exec sudo -u "$APP_USER" -H "$0" "$@"
+fi
+
+export DJANGO_SETTINGS_MODULE=config.settings.prod
+cd "$APP_DIR"
+echo "--- fetching origin/main ---"
+git fetch --quiet origin main
+git reset --hard origin/main
+echo "Now at $(git log -1 --format='%h %s')"
+exec bash scripts/run-deploy.sh

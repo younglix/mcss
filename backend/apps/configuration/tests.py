@@ -142,3 +142,94 @@ class PublicBrandingLoginSettingsTests(TestCase):
         res = self.client.get("/api/v1/settings/public-branding")
         self.assertEqual(res.json()["data"]["login_transition_style"], "zoom_in")
         self.assertEqual(res.json()["data"]["login_transition_duration"], 8)
+
+
+class RewriteFileUrlsTests(TestCase):
+    """manage.py rewrite_file_urls: uploads are saved as ABSOLUTE URLs in
+    plain text/JSON columns, so moving the bucket (AWS S3 -> Cloudflare R2)
+    leaves every saved link on the old host until this rewrites them."""
+
+    OLD = "https://mcss-assets.s3.eu-north-1.amazonaws.com/"
+    NEW = "https://pub-abc123.r2.dev/"
+
+    def setUp(self):
+        from apps.audit.models import AuditLog
+
+        from .models import SchoolProfile
+
+        self.profile = SchoolProfile.objects.create(
+            name="Mount Carmel", logo=f"{self.OLD}branding/logo.png", favicon="/favicon.ico",
+            address=f"See {self.OLD}branding/map.png for directions",
+        )
+        self.deleted = SchoolProfile.objects.create(name="Old profile", logo=f"{self.OLD}branding/old.png")
+        self.deleted.soft_delete()
+        self.setting = SystemSetting.objects.create(
+            key="branding.login_logo", group="branding",
+            value={"url": f"{self.OLD}branding/login.png", "alt": "Logo"},
+        )
+        self.path_style = SystemSetting.objects.create(
+            key="branding.legacy", group="branding",
+            value="https://s3.eu-north-1.amazonaws.com/mcss-assets/branding/legacy.png",
+        )
+        self.audit = AuditLog.objects.create(action="config.updated", changes={"logo": f"{self.OLD}branding/logo.png"})
+
+    def _run(self, *args):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        out = StringIO()
+        call_command("rewrite_file_urls", *args, stdout=out)
+        return out.getvalue()
+
+    def test_scan_lists_the_prefixes_in_use(self):
+        out = self._run("--scan")
+        self.assertIn(self.OLD, out)
+        self.assertIn("https://s3.eu-north-1.amazonaws.com/mcss-assets/", out)  # path-style keeps the bucket
+        self.assertNotIn("/favicon.ico", out)
+
+    def test_dry_run_changes_nothing(self):
+        out = self._run("--from", self.OLD, "--to", self.NEW)
+        self.assertIn("Dry run only", out)
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.logo, f"{self.OLD}branding/logo.png")
+
+    def test_apply_rewrites_text_and_json_and_soft_deleted_rows(self):
+        self._run("--from", self.OLD, "--to", self.NEW, "--apply")
+        self.profile.refresh_from_db()
+        self.deleted.refresh_from_db()
+        self.setting.refresh_from_db()
+        self.assertEqual(self.profile.logo, f"{self.NEW}branding/logo.png")
+        self.assertEqual(self.profile.address, f"See {self.NEW}branding/map.png for directions")
+        self.assertEqual(self.profile.favicon, "/favicon.ico")
+        self.assertEqual(self.deleted.logo, f"{self.NEW}branding/old.png")
+        self.assertEqual(self.setting.value, {"url": f"{self.NEW}branding/login.png", "alt": "Logo"})
+
+    def test_from_aws_picks_up_every_s3_prefix(self):
+        self._run("--from-aws", "--to", self.NEW, "--apply")
+        self.path_style.refresh_from_db()
+        self.assertEqual(self.path_style.value, f"{self.NEW}branding/legacy.png")
+        self.assertNotIn("amazonaws.com", self._run("--scan"))  # audit rows aren't scanned either
+
+    def test_bucket_filter_leaves_other_aws_links_alone(self):
+        other = SystemSetting.objects.create(
+            key="cms.partner_banner", group="cms", value="https://someone-else.s3.amazonaws.com/banner.png",
+        )
+        self._run("--from-aws", "--bucket", "mcss-assets", "--to", self.NEW, "--apply")
+        other.refresh_from_db()
+        self.path_style.refresh_from_db()
+        self.profile.refresh_from_db()
+        self.assertEqual(other.value, "https://someone-else.s3.amazonaws.com/banner.png")
+        self.assertEqual(self.path_style.value, f"{self.NEW}branding/legacy.png")  # path-style, same bucket
+        self.assertEqual(self.profile.logo, f"{self.NEW}branding/logo.png")
+
+    def test_audit_history_is_left_alone(self):
+        self._run("--from", self.OLD, "--to", self.NEW, "--apply")
+        self.audit.refresh_from_db()
+        self.assertEqual(self.audit.changes, {"logo": f"{self.OLD}branding/logo.png"})
+
+    def test_needs_a_target(self):
+        from django.core.management.base import CommandError
+
+        with self.assertRaises(CommandError):
+            self._run("--from", self.OLD)

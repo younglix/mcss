@@ -1,0 +1,18 @@
+#!/bin/bash
+# Installed to /usr/local/bin/mcss-backup by deploy/setup-server.sh and run
+# nightly from /etc/cron.d/mcss-backup. Keeps the last 14 days of database
+# dumps in /var/backups/mcss. These stay ON this server, so also copy them
+# somewhere else from time to time (see deploy/README.md).
+set -euo pipefail
+
+DEST=/var/backups/mcss
+KEEP_DAYS=14
+mkdir -p "$DEST"
+chmod 700 "$DEST"
+
+STAMP=$(date +%Y-%m-%d_%H%M)
+# pg_dump runs as postgres; root (this script) writes the root-only file.
+# shellcheck disable=SC2024
+sudo -u postgres pg_dump --format=custom mcss_erp > "$DEST/mcss_erp_$STAMP.dump.partial"
+mv "$DEST/mcss_erp_$STAMP.dump.partial" "$DEST/mcss_erp_$STAMP.dump"
+find "$DEST" -name 'mcss_erp_*.dump' -mtime +"$KEEP_DAYS" -delete

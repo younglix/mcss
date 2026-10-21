@@ -1,0 +1,16 @@
+[Unit]
+Description=Mount Carmel ERP - Celery beat (scheduled jobs)
+After=network.target redis-server.service
+Wants=redis-server.service
+
+[Service]
+User=mcss
+Group=mcss
+WorkingDirectory=/srv/mcss/backend
+Environment=DJANGO_SETTINGS_MODULE=config.settings.prod
+ExecStart=/srv/mcss/backend/.venv/bin/celery -A config beat -l info --schedule /srv/mcss/backend/celerybeat-schedule
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
